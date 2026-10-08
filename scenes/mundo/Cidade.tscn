@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d1dgwf3vbiqkw" path="res://scripts/jogador/Jogador.gd" id="1_mtbfa"]
 [ext_resource type="Script" uid="uid://dqti13wid6dwe" path="res://scripts/camera/CameraFollow.gd" id="1_ocx82"]
+[ext_resource type="Script" uid="uid://cv6jl8et5inbi" path="res://scripts/cycle/DayNightCycle.gd" id="3_st4sy"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -125,3 +126,8 @@ mesh = SubResource("CapsuleMesh_t2dwb")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Jogador" unique_id=1026956094]
 shape = SubResource("CapsuleShape3D_t2dwb")
+
+[node name="DayNightCycle" type="Node" parent="." unique_id=380405983 node_paths=PackedStringArray("sun", "world_environment")]
+script = ExtResource("3_st4sy")
+sun = NodePath("../DirectionalLight3D")
+world_environment = NodePath("../WorldEnvironment")
