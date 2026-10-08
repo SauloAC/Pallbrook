@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cerldkexjome5"]
 
 [ext_resource type="Script" uid="uid://d1dgwf3vbiqkw" path="res://scripts/jogador/Jogador.gd" id="1_mtbfa"]
+[ext_resource type="Script" uid="uid://dqti13wid6dwe" path="res://scripts/camera/CameraFollow.gd" id="1_ocx82"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -54,11 +55,13 @@ environment = SubResource("Environment_ocx82")
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
 shadow_enabled = true
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1656558175]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1656558175 node_paths=PackedStringArray("target")]
 transform = Transform3D(0.70710677, -0.35355338, 0.6123724, 0, 0.8660254, 0.5, -0.70710677, -0.35355338, 0.6123724, 10, 8.2, 10)
 projection = 1
 current = true
-size = 20.0
+size = 13.0
+script = ExtResource("1_ocx82")
+target = NodePath("../Jogador")
 
 [node name="Chao" type="MeshInstance3D" parent="." unique_id=1149399866]
 mesh = SubResource("PlaneMesh_t2dwb")
