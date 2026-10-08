@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://cerldkexjome5"]
 
+[ext_resource type="Script" uid="uid://d1dgwf3vbiqkw" path="res://scripts/jogador/Jogador.gd" id="1_mtbfa"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -15,11 +17,33 @@ glow_enabled = true
 [sub_resource type="PlaneMesh" id="PlaneMesh_t2dwb"]
 size = Vector2(30, 30)
 
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_ocx82"]
+data = PackedVector3Array(15, 0, 15, -15, 0, 15, 15, 0, -15, -15, 0, 15, -15, 0, -15, 15, 0, -15)
+
 [sub_resource type="BoxMesh" id="BoxMesh_t2dwb"]
+size = Vector3(4, 3, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_st4sy"]
+size = Vector3(4, 3, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qthrd"]
+size = Vector3(4, 3, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o5pq4"]
+size = Vector3(4, 3, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_73egf"]
 size = Vector3(4, 3, 4)
 
 [sub_resource type="BoxMesh" id="BoxMesh_st4sy"]
 size = Vector3(4, 6, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gq2ka"]
+size = Vector3(4, 6, 4)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_t2dwb"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_t2dwb"]
 
 [node name="Cidade" type="Node3D" unique_id=917760355]
 
@@ -39,22 +63,62 @@ size = 20.0
 [node name="Chao" type="MeshInstance3D" parent="." unique_id=1149399866]
 mesh = SubResource("PlaneMesh_t2dwb")
 
+[node name="StaticBody3D" type="StaticBody3D" parent="Chao" unique_id=919701905]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Chao/StaticBody3D" unique_id=2128698828]
+shape = SubResource("ConcavePolygonShape3D_ocx82")
+
 [node name="Clinica" type="MeshInstance3D" parent="." unique_id=607822049]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.5, -4)
 mesh = SubResource("BoxMesh_t2dwb")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Clinica" unique_id=1367045606]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Clinica/StaticBody3D" unique_id=757966718]
+shape = SubResource("BoxShape3D_st4sy")
 
 [node name="Taverna" type="MeshInstance3D" parent="." unique_id=1947628007]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -4)
 mesh = SubResource("BoxMesh_t2dwb")
 
+[node name="StaticBody3D" type="StaticBody3D" parent="Taverna" unique_id=679094610]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Taverna/StaticBody3D" unique_id=501694222]
+shape = SubResource("BoxShape3D_qthrd")
+
 [node name="Casa1" type="MeshInstance3D" parent="." unique_id=1551384272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.5, 5)
 mesh = SubResource("BoxMesh_t2dwb")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Casa1" unique_id=2121955065]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Casa1/StaticBody3D" unique_id=667355992]
+shape = SubResource("BoxShape3D_o5pq4")
 
 [node name="Casa2" type="MeshInstance3D" parent="." unique_id=2108712054]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, 5)
 mesh = SubResource("BoxMesh_t2dwb")
 
+[node name="StaticBody3D" type="StaticBody3D" parent="Casa2" unique_id=2117792275]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Casa2/StaticBody3D" unique_id=561731628]
+shape = SubResource("BoxShape3D_73egf")
+
 [node name="Igreja" type="MeshInstance3D" parent="." unique_id=1098189870]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -9)
 mesh = SubResource("BoxMesh_st4sy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Igreja" unique_id=2019010410]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Igreja/StaticBody3D" unique_id=1319727160]
+shape = SubResource("BoxShape3D_gq2ka")
+
+[node name="Jogador" type="CharacterBody3D" parent="." unique_id=1280879686]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("1_mtbfa")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Jogador" unique_id=951761963]
+mesh = SubResource("CapsuleMesh_t2dwb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Jogador" unique_id=1026956094]
+shape = SubResource("CapsuleShape3D_t2dwb")
