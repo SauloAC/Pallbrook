@@ -2,6 +2,9 @@ extends CharacterBody3D
 
 @export var speed := 5.0
 
+func _ready() -> void:
+	print("Day ", GameState.day, " - night: ", GameState.is_night)
+
 func _physics_process(delta: float) -> void:
 	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	# Rotate input 45° so "up" matches the isometric camera's screen direction

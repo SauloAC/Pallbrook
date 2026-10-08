@@ -14,6 +14,11 @@ config/name="Pallbrook"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+EventBus="*uid://cfmwvf2arl7s6"
+GameState="*uid://c7cmllcuhuq77"
+
 [display]
 
 window/stretch/mode="canvas_items"
