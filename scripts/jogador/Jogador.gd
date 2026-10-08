@@ -1,14 +1,14 @@
 extends CharacterBody3D
 
-@export var velocidade := 5.0
+@export var speed := 5.0
 
 func _physics_process(delta: float) -> void:
-	var entrada := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	# Gira a entrada 45° para "cima" ser a diagonal da câmera isométrica
-	var direcao := Vector3(entrada.x, 0, entrada.y).rotated(Vector3.UP, deg_to_rad(45))
+	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	# Rotate input 45° so "up" matches the isometric camera's screen direction
+	var direction := Vector3(input.x, 0, input.y).rotated(Vector3.UP, deg_to_rad(45))
 
-	velocity.x = direcao.x * velocidade
-	velocity.z = direcao.z * velocidade
+	velocity.x = direction.x * speed
+	velocity.z = direction.z * speed
 
 	if not is_on_floor():
 		velocity += get_gravity() * delta
