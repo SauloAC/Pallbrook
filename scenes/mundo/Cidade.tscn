@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://d1dgwf3vbiqkw" path="res://scripts/jogador/Jogador.gd" id="1_mtbfa"]
 [ext_resource type="Script" uid="uid://dqti13wid6dwe" path="res://scripts/camera/CameraFollow.gd" id="1_ocx82"]
 [ext_resource type="Script" uid="uid://cv6jl8et5inbi" path="res://scripts/cycle/DayNightCycle.gd" id="3_st4sy"]
+[ext_resource type="PackedScene" uid="uid://bqni0wta1nggy" path="res://scenes/mundo/StreetLamp.tscn" id="4_qthrd"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -131,3 +132,15 @@ shape = SubResource("CapsuleShape3D_t2dwb")
 script = ExtResource("3_st4sy")
 sun = NodePath("../DirectionalLight3D")
 world_environment = NodePath("../WorldEnvironment")
+
+[node name="StreetLamp" parent="." unique_id=1350933322 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -2)
+
+[node name="StreetLamp2" parent="." unique_id=524428276 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2)
+
+[node name="StreetLamp3" parent="." unique_id=532610622 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 6)
+
+[node name="StreetLamp4" parent="." unique_id=408044280 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -6)

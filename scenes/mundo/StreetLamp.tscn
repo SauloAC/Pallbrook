@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bqni0wta1nggy"]
+
+[ext_resource type="Script" uid="uid://b5nkxcshyjgjg" path="res://scripts/world/NightLight.gd" id="1_lf8sb"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_t2dwb"]
+top_radius = 0.08
+bottom_radius = 0.08
+height = 3.0
+
+[node name="StreetLamp" type="Node3D" unique_id=1350933322]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=528790639]
+mesh = SubResource("CylinderMesh_t2dwb")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=2007064198]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+light_color = Color(1, 0.8, 0.5019608, 1)
+light_energy = 2.0
+shadow_enabled = true
+omni_range = 8.0
+script = ExtResource("1_lf8sb")
