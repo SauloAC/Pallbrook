@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://q4sfidb3tq7a"]
+
+[ext_resource type="Script" uid="uid://b5nkxcshyjgjg" path="res://scripts/world/NightLight.gd" id="1_uvtis"]
+
+[node name="WindowLight" type="OmniLight3D" unique_id=1929029952]
+light_color = Color(1, 0.6901961, 0.3764706, 1)
+omni_range = 3.0
+script = ExtResource("1_uvtis")
