@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cv6jl8et5inbi" path="res://scripts/cycle/DayNightCycle.gd" id="3_st4sy"]
 [ext_resource type="PackedScene" uid="uid://bqni0wta1nggy" path="res://scenes/mundo/StreetLamp.tscn" id="4_qthrd"]
 [ext_resource type="PackedScene" uid="uid://q4sfidb3tq7a" path="res://scenes/mundo/WindowLight.tscn" id="5_o5pq4"]
+[ext_resource type="Script" uid="uid://coab8nqlctlo0" path="res://scripts/ui/PhaseBanner.gd" id="6_73egf"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -160,3 +161,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 6)
 
 [node name="StreetLamp4" parent="." unique_id=408044280 instance=ExtResource("4_qthrd")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -6)
+
+[node name="PhaseBanner" type="CanvasLayer" parent="." unique_id=764145283]
+script = ExtResource("6_73egf")
+
+[node name="Label" type="Label" parent="PhaseBanner" unique_id=1597711413]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+horizontal_alignment = 1
+vertical_alignment = 1
