@@ -61,6 +61,7 @@ func _update_exhaustion() -> void:
 		GameState.exhaustion = 0.0
 
 func _collapse() -> void:
+	GameState.add_night_event("Você desmaiou na rua. Alguém pode ter visto o doutor caído.")
 	GameState.collapsed_in_street = true
 	EventBus.player_collapsed.emit()
 	_skip_to_morning()
@@ -68,6 +69,7 @@ func _collapse() -> void:
 func _on_player_slept() -> void:
 	if is_collapsing:
 		return
+	GameState.add_night_event("Você dormiu na clínica.")
 	_skip_to_morning()  # Slept safely: no consequence
 
 func _skip_to_morning() -> void:
