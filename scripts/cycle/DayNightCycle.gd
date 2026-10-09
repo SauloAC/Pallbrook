@@ -17,6 +17,7 @@ func _ready() -> void:
 	# Test listener: shows the EventBus working
 	EventBus.phase_changed.connect(func(is_night): print("Night " if is_night else "Day ", GameState.day))
 	_update_lighting()
+	EventBus.player_slept.connect(_on_player_slept)
 
 func _process(delta: float) -> void:
 	hour += delta / seconds_per_hour
@@ -60,9 +61,17 @@ func _update_exhaustion() -> void:
 		GameState.exhaustion = 0.0
 
 func _collapse() -> void:
-	is_collapsing = true
 	GameState.collapsed_in_street = true
 	EventBus.player_collapsed.emit()
-	await get_tree().create_timer(2.0).timeout  # Time for the screen to go black
-	hour = day_start_hour  # Jump to sunrise; _check_phase will start the new day
+	_skip_to_morning()
+
+func _on_player_slept() -> void:
+	if is_collapsing:
+		return
+	_skip_to_morning()  # Slept safely: no consequence
+
+func _skip_to_morning() -> void:
+	is_collapsing = true
+	await get_tree().create_timer(2.0).timeout
+	hour = day_start_hour
 	is_collapsing = false
