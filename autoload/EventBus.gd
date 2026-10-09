@@ -4,3 +4,4 @@ extends Node
 signal phase_changed(is_night: bool)
 signal npc_died(npc_name: String)
 signal clue_found(clue_id: String)
+signal player_collapsed

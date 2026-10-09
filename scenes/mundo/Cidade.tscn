@@ -165,6 +165,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -6)
 [node name="PhaseBanner" type="CanvasLayer" parent="." unique_id=764145283]
 script = ExtResource("6_73egf")
 
+[node name="Fade" type="ColorRect" parent="PhaseBanner" unique_id=1913539996]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
 [node name="Label" type="Label" parent="PhaseBanner" unique_id=1597711413]
 anchors_preset = 15
 anchor_right = 1.0
