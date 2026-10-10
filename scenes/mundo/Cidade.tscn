@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d1dgwf3vbiqkw" path="res://scripts/jogador/Jogador.gd" id="1_mtbfa"]
 [ext_resource type="Script" uid="uid://dqti13wid6dwe" path="res://scripts/camera/CameraFollow.gd" id="1_ocx82"]
+[ext_resource type="Script" uid="uid://dkvdtt6h5ov45" path="res://scripts/cycle/VampireDirector.gd" id="2_t3jqk"]
 [ext_resource type="Script" uid="uid://bmu8o4jphr7ed" path="res://scripts/world/SleepSpot.gd" id="3_l36k5"]
 [ext_resource type="Script" uid="uid://cv6jl8et5inbi" path="res://scripts/cycle/DayNightCycle.gd" id="3_st4sy"]
 [ext_resource type="PackedScene" uid="uid://bqni0wta1nggy" path="res://scenes/mundo/StreetLamp.tscn" id="4_qthrd"]
@@ -99,6 +100,9 @@ shadow_enabled = true
 script = ExtResource("3_st4sy")
 sun = NodePath("../../Environment/DirectionalLight3D")
 world_environment = NodePath("../../Environment/WorldEnvironment")
+
+[node name="VampireDirector" type="Node" parent="Systems" unique_id=735477416]
+script = ExtResource("2_t3jqk")
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=873730630]
 navigation_mesh = SubResource("NavigationMesh_t2dwb")

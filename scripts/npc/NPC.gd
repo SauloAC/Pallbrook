@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-enum State { ROUTINE, TALKING, SCARED, SLEEPING }
+enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD }
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -36,7 +36,6 @@ func _ready() -> void:
 		_pick_random_destination()
 	else:
 		_follow_schedule()
-	
 
 
 # ---------- State machine ----------
@@ -57,8 +56,30 @@ func set_state(new_state: State) -> void:
 				_go_to_place(data.home)
 		State.SLEEPING:
 			_set_present(false)  # Went inside the house
+		State.DEAD:
+			_set_present(true)
+			collision.disabled = true  # Bodies don't block the way
+			agent.target_position = global_position
+			# The body is found at the door of their home
+			var home_marker: Node3D = null
+			if data:
+				home_marker = _find_location(data.home)
+			if home_marker:
+				# Push the body toward the middle of the street, so buildings don't hide it
+				var toward_street := -signf(home_marker.global_position.x) * 1.5
+				global_position = home_marker.global_position + Vector3(toward_street, 0.0, 0.8)
+			# Lying on the ground
+			mesh.rotation_degrees.x = 90.0
+			mesh.position.y = 0.5
+			name_label.position.y = 1.2
 	_update_label()
 
+func is_alive() -> bool:
+	return state != State.DEAD
+
+
+func die() -> void:
+	set_state(State.DEAD)
 
 func _set_present(present: bool) -> void:
 	visible = present
@@ -107,7 +128,7 @@ func go_to(target: Vector3) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if state == State.SLEEPING:
+	if state == State.SLEEPING or state == State.DEAD:
 		return
 
 	if not is_on_floor():
@@ -154,7 +175,7 @@ func _on_arrived() -> void:
 # ---------- Schedule ----------
 
 func _on_hour_changed(_hour: int) -> void:
-	if wander or data == null:
+	if wander or data == null or state == State.DEAD:
 		return
 	if state == State.SLEEPING:
 		if not GameState.is_night:
