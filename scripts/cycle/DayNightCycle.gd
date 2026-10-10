@@ -3,7 +3,7 @@ extends Node
 @export var sun: DirectionalLight3D
 @export var world_environment: WorldEnvironment
 @export var seconds_per_hour := 3.0
-@export var start_hour := 8.0
+@export var start_hour := 17.0
 @export var day_start_hour := 6.0
 @export var night_start_hour := 20.0
 @export var exhaustion_start_hour := 0.0

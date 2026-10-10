@@ -13,4 +13,5 @@ schedule = Dictionary[int, String]({
 18: "Taverna",
 22: "Casa2"
 })
+home = "Casa2"
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

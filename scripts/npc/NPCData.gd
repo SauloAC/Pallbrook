@@ -8,3 +8,4 @@ extends Resource
 @export var color: Color = Color.WHITE
 @export_multiline var description: String = ""
 @export var schedule: Dictionary[int, String] = {}  # hour -> location name
+@export var home: String = ""  # Location name where this NPC sleeps
