@@ -7,4 +7,10 @@ script = ExtResource("1_c02m7")
 npc_name = "Tomas"
 role = "Ferreiro"
 color = Color(0.64658266, 0.3092063, 0.019033113, 1)
+schedule = Dictionary[int, String]({
+6: "Casa2",
+8: "Praca",
+18: "Taverna",
+22: "Casa2"
+})
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

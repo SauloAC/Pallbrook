@@ -7,3 +7,4 @@ extends Resource
 @export var role: String = ""        # e.g. "Padre", "Taverneira"
 @export var color: Color = Color.WHITE
 @export_multiline var description: String = ""
+@export var schedule: Dictionary[int, String] = {}  # hour -> location name

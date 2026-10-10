@@ -2,7 +2,7 @@ extends Node
 
 @export var sun: DirectionalLight3D
 @export var world_environment: WorldEnvironment
-@export var seconds_per_hour := 60.0
+@export var seconds_per_hour := 3.0
 @export var start_hour := 8.0
 @export var day_start_hour := 6.0
 @export var night_start_hour := 20.0
@@ -11,9 +11,11 @@ extends Node
 
 var hour: float
 var is_collapsing := false
+var last_hour := -1
 
 func _ready() -> void:
 	hour = start_hour
+	GameState.hour = hour
 	# Test listener: shows the EventBus working
 	EventBus.phase_changed.connect(func(is_night): print("Night " if is_night else "Day ", GameState.day))
 	_update_lighting()
@@ -26,6 +28,10 @@ func _process(delta: float) -> void:
 	_check_phase()
 	_update_exhaustion()
 	_update_lighting()
+	GameState.hour = hour
+	if int(hour) != last_hour:
+		last_hour = int(hour)
+		EventBus.hour_changed.emit(last_hour)
 
 func _check_phase() -> void:
 	var should_be_night := hour >= night_start_hour or hour < day_start_hour

@@ -7,4 +7,11 @@ script = ExtResource("1_62wn5")
 npc_name = "Elias"
 role = "Padre"
 color = Color(0.4774989, 0.48340583, 0.50913167, 1)
+schedule = Dictionary[int, String]({
+6: "Igreja",
+12: "Praca",
+14: "Igreja",
+19: "Taverna",
+21: "Igreja"
+})
 metadata/_custom_type_script = "uid://dl651qayo3ngb"
