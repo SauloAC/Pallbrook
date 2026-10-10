@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://dtbgvtwk3tawr"]
+
+[ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_62wn5"]
+
+[resource]
+script = ExtResource("1_62wn5")
+npc_name = "Elias"
+role = "Padre"
+color = Color(0.4774989, 0.48340583, 0.50913167, 1)
+metadata/_custom_type_script = "uid://dl651qayo3ngb"

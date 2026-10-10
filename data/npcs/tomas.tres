@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://dyclkhngaj7bu"]
+
+[ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_c02m7"]
+
+[resource]
+script = ExtResource("1_c02m7")
+npc_name = "Tomas"
+role = "Ferreiro"
+color = Color(0.64658266, 0.3092063, 0.019033113, 1)
+metadata/_custom_type_script = "uid://dl651qayo3ngb"

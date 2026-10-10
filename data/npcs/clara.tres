@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://d1g3qohx1m3mc"]
+
+[ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_ns0lb"]
+
+[resource]
+script = ExtResource("1_ns0lb")
+npc_name = "Clara"
+role = "Costureira"
+color = Color(3.272891e-06, 0.499933, 0.763627, 1)
+metadata/_custom_type_script = "uid://dl651qayo3ngb"

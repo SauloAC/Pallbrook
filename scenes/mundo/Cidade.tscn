@@ -9,6 +9,12 @@
 [ext_resource type="Script" uid="uid://coab8nqlctlo0" path="res://scripts/ui/PhaseBanner.gd" id="6_73egf"]
 [ext_resource type="Shader" uid="uid://cudikbpjewu53" path="res://shaders/vignette.gdshader" id="7_gq2ka"]
 [ext_resource type="Script" uid="uid://b8qlfb4bh8whw" path="res://scripts/ui/MorningSummary.gd" id="9_tkho8"]
+[ext_resource type="PackedScene" uid="uid://cflwpimx1kbw6" path="res://scenes/personagens/NPC.tscn" id="10_p3xqx"]
+[ext_resource type="Resource" uid="uid://dtbgvtwk3tawr" path="res://data/npcs/padre.tres" id="11_2n2no"]
+[ext_resource type="Resource" uid="uid://cbfk62j70stao" path="res://data/npcs/marta.tres" id="12_fm4th"]
+[ext_resource type="Resource" uid="uid://d1g3qohx1m3mc" path="res://data/npcs/clara.tres" id="13_t3jqk"]
+[ext_resource type="Resource" uid="uid://dyclkhngaj7bu" path="res://data/npcs/tomas.tres" id="14_mequr"]
+[ext_resource type="Resource" uid="uid://b32sbhwo8rmh6" path="res://data/npcs/hugo.tres" id="15_ervra"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -68,6 +74,7 @@ bg_color = Color(0.050980393, 0.05882353, 0.101960786, 0.9019608)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="Cidade" type="Node3D" unique_id=917760355]
 
@@ -267,3 +274,23 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "[E] Continuar"
 horizontal_alignment = 1
+
+[node name="Elias" parent="." unique_id=2114807663 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -6)
+data = ExtResource("11_2n2no")
+
+[node name="Marta" parent="." unique_id=213485090 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, -1)
+data = ExtResource("12_fm4th")
+
+[node name="Clara" parent="." unique_id=1183229265 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, 5)
+data = ExtResource("13_t3jqk")
+
+[node name="Tomas" parent="." unique_id=407762272 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 6)
+data = ExtResource("14_mequr")
+
+[node name="Hugo" parent="." unique_id=1100674295 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+data = ExtResource("15_ervra")

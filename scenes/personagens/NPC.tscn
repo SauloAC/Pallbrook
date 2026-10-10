@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://cflwpimx1kbw6"]
+
+[ext_resource type="Script" uid="uid://ck325ortxnno8" path="res://scripts/npc/NPC.gd" id="1_qyqxh"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_t2dwb"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m2va7"]
+
+[node name="NPC" type="CharacterBody3D" unique_id=2114807663]
+script = ExtResource("1_qyqxh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2112089944]
+mesh = SubResource("CapsuleMesh_t2dwb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=247430604]
+shape = SubResource("CapsuleShape3D_m2va7")
+
+[node name="NameLabel" type="Label3D" parent="." unique_id=285620583]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+billboard = 1
+no_depth_test = true
+font_size = 64
+outline_size = 16
