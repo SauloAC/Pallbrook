@@ -10,14 +10,18 @@
 script = ExtResource("1_qyqxh")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2112089944]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_t2dwb")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=247430604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_m2va7")
 
 [node name="NameLabel" type="Label3D" parent="." unique_id=285620583]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
 billboard = 1
 no_depth_test = true
 font_size = 64
 outline_size = 16
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=800975982]
