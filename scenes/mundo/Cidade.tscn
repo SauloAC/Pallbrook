@@ -15,6 +15,7 @@
 [ext_resource type="Resource" uid="uid://d1g3qohx1m3mc" path="res://data/npcs/clara.tres" id="13_t3jqk"]
 [ext_resource type="Resource" uid="uid://dyclkhngaj7bu" path="res://data/npcs/tomas.tres" id="14_mequr"]
 [ext_resource type="Resource" uid="uid://b32sbhwo8rmh6" path="res://data/npcs/hugo.tres" id="15_ervra"]
+[ext_resource type="Script" uid="uid://dly1apg7e36vd" path="res://scripts/ui/DialogueBox.gd" id="16_fm4th"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -314,6 +315,37 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "[E] Continuar"
 horizontal_alignment = 1
+
+[node name="DialogueBox" type="CanvasLayer" parent="UI" unique_id=1691680637]
+script = ExtResource("16_fm4th")
+
+[node name="Panel" type="PanelContainer" parent="UI/DialogueBox" unique_id=162285460]
+custom_minimum_size = Vector2(0, 160)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -77.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBox" type="VBoxContainer" parent="UI/DialogueBox/Panel" unique_id=1030745275]
+layout_mode = 2
+
+[node name="Speaker" type="Label" parent="UI/DialogueBox/Panel/VBox" unique_id=300391462]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+
+[node name="Body" type="Label" parent="UI/DialogueBox/Panel/VBox" unique_id=1551126764]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="UI/DialogueBox/Panel/VBox" unique_id=1498512158]
+layout_mode = 2
+text = "[E] Fechar"
+horizontal_alignment = 2
 
 [node name="Locations" type="Node3D" parent="." unique_id=188944316]
 

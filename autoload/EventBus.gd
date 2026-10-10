@@ -7,3 +7,5 @@ signal clue_found(clue_id: String)
 signal player_collapsed
 signal player_slept
 signal hour_changed(hour: int)
+signal dialogue_started(speaker: String, text: String)
+signal dialogue_ended

@@ -9,3 +9,4 @@ extends Resource
 @export_multiline var description: String = ""
 @export var schedule: Dictionary[int, String] = {}  # hour -> location name
 @export var home: String = ""  # Location name where this NPC sleeps
+@export var dialogue_lines: Array[String] = []  # One is picked at random each time

@@ -10,6 +10,8 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING }
 var state: State = State.ROUTINE
 var current_place := ""
 var stuck_time := 0.0
+var highlighted := false
+var line_index := 0
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -29,10 +31,12 @@ func _ready() -> void:
 	while NavigationServer3D.map_get_random_point(map, 1, true) == Vector3.ZERO:
 		await get_tree().physics_frame
 	EventBus.hour_changed.connect(_on_hour_changed)
+	EventBus.dialogue_ended.connect(_on_dialogue_ended)
 	if wander:
 		_pick_random_destination()
 	else:
 		_follow_schedule()
+	
 
 
 # ---------- State machine ----------
@@ -65,8 +69,36 @@ func _update_label() -> void:
 	var text: String = data.npc_name if data else String(name)
 	if show_state:
 		text += "\n(%s)" % State.keys()[state]
+	if highlighted and state == State.ROUTINE:
+		text += "\n[E] Falar"
 	name_label.text = text
 
+func can_talk() -> bool:
+	return state == State.ROUTINE
+
+
+func set_highlighted(value: bool) -> void:
+	if highlighted == value:
+		return
+	highlighted = value
+	_update_label()
+
+
+func talk(player: Node3D) -> void:
+	set_state(State.TALKING)
+	# Turn to face the doctor (ignore height so we don't tilt)
+	look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z))
+	var line := "..."
+	if data and not data.dialogue_lines.is_empty():
+		# Go through the lines in order, looping back to the start
+		line = data.dialogue_lines[line_index % data.dialogue_lines.size()]
+		line_index += 1
+	EventBus.dialogue_started.emit(data.npc_name if data else String(name), line)
+
+
+func _on_dialogue_ended() -> void:
+	if state == State.TALKING:
+		set_state(State.ROUTINE)
 
 # ---------- Movement ----------
 

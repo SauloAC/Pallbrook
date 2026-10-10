@@ -15,4 +15,5 @@ schedule = Dictionary[int, String]({
 20: "Casa2"
 })
 home = "Casa2"
+dialogue_lines = Array[String](["Bem-vindo a Pallbrook! Uma cidade tranquila, eu garanto.", "Se ouvir boatos, ignore. O povo daqui adora uma história."])
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

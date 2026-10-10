@@ -12,4 +12,5 @@ schedule = Dictionary[int, String]({
 9: "Taverna"
 })
 home = "Taverna"
+dialogue_lines = Array[String](["Primeira bebida por conta da casa, doutor.", "Ouvi passos no telhado ontem. Gatos, deve ser… gatos."])
 metadata/_custom_type_script = "uid://dl651qayo3ngb"
