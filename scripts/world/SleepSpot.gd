@@ -12,5 +12,5 @@ func _process(_delta: float) -> void:
 	prompt.visible = player_inside and GameState.is_night
 
 func _unhandled_input(event: InputEvent) -> void:
-	if prompt.visible and event.is_action_pressed("interact"):
+	if prompt.visible and not GameState.in_dialogue and event.is_action_pressed("interact"):
 		EventBus.player_slept.emit()

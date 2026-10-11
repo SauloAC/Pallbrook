@@ -10,6 +10,8 @@ var opened_frame := -1
 func _ready() -> void:
 	panel.visible = false
 	EventBus.dialogue_started.connect(_on_dialogue_started)
+	EventBus.player_slept.connect(_close)
+	EventBus.player_collapsed.connect(_close)
 
 
 func _on_dialogue_started(speaker_name: String, line: String) -> void:
@@ -25,7 +27,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not panel.visible or Engine.get_process_frames() == opened_frame:
 		return
 	if event.is_action_pressed("interact"):
-		panel.visible = false
-		GameState.in_dialogue = false
-		EventBus.dialogue_ended.emit()
+		_close()
 		get_viewport().set_input_as_handled()
+
+
+func _close() -> void:
+	if not panel.visible:
+		return
+	panel.visible = false
+	GameState.in_dialogue = false
+	EventBus.dialogue_ended.emit()

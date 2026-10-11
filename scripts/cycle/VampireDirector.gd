@@ -1,4 +1,5 @@
 extends Node
+@export_range(0.0, 1.0) var servant_chance := 0.35
 
 # Picks the secret vampire and decides what they do each night
 
@@ -31,11 +32,19 @@ func _on_phase_changed(is_night: bool) -> void:
 func _night_action() -> void:
 	var victims := []
 	for npc in get_tree().get_nodes_in_group("npcs"):
-		if npc != vampire and npc.is_alive():
+		if npc != vampire and npc.is_alive() and not npc.is_servant:
 			victims.append(npc)
 	if victims.is_empty():
 		return
 	var victim = victims.pick_random()
-	victim.die()
-	GameState.add_night_event("%s foi encontrado sem vida na porta de casa." % victim.data.npc_name)
-	EventBus.npc_died.emit(victim.data.npc_name)
+	var victim_name: String = victim.data.npc_name
+
+	# Sometimes convert instead of kill (only if there is still someone else to hunt)
+	if victims.size() > 1 and randf() < servant_chance:
+		victim.make_servant()
+		GameState.add_night_event("Durante a noite, um vulto foi visto perto da casa de %s." % victim_name)
+		print("[DEBUG] %s became a servant" % victim_name)
+	else:
+		victim.die()
+		GameState.add_night_event("%s foi encontrado sem vida na porta de casa." % victim_name)
+		EventBus.npc_died.emit(victim_name)

@@ -12,6 +12,7 @@ var current_place := ""
 var stuck_time := 0.0
 var highlighted := false
 var line_index := 0
+var is_servant := false
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -90,6 +91,8 @@ func _update_label() -> void:
 	var text: String = data.npc_name if data else String(name)
 	if show_state:
 		text += "\n(%s)" % State.keys()[state]
+	if show_state and is_servant:
+		text += " [SERVO]"  # Debug only
 	if highlighted and state == State.ROUTINE:
 		text += "\n[E] Falar"
 	name_label.text = text
@@ -110,7 +113,9 @@ func talk(player: Node3D) -> void:
 	# Turn to face the doctor (ignore height so we don't tilt)
 	look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z))
 	var line := "..."
-	if data and not data.dialogue_lines.is_empty():
+	if is_servant:
+		line = _servant_line()
+	elif data and not data.dialogue_lines.is_empty():
 		# Go through the lines in order, looping back to the start
 		line = data.dialogue_lines[line_index % data.dialogue_lines.size()]
 		line_index += 1
@@ -120,6 +125,31 @@ func talk(player: Node3D) -> void:
 func _on_dialogue_ended() -> void:
 	if state == State.TALKING:
 		set_state(State.ROUTINE)
+		
+func make_servant() -> void:
+	is_servant = true
+	# Paler: blend the original color toward a sickly grey-white
+	var material := mesh.material_override as StandardMaterial3D
+	if material and data:
+		material.albedo_color = data.color.lerp(Color(0.85, 0.85, 0.9), 0.5)
+	_update_label()
+
+
+func _servant_line() -> String:
+	# Servants shift suspicion to others, but never to their master
+	var suspects := []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc != self and npc.is_alive() and npc.data.npc_name != GameState.vampire_name:
+			suspects.append(npc)
+	if suspects.is_empty():
+		return "..."
+	var suspect: String = suspects.pick_random().data.npc_name
+	var lies := [
+		"Já reparou como o %s anda estranho ultimamente?",
+		"Eu não confiaria no %s se fosse você, doutor.",
+		"Vi o %s rondando por aí de madrugada.",
+	]
+	return lies.pick_random() % suspect
 
 # ---------- Movement ----------
 
@@ -130,6 +160,9 @@ func go_to(target: Vector3) -> void:
 func _physics_process(delta: float) -> void:
 	if state == State.SLEEPING or state == State.DEAD:
 		return
+	# Safety net: if no dialogue is open, nobody should be stuck talking
+	if state == State.TALKING and not GameState.in_dialogue:
+		set_state(State.ROUTINE)
 
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -207,6 +240,9 @@ func _place_for_hour(hour: int) -> String:
 	for h in hours:
 		if h <= hour:
 			place = data.schedule[h]
+	# Servants avoid the open square during the day
+	if is_servant and not GameState.is_night and place == "Praca":
+		return data.home
 	return place
 
 
