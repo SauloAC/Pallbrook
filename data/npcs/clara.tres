@@ -16,4 +16,5 @@ schedule = Dictionary[int, String]({
 })
 home = "Casa1"
 dialogue_lines = Array[String](["Estou costurando um vestido novo. Para um enterro, infelizmente.", "Não saio depois que escurece. Ninguém deveria."])
+clue_trait = "fiapos de linha"
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

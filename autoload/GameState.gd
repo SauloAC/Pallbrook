@@ -7,6 +7,13 @@ var exhaustion := 0.0              # 0.0 = rested, 1.0 = collapses
 var collapsed_in_street := false   # Used by the morning summary later
 var in_dialogue := false
 var vampire_name := ""
+var clues: Array[String] = []
+
+func add_clue(text: String) -> void:
+	if text in clues:
+		return  # No duplicates
+	clues.append(text)
+	EventBus.clue_found.emit(text)
 
 func start_night() -> void:
 	night_events.clear()

@@ -10,3 +10,4 @@ extends Resource
 @export var schedule: Dictionary[int, String] = {}  # hour -> location name
 @export var home: String = ""  # Location name where this NPC sleeps
 @export var dialogue_lines: Array[String] = []  # One is picked at random each time
+@export var clue_trait: String = ""  # Trace this person leaves behind, e.g. "fuligem de forja"

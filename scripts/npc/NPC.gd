@@ -13,6 +13,8 @@ var stuck_time := 0.0
 var highlighted := false
 var line_index := 0
 var is_servant := false
+var examined := false
+var body_trace := ""
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -79,7 +81,8 @@ func is_alive() -> bool:
 	return state != State.DEAD
 
 
-func die() -> void:
+func die(trace: String = "") -> void:
+	body_trace = trace
 	set_state(State.DEAD)
 
 func _set_present(present: bool) -> void:
@@ -95,10 +98,13 @@ func _update_label() -> void:
 		text += " [SERVO]"  # Debug only
 	if highlighted and state == State.ROUTINE:
 		text += "\n[E] Falar"
+	elif highlighted and state == State.DEAD and not examined:
+		text += "\n[E] Examinar"
 	name_label.text = text
 
 func can_talk() -> bool:
-	return state == State.ROUTINE
+	# Talk to the living, examine the dead (once)
+	return state == State.ROUTINE or (state == State.DEAD and not examined)
 
 
 func set_highlighted(value: bool) -> void:
@@ -109,6 +115,11 @@ func set_highlighted(value: bool) -> void:
 
 
 func talk(player: Node3D) -> void:
+	# Dead bodies are examined, not talked to (must come BEFORE any state change)
+	if state == State.DEAD:
+		_examine_body()
+		return
+
 	set_state(State.TALKING)
 	# Turn to face the doctor (ignore height so we don't tilt)
 	look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z))
@@ -119,6 +130,8 @@ func talk(player: Node3D) -> void:
 		# Go through the lines in order, looping back to the start
 		line = data.dialogue_lines[line_index % data.dialogue_lines.size()]
 		line_index += 1
+	if data:
+		GameState.add_clue("%s disse: \"%s\"" % [data.npc_name, line])
 	EventBus.dialogue_started.emit(data.npc_name if data else String(name), line)
 
 
@@ -263,3 +276,12 @@ func _pick_random_destination() -> void:
 			return
 	await get_tree().create_timer(0.2).timeout
 	_pick_random_destination()
+	
+	
+func _examine_body() -> void:
+	examined = true
+	_update_label()
+	var trace := body_trace if body_trace != "" else "nada de incomum"
+	var text := "Marcas de mordida no pescoço. Na roupa, vestígios de %s." % trace
+	GameState.add_clue("Corpo de %s: %s" % [data.npc_name, text])
+	EventBus.dialogue_started.emit("Corpo de %s" % data.npc_name, text)

@@ -15,4 +15,5 @@ schedule = Dictionary[int, String]({
 })
 home = "Casa2"
 dialogue_lines = Array[String](["Ferro não mente, doutor. Gente mente.", "Martelo o dia todo. À noite, durmo pesado… ou quase."])
+clue_trait = "fuligem de forja"
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

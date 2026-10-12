@@ -14,6 +14,9 @@ func _on_phase_changed(is_night: bool) -> void:
 		return
 	# Wait for the "Dia X" banner to finish before showing the summary
 	await get_tree().create_timer(4.5).timeout
+		# Don't open on top of an open dialogue
+	while GameState.in_dialogue:
+		await get_tree().process_frame
 	_show_summary()
 
 func _show_summary() -> void:
