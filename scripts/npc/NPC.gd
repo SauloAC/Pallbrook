@@ -263,9 +263,13 @@ func _set_dark(dark: bool) -> void:
 		return
 	if dark:
 		normal_color = material.albedo_color
-		material.albedo_color = Color(0.05, 0.05, 0.07)
+		material.albedo_color = Color(0.12, 0.12, 0.16)
+		material.emission_enabled = true
+		material.emission = Color(0.25, 0.05, 0.05)  # A faint red glow: something is wrong
+		material.emission_energy_multiplier = 0.6
 	else:
 		material.albedo_color = normal_color
+		material.emission_enabled = false
 	is_dark = dark
 
 
@@ -276,9 +280,8 @@ func _process(_delta: float) -> void:
 	if player and global_position.distance_to(player.global_position) < witness_range:
 		witnessed = true
 		name_label.visible = true  # Close enough to recognize the face
-		var minutes := int(fmod(GameState.hour, 1.0) * 60.0)
-		GameState.add_clue("Night of Day %d, %02d:%02d: you saw %s sneaking through the dark streets." % [GameState.day, int(GameState.hour), minutes, data.npc_name])
-
+		var clue := "Night of Day %d, %s: you saw %s sneaking through the dark streets." % [GameState.day, GameState.format_time(GameState.hour), data.npc_name]
+		GameState.add_clue(clue)
 
 # ---------- Schedule ----------
 

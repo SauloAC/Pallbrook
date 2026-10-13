@@ -76,6 +76,9 @@ func _run_hunt(victim: Node) -> void:
 	if not hunting:
 		return
 	await get_tree().create_timer(2.0).timeout  # Inside the house...
+	if vampire.witnessed:
+		_abort_hunt()
+		return
 	if not hunting:
 		return
 	_resolve_attack(victim)

@@ -9,9 +9,6 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	var hours := int(GameState.hour)
-	var minutes := int((GameState.hour - hours) * 6.0) * 10  # Shown in 10-minute steps
 	var phase := "Night" if GameState.is_night else "Day"
-	clock.text = "Day %d   ·   %02d:%02d   ·   %s" % [GameState.day, hours, minutes, phase]
-	# Turns red once exhaustion starts: a warning to head to the clinic
+	clock.text = "Day %d   ·   %s   ·   %s" % [GameState.day, GameState.format_time(GameState.hour), phase]
 	clock.modulate = Color(1.0, 0.45, 0.45) if GameState.exhaustion > 0.0 else Color.WHITE
