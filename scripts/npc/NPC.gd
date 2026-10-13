@@ -1,13 +1,17 @@
 extends CharacterBody3D
 
-enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD }
+enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING }
 
 @export var data: NPCData
 @export var speed := 2.5
 @export var wander := false      # Debug: walk to random places instead of the schedule
 @export var show_state := true   # Debug: show the current state above the name
+@export var witness_range := 5.0  # How close the doctor must be to recognize a hunting vampire
 
-
+var hunt_returning := false
+var witnessed := false
+var is_dark := false
+var normal_color: Color
 var state: State = State.ROUTINE
 var current_place := ""
 var stuck_time := 0.0
@@ -48,6 +52,10 @@ func set_state(new_state: State) -> void:
 	if state == new_state:
 		return
 	state = new_state
+	# Leaving the hunt: back to a normal, recognizable person
+	if new_state != State.HUNTING and is_dark:
+		_set_dark(false)
+		name_label.visible = true
 	match state:
 		State.ROUTINE:
 			_set_present(true)
@@ -63,6 +71,7 @@ func set_state(new_state: State) -> void:
 		State.DEAD:
 			_set_present(true)
 			collision.disabled = true  # Bodies don't block the way
+			velocity = Vector3.ZERO
 			agent.target_position = global_position
 			# The body is found at the door of their home
 			var home_marker: Node3D = null
@@ -76,7 +85,13 @@ func set_state(new_state: State) -> void:
 			mesh.rotation_degrees.x = 90.0
 			mesh.position.y = 0.5
 			name_label.position.y = 1.2
+		State.HUNTING:
+			_set_present(true)
+			witnessed = false
+			name_label.visible = false  # Just a dark shape in the night
+			_set_dark(true)
 	_update_label()
+
 
 func is_alive() -> bool:
 	return state != State.DEAD
@@ -181,7 +196,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
-	var current_speed := speed * (1.8 if state == State.SCARED else 1.0)
+	var current_speed := speed * (1.8 if state == State.SCARED or state == State.HUNTING else 1.0)
 
 	if state == State.TALKING or agent.is_navigation_finished():
 		velocity.x = 0.0
@@ -217,6 +232,52 @@ func _on_arrived() -> void:
 	# Reached home at night (or while scared): go inside
 	if data and current_place == data.home and (_is_bedtime() or state == State.SCARED):
 		set_state(State.SLEEPING)
+	if state == State.HUNTING:
+		# Back home after the hunt: go inside and sleep
+		if hunt_returning and current_place == data.home:
+			hunt_returning = false
+			set_state(State.SLEEPING)
+		return
+
+
+func start_hunt(place: String) -> void:
+	hunt_returning = false
+	set_state(State.HUNTING)
+	_go_to_place(place)
+
+
+func end_hunt() -> void:
+	hunt_returning = true
+	_go_to_place(data.home)
+
+
+func stop_hunt() -> void:
+	# Dawn arrived mid-hunt: drop everything and return to daily life
+	hunt_returning = false
+	set_state(State.ROUTINE)
+
+
+func _set_dark(dark: bool) -> void:
+	var material := mesh.material_override as StandardMaterial3D
+	if material == null:
+		return
+	if dark:
+		normal_color = material.albedo_color
+		material.albedo_color = Color(0.05, 0.05, 0.07)
+	else:
+		material.albedo_color = normal_color
+	is_dark = dark
+
+
+func _process(_delta: float) -> void:
+	if state != State.HUNTING or witnessed:
+		return
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player and global_position.distance_to(player.global_position) < witness_range:
+		witnessed = true
+		name_label.visible = true  # Close enough to recognize the face
+		var minutes := int(fmod(GameState.hour, 1.0) * 60.0)
+		GameState.add_clue("Night of Day %d, %02d:%02d: you saw %s sneaking through the dark streets." % [GameState.day, int(GameState.hour), minutes, data.npc_name])
 
 
 # ---------- Schedule ----------

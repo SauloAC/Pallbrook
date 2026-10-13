@@ -6,6 +6,10 @@ extends CharacterBody3D
 var nearby_npc: Node3D = null
 
 
+func _ready() -> void:
+	add_to_group("player")  # Lets the vampire know where the doctor is
+
+
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
