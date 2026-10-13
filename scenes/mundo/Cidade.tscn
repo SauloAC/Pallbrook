@@ -19,6 +19,8 @@
 [ext_resource type="Script" uid="uid://dly1apg7e36vd" path="res://scripts/ui/DialogueBox.gd" id="16_fm4th"]
 [ext_resource type="Script" uid="uid://c4hmcrjf3pqp1" path="res://scripts/ui/Notebook.gd" id="18_mequr"]
 [ext_resource type="Script" uid="uid://cqh3p8bipx8e" path="res://scripts/ui/Accusation.gd" id="19_ervra"]
+[ext_resource type="Script" uid="uid://c4cvy1j1dmabp" path="res://scripts/ui/HUD.gd" id="20_4bwyx"]
+[ext_resource type="Script" uid="uid://dwh5365ql3ql7" path="res://scripts/ui/Intro.gd" id="21_n6eqd"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -373,6 +375,7 @@ text = "[E] Close"
 horizontal_alignment = 2
 
 [node name="Notebook" type="CanvasLayer" parent="UI" unique_id=1241914915]
+layer = 3
 script = ExtResource("18_mequr")
 
 [node name="Panel" type="PanelContainer" parent="UI/Notebook" unique_id=980850445]
@@ -411,6 +414,7 @@ layout_mode = 2
 text = "[Tab] Close"
 
 [node name="Accusation" type="CanvasLayer" parent="UI" unique_id=445527340]
+layer = 4
 script = ExtResource("19_ervra")
 
 [node name="Panel" type="PanelContainer" parent="UI/Accusation" unique_id=614301126]
@@ -446,6 +450,66 @@ autowrap_mode = 2
 [node name="Hint" type="Label" parent="UI/Accusation/Panel/VBox" unique_id=870668313]
 layout_mode = 2
 size_flags_horizontal = 4
+
+[node name="HUD" type="CanvasLayer" parent="UI" unique_id=1766155086]
+script = ExtResource("20_4bwyx")
+
+[node name="Clock" type="Label" parent="UI/HUD" unique_id=1892469658]
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 60.0
+offset_bottom = 50.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+
+[node name="Controls" type="Label" parent="UI/HUD" unique_id=276618793]
+offset_left = 20.0
+offset_top = 612.0
+offset_right = 60.0
+offset_bottom = 635.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+
+[node name="Intro" type="CanvasLayer" parent="UI" unique_id=209549530]
+layer = 10
+script = ExtResource("21_n6eqd")
+
+[node name="Background" type="ColorRect" parent="UI/Intro" unique_id=771798768]
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0, 0, 0, 1)
+
+[node name="Title" type="Label" parent="UI/Intro/Background" unique_id=749746822]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 70.0
+offset_right = 976.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 56
+text = "PALLBROOK"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="UI/Intro/Background" unique_id=456865873]
+custom_minimum_size = Vector2(800, 0)
+custom_maximum_size = Vector2(800, -1)
+layout_mode = 0
+offset_left = 176.0
+offset_top = 170.0
+offset_right = 976.0
+offset_bottom = 510.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="UI/Intro/Background" unique_id=770555443]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 560.0
+offset_right = 976.0
+offset_bottom = 600.0
+text = "[E] Begin"
+horizontal_alignment = 1
 
 [node name="Locations" type="Node3D" parent="." unique_id=188944316]
 

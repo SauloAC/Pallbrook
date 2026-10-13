@@ -9,6 +9,7 @@ var in_dialogue := false
 var vampire_name := ""
 var clues: Array[String] = []
 var game_over := false
+var intro_seen := false
 
 func reset() -> void:
 	# Autoloads survive a scene reload, so their state must be cleared by hand
