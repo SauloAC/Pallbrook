@@ -8,6 +8,20 @@ var collapsed_in_street := false   # Used by the morning summary later
 var in_dialogue := false
 var vampire_name := ""
 var clues: Array[String] = []
+var game_over := false
+
+func reset() -> void:
+	# Autoloads survive a scene reload, so their state must be cleared by hand
+	day = 1
+	hour = 8.0
+	is_night = false
+	exhaustion = 0.0
+	collapsed_in_street = false
+	in_dialogue = false
+	game_over = false
+	vampire_name = ""
+	night_events.clear()
+	clues.clear()
 
 func add_clue(text: String) -> void:
 	if text in clues:

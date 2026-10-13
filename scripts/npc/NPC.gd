@@ -95,11 +95,11 @@ func _update_label() -> void:
 	if show_state:
 		text += "\n(%s)" % State.keys()[state]
 	if show_state and is_servant:
-		text += " [SERVO]"  # Debug only
+		text += " [SERVANT]"  # Debug only
 	if highlighted and state == State.ROUTINE:
-		text += "\n[E] Falar"
+		text += "\n[E] Talk   [Q] Accuse"
 	elif highlighted and state == State.DEAD and not examined:
-		text += "\n[E] Examinar"
+		text += "\n[E] Examine"
 	name_label.text = text
 
 func can_talk() -> bool:
@@ -131,7 +131,7 @@ func talk(player: Node3D) -> void:
 		line = data.dialogue_lines[line_index % data.dialogue_lines.size()]
 		line_index += 1
 	if data:
-		GameState.add_clue("%s disse: \"%s\"" % [data.npc_name, line])
+		GameState.add_clue("%s said: \"%s\"" % [data.npc_name, line])
 	EventBus.dialogue_started.emit(data.npc_name if data else String(name), line)
 
 
@@ -158,9 +158,9 @@ func _servant_line() -> String:
 		return "..."
 	var suspect: String = suspects.pick_random().data.npc_name
 	var lies := [
-		"Já reparou como o %s anda estranho ultimamente?",
-		"Eu não confiaria no %s se fosse você, doutor.",
-		"Vi o %s rondando por aí de madrugada.",
+		"Have you noticed how strange %s has been lately?",
+		"I wouldn't trust %s if I were you, doctor.",
+		"I saw %s wandering around late at night.",
 	]
 	return lies.pick_random() % suspect
 
@@ -281,7 +281,7 @@ func _pick_random_destination() -> void:
 func _examine_body() -> void:
 	examined = true
 	_update_label()
-	var trace := body_trace if body_trace != "" else "nada de incomum"
-	var text := "Marcas de mordida no pescoço. Na roupa, vestígios de %s." % trace
-	GameState.add_clue("Corpo de %s: %s" % [data.npc_name, text])
-	EventBus.dialogue_started.emit("Corpo de %s" % data.npc_name, text)
+	var trace := body_trace if body_trace != "" else "nothing unusual"
+	var text := "Bite marks on the neck. On the clothes, traces of %s." % trace
+	GameState.add_clue("Body of %s: %s" % [data.npc_name, text])
+	EventBus.dialogue_started.emit("Body of %s" % data.npc_name, text)

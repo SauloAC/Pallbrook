@@ -21,7 +21,7 @@ func _input(event: InputEvent) -> void:
 
 func _open() -> void:
 	if GameState.clues.is_empty():
-		entries.text = "Nenhuma pista ainda."
+		entries.text = "No clues yet."
 	else:
 		entries.text = "• " + "\n\n• ".join(PackedStringArray(GameState.clues))
 	panel.visible = true

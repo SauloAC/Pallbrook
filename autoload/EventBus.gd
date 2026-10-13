@@ -9,3 +9,5 @@ signal player_slept
 signal hour_changed(hour: int)
 signal dialogue_started(speaker: String, text: String)
 signal dialogue_ended
+signal accusation_requested(npc: Node)
+signal game_ended(won: bool, message: String)

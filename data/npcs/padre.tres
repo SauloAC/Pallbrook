@@ -15,6 +15,6 @@ schedule = Dictionary[int, String]({
 21: "Igreja"
 })
 home = "Igreja"
-dialogue_lines = Array[String](["Que Deus o proteja, doutor. As noites aqui andam longas demais.", "Rezo por esta cidade todas as manhãs. Ultimamente, rezo mais."])
+dialogue_lines = Array[String](["May God protect you, doctor. The nights here have grown too long.", "I pray for this town every morning. Lately, I pray more."])
 clue_trait = "cera de vela"
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

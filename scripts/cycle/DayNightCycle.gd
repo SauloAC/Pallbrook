@@ -2,8 +2,8 @@ extends Node
 
 @export var sun: DirectionalLight3D
 @export var world_environment: WorldEnvironment
-@export var seconds_per_hour := 3.0
-@export var start_hour := 19.0
+@export var seconds_per_hour := 60.0
+@export var start_hour := 8.0
 @export var day_start_hour := 6.0
 @export var night_start_hour := 20.0
 @export var exhaustion_start_hour := 0.0
@@ -67,7 +67,7 @@ func _update_exhaustion() -> void:
 		GameState.exhaustion = 0.0
 
 func _collapse() -> void:
-	GameState.add_night_event("Você desmaiou na rua. Alguém pode ter visto o doutor caído.")
+	GameState.add_night_event("You collapsed in the street. Someone may have seen the doctor lying there.")
 	GameState.collapsed_in_street = true
 	EventBus.player_collapsed.emit()
 	_skip_to_morning()
@@ -75,7 +75,7 @@ func _collapse() -> void:
 func _on_player_slept() -> void:
 	if is_collapsing:
 		return
-	GameState.add_night_event("Você dormiu na clínica.")
+	GameState.add_night_event("You slept at the clinic.")
 	_skip_to_morning()  # Slept safely: no consequence
 
 func _skip_to_morning() -> void:

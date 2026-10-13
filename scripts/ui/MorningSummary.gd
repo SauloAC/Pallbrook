@@ -20,9 +20,11 @@ func _on_phase_changed(is_night: bool) -> void:
 	_show_summary()
 
 func _show_summary() -> void:
-	title.text = "Manhã do Dia %d" % GameState.day
+	if GameState.game_over:
+		return
+	title.text = "Morning of Day %d" % GameState.day
 	if GameState.night_events.is_empty():
-		body.text = "A noite passou em silêncio."
+		body.text = "The night passed in silence."
 	else:
 		body.text = "• " + "\n• ".join(PackedStringArray(GameState.night_events))
 	panel.visible = true

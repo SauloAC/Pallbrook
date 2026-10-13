@@ -12,6 +12,6 @@ schedule = Dictionary[int, String]({
 9: "Taverna"
 })
 home = "Taverna"
-dialogue_lines = Array[String](["Primeira bebida por conta da casa, doutor.", "Ouvi passos no telhado ontem. Gatos, deve ser… gatos."])
+dialogue_lines = Array[String](["First drink’s on the house, doctor.", "I heard footsteps on the roof last night. Cats, must be... cats."])
 clue_trait = "manchas de vinho"
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

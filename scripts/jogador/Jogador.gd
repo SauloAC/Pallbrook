@@ -48,9 +48,13 @@ func _update_nearby_npc() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if GameState.in_dialogue:
+	if GameState.in_dialogue or nearby_npc == null:
 		return
-	if event.is_action_pressed("interact") and nearby_npc:
+	if event.is_action_pressed("interact"):
 		nearby_npc.set_highlighted(false)
 		nearby_npc.talk(self)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("accuse") and nearby_npc.is_alive():
+		nearby_npc.set_highlighted(false)
+		EventBus.accusation_requested.emit(nearby_npc)
 		get_viewport().set_input_as_handled()
