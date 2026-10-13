@@ -47,7 +47,7 @@ func _night_action() -> void:
 	if victims.size() > 1 and randf() < servant_chance:
 		victim.make_servant()
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
-		print("[DEBUG] %s became a servant" % victim_name)
+		#print("[DEBUG] %s became a servant" % victim_name)
 		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [GameState.day, victim_name])
 	else:
 		victim.die(_pick_trace(victim))

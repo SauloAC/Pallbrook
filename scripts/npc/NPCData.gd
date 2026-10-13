@@ -11,3 +11,4 @@ extends Resource
 @export var home: String = ""  # Location name where this NPC sleeps
 @export var dialogue_lines: Array[String] = []  # One is picked at random each time
 @export var clue_trait: String = ""  # Trace this person leaves behind, e.g. "fuligem de forja"
+@export var bedtime: int = 22  # Hour this person goes to bed (if at home)

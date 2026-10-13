@@ -5,7 +5,7 @@ extends Node
 @export var seconds_per_hour := 60.0
 @export var start_hour := 8.0
 @export var day_start_hour := 6.0
-@export var night_start_hour := 20.0
+@export var night_start_hour := 18.0
 @export var exhaustion_start_hour := 0.0
 @export var collapse_hour := 1.0
 

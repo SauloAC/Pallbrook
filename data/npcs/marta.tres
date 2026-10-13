@@ -13,5 +13,6 @@ schedule = Dictionary[int, String]({
 })
 home = "Taverna"
 dialogue_lines = Array[String](["First drink’s on the house, doctor.", "I heard footsteps on the roof last night. Cats, must be... cats."])
-clue_trait = "manchas de vinho"
+clue_trait = "wine stains"
+bedtime = 23
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

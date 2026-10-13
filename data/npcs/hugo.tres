@@ -16,5 +16,6 @@ schedule = Dictionary[int, String]({
 })
 home = "Casa2"
 dialogue_lines = Array[String](["Welcome to Pallbrook! A quiet town, I assure you.", "If you hear rumors, ignore them. People here love a good story."])
-clue_trait = "tinta de carimbo"
+clue_trait = "stamp ink"
+bedtime = 21
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

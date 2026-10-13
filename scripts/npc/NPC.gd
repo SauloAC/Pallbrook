@@ -7,6 +7,7 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD }
 @export var wander := false      # Debug: walk to random places instead of the schedule
 @export var show_state := true   # Debug: show the current state above the name
 
+
 var state: State = State.ROUTINE
 var current_place := ""
 var stuck_time := 0.0
@@ -214,7 +215,7 @@ func _on_arrived() -> void:
 		_pick_random_destination()
 		return
 	# Reached home at night (or while scared): go inside
-	if data and current_place == data.home and (GameState.is_night or state == State.SCARED):
+	if data and current_place == data.home and (_is_bedtime() or state == State.SCARED):
 		set_state(State.SLEEPING)
 
 
@@ -285,3 +286,8 @@ func _examine_body() -> void:
 	var text := "Bite marks on the neck. On the clothes, traces of %s." % trace
 	GameState.add_clue("Body of %s: %s" % [data.npc_name, text])
 	EventBus.dialogue_started.emit("Body of %s" % data.npc_name, text)
+
+
+func _is_bedtime() -> bool:
+	# Bedtime until sunrise: e.g. 22 means asleep from 22:00 to 06:00
+	return GameState.hour >= data.bedtime or GameState.hour < 6.0
