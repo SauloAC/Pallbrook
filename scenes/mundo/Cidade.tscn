@@ -16,9 +16,11 @@
 [ext_resource type="Resource" uid="uid://d1g3qohx1m3mc" path="res://data/npcs/clara.tres" id="13_t3jqk"]
 [ext_resource type="Resource" uid="uid://dyclkhngaj7bu" path="res://data/npcs/tomas.tres" id="14_mequr"]
 [ext_resource type="Resource" uid="uid://b32sbhwo8rmh6" path="res://data/npcs/hugo.tres" id="15_ervra"]
+[ext_resource type="FontFile" uid="uid://dyht6nehoscch" path="res://assets/fonts/Cinzel/static/Cinzel-Bold.ttf" id="16_5xce6"]
 [ext_resource type="Script" uid="uid://dly1apg7e36vd" path="res://scripts/ui/DialogueBox.gd" id="16_fm4th"]
 [ext_resource type="Script" uid="uid://c4hmcrjf3pqp1" path="res://scripts/ui/Notebook.gd" id="18_mequr"]
 [ext_resource type="Script" uid="uid://cqh3p8bipx8e" path="res://scripts/ui/Accusation.gd" id="19_ervra"]
+[ext_resource type="FontFile" uid="uid://xlmosxhirafp" path="res://assets/fonts/Lora/static/Lora-Bold.ttf" id="19_ud5yp"]
 [ext_resource type="Script" uid="uid://c4cvy1j1dmabp" path="res://scripts/ui/HUD.gd" id="20_4bwyx"]
 [ext_resource type="Script" uid="uid://dwh5365ql3ql7" path="res://scripts/ui/Intro.gd" id="21_n6eqd"]
 
@@ -86,6 +88,17 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n6eqd"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.101960786, 0.12941177, 0.16078432, 0.9019608)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mequr"]
 content_margin_left = 30.0
@@ -299,6 +312,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/font = ExtResource("16_5xce6")
 theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -328,6 +342,7 @@ theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="UI/MorningSummary/Panel/VBox" unique_id=1959865949]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("16_5xce6")
 theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
 
@@ -355,21 +370,33 @@ anchor_bottom = 1.0
 offset_top = -77.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_n6eqd")
 
-[node name="VBox" type="VBoxContainer" parent="UI/DialogueBox/Panel" unique_id=1030745275]
+[node name="HBox" type="HBoxContainer" parent="UI/DialogueBox/Panel" unique_id=732482363]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Portrait" type="TextureRect" parent="UI/DialogueBox/Panel/HBox" unique_id=665311861]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="UI/DialogueBox/Panel/HBox" unique_id=1030745275]
 layout_mode = 2
 
-[node name="Speaker" type="Label" parent="UI/DialogueBox/Panel/VBox" unique_id=300391462]
+[node name="Speaker" type="Label" parent="UI/DialogueBox/Panel/HBox/VBox" unique_id=300391462]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("19_ud5yp")
 theme_override_font_sizes/font_size = 28
 
-[node name="Body" type="Label" parent="UI/DialogueBox/Panel/VBox" unique_id=1551126764]
+[node name="Body" type="Label" parent="UI/DialogueBox/Panel/HBox/VBox" unique_id=1551126764]
 custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 autowrap_mode = 2
 
-[node name="Hint" type="Label" parent="UI/DialogueBox/Panel/VBox" unique_id=1498512158]
+[node name="Hint" type="Label" parent="UI/DialogueBox/Panel/HBox/VBox" unique_id=1498512158]
 layout_mode = 2
 text = "[E] Close"
 horizontal_alignment = 2
@@ -398,6 +425,7 @@ layout_mode = 2
 
 [node name="Title" type="Label" parent="UI/Notebook/Panel/VBox" unique_id=827428489]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("16_5xce6")
 text = "Casebook"
 
 [node name="Scroll" type="ScrollContainer" parent="UI/Notebook/Panel/VBox" unique_id=363098160]
@@ -438,6 +466,7 @@ layout_mode = 2
 [node name="Title" type="Label" parent="UI/Accusation/Panel/VBox" unique_id=1604245535]
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("16_5xce6")
 theme_override_font_sizes/font_size = 32
 
 [node name="Body" type="Label" parent="UI/Accusation/Panel/VBox" unique_id=1819474698]
@@ -486,6 +515,7 @@ offset_left = 176.0
 offset_top = 70.0
 offset_right = 976.0
 offset_bottom = 150.0
+theme_override_fonts/font = ExtResource("16_5xce6")
 theme_override_font_sizes/font_size = 56
 text = "PALLBROOK"
 horizontal_alignment = 1

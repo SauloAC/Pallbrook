@@ -24,6 +24,10 @@ GameState="*uid://c7cmllcuhuq77"
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[gui]
+
+theme/custom="uid://5y30rax2iib"
+
 [input]
 
 move_left={

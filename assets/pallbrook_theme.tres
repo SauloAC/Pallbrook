@@ -1,0 +1,7 @@
+[gd_resource type="Theme" format=3 uid="uid://5y30rax2iib"]
+
+[ext_resource type="FontFile" uid="uid://fuk4ifulq0hp" path="res://assets/fonts/Lora/static/Lora-Regular.ttf" id="1_mlvyc"]
+
+[resource]
+default_font = ExtResource("1_mlvyc")
+default_font_size = 20

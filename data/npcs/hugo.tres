@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://b32sbhwo8rmh6"]
 
 [ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_7d8pf"]
+[ext_resource type="Texture2D" uid="uid://cuqgutoquhb38" path="res://assets/portraits/hugo.png" id="1_ew0v0"]
 
 [resource]
 script = ExtResource("1_7d8pf")
 npc_name = "Hugo"
-role = "Prefeito"
+role = "Mayor"
 color = Color(0, 0.49803922, 0, 1)
 schedule = Dictionary[int, String]({
 8: "Praca",
@@ -18,4 +19,5 @@ home = "Casa2"
 dialogue_lines = Array[String](["Welcome to Pallbrook! A quiet town, I assure you.", "If you hear rumors, ignore them. People here love a good story."])
 clue_trait = "stamp ink"
 bedtime = 21
+portrait = ExtResource("1_ew0v0")
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

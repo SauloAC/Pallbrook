@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://d1g3qohx1m3mc"]
 
 [ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_ns0lb"]
+[ext_resource type="Texture2D" uid="uid://4atpkxdb2imf" path="res://assets/portraits/clara.png" id="1_u435y"]
 
 [resource]
 script = ExtResource("1_ns0lb")
 npc_name = "Clara"
-role = "Costureira"
+role = "Seamstress"
 color = Color(3.272891e-06, 0.499933, 0.763627, 1)
 schedule = Dictionary[int, String]({
 7: "Casa1",
@@ -17,4 +18,5 @@ schedule = Dictionary[int, String]({
 home = "Casa1"
 dialogue_lines = Array[String](["I’m sewing a new dress. For a funeral, sadly.", "I don’t go out after dark. No one should."])
 clue_trait = "loose threads"
+portrait = ExtResource("1_u435y")
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

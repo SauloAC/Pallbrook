@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://dtbgvtwk3tawr"]
 
 [ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_62wn5"]
+[ext_resource type="Texture2D" uid="uid://crotktxd3v8xb" path="res://assets/portraits/elias.png" id="1_wjk00"]
 
 [resource]
 script = ExtResource("1_62wn5")
 npc_name = "Elias"
-role = "Padre"
+role = "Priest"
 color = Color(0.4774989, 0.48340583, 0.50913167, 1)
 schedule = Dictionary[int, String]({
 6: "Igreja",
@@ -18,4 +19,5 @@ home = "Igreja"
 dialogue_lines = Array[String](["May God protect you, doctor. The nights here have grown too long.", "I pray for this town every morning. Lately, I pray more."])
 clue_trait = "candle wax"
 bedtime = 21
+portrait = ExtResource("1_wjk00")
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

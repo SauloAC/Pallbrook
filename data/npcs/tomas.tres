@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://dyclkhngaj7bu"]
 
+[ext_resource type="Texture2D" uid="uid://dqojeo7sbp2it" path="res://assets/portraits/tomas.png" id="1_62qct"]
 [ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_c02m7"]
 
 [resource]
 script = ExtResource("1_c02m7")
 npc_name = "Tomas"
-role = "Ferreiro"
+role = "Blacksmith"
 color = Color(0.64658266, 0.3092063, 0.019033113, 1)
 schedule = Dictionary[int, String]({
 6: "Casa2",
@@ -16,4 +17,5 @@ schedule = Dictionary[int, String]({
 home = "Casa2"
 dialogue_lines = Array[String](["Iron doesn’t lie, doctor. People do.", "I hammer all day. At night I sleep like a rock... almost."])
 clue_trait = "forge soot"
+portrait = ExtResource("1_62qct")
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

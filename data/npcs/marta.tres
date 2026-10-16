@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://cbfk62j70stao"]
 
 [ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_n0pe1"]
+[ext_resource type="Texture2D" uid="uid://cyf7wu2a32t2q" path="res://assets/portraits/marta.png" id="1_rei4j"]
 
 [resource]
 script = ExtResource("1_n0pe1")
 npc_name = "Marta"
-role = "Taverneira"
+role = "Innkeeper"
 color = Color(0.7647059, 0, 0, 1)
 schedule = Dictionary[int, String]({
 7: "Praca",
@@ -15,4 +16,5 @@ home = "Taverna"
 dialogue_lines = Array[String](["First drink’s on the house, doctor.", "I heard footsteps on the roof last night. Cats, must be... cats."])
 clue_trait = "wine stains"
 bedtime = 23
+portrait = ExtResource("1_rei4j")
 metadata/_custom_type_script = "uid://dl651qayo3ngb"
