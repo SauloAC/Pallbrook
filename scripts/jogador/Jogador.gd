@@ -4,13 +4,20 @@ extends CharacterBody3D
 @export var talk_range := 2.5
 
 var nearby_npc: Node3D = null
+var spawn_point: Vector3
 
 
 func _ready() -> void:
 	add_to_group("player")  # Lets the vampire know where the doctor is
+	spawn_point = global_position  # Where the doctor starts; used if he ever falls off
 
 
 func _physics_process(delta: float) -> void:
+	if global_position.y < -5.0:
+		global_position = spawn_point
+		velocity = Vector3.ZERO
+		reset_physics_interpolation()  # Teleport instantly, don't slide there
+	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
