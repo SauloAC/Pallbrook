@@ -8,14 +8,14 @@ script = ExtResource("1_7d8pf")
 npc_name = "Hugo"
 role = "Mayor"
 color = Color(0, 0.49803922, 0, 1)
-schedule = Dictionary[int, String]({
-8: "Praca",
+Dictionary[int, String]({
+8: "Prefeitura",
 12: "Taverna",
-15: "Clinica",
+14: "Prefeitura",
 17: "Praca",
-20: "Casa2"
+20: "CasaHugo"
 })
-home = "Casa2"
+home = "CasaHugo"
 dialogue_lines = Array[String](["Welcome to Pallbrook! A quiet town, I assure you.", "If you hear rumors, ignore them. People here love a good story."])
 clue_trait = "stamp ink"
 bedtime = 21

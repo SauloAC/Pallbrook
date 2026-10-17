@@ -20,6 +20,22 @@ var line_index := 0
 var is_servant := false
 var examined := false
 var body_trace := ""
+var place_slot := -1  # Which spot this NPC took at the current place
+var real_target := Vector3.ZERO  # Where we actually want to go (detours are temporary)
+var detouring := false
+var stuck_tries := 0
+
+# Spots in front of a door (the door faces +z): a small crowd instead of a pile
+const PLACE_SLOTS: Array[Vector3] = [
+	Vector3(0.0, 0.0, 0.8),
+	Vector3(-1.8, 0.0, 1.1),
+	Vector3(1.8, 0.0, 1.1),
+	Vector3(-0.9, 0.0, 2.7),
+	Vector3(0.9, 0.0, 2.7),
+	Vector3(-2.7, 0.0, 2.8),
+	Vector3(2.7, 0.0, 2.8),
+	Vector3(0.0, 0.0, 4.2),
+]
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -192,7 +208,20 @@ func _servant_line() -> String:
 # ---------- Movement ----------
 
 func go_to(target: Vector3) -> void:
+	real_target = target
+	detouring = false
+	stuck_tries = 0
 	agent.target_position = target
+
+
+func _detour() -> void:
+	# Blocked (a post, a corner, another person): step to the side, then try again
+	var forward := real_target - global_position
+	forward.y = 0.0
+	forward = forward.normalized()
+	var side := forward.cross(Vector3.UP) * (1.0 if randf() < 0.5 else -1.0)
+	detouring = true
+	agent.target_position = global_position + side * 1.5 - forward * 0.5
 
 
 func _physics_process(delta: float) -> void:
@@ -210,7 +239,10 @@ func _physics_process(delta: float) -> void:
 	if state == State.TALKING or agent.is_navigation_finished():
 		velocity.x = 0.0
 		velocity.z = 0.0
-		if state != State.TALKING:
+		if detouring:
+			detouring = false
+			agent.target_position = real_target  # Side step done: back to the real goal
+		elif state != State.TALKING:
 			_on_arrived()
 	else:
 		var direction := agent.get_next_path_position() - global_position
@@ -226,10 +258,14 @@ func _physics_process(delta: float) -> void:
 		stuck_time += delta
 		if stuck_time > 2.0:
 			stuck_time = 0.0
+			stuck_tries += 1
 			if wander:
 				_pick_random_destination()
+			elif stuck_tries <= 3 and global_position.distance_to(real_target) > 2.0:
+				_detour()
 			else:
-				agent.target_position = global_position  # Close enough: stop here
+				detouring = false
+				agent.target_position = global_position  # Close enough (or truly stuck): stop here
 	else:
 		stuck_time = 0.0
 
@@ -315,9 +351,25 @@ func _go_to_place(place: String) -> void:
 	var marker := _find_location(place)
 	if marker:
 		current_place = place
-		# Small random offset so people don't stack on the exact same spot
-		var offset := Vector3(randf_range(-1.0, 1.0), 0.0, randf_range(-1.0, 1.0))
-		go_to(marker.global_position + offset)
+		place_slot = _free_slot(place)
+		# Each person takes their own spot, with a tiny jitter so it doesn't look like a grid
+		var jitter := Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
+		go_to(marker.global_position + PLACE_SLOTS[place_slot] + jitter)
+
+
+func _free_slot(place: String) -> int:
+	# Spots already taken by other people heading to (or standing at) the same place
+	var taken := []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc == self or npc.current_place != place:
+			continue
+		if npc.state == State.DEAD or npc.state == State.SLEEPING:
+			continue
+		taken.append(npc.place_slot)
+	for i in PLACE_SLOTS.size():
+		if not taken.has(i):
+			return i
+	return randi() % PLACE_SLOTS.size()  # Very crowded: share a spot
 
 
 func _place_for_hour(hour: int) -> String:

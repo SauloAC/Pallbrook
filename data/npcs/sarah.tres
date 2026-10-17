@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://dua3ndtkdmva8"]
+
+[ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_npc"]
+[ext_resource type="Texture2D" uid="uid://dx5yhi76udjpl" path="res://assets/portraits/sarah.png" id="2_portrait"]
+
+[resource]
+script = ExtResource("1_npc")
+npc_name = "Sarah"
+role = "Teacher"
+color = Color(0.24313726, 0.49019608, 0.47058824, 1)
+schedule = Dictionary[int, String]({
+7: "Escola",
+12: "Praca",
+13: "Escola",
+16: "Biblioteca",
+19: "CasaSarah"
+})
+home = "CasaSarah"
+dialogue_lines = Array[String](["Half my pupils stayed home this week. Their parents say they are just tired.", "Children notice things, doctor. They say someone walks the streets at night."])
+clue_trait = "chalk dust"
+portrait = ExtResource("2_portrait")
+metadata/_custom_type_script = "uid://dl651qayo3ngb"

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="NPCData" format=3 uid="uid://dedw38ak3uad6"]
+
+[ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_npc"]
+[ext_resource type="Texture2D" uid="uid://dhvceq1n31oe0" path="res://assets/portraits/sophia.png" id="2_portrait"]
+
+[resource]
+script = ExtResource("1_npc")
+npc_name = "Sophia"
+role = "Librarian"
+color = Color(0.72156864, 0.58431375, 0.18039216, 1)
+schedule = Dictionary[int, String]({
+7: "CasaSophia",
+8: "Biblioteca",
+12: "Praca",
+13: "Biblioteca",
+18: "Taverna",
+21: "CasaSophia"
+})
+home = "CasaSophia"
+dialogue_lines = Array[String](["Every book in this town has been read twice. Except the ones about this town.", "The old records stop forty years ago. Someone tore the pages out."])
+clue_trait = "old paper dust"
+portrait = ExtResource("2_portrait")
+metadata/_custom_type_script = "uid://dl651qayo3ngb"

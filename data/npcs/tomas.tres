@@ -10,7 +10,8 @@ role = "Blacksmith"
 color = Color(0.64658266, 0.3092063, 0.019033113, 1)
 schedule = Dictionary[int, String]({
 6: "Casa2",
-8: "Praca",
+12: "Praca",
+13: "Casa2",
 18: "Taverna",
 22: "Casa2"
 })
