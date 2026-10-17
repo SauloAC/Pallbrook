@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bmu8o4jphr7ed" path="res://scripts/world/SleepSpot.gd" id="3_l36k5"]
 [ext_resource type="Script" uid="uid://cv6jl8et5inbi" path="res://scripts/cycle/DayNightCycle.gd" id="3_st4sy"]
 [ext_resource type="PackedScene" uid="uid://bqni0wta1nggy" path="res://scenes/mundo/StreetLamp.tscn" id="4_qthrd"]
+[ext_resource type="Texture2D" uid="uid://b38oi7nbegyiu" path="res://assets/ui/icon_sleep.png" id="5_85yts"]
 [ext_resource type="PackedScene" uid="uid://q4sfidb3tq7a" path="res://scenes/mundo/WindowLight.tscn" id="5_o5pq4"]
 [ext_resource type="Script" uid="uid://coab8nqlctlo0" path="res://scripts/ui/PhaseBanner.gd" id="6_73egf"]
 [ext_resource type="Shader" uid="uid://cudikbpjewu53" path="res://shaders/vignette.gdshader" id="7_gq2ka"]
@@ -168,13 +169,13 @@ script = ExtResource("3_l36k5")
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 shape = SubResource("BoxShape3D_t2dwb")
 
-[node name="Prompt" type="Label3D" parent="NavigationRegion3D/Clinica/SleepSpot" unique_id=994264319]
+[node name="Prompt" type="Sprite3D" parent="NavigationRegion3D/Clinica/SleepSpot" unique_id=1121701819]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+cast_shadow = 0
+pixel_size = 0.008
 billboard = 1
 no_depth_test = true
-text = "[E] Sleep"
-font_size = 128
-outline_size = 24
+texture = ExtResource("5_85yts")
 
 [node name="Taverna" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=1947628007]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -4)
@@ -255,27 +256,22 @@ shape = SubResource("CapsuleShape3D_t2dwb")
 [node name="Elias" parent="Characters/NPCs" unique_id=2114807663 instance=ExtResource("10_p3xqx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
 data = ExtResource("11_2n2no")
-show_state = false
 
 [node name="Marta" parent="Characters/NPCs" unique_id=213485090 instance=ExtResource("10_p3xqx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -1)
 data = ExtResource("12_fm4th")
-show_state = false
 
 [node name="Clara" parent="Characters/NPCs" unique_id=1183229265 instance=ExtResource("10_p3xqx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 5)
 data = ExtResource("13_t3jqk")
-show_state = false
 
 [node name="Tomas" parent="Characters/NPCs" unique_id=407762272 instance=ExtResource("10_p3xqx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 6)
 data = ExtResource("14_mequr")
-show_state = false
 
 [node name="Hugo" parent="Characters/NPCs" unique_id=1100674295 instance=ExtResource("10_p3xqx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 data = ExtResource("15_ervra")
-show_state = false
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1656558175 node_paths=PackedStringArray("target")]
 transform = Transform3D(0.70710677, -0.35355338, 0.6123724, 0, 0.8660254, 0.5, -0.70710677, -0.35355338, 0.6123724, 10, 8.2, 10)

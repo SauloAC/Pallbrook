@@ -1,6 +1,6 @@
 extends Area3D
 
-@onready var prompt: Label3D = $Prompt
+@onready var prompt: Sprite3D = $Prompt
 var player_inside := false
 
 func _ready() -> void:

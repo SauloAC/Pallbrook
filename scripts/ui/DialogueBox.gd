@@ -43,8 +43,8 @@ func _close() -> void:
 	EventBus.dialogue_ended.emit()
 
 
-func _find_portrait(speaker: String) -> Texture2D:
+func _find_portrait(speaker_name: String) -> Texture2D:
 	for npc in get_tree().get_nodes_in_group("npcs"):
-		if npc.data and npc.data.npc_name == speaker:
+		if npc.data and npc.data.npc_name == speaker_name:
 			return npc.data.portrait
 	return null

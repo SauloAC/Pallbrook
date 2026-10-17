@@ -5,7 +5,7 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING }
 @export var data: NPCData
 @export var speed := 2.5
 @export var wander := false      # Debug: walk to random places instead of the schedule
-@export var show_state := true   # Debug: show the current state above the name
+@export var show_state := false   # Debug: show the current state above the name
 @export var witness_range := 5.0  # How close the doctor must be to recognize a hunting vampire
 
 var hunt_returning := false
@@ -25,6 +25,11 @@ var body_trace := ""
 @onready var collision: CollisionShape3D = $CollisionShape3D
 @onready var name_label: Label3D = $NameLabel
 @onready var agent: NavigationAgent3D = $NavigationAgent3D
+@onready var prompt_icon: Sprite3D = $PromptIcon
+
+const ICON_TALK := preload("res://assets/ui/icon_talk.png")
+const ICON_EXAMINE := preload("res://assets/ui/icon_examine.png")
+const HIGHLIGHT_COLOR := Color("C2A65B")
 
 
 func _ready() -> void:
@@ -112,11 +117,15 @@ func _update_label() -> void:
 		text += "\n(%s)" % State.keys()[state]
 	if show_state and is_servant:
 		text += " [SERVANT]"  # Debug only
-	if highlighted and state == State.ROUTINE:
-		text += "\n[E] Talk   [Q] Accuse"
-	elif highlighted and state == State.DEAD and not examined:
-		text += "\n[E] Examine"
 	name_label.text = text
+
+	# Can the player do something with this NPC right now?
+	var can_act := highlighted and (state == State.ROUTINE \
+			or (state == State.DEAD and not examined))
+	name_label.modulate = HIGHLIGHT_COLOR if can_act else Color.WHITE
+	prompt_icon.visible = can_act
+	if can_act:
+		prompt_icon.texture = ICON_EXAMINE if state == State.DEAD else ICON_TALK
 
 func can_talk() -> bool:
 	# Talk to the living, examine the dead (once)
