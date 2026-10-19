@@ -39,6 +39,10 @@ var wary_day := 0                      # Keeps away from the doctor on this day
 var asked: Dictionary = {}             # question -> day it was last asked
 var sight_timer := 0.0
 
+# ---------- Death and burial ----------
+var found_day := 0     # Day the body was found at the door
+var buried := false
+
 # Spots in front of a door (the door faces +z): a small crowd instead of a pile
 const PLACE_SLOTS: Array[Vector3] = [
 	Vector3(0.0, 0.0, 0.8),
@@ -75,6 +79,7 @@ func _ready() -> void:
 		await get_tree().physics_frame
 	EventBus.hour_changed.connect(_on_hour_changed)
 	EventBus.dialogue_ended.connect(_on_dialogue_ended)
+	EventBus.phase_changed.connect(_on_phase_changed)
 	if wander:
 		_pick_random_destination()
 	else:
@@ -122,7 +127,7 @@ func set_state(new_state: State) -> void:
 				var toward_street := -signf(home_marker.global_position.x) * 1.5
 				global_position = home_marker.global_position + Vector3(toward_street, 0.0, 0.8)
 			# Lying on the ground
-			mesh.rotation_degrees.x = 90.0
+			mesh.rotation_degrees.z = 90.0  # Lying sideways, so it reads as a body from above
 			mesh.position.y = 0.5
 			name_label.position.y = 1.2
 		State.HUNTING:
@@ -143,6 +148,8 @@ func is_alive() -> bool:
 
 func die(trace: String = "") -> void:
 	body_trace = trace
+	# Killed during the night: found the next morning. Killed at dawn: found today.
+	found_day = GameState.day + 1 if GameState.is_night else GameState.day
 	set_state(State.DEAD)
 
 func _set_present(present: bool) -> void:
@@ -169,7 +176,7 @@ func _update_label() -> void:
 func can_talk() -> bool:
 	# Talk to the living, examine the dead (once)
 	return state == State.ROUTINE or state == State.INSIDE \
-			or (state == State.DEAD and not examined)
+			or (state == State.DEAD and not examined and not buried)
 
 
 func set_highlighted(value: bool) -> void:
@@ -354,7 +361,7 @@ func _check_seen_by_doctor() -> void:
 		witnessed = true
 		name_label.visible = true  # Close enough to recognize the face
 		var clue := "Night of Day %d, %s: you saw %s sneaking through the dark streets." % [GameState.day, GameState.format_time(GameState.hour), data.npc_name]
-		GameState.add_clue(clue)
+		GameState.add_clue(clue, "evidence")
 
 # ---------- Schedule ----------
 
@@ -448,7 +455,7 @@ func _examine_body() -> void:
 	_update_label()
 	var trace := body_trace if body_trace != "" else "nothing unusual"
 	var text := "Bite marks on the neck. On the clothes, traces of %s." % trace
-	GameState.add_clue("Body of %s: %s" % [data.npc_name, text])
+	GameState.add_clue("Body of %s: %s" % [data.npc_name, text], "evidence")
 	EventBus.dialogue_started.emit("Body of %s" % data.npc_name, text)
 
 
@@ -480,7 +487,7 @@ func _look_around() -> void:
 		if npc.state == State.HUNTING and distance > RECOGNIZE_RANGE:
 			add_sighting(night, "figure", "", place, GameState.hour)  # Too dark to see who
 		else:
-			add_sighting(night, "person", npc.data.npc_name, place, GameState.hour)
+			add_sighting(night, "person", npc.data.npc_name, place, GameState.hour, same_room)
 
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if player and global_position.distance_to(player.global_position) <= sight:
@@ -491,14 +498,15 @@ func _look_around() -> void:
 				wary_day = GameState.day + 1  # Tomorrow they keep their distance
 
 
-func add_sighting(night: int, kind: String, who: String, place: String, hour: float) -> void:
+func add_sighting(night: int, kind: String, who: String, place: String, hour: float, inside := false) -> void:
 	# One entry per person per night, updated to the last time they were seen
 	for s in sightings:
 		if s["night"] == night and s["kind"] == kind and s["who"] == who and (kind != "figure" or s["place"] == place):
 			s["place"] = place
 			s["hour"] = hour
+			s["inside"] = inside
 			return
-	sightings.append({"night": night, "kind": kind, "who": who, "place": place, "hour": hour})
+	sightings.append({"night": night, "kind": kind, "who": who, "place": place, "hour": hour, "inside": inside})
 
 
 func _is_late(hour: float) -> bool:
@@ -524,7 +532,8 @@ func greeting() -> String:
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor_collapsed":
 			GameState.add_clue("Day %d · %s found you collapsed near %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"])])
-			return "Doctor! We found you lying in the street near %s this morning. Are you ill... or is it something else?" % GameState.place_name(s["place"])
+			var spot := "my door" if s["place"] == data.home else GameState.place_name(s["place"])
+			return "Doctor! We found you lying in the street near %s this morning. Are you ill... or is it something else?" % spot
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor" and _is_late(s["hour"]):
 			GameState.add_clue("Day %d · %s saw you out near %s at %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
@@ -600,7 +609,7 @@ func _alibi_text() -> String:
 			text += ", then %s from %s" % [_where(last_place), GameState.format_time(h)]
 	if last_place != data.home:
 		text += ", then I went home"
-	return text + ". I was asleep by %s." % GameState.format_time(data.bedtime)
+	return text + ". I went to bed around %s." % GameState.format_time(data.bedtime)
 
 
 func _where(place: String) -> String:
@@ -623,9 +632,11 @@ func _describe(s: Dictionary) -> String:
 			return "Around %s I saw a dark figure near %s. I couldn't make out a face." % [time, where]
 		"doctor":
 			return "And you, doctor, were near %s around %s." % [where, time]
+	if s.get("inside", false):
+		return "%s was at %s with me until about %s." % [s["who"], where, time]
 	if _is_late(s["hour"]):
 		return "I saw %s out near %s around %s. At that hour!" % [s["who"], where, time]
-	return "%s was at %s, the last time I looked around %s." % [s["who"], where, time]
+	return "I saw %s passing near %s around %s." % [s["who"], where, time]
 
 
 func _servant_sighting() -> String:
@@ -639,3 +650,52 @@ func _servant_sighting() -> String:
 	var place: String = GameState.PLACE_NAMES.keys().pick_random()
 	var time := GameState.format_time(snappedf(randf_range(22.5, 24.5), 1.0 / 6.0))
 	return "I saw %s sneaking near %s around %s. Ask them where they were." % [target.data.npc_name, GameState.place_name(place), time]
+
+
+# ---------- Burial ----------
+
+func _on_phase_changed(is_night: bool) -> void:
+	# The body stays at the door for the day it is found; at dusk it is buried
+	if is_night and state == State.DEAD and not buried and GameState.day >= found_day:
+		_bury()
+
+
+func _bury() -> void:
+	buried = true
+	visible = false
+	collision.disabled = true
+	var slot := _free_grave_slot()
+	if slot:
+		slot.add_child(_make_headstone())
+	GameState.add_night_event("%s was buried in the cemetery beyond the bridge." % data.npc_name)
+	if not examined:
+		GameState.add_clue("Day %d · %s was buried before you examined the body." % [GameState.day, data.npc_name], "evidence")
+
+
+func _free_grave_slot() -> Node3D:
+	# Empty slots come from the town model (empties named GraveSlot...)
+	for slot in get_tree().root.find_children("GraveSlot*", "", true, false):
+		if slot is Node3D and slot.get_child_count() == 0:
+			return slot
+	push_warning("No free grave slot in the cemetery")
+	return null
+
+
+func _make_headstone() -> Node3D:
+	var stone := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(0.7, 0.9, 0.18)
+	stone.mesh = box
+	stone.position.y = 0.45
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.55, 0.55, 0.58)
+	stone.material_override = material
+	var plate := Label3D.new()
+	plate.text = "%s\n%s" % [data.npc_name, data.role]
+	plate.font_size = 48
+	plate.outline_size = 12
+	plate.pixel_size = 0.006
+	plate.position = Vector3(0.0, 0.15, 0.1)  # On the face of the stone, toward the camera
+	plate.modulate = Color(0.9, 0.88, 0.82)
+	stone.add_child(plate)
+	return stone

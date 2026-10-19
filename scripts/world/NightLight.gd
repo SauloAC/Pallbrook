@@ -42,7 +42,7 @@ func _should_be_lit() -> bool:
 	if place == "":
 		return true  # Street lamp or the Clinic
 	for npc in get_tree().get_nodes_in_group("npcs"):
-		if npc.current_place == place and npc.state == npc.State.INSIDE:
+		if npc.current_place == place and npc.is_inside():
 			return true
 	return false
 

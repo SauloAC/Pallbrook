@@ -1,0 +1,752 @@
+[gd_scene format=3 uid="uid://cerldkexjome5"]
+
+[ext_resource type="Script" uid="uid://d1dgwf3vbiqkw" path="res://scripts/jogador/Jogador.gd" id="1_mtbfa"]
+[ext_resource type="Script" uid="uid://dqti13wid6dwe" path="res://scripts/camera/CameraFollow.gd" id="1_ocx82"]
+[ext_resource type="Script" uid="uid://dkvdtt6h5ov45" path="res://scripts/cycle/VampireDirector.gd" id="2_t3jqk"]
+[ext_resource type="Script" uid="uid://bmu8o4jphr7ed" path="res://scripts/world/SleepSpot.gd" id="3_l36k5"]
+[ext_resource type="Script" uid="uid://cv6jl8et5inbi" path="res://scripts/cycle/DayNightCycle.gd" id="3_st4sy"]
+[ext_resource type="PackedScene" uid="uid://bqni0wta1nggy" path="res://scenes/mundo/StreetLamp.tscn" id="4_qthrd"]
+[ext_resource type="Texture2D" uid="uid://b38oi7nbegyiu" path="res://assets/ui/icon_sleep.png" id="5_85yts"]
+[ext_resource type="PackedScene" uid="uid://q4sfidb3tq7a" path="res://scenes/mundo/WindowLight.tscn" id="5_o5pq4"]
+[ext_resource type="Script" uid="uid://coab8nqlctlo0" path="res://scripts/ui/PhaseBanner.gd" id="6_73egf"]
+[ext_resource type="Shader" uid="uid://cudikbpjewu53" path="res://shaders/vignette.gdshader" id="7_gq2ka"]
+[ext_resource type="Script" uid="uid://b8qlfb4bh8whw" path="res://scripts/ui/MorningSummary.gd" id="9_tkho8"]
+[ext_resource type="PackedScene" uid="uid://cflwpimx1kbw6" path="res://scenes/personagens/NPC.tscn" id="10_p3xqx"]
+[ext_resource type="Resource" uid="uid://dtbgvtwk3tawr" path="res://data/npcs/padre.tres" id="11_2n2no"]
+[ext_resource type="Resource" uid="uid://cbfk62j70stao" path="res://data/npcs/marta.tres" id="12_fm4th"]
+[ext_resource type="Resource" uid="uid://d1g3qohx1m3mc" path="res://data/npcs/clara.tres" id="13_t3jqk"]
+[ext_resource type="Resource" uid="uid://dyclkhngaj7bu" path="res://data/npcs/tomas.tres" id="14_mequr"]
+[ext_resource type="Resource" uid="uid://b32sbhwo8rmh6" path="res://data/npcs/hugo.tres" id="15_ervra"]
+[ext_resource type="FontFile" uid="uid://dyht6nehoscch" path="res://assets/fonts/Cinzel/static/Cinzel-Bold.ttf" id="16_5xce6"]
+[ext_resource type="Script" uid="uid://dly1apg7e36vd" path="res://scripts/ui/DialogueBox.gd" id="16_fm4th"]
+[ext_resource type="Script" uid="uid://c4hmcrjf3pqp1" path="res://scripts/ui/Notebook.gd" id="18_mequr"]
+[ext_resource type="Script" uid="uid://cqh3p8bipx8e" path="res://scripts/ui/Accusation.gd" id="19_ervra"]
+[ext_resource type="FontFile" uid="uid://xlmosxhirafp" path="res://assets/fonts/Lora/static/Lora-Bold.ttf" id="19_ud5yp"]
+[ext_resource type="Script" uid="uid://c4cvy1j1dmabp" path="res://scripts/ui/HUD.gd" id="20_4bwyx"]
+[ext_resource type="Script" uid="uid://dwh5365ql3ql7" path="res://scripts/ui/Intro.gd" id="21_n6eqd"]
+[ext_resource type="Texture2D" uid="uid://b8i8km80wk7yj" path="res://assets/ui/casebook.png" id="21_ud5yp"]
+[ext_resource type="Texture2D" uid="uid://7slrtqirxau8" path="res://assets/art/title_village.png" id="25_ya4kv"]
+[ext_resource type="PackedScene" uid="uid://bmj1jylisoqc" path="res://assets/models/town.glb" id="27_uhjcs"]
+[ext_resource type="Resource" uid="uid://dedw38ak3uad6" path="res://data/npcs/sophia.tres" id="40_soph"]
+[ext_resource type="Resource" uid="uid://dua3ndtkdmva8" path="res://data/npcs/sarah.tres" id="41_sarah"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_mtbfa"]
+sky_material = SubResource("ProceduralSkyMaterial_tslrp")
+
+[sub_resource type="Environment" id="Environment_ocx82"]
+background_mode = 2
+sky = SubResource("Sky_mtbfa")
+glow_enabled = true
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_dw24c"]
+vertices = PackedVector3Array(-8.050001, 0.3, -33.5, -8.050001, 0.3, -32.75, -3.5500011, 0.3, -32.75, -3.5500011, 0.3, -33.5, -1.8000011, 0.3, -32, -3.3000011, 0.3, -32.25, -3.3000011, 0.3, -29.25, -0.55000114, 0.3, -29.25, 4.449999, 0.3, -32.75, 4.699999, 0.3, -27.5, 5.699999, 0.3, -32, 5.199999, 0.3, -33.5, -0.30000114, 0.3, -32.75, -1.5500011, 0.3, -33.5, 7.699999, 0.3, -32.75, 13.449999, 0.3, -32.75, 13.449999, 0.3, -33.5, 7.199999, 0.3, -33.5, 3.9499989, 0.3, -27.25, 4.199999, 0.3, -24, 5.199999, 0.3, -24, 5.449999, 0.3, -23.5, 8.199999, 0.3, -27, 7.699999, 0.3, -27.25, 6.699999, 0.3, -32, 5.449999, 0.3, -22.25, 4.699999, 0.3, -22, 4.699999, 0.3, -21.75, 8.449999, 0.3, -21.75, 14.699999, 0.3, -22.5, 14.949999, 0.3, -21.5, 15.449999, 0.3, -21.5, 15.449999, 0.3, -32.5, 14.949999, 0.3, -32, 13.199999, 0.3, -27, 12.949999, 0.3, -21.75, 13.449999, 0.3, -22.5, 13.449999, 0.3, -32.25, -6.800001, 0.3, -15.5, -6.050001, 0.3, -16.25, -6.550001, 0.3, -16.5, 3.4499989, 0.3, -21.5, 3.4499989, 0.3, -22.5, -1.5500011, 0.3, -21.75, 3.4499989, 0.3, -23.5, -9.300001, 0.3, -14.5, -8.550001, 0.3, -14.5, -8.050001, 0.3, -15.5, -6.300001, 0.3, -21.75, -8.300001, 0.3, -23.5, -9.300001, 0.3, -23.5, -0.30000114, 0.3, -27.25, -3.5500011, 0.3, -27.25, -8.300001, 0.3, -27.25, -9.300001, 0.3, -25.5, -7.800001, 0.3, -25, -1.3000011, 0.3, -19.75, 3.4499989, 0.3, -19.75, -8.550001, 0.3, -32.25, -9.300001, 0.3, -32.25, 8.699999, 4.8, -32, 8.699999, 4.8, -28, 12.449999, 4.8, -28, 12.449999, 4.8, -32, -7.550001, 3.05, -31.75, -7.550001, 3.05, -28.25, -4.300001, 3.05, -28.25, -4.300001, 3.05, -31.75, 0.44999886, 3.05, -31.75, 0.44999886, 3.05, -28.25, 3.6999989, 3.05, -28.25, 3.6999989, 3.05, -31.75, 8.949999, 0.3, -31.75, 8.949999, 0.3, -28.25, 12.199999, 0.3, -28.25, 12.199999, 0.3, -31.75, -7.300001, 0.3, -31.5, -7.300001, 0.3, -28.5, -4.550001, 0.3, -28.5, -4.550001, 0.3, -31.5, 0.69999886, 0.3, -31.5, 0.69999886, 0.3, -28.5, 3.4499989, 0.3, -28.5, 3.4499989, 0.3, -31.5, 14.699999, 0.3, -20.5, 15.449999, 0.3, -12.25, 8.949999, 0.3, -16, 8.949999, 0.3, -15.75, 10.449999, 0.3, -15.5, 10.699999, 0.3, -16, 8.699999, 0.3, -17.75, 10.949999, 0.3, -17.5, 13.449999, 0.3, -20.5, 10.449999, 0.3, -14.25, 12.949999, 0.3, -12, 13.949999, 0.3, -12, 9.699999, 0.3, -13.75, 12.449999, 0.3, -11.25, -5.550001, 3.3, -20.75, -5.550001, 3.3, -17.25, -2.3000011, 3.3, -17.25, -2.3000011, 3.3, -20.75, 4.449999, 3.3, -20.75, 4.449999, 3.3, -17.25, 7.699999, 3.3, -17.25, 7.699999, 3.3, -20.75, -5.300001, 0.3, -20.5, -5.300001, 0.3, -17.5, -2.5500011, 0.3, -17.5, -2.5500011, 0.3, -20.5, 4.699999, 0.3, -20.5, 4.699999, 0.3, -17.5, 7.449999, 0.3, -17.5, 7.449999, 0.3, -20.5, 3.4499989, 0.3, -16.5, -1.5500011, 0.3, -15, 4.449999, 0.3, -15.5, 0.44999886, 0.3, -9.5, 4.449999, 0.3, -9.5, -8.050001, 0.3, -13.5, -9.550001, 0.3, -12.5, -1.0500011, 0.3, -8.75, -0.80000114, 0.3, -7.5, -0.050001144, 0.3, -7.5, -0.050001144, 0.3, -9.25, -1.8000011, 0.3, -14.5, -3.0500011, 0.3, -14.5, -6.800001, 0.3, -13.5, -7.550001, 0.3, -8.75, -7.800001, 0.3, -9.5, -11.300001, 0.3, -12.5, -11.300001, 0.3, -11.5, -9.300001, 0.3, -11.25, -9.300001, 0.3, -9.25, -3.5500011, 0.3, -15, -3.3000011, 0.3, -16.25, 8.449999, 0.3, -16.25, 8.199999, 0.3, -15.25, 8.449999, 0.3, -14.25, 5.199999, 0.3, -9.25, 11.449999, 0.3, -9.25, 6.449999, 0.3, -15.25, 12.949999, 0.3, -9.75, 12.949999, 0.3, -10, 6.199999, 0.3, -16.25, 6.699999, 0.3, -8.25, 11.449999, 0.3, -8.25, 5.199999, 0.3, -5.5, 6.449999, 0.3, -5.25, -26.300001, 0.3, -12.5, -26.300001, 0.3, -11.5, -22.300001, 0.3, -11.25, -21.300001, 0.3, -11.5, -19.800001, 0.3, -3.75, -19.800001, 0.3, -10.25, -21.300001, 0.3, -10.25, -22.550001, 0.3, -10.25, -24.300001, 0.3, -10.25, -24.300001, 0.3, -3.75, 13.449999, 0.3, -9.5, 14.449999, 0.3, -10.25, 14.449999, 0.3, -11.75, 14.199999, 0.3, -1.75, 12.199999, 0.3, -0.75, 15.199999, 0.3, -0.5, 15.449999, 0.3, -1.75, 13.699999, 0.3, -8, 13.699999, 0.3, -3, 12.199999, 0.3, -2.75, 13.949999, 0.3, -3, 15.449999, 0.3, -3.5, 11.949999, 0.3, 4.75, 11.699999, 0.3, 8.5, 15.449999, 0.3, 8.5, 15.199999, 0.3, 4.5, -26.800001, 0.3, -10, -26.800001, 0.3, -3, -25.800001, 0.3, -3, -25.800001, 0.3, -10.25, -18.300001, 0.3, -10.25, -18.300001, 0.3, -3, -10.800001, 0.3, -3, -10.800001, 0.3, -10.25, 0.94999886, 4.3, -8.5, 0.94999886, 4.3, -4.5, 4.199999, 4.3, -4.5, 4.199999, 4.3, -8.5, 1.1999989, 0.3, -8.25, 1.1999989, 0.3, -4.75, 3.9499989, 0.3, -4.75, 3.9499989, 0.3, -8.25, 0.94999886, 0.3, 2.75, 1.1999989, 0.3, 1.5, -1.0500011, 0.3, -2.25, -4.550001, 0.3, 1.25, -4.300001, 0.3, 2.75, -7.800001, 0.3, -2.25, -8.050001, 0.3, -7.5, -9.300001, 0.3, -7.75, -9.300001, 0.3, 1.25, -7.050001, 4.55, -7.75, -7.050001, 4.55, -3.25, -1.8000011, 4.55, -3.25, -1.8000011, 4.55, -7.75, -6.800001, 0.3, -7.5, -6.800001, 0.3, -3.5, -2.0500011, 0.3, -3.5, -2.0500011, 0.3, -7.5, 4.949999, 0.3, -3.5, 6.699999, 0.3, -2.75, 0.19999886, 0.3, -3.5, 1.6999989, 0.3, 1, 3.1999989, 0.3, 1, 9.949999, 0.3, -0.5, 3.9499989, 0.3, 1.75, 3.9499989, 0.3, 2.5, 9.949999, 0.3, 2.5, 7.449999, 3.55, -7.25, 7.449999, 3.55, -3.75, 12.699999, 3.55, -3.75, 12.699999, 3.55, -7.25, 7.699999, 0.3, -7, 7.699999, 0.3, -4, 12.449999, 0.3, -4, 12.449999, 0.3, -7, 10.949999, 3.3, 0.25, 10.949999, 3.3, 3.75, 14.199999, 3.3, 3.75, 14.199999, 3.3, 0.25, 11.199999, 0.3, 0.5, 11.199999, 0.3, 3.5, 13.949999, 0.3, 3.5, 13.949999, 0.3, 0.5, 2.1999989, 1.55, 2, 2.1999989, 1.55, 3, 2.9499989, 1.55, 2.75, 2.6999989, 1.55, 2, -8.550001, 4.55, 2.25, -8.550001, 4.55, 5.5, -5.300001, 4.55, 5.5, -5.300001, 4.55, 2.25, -8.300001, 0.3, 2.5, -8.300001, 0.3, 5.25, -5.550001, 0.3, 5.25, -5.550001, 0.3, 2.5, 4.949999, 0.3, 11, 4.449999, 0.3, 11.25, 7.449999, 0.3, 14.25, 7.949999, 0.3, 13.5, 2.6999989, 0.3, 4, 2.6999989, 0.3, 8.75, 4.949999, 0.3, 9, 3.9499989, 0.3, 3.25, 9.949999, 0.3, 4.5, 9.449999, 0.3, 8.75, 9.449999, 0.3, 13.75, 1.6999989, 0.3, 4, 1.4499989, 0.3, 8.75, -4.300001, 0.3, 6.75, -6.050001, 0.3, 7.25, -6.300001, 0.3, 6.5, -7.550001, 0.3, 6.5, -7.800001, 0.3, 7.75, -3.0500011, 0.3, 12.5, -1.5500011, 0.3, 12.75, 0.94999886, 0.3, 10.75, 0.94999886, 0.3, 9, -4.550001, 0.3, 7.25, -9.300001, 0.3, 7.75, -9.300001, 0.3, 10.5, -8.050001, 0.3, 10.5, -7.550001, 0.3, 11.75, -3.5500011, 0.3, 13, 10.449999, 5.05, 9.5, 10.449999, 5.05, 13.25, 14.699999, 5.05, 13.25, 14.699999, 5.05, 9.5, 1.9499989, 2.3, 9.75, 1.9499989, 2.3, 10.25, 3.9499989, 2.3, 10.25, 3.9499989, 2.3, 9.75, 10.699999, 0.3, 9.75, 10.699999, 0.3, 13, 14.449999, 0.3, 13, 14.449999, 0.3, 9.75, 13.949999, 0.3, 16, 15.449999, 0.3, 15.75, 15.449999, 0.3, 14.25, 9.449999, 0.3, 14, 9.199999, 0.3, 15.5, 1.1999989, 0.3, 11.25, -1.5500011, 0.3, 14.25, -2.3000011, 0.3, 14.5, -2.3000011, 0.3, 17.5, 14.199999, 0.3, 17.5, 7.949999, 0.3, 15.5, -3.5500011, 0.3, 14, -8.050001, 0.3, 12.5, -9.300001, 0.3, 12.5, -9.300001, 0.3, 17.5)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1), PackedInt32Array(5, 4, 6), PackedInt32Array(6, 4, 7), PackedInt32Array(11, 10, 8), PackedInt32Array(8, 10, 9), PackedInt32Array(13, 12, 4), PackedInt32Array(4, 12, 7), PackedInt32Array(15, 14, 16), PackedInt32Array(16, 14, 17), PackedInt32Array(20, 19, 18), PackedInt32Array(23, 22, 9), PackedInt32Array(9, 22, 18), PackedInt32Array(18, 22, 20), PackedInt32Array(20, 22, 21), PackedInt32Array(17, 14, 24), PackedInt32Array(24, 14, 23), PackedInt32Array(8, 12, 11), PackedInt32Array(11, 12, 13), PackedInt32Array(10, 24, 9), PackedInt32Array(9, 24, 23), PackedInt32Array(26, 25, 27), PackedInt32Array(27, 25, 28), PackedInt32Array(31, 30, 29), PackedInt32Array(29, 34, 31), PackedInt32Array(31, 34, 33), PackedInt32Array(31, 33, 32), PackedInt32Array(28, 25, 21), PackedInt32Array(35, 28, 36), PackedInt32Array(36, 28, 21), PackedInt32Array(36, 21, 22), PackedInt32Array(36, 22, 34), PackedInt32Array(34, 29, 36), PackedInt32Array(34, 37, 33), PackedInt32Array(38, 40, 39), PackedInt32Array(27, 41, 26), PackedInt32Array(26, 41, 42), PackedInt32Array(42, 41, 43), PackedInt32Array(44, 42, 43), PackedInt32Array(46, 45, 47), PackedInt32Array(47, 45, 48), PackedInt32Array(48, 45, 49), PackedInt32Array(49, 45, 50), PackedInt32Array(38, 47, 40), PackedInt32Array(40, 47, 48), PackedInt32Array(7, 51, 6), PackedInt32Array(6, 51, 52), PackedInt32Array(54, 53, 55), PackedInt32Array(55, 53, 52), PackedInt32Array(19, 44, 18), PackedInt32Array(18, 44, 51), PackedInt32Array(51, 44, 43), PackedInt32Array(57, 56, 41), PackedInt32Array(41, 56, 43), PackedInt32Array(49, 55, 48), PackedInt32Array(48, 55, 52), PackedInt32Array(48, 52, 43), PackedInt32Array(43, 52, 51), PackedInt32Array(58, 53, 59), PackedInt32Array(59, 53, 54), PackedInt32Array(63, 62, 60), PackedInt32Array(60, 62, 61), PackedInt32Array(67, 66, 64), PackedInt32Array(64, 66, 65), PackedInt32Array(71, 70, 68), PackedInt32Array(68, 70, 69), PackedInt32Array(75, 74, 72), PackedInt32Array(72, 74, 73), PackedInt32Array(79, 78, 76), PackedInt32Array(76, 78, 77), PackedInt32Array(83, 82, 80), PackedInt32Array(80, 82, 81), PackedInt32Array(30, 31, 84), PackedInt32Array(84, 31, 85), PackedInt32Array(87, 86, 88), PackedInt32Array(88, 86, 89), PackedInt32Array(92, 91, 35), PackedInt32Array(35, 91, 90), PackedInt32Array(35, 90, 28), PackedInt32Array(93, 88, 89), PackedInt32Array(85, 95, 94), PackedInt32Array(93, 89, 91), PackedInt32Array(94, 97, 93), PackedInt32Array(93, 97, 96), PackedInt32Array(92, 84, 91), PackedInt32Array(91, 84, 93), PackedInt32Array(93, 84, 94), PackedInt32Array(94, 84, 85), PackedInt32Array(101, 100, 98), PackedInt32Array(98, 100, 99), PackedInt32Array(105, 104, 102), PackedInt32Array(102, 104, 103), PackedInt32Array(109, 108, 106), PackedInt32Array(106, 108, 107), PackedInt32Array(113, 112, 110), PackedInt32Array(110, 112, 111), PackedInt32Array(57, 114, 56), PackedInt32Array(56, 114, 115), PackedInt32Array(114, 116, 115), PackedInt32Array(115, 116, 117), PackedInt32Array(117, 116, 118), PackedInt32Array(46, 119, 45), PackedInt32Array(45, 119, 120), PackedInt32Array(122, 121, 123), PackedInt32Array(123, 121, 124), PackedInt32Array(126, 125, 127), PackedInt32Array(127, 125, 128), PackedInt32Array(128, 125, 121), PackedInt32Array(121, 125, 124), PackedInt32Array(128, 129, 127), PackedInt32Array(130, 120, 131), PackedInt32Array(131, 120, 132), PackedInt32Array(124, 125, 117), PackedInt32Array(117, 125, 115), PackedInt32Array(129, 133, 132), PackedInt32Array(120, 119, 132), PackedInt32Array(132, 119, 127), PackedInt32Array(132, 127, 129), PackedInt32Array(39, 135, 134), PackedInt32Array(38, 39, 127), PackedInt32Array(127, 39, 134), PackedInt32Array(127, 134, 126), PackedInt32Array(86, 87, 136), PackedInt32Array(136, 87, 137), PackedInt32Array(137, 87, 138), PackedInt32Array(138, 96, 116), PackedInt32Array(116, 96, 118), PackedInt32Array(118, 96, 139), PackedInt32Array(139, 96, 140), PackedInt32Array(116, 141, 138), PackedInt32Array(143, 142, 97), PackedInt32Array(97, 142, 140), PackedInt32Array(97, 140, 96), PackedInt32Array(116, 144, 141), PackedInt32Array(146, 145, 140), PackedInt32Array(140, 145, 139), PackedInt32Array(141, 137, 138), PackedInt32Array(148, 147, 145), PackedInt32Array(145, 147, 139), PackedInt32Array(150, 149, 151), PackedInt32Array(151, 149, 152), PackedInt32Array(155, 154, 153), PackedInt32Array(158, 157, 156), PackedInt32Array(155, 153, 156), PackedInt32Array(156, 153, 158), PackedInt32Array(131, 152, 130), PackedInt32Array(130, 152, 149), PackedInt32Array(152, 155, 151), PackedInt32Array(151, 155, 156), PackedInt32Array(142, 143, 159), PackedInt32Array(159, 143, 160), PackedInt32Array(95, 85, 161), PackedInt32Array(165, 164, 162), PackedInt32Array(162, 164, 163), PackedInt32Array(160, 161, 85), PackedInt32Array(166, 159, 160), PackedInt32Array(169, 162, 167), PackedInt32Array(167, 162, 168), PackedInt32Array(168, 162, 163), PackedInt32Array(169, 167, 170), PackedInt32Array(170, 167, 166), PackedInt32Array(170, 166, 160), PackedInt32Array(170, 160, 85), PackedInt32Array(171, 174, 172), PackedInt32Array(172, 174, 173), PackedInt32Array(164, 165, 174), PackedInt32Array(174, 165, 173), PackedInt32Array(176, 175, 177), PackedInt32Array(177, 175, 178), PackedInt32Array(182, 181, 179), PackedInt32Array(179, 181, 180), PackedInt32Array(186, 185, 183), PackedInt32Array(183, 185, 184), PackedInt32Array(190, 189, 187), PackedInt32Array(187, 189, 188), PackedInt32Array(192, 191, 193), PackedInt32Array(193, 191, 194), PackedInt32Array(194, 191, 195), PackedInt32Array(197, 196, 198), PackedInt32Array(198, 196, 199), PackedInt32Array(199, 196, 194), PackedInt32Array(194, 196, 193), PackedInt32Array(203, 202, 200), PackedInt32Array(200, 202, 201), PackedInt32Array(207, 206, 204), PackedInt32Array(204, 206, 205), PackedInt32Array(147, 148, 208), PackedInt32Array(208, 148, 209), PackedInt32Array(193, 210, 211), PackedInt32Array(211, 210, 212), PackedInt32Array(212, 210, 208), PackedInt32Array(163, 213, 168), PackedInt32Array(168, 213, 209), PackedInt32Array(212, 208, 214), PackedInt32Array(214, 208, 209), PackedInt32Array(123, 210, 122), PackedInt32Array(122, 210, 193), PackedInt32Array(214, 209, 215), PackedInt32Array(215, 209, 213), PackedInt32Array(215, 213, 216), PackedInt32Array(193, 211, 192), PackedInt32Array(220, 219, 217), PackedInt32Array(217, 219, 218), PackedInt32Array(224, 223, 221), PackedInt32Array(221, 223, 222), PackedInt32Array(228, 227, 225), PackedInt32Array(225, 227, 226), PackedInt32Array(232, 231, 229), PackedInt32Array(229, 231, 230), PackedInt32Array(236, 235, 233), PackedInt32Array(233, 235, 234), PackedInt32Array(240, 239, 237), PackedInt32Array(237, 239, 238), PackedInt32Array(244, 243, 241), PackedInt32Array(241, 243, 242), PackedInt32Array(245, 248, 246), PackedInt32Array(246, 248, 247), PackedInt32Array(249, 252, 250), PackedInt32Array(250, 252, 251), PackedInt32Array(171, 172, 253), PackedInt32Array(253, 172, 254), PackedInt32Array(253, 254, 216), PackedInt32Array(216, 254, 251), PackedInt32Array(216, 251, 252), PackedInt32Array(216, 252, 215), PackedInt32Array(248, 245, 255), PackedInt32Array(255, 245, 251), PackedInt32Array(255, 251, 254), PackedInt32Array(249, 250, 256), PackedInt32Array(256, 250, 257), PackedInt32Array(256, 257, 191), PackedInt32Array(191, 257, 258), PackedInt32Array(191, 258, 195), PackedInt32Array(260, 259, 261), PackedInt32Array(261, 259, 262), PackedInt32Array(264, 263, 265), PackedInt32Array(265, 263, 266), PackedInt32Array(266, 263, 267), PackedInt32Array(266, 267, 258), PackedInt32Array(269, 268, 270), PackedInt32Array(270, 268, 262), PackedInt32Array(258, 257, 266), PackedInt32Array(262, 259, 267), PackedInt32Array(270, 262, 271), PackedInt32Array(271, 262, 267), PackedInt32Array(271, 267, 263), PackedInt32Array(271, 263, 272), PackedInt32Array(276, 275, 273), PackedInt32Array(273, 275, 274), PackedInt32Array(280, 279, 277), PackedInt32Array(277, 279, 278), PackedInt32Array(284, 283, 281), PackedInt32Array(281, 283, 282), PackedInt32Array(286, 285, 287), PackedInt32Array(287, 285, 288), PackedInt32Array(288, 285, 289), PackedInt32Array(265, 290, 264), PackedInt32Array(264, 290, 291), PackedInt32Array(293, 292, 291), PackedInt32Array(285, 294, 289), PackedInt32Array(289, 294, 295), PackedInt32Array(295, 294, 293), PackedInt32Array(247, 295, 246), PackedInt32Array(246, 295, 290), PackedInt32Array(290, 295, 291), PackedInt32Array(291, 295, 293), PackedInt32Array(292, 293, 296), PackedInt32Array(296, 293, 297), PackedInt32Array(297, 293, 298), PackedInt32Array(298, 293, 299), PackedInt32Array(271, 272, 297), PackedInt32Array(297, 272, 296)]
+geometry_parsed_geometry_type = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_t2dwb"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_t2dwb"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_t2dwb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_t2dwb"]
+shader = ExtResource("7_gq2ka")
+shader_parameter/intensity = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tkho8"]
+content_margin_left = 30.0
+content_margin_top = 30.0
+content_margin_right = 30.0
+content_margin_bottom = 30.0
+bg_color = Color(0.050980393, 0.05882353, 0.101960786, 0.9019608)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n6eqd"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.101960786, 0.12941177, 0.16078432, 0.9019608)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5xce6"]
+content_margin_left = 75.0
+content_margin_top = 40.0
+content_margin_right = 220.0
+content_margin_bottom = 40.0
+texture = ExtResource("21_ud5yp")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t2dwb"]
+content_margin_left = 30.0
+content_margin_top = 30.0
+content_margin_right = 30.0
+content_margin_bottom = 30.0
+bg_color = Color(0.050980393, 0.05882353, 0.101960786, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m2va7"]
+size = Vector3(48, 3, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oxha2"]
+size = Vector3(48, 3, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bhnsc"]
+size = Vector3(1, 3, 56)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_11rml"]
+size = Vector3(1, 3, 56)
+
+[node name="Cidade" type="Node3D" unique_id=917760355]
+
+[node name="Environment" type="Node3D" parent="." unique_id=578780014]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment" unique_id=149466214]
+environment = SubResource("Environment_ocx82")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment" unique_id=561728585]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Systems" type="Node" parent="." unique_id=1136021893]
+
+[node name="DayNightCycle" type="Node" parent="Systems" unique_id=380405983 node_paths=PackedStringArray("sun", "world_environment")]
+script = ExtResource("3_st4sy")
+sun = NodePath("../../Environment/DirectionalLight3D")
+world_environment = NodePath("../../Environment/WorldEnvironment")
+
+[node name="VampireDirector" type="Node" parent="Systems" unique_id=735477416]
+script = ExtResource("2_t3jqk")
+servant_chance = null
+clue_reliability = null
+hunt_start_hour = null
+hunt_end_hour = null
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=873730630]
+navigation_mesh = SubResource("NavigationMesh_dw24c")
+
+[node name="town" parent="NavigationRegion3D" unique_id=1161886018 instance=ExtResource("27_uhjcs")]
+
+[node name="Clinica" type="Node3D" parent="NavigationRegion3D" unique_id=1363495525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 1.5, 2)
+
+[node name="WindowLight" parent="NavigationRegion3D/Clinica" unique_id=1929029952 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Clinica" unique_id=578423724]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Clinic"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="SleepSpot" type="Area3D" parent="NavigationRegion3D/Clinica" unique_id=1199394163]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 3)
+script = ExtResource("3_l36k5")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Clinica/SleepSpot" unique_id=1680781230]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+shape = SubResource("BoxShape3D_t2dwb")
+
+[node name="Prompt" type="Sprite3D" parent="NavigationRegion3D/Clinica/SleepSpot" unique_id=1121701819]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+cast_shadow = 0
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+texture = ExtResource("5_85yts")
+
+[node name="Biblioteca" type="Node3D" parent="NavigationRegion3D" unique_id=969941166]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 1.5, 11.35)
+
+[node name="WindowLight" parent="NavigationRegion3D/Biblioteca" unique_id=1670287570 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.7)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Biblioteca" unique_id=810222797]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.35, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Library"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="Escola" type="Node3D" parent="NavigationRegion3D" unique_id=72583686]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.5, -5.5)
+
+[node name="WindowLight" parent="NavigationRegion3D/Escola" unique_id=454164372 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.45)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Escola" unique_id=907874145]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.6, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "School"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="Igreja" type="Node3D" parent="NavigationRegion3D" unique_id=37567659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, -6.5)
+
+[node name="WindowLight" parent="NavigationRegion3D/Igreja" unique_id=20996174 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.7)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Igreja" unique_id=90788170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.9, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Church"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="Prefeitura" type="Node3D" parent="NavigationRegion3D" unique_id=148426980]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.5, -5.5)
+
+[node name="WindowLight" parent="NavigationRegion3D/Prefeitura" unique_id=676391895 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.3)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Prefeitura" unique_id=2058748408]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Town Hall"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="Taverna" type="Node3D" parent="NavigationRegion3D" unique_id=560815780]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.5, 3.8)
+
+[node name="WindowLight" parent="NavigationRegion3D/Taverna" unique_id=28198849 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.45)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Taverna" unique_id=1526872951]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.6, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Tavern"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="Casa1" type="Node3D" parent="NavigationRegion3D" unique_id=1005921374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.5, -19)
+
+[node name="WindowLight" parent="NavigationRegion3D/Casa1" unique_id=737561684 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Casa1" unique_id=663687908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Clara's House"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="Casa2" type="Node3D" parent="NavigationRegion3D" unique_id=544664435]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -19)
+
+[node name="WindowLight" parent="NavigationRegion3D/Casa2" unique_id=406632297 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/Casa2" unique_id=143494207]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.9, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Tomas's Forge"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="CasaSophia" type="Node3D" parent="NavigationRegion3D" unique_id=1384767763]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.5, -30)
+
+[node name="WindowLight" parent="NavigationRegion3D/CasaSophia" unique_id=1814142142 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/CasaSophia" unique_id=2138976134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Sophia's House"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="CasaSarah" type="Node3D" parent="NavigationRegion3D" unique_id=106877121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -30)
+
+[node name="WindowLight" parent="NavigationRegion3D/CasaSarah" unique_id=2128218050 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/CasaSarah" unique_id=1009967727]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Sarah's House"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="CasaHugo" type="Node3D" parent="NavigationRegion3D" unique_id=1941452152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 1.5, -30)
+
+[node name="WindowLight" parent="NavigationRegion3D/CasaHugo" unique_id=93767081 instance=ExtResource("5_o5pq4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.7)
+
+[node name="Sign" type="Label3D" parent="NavigationRegion3D/CasaHugo" unique_id=2008628635]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.4, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.91, 0.886, 0.824, 1)
+outline_modulate = Color(0.07, 0.06, 0.05, 1)
+text = "Mayor's House"
+font = ExtResource("16_5xce6")
+font_size = 64
+outline_size = 18
+
+[node name="Props" type="Node3D" parent="." unique_id=1599075976]
+
+[node name="StreetLamp" parent="Props" unique_id=1350933322 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1.2)
+
+[node name="StreetLamp2" parent="Props" unique_id=524428276 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6, 0, -1.2)
+
+[node name="StreetLamp3" parent="Props" unique_id=532610622 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 7)
+
+[node name="StreetLamp4" parent="Props" unique_id=408044280 instance=ExtResource("4_qthrd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -20)
+
+[node name="Characters" type="Node3D" parent="." unique_id=373804578]
+
+[node name="Jogador" type="CharacterBody3D" parent="Characters" unique_id=1280879686]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("1_mtbfa")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Characters/Jogador" unique_id=951761963]
+mesh = SubResource("CapsuleMesh_t2dwb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/Jogador" unique_id=1026956094]
+shape = SubResource("CapsuleShape3D_t2dwb")
+
+[node name="NPCs" type="Node3D" parent="Characters" unique_id=1396522293]
+
+[node name="Elias" parent="Characters/NPCs" unique_id=2114807663 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2.5)
+data = ExtResource("11_2n2no")
+
+[node name="Marta" parent="Characters/NPCs" unique_id=213485090 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 4.5)
+data = ExtResource("12_fm4th")
+
+[node name="Clara" parent="Characters/NPCs" unique_id=1183229265 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.5)
+data = ExtResource("13_t3jqk")
+
+[node name="Tomas" parent="Characters/NPCs" unique_id=407762272 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 6)
+data = ExtResource("14_mequr")
+
+[node name="Hugo" parent="Characters/NPCs" unique_id=1100674295 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+data = ExtResource("15_ervra")
+
+[node name="Sophia" parent="Characters/NPCs" unique_id=1533024092 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 7)
+data = ExtResource("40_soph")
+
+[node name="Sarah" parent="Characters/NPCs" unique_id=1228804467 instance=ExtResource("10_p3xqx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -1)
+data = ExtResource("41_sarah")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1656558175 node_paths=PackedStringArray("target")]
+transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 16.32, 12.86)
+projection = 1
+current = true
+size = 16.0
+script = ExtResource("1_ocx82")
+target = NodePath("../Characters/Jogador")
+
+[node name="UI" type="Node" parent="." unique_id=462851304]
+
+[node name="PhaseBanner" type="CanvasLayer" parent="UI" unique_id=764145283]
+script = ExtResource("6_73egf")
+
+[node name="Vignette" type="ColorRect" parent="UI/PhaseBanner" unique_id=766916520]
+material = SubResource("ShaderMaterial_t2dwb")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Fade" type="ColorRect" parent="UI/PhaseBanner" unique_id=1913539996]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="UI/PhaseBanner" unique_id=1597711413]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("16_5xce6")
+theme_override_font_sizes/font_size = 64
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MorningSummary" type="CanvasLayer" parent="UI" unique_id=2119626487]
+layer = 2
+script = ExtResource("9_tkho8")
+
+[node name="Panel" type="PanelContainer" parent="UI/MorningSummary" unique_id=2106136057]
+custom_minimum_size = Vector2(600, 300)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -54.5
+offset_right = 20.0
+offset_bottom = 54.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tkho8")
+
+[node name="VBox" type="VBoxContainer" parent="UI/MorningSummary/Panel" unique_id=347055357]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="UI/MorningSummary/Panel/VBox" unique_id=1959865949]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("16_5xce6")
+theme_override_font_sizes/font_size = 40
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="UI/MorningSummary/Panel/VBox" unique_id=313958998]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="UI/MorningSummary/Panel/VBox" unique_id=1257622518]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "[E] Continue"
+horizontal_alignment = 1
+
+[node name="DialogueBox" type="CanvasLayer" parent="UI" unique_id=1691680637]
+script = ExtResource("16_fm4th")
+
+[node name="Panel" type="PanelContainer" parent="UI/DialogueBox" unique_id=162285460]
+custom_minimum_size = Vector2(0, 160)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -77.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_n6eqd")
+
+[node name="HBox" type="HBoxContainer" parent="UI/DialogueBox/Panel" unique_id=732482363]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Portrait" type="TextureRect" parent="UI/DialogueBox/Panel/HBox" unique_id=665311861]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="UI/DialogueBox/Panel/HBox" unique_id=1030745275]
+layout_mode = 2
+
+[node name="Speaker" type="Label" parent="UI/DialogueBox/Panel/HBox/VBox" unique_id=300391462]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("19_ud5yp")
+theme_override_font_sizes/font_size = 28
+
+[node name="Body" type="Label" parent="UI/DialogueBox/Panel/HBox/VBox" unique_id=1551126764]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="UI/DialogueBox/Panel/HBox/VBox" unique_id=1498512158]
+layout_mode = 2
+text = "[E] Close"
+horizontal_alignment = 2
+
+[node name="Notebook" type="CanvasLayer" parent="UI" unique_id=1241914915]
+layer = 3
+script = ExtResource("18_mequr")
+
+[node name="Panel" type="PanelContainer" parent="UI/Notebook" unique_id=980850445]
+custom_minimum_size = Vector2(700, 450)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -225.0
+offset_right = 350.0
+offset_bottom = 225.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_5xce6")
+
+[node name="Pages" type="HBoxContainer" parent="UI/Notebook/Panel" unique_id=1789976566]
+layout_mode = 2
+theme_override_constants/separation = 70
+
+[node name="VBox" type="VBoxContainer" parent="UI/Notebook/Panel/Pages" unique_id=601996959]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="UI/Notebook/Panel/Pages/VBox" unique_id=827428489]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.17254902, 0.14901961, 0.12941177, 1)
+theme_override_fonts/font = ExtResource("16_5xce6")
+text = "Casebook"
+
+[node name="Scroll" type="ScrollContainer" parent="UI/Notebook/Panel/Pages/VBox" unique_id=363098160]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Entries" type="Label" parent="UI/Notebook/Panel/Pages/VBox/Scroll" unique_id=158738055]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.17254902, 0.14901961, 0.12941177, 1)
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="UI/Notebook/Panel/Pages/VBox" unique_id=13740183]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.17254902, 0.14901961, 0.12941177, 1)
+text = "[Tab] Close"
+
+[node name="Suspects" type="VBoxContainer" parent="UI/Notebook/Panel/Pages" unique_id=1525684379]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SuspectsTitle" type="Label" parent="UI/Notebook/Panel/Pages/Suspects" unique_id=131425882]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.17254902, 0.14901961, 0.12941177, 1)
+theme_override_fonts/font = ExtResource("16_5xce6")
+text = "Suspects"
+
+[node name="List" type="VBoxContainer" parent="UI/Notebook/Panel/Pages/Suspects" unique_id=838485928]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Accusation" type="CanvasLayer" parent="UI" unique_id=445527340]
+layer = 4
+script = ExtResource("19_ervra")
+
+[node name="Panel" type="PanelContainer" parent="UI/Accusation" unique_id=614301126]
+custom_minimum_size = Vector2(600, 300)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t2dwb")
+
+[node name="VBox" type="VBoxContainer" parent="UI/Accusation/Panel" unique_id=715690696]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="UI/Accusation/Panel/VBox" unique_id=1604245535]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("16_5xce6")
+theme_override_font_sizes/font_size = 32
+
+[node name="Body" type="Label" parent="UI/Accusation/Panel/VBox" unique_id=1819474698]
+custom_minimum_size = Vector2(540, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="UI/Accusation/Panel/VBox" unique_id=870668313]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HUD" type="CanvasLayer" parent="UI" unique_id=1766155086]
+script = ExtResource("20_4bwyx")
+
+[node name="Clock" type="Label" parent="UI/HUD" unique_id=1892469658]
+offset_left = 20.0
+offset_right = 21.0
+offset_bottom = 32.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+
+[node name="Controls" type="HBoxContainer" parent="UI/HUD" unique_id=1579112318]
+offset_left = 20.0
+offset_top = 592.0
+offset_right = 21.0
+offset_bottom = 619.0
+theme_override_constants/separation = 24
+
+[node name="Intro" type="CanvasLayer" parent="UI" unique_id=209549530]
+layer = 10
+script = ExtResource("21_n6eqd")
+
+[node name="Background" type="TextureRect" parent="UI/Intro" unique_id=1004773922]
+self_modulate = Color(0.33333334, 0.33333334, 0.33333334, 1)
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = ExtResource("25_ya4kv")
+stretch_mode = 6
+
+[node name="Title" type="Label" parent="UI/Intro/Background" unique_id=749746822]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 70.0
+offset_right = 976.0
+offset_bottom = 150.0
+theme_override_fonts/font = ExtResource("16_5xce6")
+theme_override_font_sizes/font_size = 56
+text = "PALLBROOK"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="UI/Intro/Background" unique_id=456865873]
+custom_minimum_size = Vector2(800, 0)
+custom_maximum_size = Vector2(800, -1)
+layout_mode = 0
+offset_left = 176.0
+offset_top = 170.0
+offset_right = 976.0
+offset_bottom = 510.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Hint" type="Label" parent="UI/Intro/Background" unique_id=770555443]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 560.0
+offset_right = 976.0
+offset_bottom = 600.0
+text = "[E] Begin"
+horizontal_alignment = 1
+
+[node name="Locations" type="Node3D" parent="." unique_id=188944316]
+
+[node name="Clinica" type="Marker3D" parent="Locations" unique_id=1795279392 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 4.8)
+
+[node name="Taverna" type="Marker3D" parent="Locations" unique_id=1416698103 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 6.6)
+
+[node name="Igreja" type="Marker3D" parent="Locations" unique_id=865495631 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -3.4)
+
+[node name="Casa1" type="Marker3D" parent="Locations" unique_id=1250343351 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -16.4)
+
+[node name="Casa2" type="Marker3D" parent="Locations" unique_id=241660489 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -16.3)
+
+[node name="Praca" type="Marker3D" parent="Locations" unique_id=741624750 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 0, 4)
+
+[node name="Biblioteca" type="Marker3D" parent="Locations" unique_id=75848914 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 14.6)
+
+[node name="Escola" type="Marker3D" parent="Locations" unique_id=154170603 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2.7)
+
+[node name="Prefeitura" type="Marker3D" parent="Locations" unique_id=1833403450 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -2)
+
+[node name="CasaSophia" type="Marker3D" parent="Locations" unique_id=185419966 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -27.3)
+
+[node name="CasaSarah" type="Marker3D" parent="Locations" unique_id=1630580783 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -27.3)
+
+[node name="CasaHugo" type="Marker3D" parent="Locations" unique_id=1097543295 groups=["locations"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, -27.1)
+
+[node name="Bounds" type="StaticBody3D" parent="." unique_id=997266094]
+
+[node name="North" type="CollisionShape3D" parent="Bounds" unique_id=1844489195]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, -34.5)
+shape = SubResource("BoxShape3D_m2va7")
+
+[node name="South" type="CollisionShape3D" parent="Bounds" unique_id=532871442]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, 18.5)
+shape = SubResource("BoxShape3D_oxha2")
+
+[node name="West" type="CollisionShape3D" parent="Bounds" unique_id=559016920]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 1.5, -8)
+shape = SubResource("BoxShape3D_bhnsc")
+
+[node name="East" type="CollisionShape3D" parent="Bounds" unique_id=1739036475]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.2, 1.5, -8)
+shape = SubResource("BoxShape3D_11rml")

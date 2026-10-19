@@ -124,11 +124,11 @@ func _resolve_attack(victim: Node) -> void:
 	if others > 0 and randf() < servant_chance:
 		victim.make_servant()
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
-		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name])
+		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
 	else:
 		victim.die(_pick_trace(victim))
 		GameState.add_night_event("%s was found dead at their doorstep." % victim_name)
-		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name])
+		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name], "evidence", morning)
 		EventBus.npc_died.emit(victim_name)
 	_check_town_lost()
 

@@ -8,6 +8,8 @@ var collapsed_in_street := false   # Used by the morning summary later
 var in_dialogue := false
 var vampire_name := ""
 var clues: Array[String] = []
+# The casebook: {text, kind ("testimony" or "evidence"), day, people (names mentioned)}
+var entries: Array[Dictionary] = []
 var game_over := false
 var intro_seen := false
 
@@ -23,12 +25,26 @@ func reset() -> void:
 	vampire_name = ""
 	night_events.clear()
 	clues.clear()
+	entries.clear()
 
-func add_clue(text: String) -> void:
+# kind: "testimony" (what people say) or "evidence" (what the doctor saw or found)
+# on_day: which day the casebook files it under (default: today)
+func add_clue(text: String, kind := "testimony", on_day := -1) -> void:
 	if text in clues:
 		return  # No duplicates
 	clues.append(text)
+	var filed_day := on_day if on_day > 0 else day
+	entries.append({"text": text, "kind": kind, "day": filed_day, "people": _names_in(text)})
 	EventBus.clue_found.emit(text)
+
+
+# Every townsperson named in a line, so the casebook can show it under each of them
+func _names_in(text: String) -> Array[String]:
+	var names: Array[String] = []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc.data and text.contains(npc.data.npc_name):
+			names.append(npc.data.npc_name)
+	return names
 
 func start_night() -> void:
 	night_events.clear()
