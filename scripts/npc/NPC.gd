@@ -28,6 +28,17 @@ var real_target := Vector3.ZERO  # Where we actually want to go (detours are tem
 var detouring := false
 var stuck_tries := 0
 
+# ---------- What this person noticed at night ----------
+const SIGHT_RANGE := 9.0         # How far someone on the street can see
+const SIGHT_RANGE_INSIDE := 6.0  # From inside a building: just the street by the door
+const RECOGNIZE_RANGE := 4.0     # In the dark, a hunter's face is only seen up close
+const SIGHT_INTERVAL := 0.5      # Seconds between looks around
+
+var sightings: Array[Dictionary] = []  # {night, kind, who, place, hour}
+var wary_day := 0                      # Keeps away from the doctor on this day
+var asked: Dictionary = {}             # question -> day it was last asked
+var sight_timer := 0.0
+
 # Spots in front of a door (the door faces +z): a small crowd instead of a pile
 const PLACE_SLOTS: Array[Vector3] = [
 	Vector3(0.0, 0.0, 0.8),
@@ -95,6 +106,7 @@ func set_state(new_state: State) -> void:
 			_set_present(false)  # Went inside the house
 		State.INSIDE:
 			_set_present(false)  # Inside a building; the window lights up at night
+			visible = highlighted  # The doctor is already at the door
 			velocity = Vector3.ZERO
 		State.DEAD:
 			_set_present(true)
@@ -119,6 +131,10 @@ func set_state(new_state: State) -> void:
 			name_label.visible = false  # Just a dark shape in the night
 			_set_dark(true)
 	_update_label()
+
+
+func is_inside() -> bool:
+	return state == State.INSIDE
 
 
 func is_alive() -> bool:
@@ -174,16 +190,7 @@ func talk(player: Node3D) -> void:
 	set_state(State.TALKING)
 	# Turn to face the doctor (ignore height so we don't tilt)
 	look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z))
-	var line := "..."
-	if is_servant:
-		line = _servant_line()
-	elif data and not data.dialogue_lines.is_empty():
-		# Go through the lines in order, looping back to the start
-		line = data.dialogue_lines[line_index % data.dialogue_lines.size()]
-		line_index += 1
-	if data:
-		GameState.add_clue("%s said: \"%s\"" % [data.npc_name, line])
-	EventBus.dialogue_started.emit(data.npc_name if data else String(name), line)
+	EventBus.conversation_started.emit(self)  # The dialogue box shows the questions
 
 
 func _on_dialogue_ended() -> void:
@@ -331,7 +338,15 @@ func _set_dark(dark: bool) -> void:
 	is_dark = dark
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_check_seen_by_doctor()
+	sight_timer -= delta
+	if sight_timer <= 0.0:
+		sight_timer = SIGHT_INTERVAL
+		_look_around()
+
+
+func _check_seen_by_doctor() -> void:
 	if state != State.HUNTING or witnessed:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Node3D
@@ -392,15 +407,20 @@ func _free_slot(place: String) -> int:
 
 
 func _place_for_hour(hour: int) -> String:
+	var place := _scheduled_place(hour)
+	# Servants avoid the open square during the day
+	if is_servant and not GameState.is_night and place == "Praca":
+		return data.home
+	return place
+
+
+func _scheduled_place(hour: int) -> String:
 	var hours := data.schedule.keys()
 	hours.sort()
 	var place: String = data.schedule[hours[-1]]  # Default: last entry (carried over from yesterday)
 	for h in hours:
 		if h <= hour:
 			place = data.schedule[h]
-	# Servants avoid the open square during the day
-	if is_servant and not GameState.is_night and place == "Praca":
-		return data.home
 	return place
 
 
@@ -435,3 +455,187 @@ func _examine_body() -> void:
 func _is_bedtime() -> bool:
 	# Bedtime until sunrise: e.g. 22 means asleep from 22:00 to 06:00
 	return GameState.hour >= data.bedtime or GameState.hour < 6.0
+
+
+# ---------- Night memory ----------
+
+func _look_around() -> void:
+	# Only the night is worth remembering, and only while awake
+	if not GameState.is_night or data == null:
+		return
+	if state == State.SLEEPING or state == State.DEAD or state == State.HUNTING:
+		return
+	var sight := SIGHT_RANGE_INSIDE if state == State.INSIDE else SIGHT_RANGE
+	var night := GameState.day
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc == self or npc.data == null or not npc.is_alive():
+			continue
+		var same_room: bool = state == State.INSIDE and npc.is_inside() and npc.current_place == current_place
+		var on_street: bool = npc.state == State.ROUTINE or npc.state == State.SCARED \
+				or npc.state == State.TALKING or npc.state == State.HUNTING
+		var distance := global_position.distance_to(npc.global_position)
+		if not same_room and not (on_street and distance <= sight):
+			continue
+		var place: String = current_place if same_room else GameState.nearest_place(npc.global_position)
+		if npc.state == State.HUNTING and distance > RECOGNIZE_RANGE:
+			add_sighting(night, "figure", "", place, GameState.hour)  # Too dark to see who
+		else:
+			add_sighting(night, "person", npc.data.npc_name, place, GameState.hour)
+
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player and global_position.distance_to(player.global_position) <= sight:
+		var place := GameState.nearest_place(player.global_position)
+		if place != "Clinica":  # Nobody minds the doctor at his own door
+			add_sighting(night, "doctor", "the doctor", place, GameState.hour)
+			if _is_late(GameState.hour):
+				wary_day = GameState.day + 1  # Tomorrow they keep their distance
+
+
+func add_sighting(night: int, kind: String, who: String, place: String, hour: float) -> void:
+	# One entry per person per night, updated to the last time they were seen
+	for s in sightings:
+		if s["night"] == night and s["kind"] == kind and s["who"] == who and (kind != "figure" or s["place"] == place):
+			s["place"] = place
+			s["hour"] = hour
+			return
+	sightings.append({"night": night, "kind": kind, "who": who, "place": place, "hour": hour})
+
+
+func _is_late(hour: float) -> bool:
+	return hour >= 22.0 or hour < 6.0
+
+
+func _night_order(hour: float) -> float:
+	return hour + 24.0 if hour < 12.0 else hour  # 1 AM comes after 11 PM
+
+
+# ---------- Conversation ----------
+
+func is_wary() -> bool:
+	return GameState.day <= wary_day
+
+
+func was_asked(question: String) -> bool:
+	return asked.get(question, 0) == GameState.day
+
+
+func greeting() -> String:
+	var night := GameState.last_night()
+	for s in sightings:
+		if s["night"] == night and s["kind"] == "doctor_collapsed":
+			GameState.add_clue("Day %d · %s found you collapsed near %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"])])
+			return "Doctor! We found you lying in the street near %s this morning. Are you ill... or is it something else?" % GameState.place_name(s["place"])
+	for s in sightings:
+		if s["night"] == night and s["kind"] == "doctor" and _is_late(s["hour"]):
+			GameState.add_clue("Day %d · %s saw you out near %s at %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
+			return "I saw you near %s at %s last night, doctor. Decent folk are home by then." % [GameState.place_name(s["place"]), GameState.format_time(s["hour"])]
+	if is_servant:
+		return "Doctor. What is it now?"
+	var hellos := ["Good day, doctor.", "Doctor. Need something?", "Ah, doctor. Any news?"]
+	return hellos[(GameState.day + line_index) % hellos.size()]
+
+
+func answer_alibi() -> String:
+	asked["alibi"] = GameState.day
+	if is_wary():
+		return _wary_line()
+	if GameState.day == 1:
+		return "Last night? You only arrived this morning, doctor. I was home, like every night."
+	var text := _alibi_text()
+	GameState.add_clue("Day %d · %s, about last night: \"%s\"" % [GameState.day, data.npc_name, text])
+	return text
+
+
+func answer_seen() -> String:
+	asked["seen"] = GameState.day
+	if is_wary():
+		return _wary_line()
+	if GameState.day == 1:
+		return "Nothing yet. Pallbrook is quiet, doctor. Mostly."
+	var lines: Array[String] = []
+	if is_servant:
+		lines.append(_servant_sighting())  # A lie that points at someone innocent
+	else:
+		var night := GameState.last_night()
+		var seen := sightings.filter(func(s): return s["night"] == night and s["kind"] != "doctor_collapsed")
+		# Most worrying first: dark figures, then whatever happened latest
+		seen.sort_custom(func(a, b): return _weight(a) > _weight(b))
+		for s in seen.slice(0, 3):
+			lines.append(_describe(s))
+	var text := "No. I slept through the night." if lines.is_empty() else " ".join(lines)
+	GameState.add_clue("Day %d · %s saw: \"%s\"" % [GameState.day, data.npc_name, text])
+	return text
+
+
+func answer_chat() -> String:
+	asked["chat"] = GameState.day
+	if is_wary():
+		return "I'd rather not chat today, doctor."
+	var line := "..."
+	if is_servant:
+		line = _servant_line()
+	elif not data.dialogue_lines.is_empty():
+		# Go through the lines in order, looping back to the start
+		line = data.dialogue_lines[line_index % data.dialogue_lines.size()]
+		line_index += 1
+	GameState.add_clue("%s said: \"%s\"" % [data.npc_name, line])
+	return line
+
+
+func _wary_line() -> String:
+	return "I have nothing to tell you today, doctor."
+
+
+func _alibi_text() -> String:
+	# The truth according to the schedule. The vampire tells this too: a lie by omission.
+	if data.schedule.is_empty():
+		return "At home, asleep."
+	var last_place := _scheduled_place(18)
+	var text := "From 6 PM I was %s" % _where(last_place)
+	var hours := data.schedule.keys()
+	hours.sort()
+	for h: int in hours:
+		if h > 18 and h < data.bedtime and data.schedule[h] != last_place:
+			last_place = data.schedule[h]
+			text += ", then %s from %s" % [_where(last_place), GameState.format_time(h)]
+	if last_place != data.home:
+		text += ", then I went home"
+	return text + ". I was asleep by %s." % GameState.format_time(data.bedtime)
+
+
+func _where(place: String) -> String:
+	if place == data.home and place.begins_with("Casa"):
+		return "at home"
+	if place == "Praca":
+		return "in the square"
+	return "at " + GameState.place_name(place)
+
+
+func _weight(s: Dictionary) -> float:
+	return _night_order(s["hour"]) + (100.0 if s["kind"] == "figure" else 0.0)
+
+
+func _describe(s: Dictionary) -> String:
+	var time := GameState.format_time(s["hour"])
+	var where := GameState.place_name(s["place"])
+	match s["kind"]:
+		"figure":
+			return "Around %s I saw a dark figure near %s. I couldn't make out a face." % [time, where]
+		"doctor":
+			return "And you, doctor, were near %s around %s." % [where, time]
+	if _is_late(s["hour"]):
+		return "I saw %s out near %s around %s. At that hour!" % [s["who"], where, time]
+	return "%s was at %s, the last time I looked around %s." % [s["who"], where, time]
+
+
+func _servant_sighting() -> String:
+	var innocents := []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc != self and npc.is_alive() and npc.data.npc_name != GameState.vampire_name:
+			innocents.append(npc)
+	if innocents.is_empty():
+		return "Nothing. Nothing at all."
+	var target = innocents.pick_random()
+	var place: String = GameState.PLACE_NAMES.keys().pick_random()
+	var time := GameState.format_time(snappedf(randf_range(22.5, 24.5), 1.0 / 6.0))
+	return "I saw %s sneaking near %s around %s. Ask them where they were." % [target.data.npc_name, GameState.place_name(place), time]

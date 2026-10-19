@@ -56,3 +56,52 @@ func format_time(h: float) -> String:
 	if display_hour == 0:
 		display_hour = 12             # Midnight = 12 AM, noon = 12 PM
 	return "%d:%02d %s" % [display_hour, minutes, suffix]
+
+
+# ---------- Places ----------
+
+# How each location marker is called in dialogue
+const PLACE_NAMES := {
+	"Clinica": "the Clinic",
+	"Taverna": "the Tavern",
+	"Igreja": "the Church",
+	"Escola": "the School",
+	"Prefeitura": "the Town Hall",
+	"Biblioteca": "the Library",
+	"Praca": "the square",
+	"Casa1": "Clara's house",
+	"Casa2": "Tomas's forge",
+	"CasaSophia": "Sophia's house",
+	"CasaSarah": "Sarah's house",
+	"CasaHugo": "the Mayor's house",
+}
+
+
+func place_name(place: String) -> String:
+	return PLACE_NAMES.get(place, place)
+
+
+# The location marker closest to a point in the world (e.g. where someone was seen)
+func nearest_place(pos: Vector3) -> String:
+	var best := ""
+	var best_distance := INF
+	for marker in get_tree().get_nodes_in_group("locations"):
+		var distance: float = pos.distance_to(marker.global_position)
+		if distance < best_distance:
+			best_distance = distance
+			best = String(marker.name)
+	return best
+
+
+func place_position(place: String) -> Vector3:
+	for marker in get_tree().get_nodes_in_group("locations"):
+		if marker.name == place:
+			return marker.global_position
+	return Vector3.ZERO
+
+
+# Nights are numbered by the day they start on: the night of Day 2 runs from
+# 6 PM on Day 2 until 6 AM (the day counter only changes at sunrise).
+# So during the day, "last night" is always day - 1.
+func last_night() -> int:
+	return day - 1

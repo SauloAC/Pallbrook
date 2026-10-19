@@ -2,7 +2,7 @@ extends Node
 
 @export var sun: DirectionalLight3D
 @export var world_environment: WorldEnvironment
-@export var seconds_per_hour := 60.0
+@export var seconds_per_hour := 30.0
 @export var start_hour := 8.0
 @export var day_start_hour := 6.0
 @export var night_start_hour := 18.0
@@ -67,7 +67,11 @@ func _update_exhaustion() -> void:
 		GameState.exhaustion = 0.0
 
 func _collapse() -> void:
-	GameState.add_night_event("You collapsed in the street. Someone may have seen the doctor lying there.")
+	var finders := _report_collapse()
+	if finders.is_empty():
+		GameState.add_night_event("You collapsed in the street. Someone may have seen the doctor lying there.")
+	else:
+		GameState.add_night_event("You collapsed in the street. %s found you there at dawn." % " and ".join(PackedStringArray(finders)))
 	GameState.collapsed_in_street = true
 	EventBus.player_collapsed.emit()
 	_skip_to_morning()
@@ -83,3 +87,25 @@ func _skip_to_morning() -> void:
 	await get_tree().create_timer(2.0).timeout
 	hour = day_start_hour
 	is_collapsing = false
+
+
+# The two neighbors living closest to where the doctor fell find him at dawn.
+# They will mention it, and keep their distance for the day.
+func _report_collapse() -> Array[String]:
+	var names: Array[String] = []
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return names
+	var spot := player.global_position
+	var place := GameState.nearest_place(spot)
+	var neighbors := []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc.data and npc.is_alive():
+			neighbors.append(npc)
+	neighbors.sort_custom(func(a, b):
+		return GameState.place_position(a.data.home).distance_to(spot) < GameState.place_position(b.data.home).distance_to(spot))
+	for npc in neighbors.slice(0, 2):
+		npc.add_sighting(GameState.day, "doctor_collapsed", "the doctor", place, hour)
+		npc.wary_day = GameState.day + 1
+		names.append(npc.data.npc_name)
+	return names

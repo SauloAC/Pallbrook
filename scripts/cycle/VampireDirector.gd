@@ -45,6 +45,7 @@ func _on_phase_changed(is_night: bool) -> void:
 		var victim := _pick_victim()
 		if victim:
 			_resolve_attack(victim)
+			_offscreen_witness(victim)
 		else:
 			_check_town_lost()
 	acted_tonight = false
@@ -150,3 +151,25 @@ func _check_town_lost() -> void:
 		if npc != vampire and npc.is_alive() and not npc.is_servant:
 			return  # Someone is still free
 	EventBus.game_ended.emit(false, "No one in Pallbrook is free anymore. %s has won." % vampire.data.npc_name)
+
+
+func _offscreen_witness(victim: Node) -> void:
+	# Nobody watched this hunt live, so roll whether a townsperson glimpsed it
+	var night := GameState.last_night()  # Dawn has already started the new day
+	var place: String = victim.data.home
+	var candidates := []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc == vampire or npc == victim or not npc.is_alive() or npc.is_servant:
+			continue
+		# Night owls, still up at hunt time, are likelier to notice
+		var still_up: bool = npc.data.bedtime > hunt_hour
+		if randf() < (0.5 if still_up else 0.1):
+			candidates.append(npc)
+	if candidates.is_empty():
+		return
+	var witness = candidates.pick_random()
+	var h := fmod(hunt_hour, 24.0)
+	if randf() < 0.25:
+		witness.add_sighting(night, "person", vampire.data.npc_name, place, h)  # Saw the face
+	else:
+		witness.add_sighting(night, "figure", "", place, h)

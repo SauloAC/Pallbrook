@@ -9,6 +9,7 @@ signal player_collapsed
 signal player_slept
 signal hour_changed(hour: int)
 signal dialogue_started(speaker: String, text: String)
+signal conversation_started(npc: Node)  # Talking to a living NPC: opens the question menu
 signal dialogue_ended
 signal accusation_requested(npc: Node)
 signal game_ended(won: bool, message: String)
