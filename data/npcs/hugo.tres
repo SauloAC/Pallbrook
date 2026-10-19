@@ -8,7 +8,7 @@ script = ExtResource("1_7d8pf")
 npc_name = "Hugo"
 role = "Mayor"
 color = Color(0, 0.49803922, 0, 1)
-Dictionary[int, String]({
+schedule = Dictionary[int, String]({
 8: "Prefeitura",
 12: "Taverna",
 14: "Prefeitura",

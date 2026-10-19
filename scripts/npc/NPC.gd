@@ -1,6 +1,9 @@
 extends CharacterBody3D
 
-enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING }
+enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
+
+# Places people stay outside at (everything else has a door to go through)
+const OPEN_AIR_PLACES := ["Praca"]
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -82,6 +85,7 @@ func set_state(new_state: State) -> void:
 			_set_present(true)
 			_follow_schedule()
 		State.TALKING:
+			_set_present(true)  # May have come out to the door to talk
 			agent.target_position = global_position  # Stop walking
 		State.SCARED:
 			_set_present(true)
@@ -89,6 +93,9 @@ func set_state(new_state: State) -> void:
 				_go_to_place(data.home)
 		State.SLEEPING:
 			_set_present(false)  # Went inside the house
+		State.INSIDE:
+			_set_present(false)  # Inside a building; the window lights up at night
+			velocity = Vector3.ZERO
 		State.DEAD:
 			_set_present(true)
 			collision.disabled = true  # Bodies don't block the way
@@ -136,7 +143,7 @@ func _update_label() -> void:
 	name_label.text = text
 
 	# Can the player do something with this NPC right now?
-	var can_act := highlighted and (state == State.ROUTINE \
+	var can_act := highlighted and (state == State.ROUTINE or state == State.INSIDE \
 			or (state == State.DEAD and not examined))
 	name_label.modulate = HIGHLIGHT_COLOR if can_act else Color.WHITE
 	prompt_icon.visible = can_act
@@ -145,13 +152,16 @@ func _update_label() -> void:
 
 func can_talk() -> bool:
 	# Talk to the living, examine the dead (once)
-	return state == State.ROUTINE or (state == State.DEAD and not examined)
+	return state == State.ROUTINE or state == State.INSIDE \
+			or (state == State.DEAD and not examined)
 
 
 func set_highlighted(value: bool) -> void:
 	if highlighted == value:
 		return
 	highlighted = value
+	if state == State.INSIDE:
+		visible = value  # Comes to the door when the doctor is close
 	_update_label()
 
 
@@ -225,7 +235,7 @@ func _detour() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if state == State.SLEEPING or state == State.DEAD:
+	if state == State.SLEEPING or state == State.DEAD or state == State.INSIDE:
 		return
 	# Safety net: if no dialogue is open, nobody should be stuck talking
 	if state == State.TALKING and not GameState.in_dialogue:
@@ -283,6 +293,9 @@ func _on_arrived() -> void:
 			hunt_returning = false
 			set_state(State.SLEEPING)
 		return
+	# Reached a building during the routine: go in
+	if state == State.ROUTINE and current_place != "" and not OPEN_AIR_PLACES.has(current_place):
+		set_state(State.INSIDE)
 
 
 func start_hunt(place: String) -> void:
@@ -336,6 +349,12 @@ func _on_hour_changed(_hour: int) -> void:
 	if state == State.SLEEPING:
 		if not GameState.is_night:
 			set_state(State.ROUTINE)  # Wake up and start the day
+		return
+	if state == State.INSIDE:
+		if data.home == current_place and _is_bedtime():
+			set_state(State.SLEEPING)  # Already home: lights out
+		elif _place_for_hour(int(GameState.hour)) != current_place:
+			set_state(State.ROUTINE)  # Time to be somewhere else: step out
 		return
 	if state == State.ROUTINE:
 		_follow_schedule()
