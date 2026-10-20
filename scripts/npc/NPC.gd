@@ -57,8 +57,11 @@ var cared_day := 0              # Last day an exam raised trust
 var marked := false             # Visited by the vampire; turns next night unless saved
 var marked_day := 0             # The morning they will warn the doctor
 var appointment_until := -1.0   # Hour until which they wait at the clinic (-1 = none)
+var appointment_from := -1.0    # Hour the visit starts
+var appointment_day := 0        # Day of the visit
 var treated_day := 0
 var appointment: Dictionary = {}  # This patient's current entry in GameState.appointments
+var skip_appointment := false     # Said yes, but will not go
 
 # ---------- Tonight's plan ----------
 # Every evening each person may change their plans, so alibis and sightings differ night to night
@@ -467,8 +470,8 @@ func _free_slot(place: String) -> int:
 
 
 func _place_for_hour(hour: int) -> String:
-	if appointment_until > GameState.hour and not GameState.is_night:
-		return "Clinica"  # On the way to (or waiting at) the clinic
+	if _in_appointment() and not skip_appointment:
+		return "Clinica"  # At the clinic during the booked hours
 	var place := _scheduled_place(hour)
 	if not tonight.is_empty() and GameState.is_night:
 		place = _plan_place(tonight, hour)
@@ -684,12 +687,12 @@ func answer_exam() -> String:
 	asked["exam"] = GameState.day
 	if is_wary():
 		return "I'd rather you didn't touch me today, doctor."
-	var text := _exam_text()
+	var record := vitals()
+	var text := _exam_text(record)
 	GameState.add_clue("Day %d · Exam of %s: %s" % [GameState.day, data.npc_name, text], "evidence")
 	if cared_day != GameState.day:
 		cared_day = GameState.day
 		change_affinity(8.0)
-	var record := vitals()
 	record["day"] = GameState.day
 	record["marked"] = marked
 	exams.append(record)
@@ -699,14 +702,19 @@ func answer_exam() -> String:
 # What an exam shows right now, in a doctor's words (never the raw number)
 func vitals() -> Dictionary:
 	if is_vampire():
-		# Looks healthy, says otherwise. The pulse is the tell.
-		return {"pulse": "40, slow", "temp": "Cold", "look": "Good color", "blood": "Normal",
+		# Claims the sickness, but the blood is fine and there are no marks.
+		# Pulse and skin vary, so only a pattern over several exams gives it away.
+		return {"pulse": ["56, slow", "60, slow", "64, steady"].pick_random(),
+				"temp": ["Cool", "Normal"].pick_random(),
+				"look": ["Good color", "A little pale"].pick_random(), "blood": "Normal",
 				"vitality": 0.95, "marks": false, "old_marks": false, "trace": "", "dead": false}
 	var v := {"marks": not bite_traces.is_empty(), "old_marks": is_servant,
 			"trace": bite_traces[-1] if not bite_traces.is_empty() else "",
 			"vitality": blood / 100.0, "dead": false}
 	if blood >= 80.0:
-		v.merge({"pulse": "72, steady", "temp": "Normal", "look": "Good color", "blood": "Normal"})
+		# Healthy people vary too, so a single slow or cool reading proves nothing
+		v.merge({"pulse": ["64, steady", "68, steady", "72, steady", "76, steady"].pick_random(),
+				"temp": "Cool" if randf() < 0.25 else "Normal", "look": "Good color", "blood": "Normal"})
 	elif blood >= ANEMIA_LEVEL:
 		v.merge({"pulse": "88, quick", "temp": "Normal", "look": "A little pale", "blood": "Low"})
 	elif blood >= 25.0:
@@ -716,25 +724,26 @@ func vitals() -> Dictionary:
 	return v
 
 
-func _exam_text() -> String:
+func _exam_text(v: Dictionary) -> String:
+	var parts: Array[String] = ["Pulse %s." % v["pulse"]]
 	if is_vampire():
-		# The tell: complains of the sickness, but the body says otherwise
-		return "Complains of weakness, yet the color is fine. Pulse slow, very slow. Hands cold. No marks on the neck."
-	var parts: Array[String] = []
-	if blood >= 80.0:
-		parts.append("Pulse steady, good color.")
+		parts.append("Complains of weakness, but the blood seems fine.")
+	elif blood >= 80.0:
+		parts.append("Good color.")
 	elif blood >= ANEMIA_LEVEL:
 		parts.append("A little pale. Mild anemia.")
 	elif blood >= 25.0:
 		parts.append("Pale and weak. Clear anemia.")
 	else:
 		parts.append("Grey lips, can barely stand. Severe anemia: one more night like this could kill.")
+	if v["temp"] == "Cool" and blood >= ANEMIA_LEVEL:
+		parts.append("Hands a little cool, but it is autumn.")
 	if not bite_traces.is_empty():
 		parts.append("Two small punctures on the neck. On the collar, traces of %s." % bite_traces[-1])
+	elif not is_servant:
+		parts.append("No marks on the neck.")
 	if is_servant:
 		parts.append("The punctures are old and healed, and the eyes flinch from the window.")
-	if blood >= 80.0 and randf() < 0.3:
-		parts.append("Hands a little cold, but it is autumn.")  # Noise, so cold hands alone prove nothing
 	return " ".join(parts)
 
 
@@ -933,39 +942,64 @@ func answer_clinic() -> String:
 	asked["clinic"] = GameState.day
 	if GameState.is_night:
 		return "At this hour? Ask me tomorrow, doctor."
-	if is_vampire():
-		return "I can't leave my bed, doctor. Not in this light."  # The sun, not the sickness
 	if is_wary():
 		return "I'll manage on my own, thank you."
-	if appointment_until > GameState.hour:
-		return "I'm on my way, doctor."
-	if blood >= 80.0 and not marked:
+	if appointment_until >= 0.0:
+		return "I'll be at the clinic at %s, doctor, as we agreed." % GameState.format_time(appointment_from)
+	if treated_day == GameState.day:
+		return "You already treated me today, doctor. Let the tonic do its work."  # Once per day
+	if blood >= 80.0 and not marked and not is_vampire():
 		return "Me? I feel fine, doctor. Save your medicine for the sick."
-	appointment_until = minf(GameState.hour + 2.0, 18.0)
-	appointment = {"day": GameState.day, "name": data.npc_name, "from": GameState.hour,
+	if not is_vampire() and affinity < 45.0 and randf() < 0.35:
+		return "Tonics and bloodletting... no, doctor. I don't trust medicine."  # Some refuse out of pride or fear
+	# The vampire says yes and never comes (the sun). Weak patients sometimes can't make it either.
+	skip_appointment = is_vampire() or randf() < 0.25
+	# A visit one or two hours from now, lasting two hours; too late today means tomorrow morning
+	appointment_day = GameState.day
+	appointment_from = floorf(GameState.hour) + float(randi_range(1, 2))
+	if appointment_from + 1.0 > 18.0:
+		appointment_day = GameState.day + 1
+		appointment_from = float(randi_range(8, 10))
+	appointment_until = minf(appointment_from + 2.0, 18.0)  # Home before dark
+	appointment = {"day": appointment_day, "name": data.npc_name, "from": appointment_from,
 			"until": appointment_until, "status": "waiting"}
 	GameState.appointments.append(appointment)
-	return "Yes... I'll go to the clinic now. Please be there, doctor."
+	var when := GameState.format_time(appointment_from)
+	if appointment_day != GameState.day:
+		when = "tomorrow at " + when
+	return "Yes... I'll come to the clinic %s. Please be there, doctor." % ("at " + when if appointment_day == GameState.day else when)
 
 
 func _check_appointment() -> void:
 	if appointment_until < 0.0 or not is_alive():
 		return
-	if GameState.is_night or GameState.hour >= appointment_until:
+	var over := GameState.day > appointment_day \
+			or (GameState.day == appointment_day and GameState.hour >= appointment_until)
+	if over:
 		# Waited long enough
 		appointment_until = -1.0
-		if treated_day != GameState.day:
+		if treated_day != appointment_day:
 			appointment["status"] = "missed"
-			change_affinity(-5.0)
-			GameState.add_clue("Day %d · %s waited at the clinic, but you never came." % [GameState.day, data.npc_name])
+			# Who failed whom? From the doctor's side it looks the same
+			GameState.add_clue("Day %d · %s never got the treatment at the clinic." % [GameState.day, data.npc_name])
+			if not skip_appointment:
+				change_affinity(-5.0)  # They went and waited for nothing
+		skip_appointment = false
 		if state == State.INSIDE:
 			set_state(State.ROUTINE)
 		return
+	if not _in_appointment():
+		return  # Not time yet
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if current_place == "Clinica" and (state == State.INSIDE or state == State.ROUTINE) and player \
 			and player.global_position.distance_to(GameState.place_position("Clinica")) < 6.0 \
 			and global_position.distance_to(GameState.place_position("Clinica")) < 6.0:
 		_treat()
+
+
+func _in_appointment() -> bool:
+	return appointment_until >= 0.0 and GameState.day == appointment_day \
+			and GameState.hour >= appointment_from and GameState.hour < appointment_until
 
 
 func _treat() -> void:

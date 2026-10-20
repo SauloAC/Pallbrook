@@ -202,7 +202,7 @@ func _build_appointments() -> void:
 			"treated":
 				status = "treated"
 			"missed":
-				status = "waited in vain"
+				status = "missed"
 		lines.append("• %s · %s – %s · %s" % [a["name"], GameState.format_time(a["from"]), GameState.format_time(a["until"]), status])
 	if lines.is_empty():
 		entries.text = "No appointments yet.\n\nAsk a sick patient to come to the clinic for a treatment."
