@@ -29,6 +29,10 @@ const TOP_LINES := [153, 207, 261, 314, 368, 422]
 const BOX_RECTS := [Rect2(82, 558, 190, 69), Rect2(298, 558, 189, 69), Rect2(514, 558, 189, 69), Rect2(729, 558, 189, 69)]
 const TUBE_RECT := Rect2(190, 712, 690, 11)        # The mercury channel of the thermometer
 const BITE := preload("res://assets/ui/chart/bite_marks.png")
+const WRIST_NOTE := preload("res://assets/ui/chart/wrist_note.png")  # Close-up pinned under the clip
+const CLIP := preload("res://assets/ui/chart/chart_clip.png")
+const WRIST_NOTE_POS := Vector2(690, 40)
+const CLIP_POS := Vector2(790, 0)
 const BITE_RECT := Rect2(266, 1152, 66, 51)          # On the side of the neck sketch
 const NOTE_X := 474.0
 const NOTE_LINES := [861, 913, 965, 1018, 1070, 1123, 1175, 1227, 1280]
@@ -435,6 +439,19 @@ func _open_chart(npc_name: String) -> void:
 		if last["old_marks"]:
 			bite.modulate = Color(0.8, 0.7, 0.6, 0.55)  # Old, healed: brown and faded
 		sheet.add_child(bite)
+
+	# Wrist bite found: a close-up sketch pinned under the paper clip
+	if not last.is_empty() and str(last["trace"]).ends_with("(wrist)"):
+		var note := TextureRect.new()
+		note.texture = WRIST_NOTE
+		note.position = WRIST_NOTE_POS
+		note.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		sheet.add_child(note)
+		var clip := TextureRect.new()
+		clip.texture = CLIP
+		clip.position = CLIP_POS
+		clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		sheet.add_child(clip)
 
 	# Exam history, newest first
 	var row := 0

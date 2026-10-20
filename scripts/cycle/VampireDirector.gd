@@ -127,6 +127,9 @@ func _seed_outbreak() -> void:
 	others.shuffle()
 	for npc in others.slice(0, outbreak_size):
 		npc.feed(randf_range(52.0, 62.0), _pick_trace(npc))
+	# One or two healthy people, frightened by the outbreak, also claim to be ill
+	for npc in others.slice(outbreak_size, outbreak_size + randi_range(1, 2)):
+		npc.worried = true
 
 
 func _pick_victim() -> Node:

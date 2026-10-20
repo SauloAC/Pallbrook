@@ -47,6 +47,10 @@ const ANEMIA_LEVEL := 50.0
 const PALE := Color(0.92, 0.9, 0.88)
 var blood := 100.0                    # 0 = dead. The vampire feeds a little each night.
 var bite_traces: Array[String] = []   # What each bite left on the clothes
+var bite_spots: Array[String] = []    # "neck" or "wrist" for each bite
+var wrist_found := false              # Wrist bites hide under the sleeve until a careful exam
+var exam_count := 0
+var worried := false                  # Feels sick from fear of the outbreak, but isn't bitten
 var exams: Array[Dictionary] = []     # The doctor's records, shown on the patient chart
 
 # ---------- Trust in the doctor ----------
@@ -253,6 +257,19 @@ func is_anemic() -> bool:
 	return blood < ANEMIA_LEVEL
 
 
+func claims_sickness() -> bool:
+	# Who says they are ill: the anemic, the frightened, and the vampire hiding from the sun
+	return is_anemic() or worried or (is_vampire() and not GameState.is_night)
+
+
+func neck_bitten() -> bool:
+	return bite_spots.has("neck")
+
+
+func marks_visible() -> bool:
+	return neck_bitten() or (bite_spots.has("wrist") and wrist_found)
+
+
 func is_vampire() -> bool:
 	return data != null and data.npc_name == GameState.vampire_name
 
@@ -261,6 +278,7 @@ func is_vampire() -> bool:
 func feed(amount: float, trace: String) -> bool:
 	blood = maxf(blood - amount, 0.0)
 	bite_traces.append(trace)
+	bite_spots.append("neck" if randf() < 0.6 else "wrist")
 	_update_color()
 	if blood <= 0.0:
 		die(trace)
@@ -477,7 +495,7 @@ func _place_for_hour(hour: int) -> String:
 		place = _plan_place(tonight, hour)
 	if not GameState.is_night:
 		# The sick stay in bed. The vampire hides from the sun and blames the same sickness.
-		if is_anemic() or (is_vampire() and hour >= 8 and hour < 17):
+		if is_anemic() or ((is_vampire() or worried) and hour >= 8 and hour < 17):
 			return data.home
 	# Servants avoid the open square during the day
 	if is_servant and not GameState.is_night and place == "Praca":
@@ -640,7 +658,7 @@ func greeting() -> String:
 		if s["night"] == night and s["kind"] == "doctor" and _is_late(s["hour"]):
 			GameState.add_clue("Day %d · %s saw you out near %s at %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
 			return "I saw you near %s at %s last night, doctor. Decent folk are home by then." % [GameState.place_name(s["place"]), GameState.format_time(s["hour"])]
-	if is_anemic() or (is_vampire() and not GameState.is_night):
+	if claims_sickness():
 		var sick := ["This sickness... I can barely stand, doctor.",
 				"Forgive me, doctor. The light hurts my eyes these days.",
 				"I'm so tired. Is it the same thing the others have?"]
@@ -687,6 +705,11 @@ func answer_exam() -> String:
 	asked["exam"] = GameState.day
 	if is_wary():
 		return "I'd rather you didn't touch me today, doctor."
+	if cared_day == GameState.day and not exams.is_empty():
+		return "You already examined me today, doctor. Nothing has changed since."  # Once per day
+	exam_count += 1
+	if bite_spots.has("wrist") and not wrist_found and (exam_count >= 2 or randf() < 0.35):
+		wrist_found = true  # A closer look this time: under the sleeve
 	var record := vitals()
 	var text := _exam_text(record)
 	GameState.add_clue("Day %d · Exam of %s: %s" % [GameState.day, data.npc_name, text], "evidence")
@@ -708,10 +731,17 @@ func vitals() -> Dictionary:
 				"temp": ["Cool", "Normal"].pick_random(),
 				"look": ["Good color", "A little pale"].pick_random(), "blood": "Normal",
 				"vitality": 0.95, "marks": false, "old_marks": false, "trace": "", "dead": false}
-	var v := {"marks": not bite_traces.is_empty(), "old_marks": is_servant,
-			"trace": bite_traces[-1] if not bite_traces.is_empty() else "",
+	var trace := ""
+	if marks_visible():
+		trace = bite_traces[-1] + ("" if neck_bitten() else " (wrist)")
+	var v := {"marks": neck_bitten(), "old_marks": is_servant, "trace": trace,
 			"vitality": blood / 100.0, "dead": false}
-	if blood >= 80.0:
+	if worried and blood >= 80.0:
+		# Frightened, not bitten: looks much like the vampire on a single exam
+		v.merge({"pulse": ["60, slow", "64, steady", "68, steady", "72, steady"].pick_random(),
+				"temp": ["Cool", "Normal"].pick_random(),
+				"look": ["Good color", "A little pale"].pick_random(), "blood": "Normal"})
+	elif blood >= 80.0:
 		# Healthy people vary too, so a single slow or cool reading proves nothing
 		v.merge({"pulse": ["64, steady", "68, steady", "72, steady", "76, steady"].pick_random(),
 				"temp": "Cool" if randf() < 0.25 else "Normal", "look": "Good color", "blood": "Normal"})
@@ -726,7 +756,7 @@ func vitals() -> Dictionary:
 
 func _exam_text(v: Dictionary) -> String:
 	var parts: Array[String] = ["Pulse %s." % v["pulse"]]
-	if is_vampire():
+	if is_vampire() or (worried and blood >= 80.0):
 		parts.append("Complains of weakness, but the blood seems fine.")
 	elif blood >= 80.0:
 		parts.append("Good color.")
@@ -738,8 +768,10 @@ func _exam_text(v: Dictionary) -> String:
 		parts.append("Grey lips, can barely stand. Severe anemia: one more night like this could kill.")
 	if v["temp"] == "Cool" and blood >= ANEMIA_LEVEL:
 		parts.append("Hands a little cool, but it is autumn.")
-	if not bite_traces.is_empty():
+	if neck_bitten():
 		parts.append("Two small punctures on the neck. On the collar, traces of %s." % bite_traces[-1])
+	elif bite_spots.has("wrist") and wrist_found:
+		parts.append("No marks on the neck, but two small punctures inside the wrist. On the cuff, traces of %s." % bite_traces[-1])
 	elif not is_servant:
 		parts.append("No marks on the neck.")
 	if is_servant:
@@ -948,7 +980,7 @@ func answer_clinic() -> String:
 		return "I'll be at the clinic at %s, doctor, as we agreed." % GameState.format_time(appointment_from)
 	if treated_day == GameState.day:
 		return "You already treated me today, doctor. Let the tonic do its work."  # Once per day
-	if blood >= 80.0 and not marked and not is_vampire():
+	if blood >= 80.0 and not marked and not is_vampire() and not worried:
 		return "Me? I feel fine, doctor. Save your medicine for the sick."
 	if not is_vampire() and affinity < 45.0 and randf() < 0.35:
 		return "Tonics and bloodletting... no, doctor. I don't trust medicine."  # Some refuse out of pride or fear
@@ -1005,6 +1037,7 @@ func _in_appointment() -> bool:
 func _treat() -> void:
 	var was_marked := marked
 	treated_day = GameState.day
+	worried = false  # Reassured by the doctor: back to their normal day
 	appointment_until = -1.0
 	appointment["status"] = "treated"
 	marked = false
