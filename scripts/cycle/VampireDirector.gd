@@ -6,6 +6,9 @@ extends Node
 @export_range(0.0, 1.0) var clue_reliability := 0.75  # Chance the trace points to the real vampire
 @export var hunt_start_hour := 22.5  # Earliest the vampire leaves home
 @export var hunt_end_hour := 24.5    # Latest (24.5 = 00:30)
+@export var bite_min := 25.0         # Blood taken per night (people start at 100)
+@export var bite_max := 35.0
+@export var outbreak_size := 2       # People already anemic when the doctor arrives
 
 var vampire: Node = null
 var acted_tonight := false
@@ -27,6 +30,7 @@ func _choose_vampire() -> void:
 		return
 	vampire = npcs.pick_random()
 	GameState.vampire_name = vampire.data.npc_name
+	_seed_outbreak()
 	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
 
 
@@ -102,13 +106,30 @@ func _finish_hunt_now() -> void:
 	vampire.stop_hunt()
 
 
+func _seed_outbreak() -> void:
+	# The anemia started before the doctor came: a few people are already weak
+	var others := []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc != vampire:
+			others.append(npc)
+	others.shuffle()
+	for npc in others.slice(0, outbreak_size):
+		npc.feed(randf_range(52.0, 62.0), _pick_trace(npc))
+
+
 func _pick_victim() -> Node:
 	var victims := []
+	var weak := []
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc.is_alive() and not npc.is_servant:
 			victims.append(npc)
+			if npc.is_anemic():
+				weak.append(npc)
 	if victims.is_empty():
 		return null
+	# Half the time it returns to someone already weakened
+	if not weak.is_empty() and randf() < 0.5:
+		return weak.pick_random()
 	return victims.pick_random()
 
 
@@ -120,16 +141,19 @@ func _resolve_attack(victim: Node) -> void:
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc != victim and npc.is_alive() and not npc.is_servant:
 			others += 1
-	# Sometimes convert instead of kill (only if someone else is left to hunt)
-	if others > 0 and randf() < servant_chance:
+	# Feed. Death only comes when the blood runs out.
+	var died: bool = victim.feed(randf_range(bite_min, bite_max), _pick_trace(victim))
+	if died:
+		GameState.add_night_event("%s was found dead at their doorstep." % victim_name)
+		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name], "evidence", morning)
+		EventBus.npc_died.emit(victim_name)
+	elif others > 0 and randf() < servant_chance:
+		# Sometimes the bite turns them (only if someone else is left to hunt)
 		victim.make_servant()
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
 		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
 	else:
-		victim.die(_pick_trace(victim))
-		GameState.add_night_event("%s was found dead at their doorstep." % victim_name)
-		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name], "evidence", morning)
-		EventBus.npc_died.emit(victim_name)
+		GameState.add_night_event("Somewhere in Pallbrook, someone woke up weaker than they went to bed.")
 	_check_town_lost()
 
 
@@ -162,7 +186,8 @@ func _offscreen_witness(victim: Node) -> void:
 		if npc == vampire or npc == victim or not npc.is_alive() or npc.is_servant:
 			continue
 		# Night owls, still up at hunt time, are likelier to notice
-		var still_up: bool = npc.data.bedtime > hunt_hour
+		var bed: int = npc.plans.get(night, {}).get("bedtime", npc.data.bedtime)
+		var still_up: bool = bed > hunt_hour
 		if randf() < (0.5 if still_up else 0.1):
 			candidates.append(npc)
 	if candidates.is_empty():

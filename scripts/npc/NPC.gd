@@ -41,6 +41,19 @@ var sight_timer := 0.0
 
 # ---------- Death and burial ----------
 var found_day := 0     # Day the body was found at the door
+
+# ---------- Blood and anemia ----------
+const ANEMIA_LEVEL := 50.0
+const PALE := Color(0.92, 0.9, 0.88)
+var blood := 100.0                    # 0 = dead. The vampire feeds a little each night.
+var bite_traces: Array[String] = []   # What each bite left on the clothes
+var exams: Array[Dictionary] = []     # The doctor's records, shown on the patient chart
+
+# ---------- Tonight's plan ----------
+# Every evening each person may change their plans, so alibis and sightings differ night to night
+var tonight: Dictionary = {}  # hour -> place, from 6 PM (empty during the day)
+var tonight_bedtime := 22
+var plans: Dictionary = {}    # night -> {"schedule": Dictionary, "bedtime": int, "kind": String}
 var buried := false
 
 # Spots in front of a door (the door faces +z): a small crowd instead of a pile
@@ -206,11 +219,39 @@ func _on_dialogue_ended() -> void:
 		
 func make_servant() -> void:
 	is_servant = true
-	# Paler: blend the original color toward a sickly grey-white
-	var material := mesh.material_override as StandardMaterial3D
-	if material and data:
-		material.albedo_color = data.color.lerp(Color(0.85, 0.85, 0.9), 0.5)
+	_update_color()
 	_update_label()
+
+
+func _update_color() -> void:
+	# Servants turn grey; blood loss makes anyone paler
+	var material := mesh.material_override as StandardMaterial3D
+	if material == null or data == null or is_dark:
+		return
+	var c := data.color
+	if is_servant:
+		c = c.lerp(Color(0.85, 0.85, 0.9), 0.5)
+	c = c.lerp(PALE, clampf((100.0 - blood) / 100.0, 0.0, 1.0) * 0.6)
+	material.albedo_color = c
+
+
+func is_anemic() -> bool:
+	return blood < ANEMIA_LEVEL
+
+
+func is_vampire() -> bool:
+	return data != null and data.npc_name == GameState.vampire_name
+
+
+# A bite. Returns true if it was the last one.
+func feed(amount: float, trace: String) -> bool:
+	blood = maxf(blood - amount, 0.0)
+	bite_traces.append(trace)
+	_update_color()
+	if blood <= 0.0:
+		die(trace)
+		return true
+	return false
 
 
 func _servant_line() -> String:
@@ -415,6 +456,12 @@ func _free_slot(place: String) -> int:
 
 func _place_for_hour(hour: int) -> String:
 	var place := _scheduled_place(hour)
+	if not tonight.is_empty() and GameState.is_night:
+		place = _plan_place(tonight, hour)
+	if not GameState.is_night:
+		# The sick stay in bed. The vampire hides from the sun and blames the same sickness.
+		if is_anemic() or (is_vampire() and hour >= 8 and hour < 17):
+			return data.home
 	# Servants avoid the open square during the day
 	if is_servant and not GameState.is_night and place == "Praca":
 		return data.home
@@ -428,6 +475,18 @@ func _scheduled_place(hour: int) -> String:
 	for h in hours:
 		if h <= hour:
 			place = data.schedule[h]
+	return place
+
+
+# Where a plan (hour -> place) puts someone at a given hour. Hours after midnight count as 24+.
+func _plan_place(plan: Dictionary, hour: int) -> String:
+	var h := hour + 24 if hour < 12 else hour
+	var hours := plan.keys()
+	hours.sort()
+	var place: String = plan[hours[0]]
+	for key: int in hours:
+		if key <= h:
+			place = plan[key]
 	return place
 
 
@@ -454,6 +513,9 @@ func _examine_body() -> void:
 	examined = true
 	_update_label()
 	var trace := body_trace if body_trace != "" else "nothing unusual"
+	exams.append({"day": GameState.day, "pulse": "None", "temp": "Cold", "look": "Dead",
+			"blood": "Drained", "vitality": 0.0, "marks": true, "old_marks": false,
+			"trace": body_trace, "dead": true})
 	var text := "Bite marks on the neck. On the clothes, traces of %s." % trace
 	GameState.add_clue("Body of %s: %s" % [data.npc_name, text], "evidence")
 	EventBus.dialogue_started.emit("Body of %s" % data.npc_name, text)
@@ -461,7 +523,8 @@ func _examine_body() -> void:
 
 func _is_bedtime() -> bool:
 	# Bedtime until sunrise: e.g. 22 means asleep from 22:00 to 06:00
-	return GameState.hour >= data.bedtime or GameState.hour < 6.0
+	var bed := tonight_bedtime if not tonight.is_empty() else data.bedtime
+	return GameState.hour >= bed or GameState.hour < 6.0
 
 
 # ---------- Night memory ----------
@@ -538,6 +601,11 @@ func greeting() -> String:
 		if s["night"] == night and s["kind"] == "doctor" and _is_late(s["hour"]):
 			GameState.add_clue("Day %d · %s saw you out near %s at %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
 			return "I saw you near %s at %s last night, doctor. Decent folk are home by then." % [GameState.place_name(s["place"]), GameState.format_time(s["hour"])]
+	if is_anemic() or (is_vampire() and not GameState.is_night):
+		var sick := ["This sickness... I can barely stand, doctor.",
+				"Forgive me, doctor. The light hurts my eyes these days.",
+				"I'm so tired. Is it the same thing the others have?"]
+		return sick[(GameState.day + data.npc_name.length()) % sick.size()]
 	if is_servant:
 		return "Doctor. What is it now?"
 	var hellos := ["Good day, doctor.", "Doctor. Need something?", "Ah, doctor. Any news?"]
@@ -550,7 +618,7 @@ func answer_alibi() -> String:
 		return _wary_line()
 	if GameState.day == 1:
 		return "Last night? You only arrived this morning, doctor. I was home, like every night."
-	var text := _alibi_text()
+	var text := _alibi_text(GameState.last_night())
 	GameState.add_clue("Day %d · %s, about last night: \"%s\"" % [GameState.day, data.npc_name, text])
 	return text
 
@@ -576,6 +644,60 @@ func answer_seen() -> String:
 	return text
 
 
+func answer_exam() -> String:
+	asked["exam"] = GameState.day
+	if is_wary():
+		return "I'd rather you didn't touch me today, doctor."
+	var text := _exam_text()
+	GameState.add_clue("Day %d · Exam of %s: %s" % [GameState.day, data.npc_name, text], "evidence")
+	var record := vitals()
+	record["day"] = GameState.day
+	exams.append(record)
+	return text
+
+
+# What an exam shows right now, in a doctor's words (never the raw number)
+func vitals() -> Dictionary:
+	if is_vampire():
+		# Looks healthy, says otherwise. The pulse is the tell.
+		return {"pulse": "40, slow", "temp": "Cold", "look": "Good color", "blood": "Normal",
+				"vitality": 0.95, "marks": false, "old_marks": false, "trace": "", "dead": false}
+	var v := {"marks": not bite_traces.is_empty(), "old_marks": is_servant,
+			"trace": bite_traces[-1] if not bite_traces.is_empty() else "",
+			"vitality": blood / 100.0, "dead": false}
+	if blood >= 80.0:
+		v.merge({"pulse": "72, steady", "temp": "Normal", "look": "Good color", "blood": "Normal"})
+	elif blood >= ANEMIA_LEVEL:
+		v.merge({"pulse": "88, quick", "temp": "Normal", "look": "A little pale", "blood": "Low"})
+	elif blood >= 25.0:
+		v.merge({"pulse": "104, weak", "temp": "Cool", "look": "Pale", "blood": "Very low"})
+	else:
+		v.merge({"pulse": "120, faint", "temp": "Cool", "look": "Grey", "blood": "Critical"})
+	return v
+
+
+func _exam_text() -> String:
+	if is_vampire():
+		# The tell: complains of the sickness, but the body says otherwise
+		return "Complains of weakness, yet the color is fine. Pulse slow, very slow. Hands cold. No marks on the neck."
+	var parts: Array[String] = []
+	if blood >= 80.0:
+		parts.append("Pulse steady, good color.")
+	elif blood >= ANEMIA_LEVEL:
+		parts.append("A little pale. Mild anemia.")
+	elif blood >= 25.0:
+		parts.append("Pale and weak. Clear anemia.")
+	else:
+		parts.append("Grey lips, can barely stand. Severe anemia: one more night like this could kill.")
+	if not bite_traces.is_empty():
+		parts.append("Two small punctures on the neck. On the collar, traces of %s." % bite_traces[-1])
+	if is_servant:
+		parts.append("The punctures are old and healed, and the eyes flinch from the window.")
+	if blood >= 80.0 and randf() < 0.3:
+		parts.append("Hands a little cold, but it is autumn.")  # Noise, so cold hands alone prove nothing
+	return " ".join(parts)
+
+
 func answer_chat() -> String:
 	asked["chat"] = GameState.day
 	if is_wary():
@@ -595,21 +717,27 @@ func _wary_line() -> String:
 	return "I have nothing to tell you today, doctor."
 
 
-func _alibi_text() -> String:
-	# The truth according to the schedule. The vampire tells this too: a lie by omission.
+func _alibi_text(night: int) -> String:
+	# What they really did that evening. The vampire tells this too: a lie by omission.
 	if data.schedule.is_empty():
 		return "At home, asleep."
+	var plan: Dictionary = data.schedule
+	var bed := data.bedtime
 	var last_place := _scheduled_place(18)
+	if plans.has(night):
+		plan = plans[night]["schedule"]
+		bed = plans[night]["bedtime"]
+		last_place = plan.get(18, last_place)
 	var text := "From 6 PM I was %s" % _where(last_place)
-	var hours := data.schedule.keys()
+	var hours := plan.keys()
 	hours.sort()
 	for h: int in hours:
-		if h > 18 and h < data.bedtime and data.schedule[h] != last_place:
-			last_place = data.schedule[h]
+		if h > 18 and h < bed and plan[h] != last_place:
+			last_place = plan[h]
 			text += ", then %s from %s" % [_where(last_place), GameState.format_time(h)]
 	if last_place != data.home:
 		text += ", then I went home"
-	return text + ". I went to bed around %s." % GameState.format_time(data.bedtime)
+	return text + ". I went to bed around %s." % GameState.format_time(bed)
 
 
 func _where(place: String) -> String:
@@ -633,7 +761,7 @@ func _describe(s: Dictionary) -> String:
 		"doctor":
 			return "And you, doctor, were near %s around %s." % [where, time]
 	if s.get("inside", false):
-		return "%s was at %s with me until about %s." % [s["who"], where, time]
+		return "%s was with me at %s until about %s." % [s["who"], where, time]
 	if _is_late(s["hour"]):
 		return "I saw %s out near %s around %s. At that hour!" % [s["who"], where, time]
 	return "I saw %s passing near %s around %s." % [s["who"], where, time]
@@ -658,6 +786,64 @@ func _on_phase_changed(is_night: bool) -> void:
 	# The body stays at the door for the day it is found; at dusk it is buried
 	if is_night and state == State.DEAD and not buried and GameState.day >= found_day:
 		_bury()
+	if is_night and is_alive() and data and not data.schedule.is_empty():
+		_plan_evening()
+	elif not is_night:
+		tonight = {}
+
+
+func _plan_evening() -> void:
+	# Start from the usual evening, then maybe change it
+	var plan := {}
+	for h: int in data.schedule.keys():
+		if h > 18:
+			plan[h] = data.schedule[h]
+	plan[18] = _scheduled_place(18)
+	var bed := data.bedtime
+	var kind := "usual"
+	var friends := []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc != self and npc.is_alive() and npc.data and npc.data.home != data.home:
+			friends.append(npc)
+	var roll := randf()
+	if is_anemic():
+		# Too weak to go out
+		kind = "sick"
+		plan = {18: data.home}
+		bed = maxi(data.bedtime - 1, 20)
+	elif roll < 0.2:
+		# A long night at the tavern
+		kind = "tavern"
+		plan = {18: plan[18], 19: "Taverna"}
+		bed = mini(data.bedtime + 1, 23)
+	elif roll < 0.4 and not friends.is_empty():
+		# Visiting a friend after dinner
+		kind = "visit"
+		var friend = friends.pick_random()
+		for h: int in plan.keys():
+			if h >= 19 and h <= 21:
+				plan.erase(h)
+		plan[19] = friend.data.home
+		plan[21] = data.home
+	elif roll < 0.55:
+		# Tired: home early
+		kind = "early"
+		plan = {18: data.home}
+		bed = maxi(data.bedtime - 1, 20)
+	elif roll < 0.7:
+		# A walk through the square before bed
+		kind = "walk"
+		plan[20] = "Praca"
+		if not plan.has(21):
+			plan[21] = data.home
+	# Whatever happened, they must end the night at home to go to sleep
+	var keys := plan.keys()
+	keys.sort()
+	if plan[keys[-1]] != data.home:
+		plan[bed] = data.home
+	tonight = plan
+	tonight_bedtime = bed
+	plans[GameState.day] = {"schedule": plan.duplicate(), "bedtime": bed, "kind": kind}
 
 
 func _bury() -> void:

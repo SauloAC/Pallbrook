@@ -10,6 +10,7 @@ extends CanvasLayer
 const QUESTIONS := [
 	["alibi", "Where were you last night?"],
 	["seen", "Did you see anything unusual last night?"],
+	["exam", "Let me examine you."],
 	["chat", "How are things?"],
 	["bye", "Goodbye."],
 ]
@@ -109,6 +110,8 @@ func _ask(key: String) -> void:
 			body.text = npc.answer_alibi()
 		"seen":
 			body.text = npc.answer_seen()
+		"exam":
+			body.text = npc.answer_exam()
 		"chat":
 			body.text = npc.answer_chat()
 		"bye":
