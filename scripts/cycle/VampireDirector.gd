@@ -9,6 +9,7 @@ extends Node
 @export var bite_min := 25.0         # Blood taken per night (people start at 100)
 @export var bite_max := 35.0
 @export var outbreak_size := 2       # People already anemic when the doctor arrives
+@export var watch_range := 8.0       # Doctor this close to the victim's door: the vampire gives up
 
 var vampire: Node = null
 var acted_tonight := false
@@ -80,8 +81,12 @@ func _run_hunt(victim: Node) -> void:
 		await get_tree().physics_frame
 	if not hunting:
 		return
+	if _doctor_watching(victim):
+		victim.marked = false  # The doctor kept watch: the hold is broken
+		_abort_hunt("A figure fled from %s's door when it saw the doctor." % victim.data.npc_name)
+		return
 	await get_tree().create_timer(2.0).timeout  # Inside the house...
-	if vampire.witnessed:
+	if vampire.witnessed or _doctor_watching(victim):
 		_abort_hunt()
 		return
 	if not hunting:
@@ -91,11 +96,18 @@ func _run_hunt(victim: Node) -> void:
 	hunting = false
 
 
-func _abort_hunt() -> void:
-	# Recognized by the doctor: flee home, nobody dies tonight
+func _abort_hunt(event := "A shadow was seen prowling the streets. Nobody died tonight.") -> void:
+	# Seen by the doctor: flee home, nobody is harmed tonight
 	hunting = false
 	vampire.end_hunt()
-	GameState.add_night_event("A shadow was seen prowling the streets. Nobody died tonight.")
+	GameState.add_night_event(event)
+
+
+func _doctor_watching(victim: Node) -> bool:
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return false
+	return player.global_position.distance_to(GameState.place_position(victim.data.home)) < watch_range
 
 
 func _finish_hunt_now() -> void:
@@ -118,6 +130,10 @@ func _seed_outbreak() -> void:
 
 
 func _pick_victim() -> Node:
+	# A marked person is the first to be visited again
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc != vampire and npc.is_alive() and npc.marked:
+			return npc
 	var victims := []
 	var weak := []
 	for npc in get_tree().get_nodes_in_group("npcs"):
@@ -141,12 +157,25 @@ func _resolve_attack(victim: Node) -> void:
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc != victim and npc.is_alive() and not npc.is_servant:
 			others += 1
+	# A marked person who was not saved during the day is turned now
+	if victim.marked:
+		victim.marked = false
+		victim.make_servant()
+		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
+		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
+		_check_town_lost()
+		return
 	# Feed. Death only comes when the blood runs out.
 	var died: bool = victim.feed(randf_range(bite_min, bite_max), _pick_trace(victim))
 	if died:
 		GameState.add_night_event("%s was found dead at their doorstep." % victim_name)
 		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name], "evidence", morning)
 		EventBus.npc_died.emit(victim_name)
+	elif others > 0 and randf() < servant_chance and victim.affinity >= 60.0:
+		# They trust the doctor: marked, with one day to warn him
+		victim.marked = true
+		victim.marked_day = morning
+		GameState.add_night_event("Somewhere in Pallbrook, someone woke up weaker than they went to bed.")
 	elif others > 0 and randf() < servant_chance:
 		# Sometimes the bite turns them (only if someone else is left to hunt)
 		victim.make_servant()

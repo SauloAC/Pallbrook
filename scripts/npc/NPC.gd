@@ -49,6 +49,17 @@ var blood := 100.0                    # 0 = dead. The vampire feeds a little eac
 var bite_traces: Array[String] = []   # What each bite left on the clothes
 var exams: Array[Dictionary] = []     # The doctor's records, shown on the patient chart
 
+# ---------- Trust in the doctor ----------
+# Trust of 60 or more: a night visit marks them instead of turning them (see VampireDirector)
+var affinity := 40.0
+var talked_day := 0             # Last day a conversation raised trust
+var cared_day := 0              # Last day an exam raised trust
+var marked := false             # Visited by the vampire; turns next night unless saved
+var marked_day := 0             # The morning they will warn the doctor
+var appointment_until := -1.0   # Hour until which they wait at the clinic (-1 = none)
+var treated_day := 0
+var appointment: Dictionary = {}  # This patient's current entry in GameState.appointments
+
 # ---------- Tonight's plan ----------
 # Every evening each person may change their plans, so alibis and sightings differ night to night
 var tonight: Dictionary = {}  # hour -> place, from 6 PM (empty during the day)
@@ -392,6 +403,7 @@ func _process(delta: float) -> void:
 	if sight_timer <= 0.0:
 		sight_timer = SIGHT_INTERVAL
 		_look_around()
+		_check_appointment()
 
 
 func _check_seen_by_doctor() -> void:
@@ -455,6 +467,8 @@ func _free_slot(place: String) -> int:
 
 
 func _place_for_hour(hour: int) -> String:
+	if appointment_until > GameState.hour and not GameState.is_night:
+		return "Clinica"  # On the way to (or waiting at) the clinic
 	var place := _scheduled_place(hour)
 	if not tonight.is_empty() and GameState.is_night:
 		place = _plan_place(tonight, hour)
@@ -558,6 +572,8 @@ func _look_around() -> void:
 		if place != "Clinica":  # Nobody minds the doctor at his own door
 			add_sighting(night, "doctor", "the doctor", place, GameState.hour)
 			if _is_late(GameState.hour):
+				if wary_day != GameState.day + 1:
+					change_affinity(-12.0)
 				wary_day = GameState.day + 1  # Tomorrow they keep their distance
 
 
@@ -583,7 +599,21 @@ func _night_order(hour: float) -> float:
 # ---------- Conversation ----------
 
 func is_wary() -> bool:
-	return GameState.day <= wary_day
+	return GameState.day <= wary_day or affinity < 20.0
+
+
+func change_affinity(amount: float) -> void:
+	affinity = clampf(affinity + amount, 0.0, 100.0)
+
+
+func trust_word() -> String:
+	if affinity >= 70.0:
+		return "Trusts you"
+	if affinity >= 45.0:
+		return "Friendly"
+	if affinity >= 25.0:
+		return "Guarded"
+	return "Distrusts you"
 
 
 func was_asked(question: String) -> bool:
@@ -591,6 +621,12 @@ func was_asked(question: String) -> bool:
 
 
 func greeting() -> String:
+	if talked_day != GameState.day:
+		talked_day = GameState.day
+		change_affinity(6.0)  # A daily visit builds trust
+	if marked and marked_day == GameState.day:
+		GameState.add_clue("Day %d · %s was visited in the night and fears it will come back tonight." % [GameState.day, data.npc_name], "evidence")
+		return "Doctor... last night something stood by my bed. I couldn't move, and now my neck burns. Please, it will come back tonight."
 	var night := GameState.last_night()
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor_collapsed":
@@ -650,8 +686,12 @@ func answer_exam() -> String:
 		return "I'd rather you didn't touch me today, doctor."
 	var text := _exam_text()
 	GameState.add_clue("Day %d · Exam of %s: %s" % [GameState.day, data.npc_name, text], "evidence")
+	if cared_day != GameState.day:
+		cared_day = GameState.day
+		change_affinity(8.0)
 	var record := vitals()
 	record["day"] = GameState.day
+	record["marked"] = marked
 	exams.append(record)
 	return text
 
@@ -885,3 +925,69 @@ func _make_headstone() -> Node3D:
 	plate.modulate = Color(0.9, 0.88, 0.82)
 	stone.add_child(plate)
 	return stone
+
+
+# ---------- Clinic visits ----------
+
+func answer_clinic() -> String:
+	asked["clinic"] = GameState.day
+	if GameState.is_night:
+		return "At this hour? Ask me tomorrow, doctor."
+	if is_vampire():
+		return "I can't leave my bed, doctor. Not in this light."  # The sun, not the sickness
+	if is_wary():
+		return "I'll manage on my own, thank you."
+	if appointment_until > GameState.hour:
+		return "I'm on my way, doctor."
+	if blood >= 80.0 and not marked:
+		return "Me? I feel fine, doctor. Save your medicine for the sick."
+	appointment_until = minf(GameState.hour + 2.0, 18.0)
+	appointment = {"day": GameState.day, "name": data.npc_name, "from": GameState.hour,
+			"until": appointment_until, "status": "waiting"}
+	GameState.appointments.append(appointment)
+	return "Yes... I'll go to the clinic now. Please be there, doctor."
+
+
+func _check_appointment() -> void:
+	if appointment_until < 0.0 or not is_alive():
+		return
+	if GameState.is_night or GameState.hour >= appointment_until:
+		# Waited long enough
+		appointment_until = -1.0
+		if treated_day != GameState.day:
+			appointment["status"] = "missed"
+			change_affinity(-5.0)
+			GameState.add_clue("Day %d · %s waited at the clinic, but you never came." % [GameState.day, data.npc_name])
+		if state == State.INSIDE:
+			set_state(State.ROUTINE)
+		return
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if current_place == "Clinica" and (state == State.INSIDE or state == State.ROUTINE) and player \
+			and player.global_position.distance_to(GameState.place_position("Clinica")) < 6.0 \
+			and global_position.distance_to(GameState.place_position("Clinica")) < 6.0:
+		_treat()
+
+
+func _treat() -> void:
+	var was_marked := marked
+	treated_day = GameState.day
+	appointment_until = -1.0
+	appointment["status"] = "treated"
+	marked = false
+	blood = minf(blood + 25.0, 100.0)
+	change_affinity(15.0)
+	_update_color()
+	# The doctor checks them again after the tonic: the chart shows the new state
+	var record := vitals()
+	record["day"] = GameState.day
+	record["treated"] = true
+	record["marked"] = false
+	exams.append(record)
+	var note := "Day %d · You treated %s at the clinic: an iron tonic and rest." % [GameState.day, data.npc_name]
+	if was_marked:
+		note += " The night visitor's hold on them is broken."
+	GameState.add_clue(note, "evidence")
+	if state == State.INSIDE:
+		set_state(State.ROUTINE)  # Back to their day
+	if not GameState.in_dialogue:
+		EventBus.dialogue_started.emit(data.npc_name, "Thank you, doctor. I feel stronger already.")

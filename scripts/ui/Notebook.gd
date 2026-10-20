@@ -13,6 +13,7 @@ const INK := Color("2C2621")
 const INK_FADED := Color(0.17, 0.15, 0.13, 0.45)
 const ALL := ""
 const EVIDENCE := "#evidence"
+const APPOINTMENTS := "#appointments"
 
 var filter := ALL  # ALL, EVIDENCE or a person's name
 const PER_PAGE := 9  # 3x3 grid; more townsfolk spill onto extra pages
@@ -27,7 +28,8 @@ const LINE_X := 410.0
 const TOP_LINES := [153, 207, 261, 314, 368, 422]
 const BOX_RECTS := [Rect2(82, 558, 190, 69), Rect2(298, 558, 189, 69), Rect2(514, 558, 189, 69), Rect2(729, 558, 189, 69)]
 const TUBE_RECT := Rect2(190, 712, 690, 11)        # The mercury channel of the thermometer
-const NECK_MARKS := [Vector2(292, 1172), Vector2(305, 1183)]
+const BITE := preload("res://assets/ui/chart/bite_marks.png")
+const BITE_RECT := Rect2(266, 1152, 66, 51)          # On the side of the neck sketch
 const NOTE_X := 474.0
 const NOTE_LINES := [861, 913, 965, 1018, 1070, 1123, 1175, 1227, 1280]
 const BLOOD_RED := Color(0.48, 0.07, 0.07)
@@ -41,7 +43,7 @@ func _ready() -> void:
 	panel.visible = false
 	# Filter buttons, built in code right under the title
 	filter_bar = HBoxContainer.new()
-	filter_bar.add_theme_constant_override("separation", 18)
+	filter_bar.add_theme_constant_override("separation", 14)
 	var vbox: VBoxContainer = $Panel/Pages/VBox
 	vbox.add_child(filter_bar)
 	vbox.move_child(filter_bar, title.get_index() + 1)
@@ -125,7 +127,8 @@ func _build_filter_bar() -> void:
 	_clear(filter_bar)
 	filter_bar.add_child(_link("All", ALL))
 	filter_bar.add_child(_link("Evidence", EVIDENCE))
-	if filter != ALL and filter != EVIDENCE:
+	filter_bar.add_child(_link("Clinic", APPOINTMENTS))
+	if filter != ALL and filter != EVIDENCE and filter != APPOINTMENTS:
 		var chart_link := _link("Patient chart", "")
 		chart_link.add_theme_color_override("font_color", BLOOD_RED)
 		var who := filter
@@ -149,6 +152,9 @@ func _link(text: String, value: String) -> Label:
 
 
 func _build_entries() -> void:
+	if filter == APPOINTMENTS:
+		_build_appointments()
+		return
 	match filter:
 		ALL:
 			title.text = "Casebook"
@@ -174,13 +180,44 @@ func _build_entries() -> void:
 	scroll.scroll_vertical = 0
 
 
+func _build_appointments() -> void:
+	# Who needs the doctor today, then every clinic visit, newest first
+	title.text = "Clinic"
+	var lines: Array[String] = []
+	var urgent: Array[String] = []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc.is_alive() and npc.marked and npc.talked_day >= npc.marked_day:
+			urgent.append("• %s · visited at night: treat today, or keep watch at the door tonight" % npc.data.npc_name)
+	if not urgent.is_empty():
+		lines.append("— Urgent —")
+		lines.append_array(urgent)
+	var last_day := -1
+	for i in range(GameState.appointments.size() - 1, -1, -1):
+		var a: Dictionary = GameState.appointments[i]
+		if a["day"] != last_day:
+			last_day = a["day"]
+			lines.append("— Today —" if last_day == GameState.day else "— Day %d —" % last_day)
+		var status := "expected at the clinic"
+		match a["status"]:
+			"treated":
+				status = "treated"
+			"missed":
+				status = "waited in vain"
+		lines.append("• %s · %s – %s · %s" % [a["name"], GameState.format_time(a["from"]), GameState.format_time(a["until"]), status])
+	if lines.is_empty():
+		entries.text = "No appointments yet.\n\nAsk a sick patient to come to the clinic for a treatment."
+	else:
+		entries.text = "\n\n".join(PackedStringArray(lines))
+	scroll.scroll_vertical = 0
+
+
 func _matches(entry: Dictionary) -> bool:
 	match filter:
 		ALL:
 			return true
 		EVIDENCE:
 			return entry["kind"] == "evidence"
-	return filter in entry["people"]
+	return filter in entry["people"]  # A person's name
 
 
 # ---------- Right page ----------
@@ -231,7 +268,7 @@ func _build_suspects() -> void:
 
 		if not npc.is_alive():
 			card.modulate = Color(1, 1, 1, 0.45)  # Faded: no longer a suspect
-		elif filter != ALL and filter != EVIDENCE and filter != name_text:
+		elif filter not in [ALL, EVIDENCE, APPOINTMENTS] and filter != name_text:
 			card.modulate = Color(1, 1, 1, 0.7)   # Someone else is selected
 
 		_make_clickable(card, name_text)
@@ -358,6 +395,10 @@ func _open_chart(npc_name: String) -> void:
 		_line_text("Traces: %s" % last["trace"], LINE_X, TOP_LINES[3], 28)
 	if not last.is_empty() and last["old_marks"]:
 		_line_text("Old, healed punctures", LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
+	elif npc.is_alive() and npc.marked and npc.talked_day >= npc.marked_day:
+		_line_text("Visited at night: treat today!", LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
+	if npc.is_alive():
+		_line_text(npc.trust_word(), LINE_X, TOP_LINES[5], 28)
 
 	# Vital signs boxes: pulse, temperature, appearance, blood
 	var values := ["—", "—", "—", "—"]
@@ -382,18 +423,18 @@ func _open_chart(npc_name: String) -> void:
 			fill.modulate.a = 0.45  # Old news: things may be worse now
 		sheet.add_child(fill)
 
-	# Marks drawn on the neck sketch once the doctor has found them
+	# The bite drawn on the neck sketch once the doctor has found it
 	if not last.is_empty() and (last["marks"] or last["old_marks"]):
-		for point: Vector2 in NECK_MARKS:
-			var dot := Panel.new()
-			var round_style := StyleBoxFlat.new()
-			round_style.bg_color = BLOOD_RED if last["marks"] and not last["old_marks"] else Color(0.45, 0.3, 0.25)
-			round_style.set_corner_radius_all(6)
-			dot.add_theme_stylebox_override("panel", round_style)
-			dot.size = Vector2(10, 10)
-			dot.position = point - Vector2(5, 5)
-			dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			sheet.add_child(dot)
+		var bite := TextureRect.new()
+		bite.texture = BITE
+		bite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		bite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		bite.position = BITE_RECT.position
+		bite.size = BITE_RECT.size
+		bite.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if last["old_marks"]:
+			bite.modulate = Color(0.8, 0.7, 0.6, 0.55)  # Old, healed: brown and faded
+		sheet.add_child(bite)
 
 	# Exam history, newest first
 	var row := 0
@@ -404,6 +445,8 @@ func _open_chart(npc_name: String) -> void:
 		var note := "Day %d · %s, %s" % [e["day"], e["look"], "pulse " + e["pulse"]]
 		if e["dead"]:
 			note = "Day %d · found dead" % e["day"]
+		elif e.get("treated", false):
+			note = "Day %d · Treated at the clinic, now %s" % [e["day"], e["look"].to_lower()]
 		_line_text(note, NOTE_X, NOTE_LINES[row], 24)
 		row += 1
 

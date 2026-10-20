@@ -107,5 +107,6 @@ func _report_collapse() -> Array[String]:
 	for npc in neighbors.slice(0, 2):
 		npc.add_sighting(GameState.day, "doctor_collapsed", "the doctor", place, hour)
 		npc.wary_day = GameState.day + 1
+		npc.change_affinity(-15.0)
 		names.append(npc.data.npc_name)
 	return names

@@ -10,6 +10,8 @@ var vampire_name := ""
 var clues: Array[String] = []
 # The casebook: {text, kind ("testimony" or "evidence"), day, people (names mentioned)}
 var entries: Array[Dictionary] = []
+# Clinic appointments: {day, name, from, until, status ("waiting", "treated", "missed")}
+var appointments: Array[Dictionary] = []
 var game_over := false
 var intro_seen := false
 
@@ -26,6 +28,7 @@ func reset() -> void:
 	night_events.clear()
 	clues.clear()
 	entries.clear()
+	appointments.clear()
 
 # kind: "testimony" (what people say) or "evidence" (what the doctor saw or found)
 # on_day: which day the casebook files it under (default: today)
