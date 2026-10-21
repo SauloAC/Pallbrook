@@ -3,7 +3,9 @@ extends CharacterBody3D
 enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
 
 # Places people stay outside at (everything else has a door to go through)
-const OPEN_AIR_PLACES := ["Praca", "Clinica"]  # Clinica: patients wait inside, in plain sight
+const OPEN_AIR_PLACES := ["Praca"]
+# Walk-in buildings: people stay visible inside (the roof opens when the doctor enters)
+const WALK_IN_PLACES := ["Clinica", "Taverna"]
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -90,18 +92,19 @@ const PLACE_SLOTS: Array[Vector3] = [
 	Vector3(0.0, 0.0, 4.2),
 ]
 
-# Inside the clinic room (around the marker): the middle of the floor, clear of the bed,
-# cabinet and desk. The last two are outside the door, for a queue.
-const CLINIC_SLOTS: Array[Vector3] = [
-	Vector3(0.0, 0.0, 0.0),
-	Vector3(-0.6, 0.0, 0.2),
-	Vector3(0.3, 0.0, -1.0),
-	Vector3(-1.0, 0.0, 0.4),
-	Vector3(0.4, 0.0, -1.7),
-	Vector3(0.5, 0.0, 0.5),
-	Vector3(-0.6, 0.0, 2.4),
-	Vector3(0.6, 0.0, 2.6),
-]
+# Spots inside walk-in buildings, around their marker: open floor, clear of the furniture.
+# Clinic: the last two are outside the door, for a queue.
+const INTERIOR_SLOTS := {
+	"Clinica": [
+		Vector3(0.0, 0.0, 0.0), Vector3(-0.6, 0.0, 0.2), Vector3(0.3, 0.0, -1.0), Vector3(-1.0, 0.0, 0.4),
+		Vector3(0.4, 0.0, -1.7), Vector3(0.5, 0.0, 0.5), Vector3(-0.6, 0.0, 2.4), Vector3(0.6, 0.0, 2.6),
+	],
+	# Tavern (marker at the south door): four inside by the bar and the table, four out on the patio
+	"Taverna": [
+		Vector3(0.5, 0.0, -5.0), Vector3(-0.5, 0.0, -5.0), Vector3(0.0, 0.0, -2.0), Vector3(1.2, 0.0, -7.2),
+		Vector3(0.0, 0.0, 1.4), Vector3(-0.6, 0.0, 3.1), Vector3(0.6, 0.0, 3.1), Vector3(2.4, 0.0, 0.9),
+	],
+}
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -199,7 +202,9 @@ func set_state(new_state: State) -> void:
 
 
 func is_inside() -> bool:
-	return state == State.INSIDE
+	# Also true for someone standing inside a walk-in building (window lights, sight)
+	return state == State.INSIDE or (state == State.ROUTINE and WALK_IN_PLACES.has(current_place) \
+			and agent.is_navigation_finished())
 
 
 func is_alive() -> bool:
@@ -423,7 +428,8 @@ func _on_arrived() -> void:
 			set_state(State.SLEEPING)
 		return
 	# Reached a building during the routine: go in
-	if state == State.ROUTINE and current_place != "" and not OPEN_AIR_PLACES.has(current_place):
+	if state == State.ROUTINE and current_place != "" and not OPEN_AIR_PLACES.has(current_place) \
+			and not WALK_IN_PLACES.has(current_place):
 		set_state(State.INSIDE)
 
 
@@ -513,9 +519,9 @@ func _go_to_place(place: String) -> void:
 		place_slot = _free_slot(place)
 		# Each person takes their own spot, with a tiny jitter so it doesn't look like a grid
 		var jitter := Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
-		var slots := CLINIC_SLOTS if place == "Clinica" else PLACE_SLOTS
-		if place == "Clinica":
-			jitter *= 0.5  # A small room: stay on the spot
+		var slots: Array = INTERIOR_SLOTS.get(place, PLACE_SLOTS)
+		if INTERIOR_SLOTS.has(place):
+			jitter *= 0.5  # Indoors: stay on the spot
 		go_to(marker.global_position + slots[place_slot] + jitter)
 
 
@@ -528,7 +534,7 @@ func _free_slot(place: String) -> int:
 		if npc.state == State.DEAD or npc.state == State.SLEEPING:
 			continue
 		taken.append(npc.place_slot)
-	var count := CLINIC_SLOTS.size() if place == "Clinica" else PLACE_SLOTS.size()
+	var count: int = INTERIOR_SLOTS[place].size() if INTERIOR_SLOTS.has(place) else PLACE_SLOTS.size()
 	for i in count:
 		if not taken.has(i):
 			return i
