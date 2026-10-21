@@ -28,7 +28,8 @@ const PHOTO_RECT := Rect2(104, 120, 220, 296)
 const LINE_X := 410.0
 const TOP_LINES := [153, 207, 261, 314, 368, 422]
 const BOX_RECTS := [Rect2(82, 558, 190, 69), Rect2(298, 558, 189, 69), Rect2(514, 558, 189, 69), Rect2(729, 558, 189, 69)]
-const TUBE_RECT := Rect2(190, 712, 690, 11)        # The mercury channel of the thermometer
+const BLOOD_BAR := Rect2(250, 694, 580, 44)        # Classic blood bar (a thermometer read as body heat)
+const BLOOD_DROP := preload("res://assets/ui/chart/blood_drop.png")
 const BITE := preload("res://assets/ui/chart/bite_marks.png")
 const WRIST_NOTE := preload("res://assets/ui/chart/wrist_note.png")  # Close-up pinned under the clip
 const CLIP := preload("res://assets/ui/chart/chart_clip.png")
@@ -435,28 +436,21 @@ func _open_chart(npc_name: String) -> void:
 	if npc.is_alive():
 		_line_text(npc.trust_word(), LINE_X, TOP_LINES[5], 28)
 
-	# Vital signs boxes: pulse, temperature, appearance, blood
+	# Vital signs boxes: pulse, temperature, appearance, sleep
 	var values := ["—", "—", "—", "—"]
 	if not last.is_empty():
-		values = [last["pulse"], last["temp"], last["look"], last["blood"]]
+		values = [last["pulse"], last["temp"], last["look"], last.get("sleep", "—")]
 	for i in 4:
 		var box: Rect2 = BOX_RECTS[i]
-		var label := _label(values[i], 28)
+		var label := _label(values[i], 28 if str(values[i]).length() <= 11 else 23)  # Long words shrink to fit
 		label.position = box.position
 		label.size = box.size
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		sheet.add_child(label)
 
-	# Vitality: the thermometer fills with what is left (faded if the exam is old)
-	if not last.is_empty():
-		var fill := ColorRect.new()
-		fill.color = BLOOD_RED
-		fill.position = TUBE_RECT.position
-		fill.size = Vector2(TUBE_RECT.size.x * clampf(last["vitality"], 0.0, 1.0), TUBE_RECT.size.y)
-		if int(last["day"]) < GameState.day:
-			fill.modulate.a = 0.45  # Old news: things may be worse now
-		sheet.add_child(fill)
+	# Blood left: a classic bar with a label and a percentage (faded if the exam is old)
+	_blood_bar(-1.0 if last.is_empty() else float(last["vitality"]), not last.is_empty() and int(last["day"]) < GameState.day)
 
 	# The bite drawn on the neck sketch once the doctor has found it
 	if not last.is_empty() and (last["marks"] or last["old_marks"]):
@@ -499,6 +493,63 @@ func _open_chart(npc_name: String) -> void:
 		row += 1
 
 	chart_layer.visible = true
+
+
+func _blood_bar(vitality: float, old: bool) -> void:
+	var bar := BLOOD_BAR
+	var drop := TextureRect.new()
+	drop.texture = BLOOD_DROP
+	drop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	drop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	drop.position = Vector2(84, bar.position.y - 10)
+	drop.size = Vector2(38, 64)
+	drop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sheet.add_child(drop)
+	var title := _label("Blood", 30)
+	title.position = Vector2(130, bar.position.y)
+	title.size = Vector2(115, bar.size.y)
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sheet.add_child(title)
+
+	# Frame drawn in ink, the red fill inside it
+	var frame := Panel.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.55, 0.45, 0.38, 0.18)
+	style.border_color = INK
+	style.set_border_width_all(3)
+	style.set_corner_radius_all(6)
+	frame.add_theme_stylebox_override("panel", style)
+	frame.position = bar.position
+	frame.size = bar.size
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sheet.add_child(frame)
+
+	var amount := clampf(vitality, 0.0, 1.0)
+	if vitality >= 0.0 and amount > 0.0:
+		var fill := ColorRect.new()
+		fill.color = BLOOD_RED
+		fill.position = bar.position + Vector2(5, 5)
+		fill.size = Vector2((bar.size.x - 10) * amount, bar.size.y - 10)
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if old:
+			fill.modulate.a = 0.45  # Old news: things may be worse now
+		sheet.add_child(fill)
+	# Quarter marks so the level reads at a glance
+	for q in [0.25, 0.5, 0.75]:
+		var tick := ColorRect.new()
+		tick.color = INK_FADED
+		tick.position = bar.position + Vector2(bar.size.x * q - 1, 5)
+		tick.size = Vector2(2, bar.size.y - 10)
+		tick.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		sheet.add_child(tick)
+
+	var percent := _label("—" if vitality < 0.0 else "%d%%" % roundi(amount * 100.0), 30, BLOOD_RED if amount < 0.5 and vitality >= 0.0 else INK)
+	percent.position = Vector2(bar.end.x + 14, bar.position.y)
+	percent.size = Vector2(90, bar.size.y)
+	percent.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	if old:
+		percent.modulate.a = 0.6
+	sheet.add_child(percent)
 
 
 func _line_text(text: String, x: float, baseline: float, font_size: int, font: Font = null, color := INK) -> void:

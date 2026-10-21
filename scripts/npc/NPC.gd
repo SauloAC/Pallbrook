@@ -295,6 +295,12 @@ func is_vampire() -> bool:
 	return data != null and data.npc_name == GameState.vampire_name
 
 
+# The vampire's own blood: drops each day, refills when he feeds. Never kills him.
+func set_hunger(level: float) -> void:
+	blood = clampf(level, 1.0, 100.0)
+	_update_color()
+
+
 # A bite. Returns true if it was the last one.
 func feed(amount: float, trace: String) -> bool:
 	blood = maxf(blood - amount, 0.0)
@@ -574,7 +580,7 @@ func _examine_body() -> void:
 	_update_label()
 	var trace := body_trace if body_trace != "" else "nothing unusual"
 	exams.append({"day": GameState.day, "pulse": "None", "temp": "Cold", "look": "Dead",
-			"blood": "Drained", "vitality": 0.0, "marks": true, "old_marks": false,
+			"sleep": "—", "vitality": 0.0, "marks": true, "old_marks": false,
 			"trace": body_trace, "dead": true})
 	var text := "Bite marks on the neck. On the clothes, traces of %s." % trace
 	GameState.add_clue("Body of %s: %s" % [data.npc_name, text], "evidence")
@@ -751,12 +757,22 @@ func answer_exam() -> String:
 # What an exam shows right now, in a doctor's words (never the raw number)
 func vitals() -> Dictionary:
 	if is_vampire():
-		# Claims the sickness, but the blood is fine and there are no marks.
-		# Pulse and skin vary, so only a pattern over several exams gives it away.
-		return {"pulse": ["56, slow", "60, slow", "64, steady"].pick_random(),
-				"temp": ["Cool", "Normal"].pick_random(),
-				"look": ["Good color", "A little pale"].pick_random(), "blood": "Normal",
-				"vitality": 0.95, "marks": false, "old_marks": false, "trace": "", "dead": false}
+		# His own blood is his hunger: fed, he looks healthy; starving, he looks as anemic
+		# as his victims. The tells: the pulse stays slow and there are never any marks.
+		var vv := {"marks": false, "old_marks": false, "trace": "", "vitality": blood / 100.0, "dead": false}
+		if blood >= 80.0:
+			vv.merge({"pulse": ["56, slow", "60, slow", "64, steady"].pick_random(), "temp": ["Cool", "Normal"].pick_random(),
+					"look": ["Good color", "A little pale"].pick_random()})
+		elif blood >= ANEMIA_LEVEL:
+			vv.merge({"pulse": ["56, slow", "60, slow"].pick_random(), "temp": ["Cool", "Normal"].pick_random(),
+					"look": "A little pale"})
+		elif blood >= 25.0:
+			vv.merge({"pulse": ["52, slow", "56, slow"].pick_random(), "temp": "Cool", "look": "Pale"})
+		else:
+			vv.merge({"pulse": "48, slow", "temp": "Cold", "look": "Grey"})
+		# Sleeps like anyone else, by his own account
+		vv["sleep"] = ["Sound", "Light", "Restless", "Oversleeps"].pick_random()
+		return vv
 	var trace := ""
 	if marks_visible():
 		trace = bite_traces[-1] + ("" if neck_bitten() else " (wrist)")
@@ -766,23 +782,39 @@ func vitals() -> Dictionary:
 		# Frightened, not bitten: looks much like the vampire on a single exam
 		v.merge({"pulse": ["60, slow", "64, steady", "68, steady", "72, steady"].pick_random(),
 				"temp": ["Cool", "Normal"].pick_random(),
-				"look": ["Good color", "A little pale"].pick_random(), "blood": "Normal"})
+				"look": ["Good color", "A little pale"].pick_random()})
 	elif blood >= 80.0:
 		# Healthy people vary too, so a single slow or cool reading proves nothing
 		v.merge({"pulse": ["64, steady", "68, steady", "72, steady", "76, steady"].pick_random(),
-				"temp": "Cool" if randf() < 0.25 else "Normal", "look": "Good color", "blood": "Normal"})
+				"temp": "Cool" if randf() < 0.25 else "Normal", "look": "Good color"})
 	elif blood >= ANEMIA_LEVEL:
-		v.merge({"pulse": "88, quick", "temp": "Normal", "look": "A little pale", "blood": "Low"})
+		v.merge({"pulse": "88, quick", "temp": "Normal", "look": "A little pale"})
 	elif blood >= 25.0:
-		v.merge({"pulse": "104, weak", "temp": "Cool", "look": "Pale", "blood": "Very low"})
+		v.merge({"pulse": "104, weak", "temp": "Cool", "look": "Pale"})
 	else:
-		v.merge({"pulse": "120, faint", "temp": "Cool", "look": "Grey", "blood": "Critical"})
+		v.merge({"pulse": "120, faint", "temp": "Cool", "look": "Grey"})
+	v["sleep"] = _sleep()
 	return v
+
+
+# How they have been sleeping. Anyone bitten may dream badly; the marked are haunted.
+func _sleep() -> String:
+	if marked:
+		return ["Night terrors", "Hallucinations", "Sleepwalks"].pick_random()
+	if is_servant:
+		return "Dreamless"
+	if blood < 25.0:
+		return "Nightmares" if randf() < 0.35 else ["Oversleeps", "Wakes dizzy", "Can't get up"].pick_random()
+	if blood < 80.0:
+		return "Nightmares" if randf() < 0.25 else ["Restless", "Oversleeps", "Wakes tired"].pick_random()
+	if worried:
+		return ["Light", "Restless", "Nightmares"].pick_random()  # Frightened by the outbreak
+	return "Restless" if randf() < 0.2 else "Sound"
 
 
 func _exam_text(v: Dictionary) -> String:
 	var parts: Array[String] = ["Pulse %s." % v["pulse"]]
-	if is_vampire() or (worried and blood >= 80.0):
+	if blood >= 80.0 and (is_vampire() or worried):
 		parts.append("Complains of weakness, but the blood seems fine.")
 	elif blood >= 80.0:
 		parts.append("Good color.")
@@ -802,6 +834,15 @@ func _exam_text(v: Dictionary) -> String:
 		parts.append("No marks on the neck.")
 	if is_servant:
 		parts.append("The punctures are old and healed, and the eyes flinch from the window.")
+	match str(v.get("sleep", "")):
+		"Night terrors":
+			parts.append("Wakes screaming: dreams of something leaning over the bed.")
+		"Hallucinations":
+			parts.append("Swears a figure stands at the foot of the bed each night.")
+		"Sleepwalks":
+			parts.append("Was found at the door at night, with no memory of it.")
+		"Nightmares":
+			parts.append("Sleeps badly, with nightmares.")
 	return " ".join(parts)
 
 

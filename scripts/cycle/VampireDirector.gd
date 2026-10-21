@@ -10,11 +10,15 @@ extends Node
 @export var bite_max := 35.0
 @export var outbreak_size := 2       # People already anemic when the doctor arrives
 @export var watch_range := 8.0       # Doctor this close to the victim's door: the vampire gives up
+@export var hunger_per_day := 15.0   # The vampire's own blood drops this much every dawn
+@export var blood_gain := 0.4         # Share of what it drinks that refills the vampire
+@export var hungry_level := 50.0     # Below this, bites take twice as much
+@export var frenzy_level := 25.0     # Below this, the vampire turns reckless and violent
 
 var vampire: Node = null
 var acted_tonight := false
 var fed_tonight := false
-var hungry_nights := 0   # Nights in a row without blood: the next bite takes twice as much
+var frenzy_tonight := false  # Decided at nightfall, before any feeding
 var hunting := false
 var hunt_victim: Node = null
 var hunt_hour := 23.0
@@ -33,6 +37,7 @@ func _choose_vampire() -> void:
 		return
 	vampire = npcs.pick_random()
 	GameState.vampire_name = vampire.data.npc_name
+	vampire.set_hunger(randf_range(65.0, 80.0))  # Fed recently, before the doctor came
 	_seed_outbreak()
 	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
 
@@ -43,7 +48,11 @@ func _on_phase_changed(is_night: bool) -> void:
 	if is_night:
 		acted_tonight = false
 		fed_tonight = false
-		hunt_hour = randf_range(hunt_start_hour, hunt_end_hour)
+		frenzy_tonight = _frenzied()
+		if frenzy_tonight:
+			hunt_hour = randf_range(20.5, 22.0)  # Can't wait: hunts while people are still up
+		else:
+			hunt_hour = randf_range(hunt_start_hour, hunt_end_hour)
 		return
 	# Dawn
 	if hunting:
@@ -57,8 +66,16 @@ func _on_phase_changed(is_night: bool) -> void:
 		else:
 			_check_town_lost()
 	acted_tonight = false
-	# A night without blood makes the next one worse
-	hungry_nights = 0 if fed_tonight else hungry_nights + 1
+	# Every day without enough blood leaves the vampire hungrier
+	vampire.set_hunger(vampire.blood - hunger_per_day)
+
+
+func _hungry() -> bool:
+	return vampire.blood < hungry_level
+
+
+func _frenzied() -> bool:
+	return vampire.blood < frenzy_level
 
 
 func _process(_delta: float) -> void:
@@ -86,12 +103,12 @@ func _run_hunt(victim: Node) -> void:
 		await get_tree().physics_frame
 	if not hunting:
 		return
-	if _doctor_watching(victim):
+	if _doctor_watching(victim) and not _frenzied():  # Starving, it no longer cares who is watching
 		victim.marked = false  # The doctor kept watch: the hold is broken
 		_abort_hunt("A figure fled from %s's door when it saw the doctor." % victim.data.npc_name)
 		return
 	await get_tree().create_timer(2.0).timeout  # Inside the house...
-	if vampire.witnessed or _doctor_watching(victim):
+	if vampire.witnessed or (_doctor_watching(victim) and not _frenzied()):
 		_abort_hunt()
 		return
 	if not hunting:
@@ -170,21 +187,30 @@ func _resolve_attack(victim: Node) -> void:
 		fed_tonight = true
 		victim.marked = false
 		victim.make_servant()
+		vampire.set_hunger(vampire.blood + 20.0)
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
 		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
 		_check_town_lost()
 		return
 	# Feed. Death only comes when the blood runs out.
 	var amount := randf_range(bite_min, bite_max)
-	var starving := hungry_nights > 0
+	var starving := _hungry()
+	var frenzy := _frenzied()
 	if starving:
-		amount *= 2.0  # Went hungry: takes twice the blood
+		amount *= 2.0  # Hungry: takes twice the blood
 	fed_tonight = true
-	var died: bool = victim.feed(amount, _pick_trace(victim))
+	var had: float = victim.blood
+	# In a frenzy it is careless: the trace always points to the real vampire
+	var died: bool = victim.feed(amount, vampire.data.clue_trait if frenzy else _pick_trace(victim))
+	vampire.set_hunger(vampire.blood + minf(amount, had) * blood_gain)
 	if died:
 		GameState.add_night_event("%s was found dead at their doorstep." % victim_name)
 		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name], "evidence", morning)
 		EventBus.npc_died.emit(victim_name)
+	elif frenzy:
+		# No patience to turn anyone: it just feeds, and not quietly
+		GameState.add_night_event("Screams were heard in the night. Someone woke up torn and gravely weak.")
+		GameState.add_clue("Morning of Day %d: screams were heard near %s's house." % [morning, victim_name], "evidence", morning)
 	elif others > 0 and randf() < servant_chance and victim.affinity >= 60.0:
 		# They trust the doctor: marked, with one day to warn him
 		victim.marked = true
@@ -233,13 +259,16 @@ func _offscreen_witness(victim: Node) -> void:
 		# Night owls, still up at hunt time, are likelier to notice
 		var bed: int = npc.plans.get(night, {}).get("bedtime", npc.data.bedtime)
 		var still_up: bool = bed > hunt_hour
-		if randf() < (0.5 if still_up else 0.1):
+		var chance := 0.5 if still_up else 0.1
+		if frenzy_tonight:
+			chance = 0.8 if still_up else 0.3  # Reckless: easier to spot
+		if randf() < chance:
 			candidates.append(npc)
 	if candidates.is_empty():
 		return
 	var witness = candidates.pick_random()
 	var h := fmod(hunt_hour, 24.0)
-	if randf() < 0.25:
+	if randf() < (0.5 if frenzy_tonight else 0.25):
 		witness.add_sighting(night, "person", vampire.data.npc_name, place, h)  # Saw the face
 	else:
 		witness.add_sighting(night, "figure", "", place, h)
