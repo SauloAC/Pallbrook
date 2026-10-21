@@ -13,6 +13,8 @@ const FADE := 3.0
 var day_music: AudioStreamPlayer
 var night_music: AudioStreamPlayer
 var ambience: AudioStreamPlayer
+var title_music: AudioStreamPlayer
+var in_title := false
 var cache := {}
 var last_played := {}
 
@@ -22,10 +24,25 @@ func _ready() -> void:
 	day_music = _looping_player(MUSIC_DIR + "day")
 	night_music = _looping_player(MUSIC_DIR + "night")
 	ambience = _looping_player(SFX_DIR + "night_amb")
+	title_music = _looping_player(MUSIC_DIR + "title")
 	EventBus.phase_changed.connect(_on_phase_changed)
 	EventBus.npc_died.connect(func(_n): play("death"))
 	EventBus.clue_found.connect(_on_clue_found)
-	_on_phase_changed.call_deferred(GameState.is_night, true)
+	if not GameState.intro_seen and title_music:
+		# Title screen first: the town's music waits until the player presses E
+		in_title = true
+		_fade(title_music, true, true)
+	else:
+		_on_phase_changed.call_deferred(GameState.is_night, true)
+
+
+# Called by the intro when the game begins: title theme out, town music in
+func start_game() -> void:
+	if not in_title:
+		return
+	in_title = false
+	_fade(title_music, false, false)
+	_on_phase_changed(GameState.is_night)
 
 
 # Plays a short sound by name, e.g. play("page"). min_gap avoids machine-gun repeats.
@@ -70,6 +87,8 @@ func _on_clue_found(_text: String) -> void:
 
 
 func _on_phase_changed(is_night: bool, instant := false) -> void:
+	if in_title:
+		return  # Still on the title screen
 	if is_night and not instant:
 		play("bell", -4.0)
 	_fade(day_music, not is_night, instant)

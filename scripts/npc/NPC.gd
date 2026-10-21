@@ -41,6 +41,7 @@ var sight_timer := 0.0
 
 # ---------- Death and burial ----------
 var found_day := 0     # Day the body was found at the door
+var visual: CharacterVisual = null  # The 3D model, when there is one
 
 # ---------- Blood and anemia ----------
 const ANEMIA_LEVEL := 50.0
@@ -104,6 +105,14 @@ func _ready() -> void:
 		var material := StandardMaterial3D.new()
 		material.albedo_color = data.color
 		mesh.material_override = material
+		# A 3D body if this person has one; otherwise the colored capsule stays
+		visual = CharacterVisual.new()
+		add_child(visual)
+		if visual.setup(data.npc_name):
+			mesh.visible = false
+		else:
+			visual.queue_free()
+			visual = null
 	_update_label()
 	# Wait until the navigation map actually has walkable area
 	var map := agent.get_navigation_map()
@@ -162,6 +171,8 @@ func set_state(new_state: State) -> void:
 				global_position = home_marker.global_position + Vector3(toward_street, 0.0, 0.8)
 			# Lying on the ground
 			mesh.rotation_degrees.z = 90.0  # Lying sideways, so it reads as a body from above
+			if visual:
+				visual.die()
 			mesh.position.y = 0.5
 			name_label.position.y = 1.2
 		State.HUNTING:
@@ -230,7 +241,10 @@ func talk(player: Node3D) -> void:
 
 	set_state(State.TALKING)
 	# Turn to face the doctor (ignore height so we don't tilt)
-	look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z))
+	if visual:
+		visual.face(player.global_position)
+	else:
+		look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z))
 	EventBus.conversation_started.emit(self)  # The dialogue box shows the questions
 
 
@@ -254,6 +268,8 @@ func _update_color() -> void:
 		c = c.lerp(Color(0.85, 0.85, 0.9), 0.5)
 	c = c.lerp(PALE, clampf((100.0 - blood) / 100.0, 0.0, 1.0) * 0.6)
 	material.albedo_color = c
+	if visual:
+		visual.tint((100.0 - blood) / 100.0, is_servant)
 
 
 func is_anemic() -> bool:
@@ -352,6 +368,8 @@ func _physics_process(delta: float) -> void:
 		velocity.z = direction.z * current_speed
 
 	move_and_slide()
+	if visual:
+		visual.animate(get_real_velocity(), delta)
 
 	# If trying to walk but barely moving for 2s, give up
 	if state != State.TALKING and not agent.is_navigation_finished() and get_real_velocity().length() < 0.2:
@@ -406,6 +424,8 @@ func stop_hunt() -> void:
 
 
 func _set_dark(dark: bool) -> void:
+	if visual:
+		visual.set_dark(dark)
 	var material := mesh.material_override as StandardMaterial3D
 	if material == null:
 		return

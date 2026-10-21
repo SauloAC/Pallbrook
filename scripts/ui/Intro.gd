@@ -21,6 +21,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		get_viewport().set_input_as_handled()  # This E must not also trigger the player
 		GameState.intro_seen = true
+		Audio.start_game()  # Title theme fades out, the town's music fades in
 		get_tree().paused = false
 		var tween := create_tween()
 		tween.tween_property(background, "modulate:a", 0.0, 1.5)  # Fade into the town

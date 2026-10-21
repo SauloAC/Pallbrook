@@ -5,6 +5,7 @@ extends CharacterBody3D
 
 var nearby_npc: Node3D = null
 var spawn_point: Vector3
+var visual: CharacterVisual = null
 var step_timer := 0.0
 const STEP_INTERVAL := 0.42
 
@@ -12,6 +13,14 @@ const STEP_INTERVAL := 0.42
 func _ready() -> void:
 	add_to_group("player")  # Lets the vampire know where the doctor is
 	spawn_point = global_position  # Where the doctor starts; used if he ever falls off
+	visual = CharacterVisual.new()
+	add_child(visual)
+	visual.position.y = -1.0  # The doctor's body origin sits at the capsule's center
+	if visual.setup("Doctor"):
+		$MeshInstance3D.visible = false
+	else:
+		visual.queue_free()
+		visual = null
 
 
 func _physics_process(delta: float) -> void:
@@ -36,6 +45,8 @@ func _physics_process(delta: float) -> void:
 		velocity.z = direction.z * current_speed
 
 	move_and_slide()
+	if visual:
+		visual.animate(get_real_velocity(), delta)
 	_footsteps(delta)
 	_update_nearby_npc()
 

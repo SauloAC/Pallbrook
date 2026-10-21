@@ -6,6 +6,8 @@ Third-party assets used in the game. Keep this list up to date before any public
 - "Vibing Over Venus" — Kevin MacLeod (incompetech.com). Licensed under Creative Commons: By Attribution 4.0. (day.mp3)
 - "Ossuary 5 - Rest" — Kevin MacLeod (incompetech.com). Licensed under Creative Commons: By Attribution 4.0. (night.mp3)
 
+- "Yoiyami-core theme" (yoiyami_core_theme_0) — title screen music (title.ogg). CC0, no attribution required. Source: OpenGameArt.
+
 ## Sound effects
 - "Death is Looming" by Scott Elliott — excerpt used as death.ogg. Attribution required. (License: TODO, confirm on the download page)
 - Church bell — churchbell.flac, converted to bell.ogg. (Source and license: TODO)
@@ -14,5 +16,6 @@ Third-party assets used in the game. Keep this list up to date before any public
 - RPG Audio and Interface Sounds — Kenney (kenney.nl). CC0, no attribution required. (books, doors, footsteps, click, clue)
 
 ## Art
+- 3D characters: "Ultimate Animated Character Pack" by Quaternius (quaternius.com). CC0, no attribution required.
 - Character portraits, UI art and patient chart: generated with Google Gemini (AI). Steam requires disclosing AI-generated content.
 - Fonts: Cinzel and Lora (Google Fonts, SIL Open Font License).
