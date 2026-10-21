@@ -5,6 +5,8 @@ extends CharacterBody3D
 
 var nearby_npc: Node3D = null
 var spawn_point: Vector3
+var step_timer := 0.0
+const STEP_INTERVAL := 0.42
 
 
 func _ready() -> void:
@@ -34,7 +36,19 @@ func _physics_process(delta: float) -> void:
 		velocity.z = direction.z * current_speed
 
 	move_and_slide()
+	_footsteps(delta)
 	_update_nearby_npc()
+
+
+func _footsteps(delta: float) -> void:
+	var moving := is_on_floor() and Vector2(velocity.x, velocity.z).length() > 0.5
+	if not moving:
+		step_timer = 0.0
+		return
+	step_timer -= delta
+	if step_timer <= 0.0:
+		step_timer = STEP_INTERVAL / maxf(1.0 - GameState.exhaustion * 0.6, 0.4)  # Slower when tired
+		Audio.play("step_%d" % (randi() % 5), -26.0, 0.0, 0.08)  # Soft steps on dirt
 
 
 func _update_nearby_npc() -> void:

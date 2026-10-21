@@ -92,9 +92,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
 		choice = wrapi(choice - 1, 0, QUESTIONS.size())
+		Audio.play("click", -10.0)
 		_refresh_choices()
 	elif event.is_action_pressed("move_down") or event.is_action_pressed("ui_down"):
 		choice = wrapi(choice + 1, 0, QUESTIONS.size())
+		Audio.play("click", -10.0)
 		_refresh_choices()
 	elif event.is_action_pressed("interact"):
 		_ask(QUESTIONS[choice][0])

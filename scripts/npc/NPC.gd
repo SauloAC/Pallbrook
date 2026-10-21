@@ -66,6 +66,7 @@ var appointment_day := 0        # Day of the visit
 var treated_day := 0
 var appointment: Dictionary = {}  # This patient's current entry in GameState.appointments
 var skip_appointment := false     # Said yes, but will not go
+var booked_day := 0               # Day the last appointment was made (one per day)
 
 # ---------- Tonight's plan ----------
 # Every evening each person may change their plans, so alibis and sightings differ night to night
@@ -122,6 +123,8 @@ func _ready() -> void:
 func set_state(new_state: State) -> void:
 	if state == new_state:
 		return
+	if new_state == State.INSIDE or (state == State.INSIDE and new_state == State.ROUTINE):
+		Audio.play_at("door" if new_state == State.INSIDE else "door_close", global_position, -6.0)
 	state = new_state
 	# Leaving the hunt: back to a normal, recognizable person
 	if new_state != State.HUNTING and is_dark:
@@ -980,11 +983,14 @@ func answer_clinic() -> String:
 		return "I'll be at the clinic at %s, doctor, as we agreed." % GameState.format_time(appointment_from)
 	if treated_day == GameState.day:
 		return "You already treated me today, doctor. Let the tonic do its work."  # Once per day
+	if booked_day == GameState.day:
+		return "I couldn't make it today, doctor. Ask me again tomorrow."  # One booking per day
 	if blood >= 80.0 and not marked and not is_vampire() and not worried:
 		return "Me? I feel fine, doctor. Save your medicine for the sick."
 	if not is_vampire() and affinity < 45.0 and randf() < 0.35:
 		return "Tonics and bloodletting... no, doctor. I don't trust medicine."  # Some refuse out of pride or fear
 	# The vampire says yes and never comes (the sun). Weak patients sometimes can't make it either.
+	booked_day = GameState.day
 	skip_appointment = is_vampire() or randf() < 0.25
 	# A visit one or two hours from now, lasting two hours; too late today means tomorrow morning
 	appointment_day = GameState.day

@@ -75,17 +75,20 @@ func _input(event: InputEvent) -> void:
 func _open() -> void:
 	_refresh()
 	panel.visible = true
+	Audio.play("book_open", -4.0)
 	get_tree().paused = true  # Time stops while reading
 
 
 func _close() -> void:
 	panel.visible = false
+	Audio.play("book_close", -4.0)
 	get_tree().paused = false
 
 
 func _set_filter(value: String) -> void:
 	# Clicking the active person again goes back to everything
 	filter = ALL if value == filter and value != ALL else value
+	Audio.play("page", -6.0)
 	_refresh()
 
 
