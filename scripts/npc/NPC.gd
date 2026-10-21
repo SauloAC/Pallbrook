@@ -68,6 +68,8 @@ var treated_day := 0
 var appointment: Dictionary = {}  # This patient's current entry in GameState.appointments
 var skip_appointment := false     # Said yes, but will not go
 var booked_day := 0               # Day the last appointment was made (one per day)
+var appointment_arrival := -1.0   # When they actually turn up (some come an hour late)
+var doctor_was_there := false     # The doctor was at the clinic during the visit hours
 
 # ---------- Tonight's plan ----------
 # Every evening each person may change their plans, so alibis and sightings differ night to night
@@ -511,8 +513,8 @@ func _free_slot(place: String) -> int:
 
 
 func _place_for_hour(hour: int) -> String:
-	if _in_appointment() and not skip_appointment:
-		return "Clinica"  # At the clinic during the booked hours
+	if _at_clinic_now() and not skip_appointment:
+		return "Clinica"  # At the clinic from the hour they arrive
 	var place := _scheduled_place(hour)
 	if not tonight.is_empty() and GameState.is_night:
 		place = _plan_place(tonight, hour)
@@ -739,6 +741,7 @@ func answer_exam() -> String:
 	if cared_day != GameState.day:
 		cared_day = GameState.day
 		change_affinity(8.0)
+		GameState.coins += GameState.EXAM_FEE  # The patient pays for the visit
 	record["day"] = GameState.day
 	record["marked"] = marked
 	exams.append(record)
@@ -1019,6 +1022,11 @@ func answer_clinic() -> String:
 		appointment_day = GameState.day + 1
 		appointment_from = float(randi_range(8, 10))
 	appointment_until = minf(appointment_from + 2.0, 18.0)  # Home before dark
+	# Some patients are late and only turn up in the second hour
+	appointment_arrival = appointment_from
+	if appointment_from + 1.0 < appointment_until and randf() < 0.3:
+		appointment_arrival = appointment_from + 1.0
+	doctor_was_there = false
 	appointment = {"day": appointment_day, "name": data.npc_name, "from": appointment_from,
 			"until": appointment_until, "status": "waiting"}
 	GameState.appointments.append(appointment)
@@ -1037,11 +1045,16 @@ func _check_appointment() -> void:
 		# Waited long enough
 		appointment_until = -1.0
 		if treated_day != appointment_day:
-			appointment["status"] = "missed"
-			# Who failed whom? From the doctor's side it looks the same
-			GameState.add_clue("Day %d · %s never got the treatment at the clinic." % [GameState.day, data.npc_name])
-			if not skip_appointment:
-				change_affinity(-5.0)  # They went and waited for nothing
+			if skip_appointment and doctor_was_there:
+				# The doctor waited and they never came
+				appointment["status"] = "absent"
+				GameState.add_clue("Day %d · %s never showed up at the clinic." % [GameState.day, data.npc_name])
+			else:
+				# The doctor was not there in time (whether they came or not, he can't tell)
+				appointment["status"] = "missed"
+				GameState.add_clue("Day %d · You missed %s's appointment at the clinic." % [GameState.day, data.npc_name])
+				if not skip_appointment:
+					change_affinity(-5.0)  # They went and waited for nothing
 		skip_appointment = false
 		if state == State.INSIDE:
 			set_state(State.ROUTINE)
@@ -1049,10 +1062,23 @@ func _check_appointment() -> void:
 	if not _in_appointment():
 		return  # Not time yet
 	var player := get_tree().get_first_node_in_group("player") as Node3D
+	# Only waiting into the last hour proves they never came (they might just be late)
+	if player and GameState.hour >= appointment_until - 1.0 \
+			and player.global_position.distance_to(GameState.place_position("Clinica")) < 6.0:
+		doctor_was_there = true
+	if not _at_clinic_now():
+		return  # Late: still on their way
 	if current_place == "Clinica" and (state == State.INSIDE or state == State.ROUTINE) and player \
 			and player.global_position.distance_to(GameState.place_position("Clinica")) < 6.0 \
 			and global_position.distance_to(GameState.place_position("Clinica")) < 6.0:
-		_treat()
+		if GameState.tonics > 0:
+			_treat()
+		else:
+			_no_tonic()
+
+
+func _at_clinic_now() -> bool:
+	return _in_appointment() and GameState.hour >= appointment_arrival
 
 
 func _in_appointment() -> bool:
@@ -1060,7 +1086,20 @@ func _in_appointment() -> bool:
 			and GameState.hour >= appointment_from and GameState.hour < appointment_until
 
 
+func _no_tonic() -> void:
+	# They came, but the cabinet is empty
+	appointment_until = -1.0
+	appointment["status"] = "no tonic"
+	change_affinity(-3.0)
+	GameState.add_clue("Day %d · %s came to the clinic, but you had no tonic left." % [GameState.day, data.npc_name])
+	if state == State.INSIDE:
+		set_state(State.ROUTINE)
+	if not GameState.in_dialogue:
+		EventBus.dialogue_started.emit(data.npc_name, "No tonic, doctor? Then why did you call me here...")
+
+
 func _treat() -> void:
+	GameState.tonics -= 1
 	var was_marked := marked
 	treated_day = GameState.day
 	worried = false  # Reassured by the doctor: back to their normal day

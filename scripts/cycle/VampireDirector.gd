@@ -13,6 +13,8 @@ extends Node
 
 var vampire: Node = null
 var acted_tonight := false
+var fed_tonight := false
+var hungry_nights := 0   # Nights in a row without blood: the next bite takes twice as much
 var hunting := false
 var hunt_victim: Node = null
 var hunt_hour := 23.0
@@ -40,6 +42,7 @@ func _on_phase_changed(is_night: bool) -> void:
 		return
 	if is_night:
 		acted_tonight = false
+		fed_tonight = false
 		hunt_hour = randf_range(hunt_start_hour, hunt_end_hour)
 		return
 	# Dawn
@@ -54,6 +57,8 @@ func _on_phase_changed(is_night: bool) -> void:
 		else:
 			_check_town_lost()
 	acted_tonight = false
+	# A night without blood makes the next one worse
+	hungry_nights = 0 if fed_tonight else hungry_nights + 1
 
 
 func _process(_delta: float) -> void:
@@ -162,6 +167,7 @@ func _resolve_attack(victim: Node) -> void:
 			others += 1
 	# A marked person who was not saved during the day is turned now
 	if victim.marked:
+		fed_tonight = true
 		victim.marked = false
 		victim.make_servant()
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
@@ -169,7 +175,12 @@ func _resolve_attack(victim: Node) -> void:
 		_check_town_lost()
 		return
 	# Feed. Death only comes when the blood runs out.
-	var died: bool = victim.feed(randf_range(bite_min, bite_max), _pick_trace(victim))
+	var amount := randf_range(bite_min, bite_max)
+	var starving := hungry_nights > 0
+	if starving:
+		amount *= 2.0  # Went hungry: takes twice the blood
+	fed_tonight = true
+	var died: bool = victim.feed(amount, _pick_trace(victim))
 	if died:
 		GameState.add_night_event("%s was found dead at their doorstep." % victim_name)
 		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name], "evidence", morning)
@@ -184,6 +195,8 @@ func _resolve_attack(victim: Node) -> void:
 		victim.make_servant()
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
 		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
+	elif starving:
+		GameState.add_night_event("Somewhere in Pallbrook, someone woke up gravely weak, as if drained.")
 	else:
 		GameState.add_night_event("Somewhere in Pallbrook, someone woke up weaker than they went to bed.")
 	_check_town_lost()

@@ -21,7 +21,9 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	var phase := "Night" if GameState.is_night else "Day"
-	clock.text = "Day %d   ·   %s   ·   %s" % [GameState.day, GameState.format_time(GameState.hour), phase]
+	clock.text = "Day %d   ·   %s   ·   %s   ·   %d coins   ·   %d tonic%s" % [GameState.day,
+			GameState.format_time(GameState.hour), phase, GameState.coins, GameState.tonics,
+			"" if GameState.tonics == 1 else "s"]
 	clock.modulate = Color(1.0, 0.45, 0.45) if GameState.exhaustion > 0.0 else Color.WHITE
 	controls.visible = not GameState.in_dialogue
 

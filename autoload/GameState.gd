@@ -15,6 +15,14 @@ var appointments: Array[Dictionary] = []
 var game_over := false
 var intro_seen := false
 
+# ---------- The doctor's purse ----------
+const SALARY := 3        # Paid by the Town Hall every morning
+const EXAM_FEE := 1      # Each patient pays for their first exam of the day
+const TONIC_PRICE := 4   # Ingredients for one iron tonic, ordered from the clinic cabinet
+var coins := 4
+var tonics := 1          # Ready to give at the clinic
+var tonics_ordered := 0  # Arrive tomorrow morning
+
 func reset() -> void:
 	# Autoloads survive a scene reload, so their state must be cleared by hand
 	day = 1
@@ -27,6 +35,9 @@ func reset() -> void:
 	vampire_name = ""
 	night_events.clear()
 	clues.clear()
+	coins = 4
+	tonics = 1
+	tonics_ordered = 0
 	entries.clear()
 	appointments.clear()
 
@@ -58,6 +69,12 @@ func start_night() -> void:
 func start_day() -> void:
 	is_night = false
 	day += 1
+	coins += SALARY
+	add_night_event("The Town Hall paid your salary: %d coins." % SALARY)
+	if tonics_ordered > 0:
+		tonics += tonics_ordered
+		add_night_event("Your order arrived: %d iron tonic%s." % [tonics_ordered, "" if tonics_ordered == 1 else "s"])
+		tonics_ordered = 0
 	EventBus.phase_changed.emit(false)
 	
 var night_events: Array[String] = []
@@ -124,3 +141,11 @@ func place_position(place: String) -> Vector3:
 # So during the day, "last night" is always day - 1.
 func last_night() -> int:
 	return day - 1
+
+
+func order_tonic() -> bool:
+	if coins < TONIC_PRICE:
+		return false
+	coins -= TONIC_PRICE
+	tonics_ordered += 1
+	return true

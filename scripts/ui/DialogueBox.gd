@@ -50,7 +50,7 @@ func _on_conversation_started(who: Node) -> void:
 	choice = 0
 	_open(who.data.npc_name, who.greeting())
 	choices_box.visible = true
-	hint.text = "[W/S] Choose    [E] Ask    [Esc] Leave"
+	hint.text = "[W/S] Navigate    [E] Ask/Select    [Esc] Leave"
 	_refresh_choices()
 
 

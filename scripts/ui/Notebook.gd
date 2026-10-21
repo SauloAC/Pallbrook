@@ -14,6 +14,7 @@ const INK_FADED := Color(0.17, 0.15, 0.13, 0.45)
 const ALL := ""
 const EVIDENCE := "#evidence"
 const APPOINTMENTS := "#appointments"
+const CHART_PICK := "#chart"  # Waiting for the player to pick whose chart to open
 
 var filter := ALL  # ALL, EVIDENCE or a person's name
 const PER_PAGE := 9  # 3x3 grid; more townsfolk spill onto extra pages
@@ -86,6 +87,11 @@ func _close() -> void:
 
 
 func _set_filter(value: String) -> void:
+	if filter == CHART_PICK and _is_person(value):
+		filter = value
+		_refresh()
+		_open_chart(value)
+		return
 	# Clicking the active person again goes back to everything
 	filter = ALL if value == filter and value != ALL else value
 	Audio.play("page", -6.0)
@@ -133,18 +139,31 @@ func _layout_book(left_page: Control) -> void:
 func _build_filter_bar() -> void:
 	_clear(filter_bar)
 	filter_bar.add_child(_link("All", ALL))
-	filter_bar.add_child(_link("Evidence", EVIDENCE))
-	filter_bar.add_child(_link("Clinic", APPOINTMENTS))
-	if filter != ALL and filter != EVIDENCE and filter != APPOINTMENTS:
-		var chart_link := _link("Patient chart", "")
+	filter_bar.add_child(_link("Clinic", EVIDENCE))
+	filter_bar.add_child(_link("Appointments", APPOINTMENTS))
+	# Patient chart is always there: opens the selected patient, or asks you to pick one
+	var chart_link := _link("Patient chart", CHART_PICK)
+	if _is_person(filter):
 		chart_link.add_theme_color_override("font_color", BLOOD_RED)
-		var who := filter
-		for connection in chart_link.gui_input.get_connections():
-			chart_link.gui_input.disconnect(connection["callable"])
-		chart_link.gui_input.connect(func(event: InputEvent):
-			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-				_open_chart.call_deferred(who))
-		filter_bar.add_child(chart_link)
+	for connection in chart_link.gui_input.get_connections():
+		chart_link.gui_input.disconnect(connection["callable"])
+	chart_link.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_on_chart_link.call_deferred())
+	filter_bar.add_child(chart_link)
+
+
+func _is_person(value: String) -> bool:
+	return value not in [ALL, EVIDENCE, APPOINTMENTS, CHART_PICK]
+
+
+func _on_chart_link() -> void:
+	if _is_person(filter):
+		_open_chart(filter)
+	else:
+		filter = CHART_PICK
+		Audio.play("page", -6.0)
+		_refresh()
 
 
 func _link(text: String, value: String) -> Label:
@@ -162,11 +181,16 @@ func _build_entries() -> void:
 	if filter == APPOINTMENTS:
 		_build_appointments()
 		return
+	if filter == CHART_PICK:
+		title.text = "Patient chart"
+		entries.text = "Choose a patient on the right page to open their chart."
+		scroll.scroll_vertical = 0
+		return
 	match filter:
 		ALL:
 			title.text = "Casebook"
 		EVIDENCE:
-			title.text = "Evidence"
+			title.text = "Clinic"
 		_:
 			title.text = filter
 
@@ -189,7 +213,7 @@ func _build_entries() -> void:
 
 func _build_appointments() -> void:
 	# Who needs the doctor today, then every clinic visit, newest first
-	title.text = "Clinic"
+	title.text = "Appointments"
 	var lines: Array[String] = []
 	var urgent: Array[String] = []
 	for npc in get_tree().get_nodes_in_group("npcs"):
@@ -210,6 +234,10 @@ func _build_appointments() -> void:
 				status = "treated"
 			"missed":
 				status = "missed"
+			"absent":
+				status = "absent"
+			"no tonic":
+				status = "no tonic"
 		lines.append("• %s · %s – %s · %s" % [a["name"], GameState.format_time(a["from"]), GameState.format_time(a["until"]), status])
 	if lines.is_empty():
 		entries.text = "No appointments yet.\n\nAsk a sick patient to come to the clinic for a treatment."
@@ -275,7 +303,7 @@ func _build_suspects() -> void:
 
 		if not npc.is_alive():
 			card.modulate = Color(1, 1, 1, 0.45)  # Faded: no longer a suspect
-		elif filter not in [ALL, EVIDENCE, APPOINTMENTS] and filter != name_text:
+		elif _is_person(filter) and filter != name_text:
 			card.modulate = Color(1, 1, 1, 0.7)   # Someone else is selected
 
 		_make_clickable(card, name_text)
