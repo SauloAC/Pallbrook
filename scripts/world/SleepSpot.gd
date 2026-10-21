@@ -1,9 +1,13 @@
 extends Area3D
 
-# The clinic door: sleep here at night; by day, order tonic ingredients from the cabinet
+# Inside the clinic: by day, order tonic ingredients at the supply cabinet;
+# at night, sleep in the bed. The spot moves to whichever one is in use.
 
 const ICON_SLEEP := preload("res://assets/ui/icon_sleep.png")
 const ICON_CABINET := preload("res://assets/ui/icon_examine.png")
+
+@export var bed_position := Vector3(-1.2, -1.5, -0.4)     # Relative to the Clinica node
+@export var cabinet_position := Vector3(1.4, -1.5, -1.2)
 
 @onready var prompt: Sprite3D = $Prompt
 var player_inside := false
@@ -11,8 +15,12 @@ var player_inside := false
 func _ready() -> void:
 	body_entered.connect(func(body): if body.name == "Jogador": player_inside = true)
 	body_exited.connect(func(body): if body.name == "Jogador": player_inside = false)
+	position = bed_position if GameState.is_night else cabinet_position
 
 func _process(_delta: float) -> void:
+	var target := bed_position if GameState.is_night else cabinet_position
+	if position != target:
+		position = target  # Overlap signals catch up on the next physics frame
 	prompt.visible = player_inside and not GameState.in_dialogue
 	prompt.texture = ICON_SLEEP if GameState.is_night else ICON_CABINET
 

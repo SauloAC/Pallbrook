@@ -30,6 +30,8 @@
 [ext_resource type="Resource" uid="uid://dedw38ak3uad6" path="res://data/npcs/sophia.tres" id="40_soph"]
 [ext_resource type="Resource" uid="uid://dua3ndtkdmva8" path="res://data/npcs/sarah.tres" id="41_sarah"]
 
+[ext_resource type="Script" path="res://scripts/world/InteriorCutaway.gd" id="40_cutaway"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tslrp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -48,6 +50,9 @@ polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1), PackedInt32Arr
 geometry_parsed_geometry_type = 1
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_t2dwb"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_clinicroom"]
+size = Vector3(3.8, 3, 3.8)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_t2dwb"]
 
@@ -134,8 +139,15 @@ navigation_mesh = SubResource("NavigationMesh_dw24c")
 [node name="Clinica" type="Node3D" parent="NavigationRegion3D" unique_id=1363495525]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 1.5, 2)
 
+[node name="Interior" type="Area3D" parent="NavigationRegion3D/Clinica"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.15)
+script = ExtResource("40_cutaway")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Clinica/Interior"]
+shape = SubResource("BoxShape3D_clinicroom")
+
 [node name="WindowLight" parent="NavigationRegion3D/Clinica" unique_id=1929029952 instance=ExtResource("5_o5pq4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.2)
 
 [node name="Sign" type="Label3D" parent="NavigationRegion3D/Clinica" unique_id=578423724]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
@@ -150,11 +162,11 @@ font_size = 64
 outline_size = 18
 
 [node name="SleepSpot" type="Area3D" parent="NavigationRegion3D/Clinica" unique_id=1199394163]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, -1)
 script = ExtResource("3_l36k5")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Clinica/SleepSpot" unique_id=1680781230]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+transform = Transform3D(2.6, 0, 0, 0, 2, 0, 0, 0, 2.6, 0, 0, 0)
 shape = SubResource("BoxShape3D_t2dwb")
 
 [node name="Prompt" type="Sprite3D" parent="NavigationRegion3D/Clinica/SleepSpot" unique_id=1121701819]
@@ -694,7 +706,7 @@ horizontal_alignment = 1
 [node name="Locations" type="Node3D" parent="." unique_id=188944316]
 
 [node name="Clinica" type="Marker3D" parent="Locations" unique_id=1795279392 groups=["locations"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 4.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.6, 0, 3)
 
 [node name="Taverna" type="Marker3D" parent="Locations" unique_id=1416698103 groups=["locations"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 6.6)

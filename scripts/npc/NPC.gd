@@ -3,7 +3,7 @@ extends CharacterBody3D
 enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
 
 # Places people stay outside at (everything else has a door to go through)
-const OPEN_AIR_PLACES := ["Praca"]
+const OPEN_AIR_PLACES := ["Praca", "Clinica"]  # Clinica: patients wait inside, in plain sight
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -88,6 +88,19 @@ const PLACE_SLOTS: Array[Vector3] = [
 	Vector3(-2.7, 0.0, 2.8),
 	Vector3(2.7, 0.0, 2.8),
 	Vector3(0.0, 0.0, 4.2),
+]
+
+# Inside the clinic room (around the marker): the middle of the floor, clear of the bed,
+# cabinet and desk. The last two are outside the door, for a queue.
+const CLINIC_SLOTS: Array[Vector3] = [
+	Vector3(0.0, 0.0, 0.0),
+	Vector3(-0.6, 0.0, 0.2),
+	Vector3(0.3, 0.0, -1.0),
+	Vector3(-1.0, 0.0, 0.4),
+	Vector3(0.4, 0.0, -1.7),
+	Vector3(0.5, 0.0, 0.5),
+	Vector3(-0.6, 0.0, 2.4),
+	Vector3(0.6, 0.0, 2.6),
 ]
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
@@ -500,7 +513,10 @@ func _go_to_place(place: String) -> void:
 		place_slot = _free_slot(place)
 		# Each person takes their own spot, with a tiny jitter so it doesn't look like a grid
 		var jitter := Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
-		go_to(marker.global_position + PLACE_SLOTS[place_slot] + jitter)
+		var slots := CLINIC_SLOTS if place == "Clinica" else PLACE_SLOTS
+		if place == "Clinica":
+			jitter *= 0.5  # A small room: stay on the spot
+		go_to(marker.global_position + slots[place_slot] + jitter)
 
 
 func _free_slot(place: String) -> int:
@@ -512,10 +528,11 @@ func _free_slot(place: String) -> int:
 		if npc.state == State.DEAD or npc.state == State.SLEEPING:
 			continue
 		taken.append(npc.place_slot)
-	for i in PLACE_SLOTS.size():
+	var count := CLINIC_SLOTS.size() if place == "Clinica" else PLACE_SLOTS.size()
+	for i in count:
 		if not taken.has(i):
 			return i
-	return randi() % PLACE_SLOTS.size()  # Very crowded: share a spot
+	return randi() % count  # Very crowded: share a spot
 
 
 func _place_for_hour(hour: int) -> String:
