@@ -6,3 +6,6 @@
 # Export
 export_presets.cfg
 builds/
+
+# Blender backup files
+*.blend1
