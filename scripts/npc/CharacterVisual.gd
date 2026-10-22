@@ -19,8 +19,8 @@ const LOOKS := {
 			"DarkClothes": Color(0.48, 0.12, 0.14), "Hair": Color(0.10, 0.07, 0.05)}],
 	"Clara":  ["Casual_Female", {"Skin": Color(0.90, 0.75, 0.65), "Shirt": Color(0.20, 0.32, 0.55), "Pants": Color(0.16, 0.20, 0.32),
 			"Hair": Color(0.38, 0.22, 0.12)}],
-	"Tomas":  ["Viking_Male", {"Skin": Color(0.80, 0.60, 0.48), "Main": Color(0.30, 0.18, 0.10), "Light": Color(0.75, 0.40, 0.18),
-			"Pants": Color(0.20, 0.14, 0.10), "Hair": Color(0.35, 0.20, 0.10)}],
+	"Tomas":  ["Worker_Male", {"Skin": Color(0.80, 0.60, 0.48), "Shirt": Color(0.55, 0.50, 0.42), "Vest": Color(0.28, 0.17, 0.10),
+			"Pants": Color(0.20, 0.16, 0.12), "Hat": Color(0.18, 0.16, 0.14)}],
 	"Sophia": ["Casual3_Female", {"Skin": Color(0.40, 0.26, 0.18), "Shirt": Color(0.78, 0.60, 0.18), "Pants": Color(0.15, 0.15, 0.18),
 			"Hair": Color(0.08, 0.06, 0.05)}],
 	"Sarah":  ["Suit_Female", {"Skin": Color(0.88, 0.72, 0.58), "Black": Color(0.15, 0.16, 0.18), "Shirt": Color(0.20, 0.48, 0.46),
@@ -29,7 +29,14 @@ const LOOKS := {
 			"Brown": Color(0.18, 0.15, 0.13), "Hair": Color(0.25, 0.17, 0.10)}],
 }
 
+# At night the hunter wears no face: a plain, shared body instead of their own
+const SHADE_MODEL := "BaseCharacter"
+
 var anim: AnimationPlayer
+var model: Node3D             # This person's own body
+var own_anim: AnimationPlayer
+var shade: Node3D             # The faceless night body, made the first time it's needed
+var shade_anim: AnimationPlayer
 var meshes: Array[MeshInstance3D] = []
 var skin: StandardMaterial3D
 var skin_color := Color.WHITE
@@ -49,7 +56,7 @@ func setup(look: String) -> bool:
 	var path: String = MODEL_DIR + str(entry[0]) + ".gltf"
 	if not ResourceLoader.exists(path):
 		return false
-	var model: Node3D = (load(path) as PackedScene).instantiate()
+	model = (load(path) as PackedScene).instantiate()
 	model.scale = Vector3.ONE * SCALE
 	add_child(model)
 	var colors: Dictionary = entry[1]
@@ -78,6 +85,7 @@ func setup(look: String) -> bool:
 			if anim.has_animation(loop_name):
 				anim.get_animation(loop_name).loop_mode = Animation.LOOP_LINEAR
 		_play("Idle")
+	own_anim = anim
 	target_yaw = global_rotation.y
 	return true
 
@@ -115,7 +123,8 @@ func tint(blood_lost: float, servant: bool) -> void:
 		clothes[i].albedo_color = clothes_colors[i].lerp(Color(0.6, 0.6, 0.65), 0.5) if servant else clothes_colors[i]
 
 
-# Hunting at night: a dark shape with a faint red glow
+# Hunting at night: a dark, faceless shape with a faint red glow. The body is a plain
+# mannequin the same for everyone, so the outline doesn't give away who it is.
 func set_dark(dark: bool) -> void:
 	if dark and dark_overlay == null:
 		dark_overlay = StandardMaterial3D.new()
@@ -124,8 +133,36 @@ func set_dark(dark: bool) -> void:
 		dark_overlay.emission_enabled = true
 		dark_overlay.emission = Color(0.25, 0.05, 0.05)
 		dark_overlay.emission_energy_multiplier = 0.6
-	for mi in meshes:
-		mi.material_overlay = dark_overlay if dark else null
+	if dark and shade == null:
+		_make_shade()
+	if shade == null:
+		for mi in meshes:  # No shade model: darken the own body, as before
+			mi.material_overlay = dark_overlay if dark else null
+		return
+	model.visible = not dark
+	shade.visible = dark
+	anim = shade_anim if dark else own_anim
+	var playing := current
+	current = ""
+	_play(playing if playing != "" else "Idle")
+
+
+func _make_shade() -> void:
+	var path := MODEL_DIR + SHADE_MODEL + ".gltf"
+	if model == null or not ResourceLoader.exists(path):
+		return
+	shade = (load(path) as PackedScene).instantiate()
+	shade.scale = Vector3.ONE * SCALE
+	shade.visible = false
+	add_child(shade)
+	for node in shade.find_children("*", "MeshInstance3D", true, false):
+		(node as MeshInstance3D).material_overlay = dark_overlay
+	var players := shade.find_children("*", "AnimationPlayer", true, false)
+	if not players.is_empty():
+		shade_anim = players[0]
+		for loop_name in ["Idle", "Walk", "Run"]:
+			if shade_anim.has_animation(loop_name):
+				shade_anim.get_animation(loop_name).loop_mode = Animation.LOOP_LINEAR
 
 
 func _play(anim_name: String) -> void:

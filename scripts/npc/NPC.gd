@@ -5,7 +5,8 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
 # Places people stay outside at (everything else has a door to go through)
 const OPEN_AIR_PLACES := ["Praca"]
 # Walk-in buildings: people stay visible inside (the roof opens when the doctor enters)
-const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Escola", "Igreja"]
+const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Escola", "Igreja", "Casa2",
+		"Casa1", "CasaSophia", "CasaSarah", "CasaHugo"]
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -40,6 +41,7 @@ var sightings: Array[Dictionary] = []  # {night, kind, who, place, hour}
 var wary_day := 0                      # Keeps away from the doctor on this day
 var asked: Dictionary = {}             # question -> day it was last asked
 var sight_timer := 0.0
+var hid_night := -1                    # Last night this person caught the doctor lurking
 
 # ---------- Death and burial ----------
 var found_day := 0     # Day the body was found at the door
@@ -54,6 +56,16 @@ var bite_spots: Array[String] = []    # "neck" or "wrist" for each bite
 var wrist_found := false              # Wrist bites hide under the sleeve until a careful exam
 var exam_count := 0
 var worried := false                  # Feels sick from fear of the outbreak, but isn't bitten
+
+# ---------- Autumn chill (flu) ----------
+# A common cold that has nothing to do with the vampire: fever, a strong quick pulse,
+# flushed cheeks, a cough. The tonic does nothing for it; rest and good food do.
+# The vampire won't touch someone with fever in their blood.
+const FLU_DAYS := 4            # Days to get over it alone (half with rest)
+const FLU_MAX_SICK := 2        # Never more than this many at once
+var flu_days := 0              # Days left (0 = not sick)
+var flu_rest := false          # The doctor prescribed rest
+var rest_day := 0              # Last day rest was prescribed
 var exams: Array[Dictionary] = []     # The doctor's records, shown on the patient chart
 
 # ---------- Trust in the doctor ----------
@@ -70,6 +82,8 @@ var treated_day := 0
 var appointment: Dictionary = {}  # This patient's current entry in GameState.appointments
 var skip_appointment := false     # Said yes, but will not go
 var booked_day := 0               # Day the last appointment was made (one per day)
+var visit_day := 0                # Day of the last appointment itself (one visit per day)
+var waiting_announced := false    # Told the doctor they've arrived for this appointment
 var appointment_arrival := -1.0   # When they actually turn up (some come an hour late)
 var doctor_was_there := false     # The doctor was at the clinic during the visit hours
 
@@ -95,6 +109,15 @@ const PLACE_SLOTS: Array[Vector3] = [
 # Spots inside walk-in buildings, around their marker: open floor, clear of the furniture.
 # Clinic: the last two are outside the door, for a queue.
 const INTERIOR_SLOTS := {
+	# Homes (marker at the front door): spots off to the side, so the doctor can step in
+	"Casa1": [Vector3(0.6, 0.0, -2.2), Vector3(-0.4, 0.0, -1.9), Vector3(0.2, 0.0, -2.9)],
+	"CasaSophia": [Vector3(-1.2, 0.0, -2.0), Vector3(-1.8, 0.0, -2.4), Vector3(-0.6, 0.0, -1.7)],
+	"CasaSarah": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],
+	"CasaHugo": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],
+	# Tomas's forge (marker at the house door): beside the anvil, at the hearth, in front of the anvil
+	"Casa2": [
+		Vector3(4.1, 0.0, -1.9), Vector3(4.25, 0.0, -2.3), Vector3(2.6, 0.0, -0.6), Vector3(3.4, 0.0, -0.6),
+	],
 	"Clinica": [
 		Vector3(0.0, 0.0, 0.0), Vector3(-0.6, 0.0, 0.2), Vector3(0.3, 0.0, -1.0), Vector3(-1.0, 0.0, 0.4),
 		Vector3(0.4, 0.0, -1.7), Vector3(0.5, 0.0, 0.5), Vector3(-0.6, 0.0, 2.4), Vector3(0.6, 0.0, 2.6),
@@ -125,6 +148,19 @@ const INTERIOR_SLOTS := {
 		Vector3(1.3, 0.0, -4.6), Vector3(-0.9, 0.0, -1.1), Vector3(0.9, 0.0, -1.1), Vector3(0.0, 0.0, -0.6),
 	],
 }
+
+# Where each person sleeps: the foot of their bed (from the home's door marker) and which
+# way the head points (degrees around Y; 0 = head toward -z). Homes without a bed here
+# (the tavern rooms upstairs, the priest's quarters) still send their owner out of sight.
+const BED_SPOTS := {
+	"Casa1": [Vector3(2.15, 0.0, -2.75), 0.0],
+	"Casa2": [Vector3(-1.9, 0.0, -2.7), 0.0],
+	"CasaSophia": [Vector3(-1.0, 0.0, -3.7), 90.0],
+	"CasaSarah": [Vector3(2.55, 0.0, -3.8), 90.0],
+	"CasaHugo": [Vector3(2.7, 0.0, -3.8), 90.0],
+}
+const BED_HEIGHT := 0.6
+var in_bed := false
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -172,6 +208,8 @@ func set_state(new_state: State) -> void:
 		return
 	if new_state == State.INSIDE or (state == State.INSIDE and new_state == State.ROUTINE):
 		Audio.play_at("door" if new_state == State.INSIDE else "door_close", global_position, -6.0)
+	if in_bed:
+		_get_up()
 	state = new_state
 	# Leaving the hunt: back to a normal, recognizable person
 	if new_state != State.HUNTING and is_dark:
@@ -189,7 +227,10 @@ func set_state(new_state: State) -> void:
 			if data and data.home != "":
 				_go_to_place(data.home)
 		State.SLEEPING:
-			_set_present(false)  # Went inside the house
+			if data and BED_SPOTS.has(data.home) and current_place == data.home:
+				_lie_down()  # In bed, visible through the open roof
+			else:
+				_set_present(false)  # Went inside, out of sight
 		State.INSIDE:
 			_set_present(false)  # Inside a building; the window lights up at night
 			visible = highlighted  # The doctor is already at the door
@@ -219,6 +260,43 @@ func set_state(new_state: State) -> void:
 			name_label.visible = false  # Just a dark shape in the night
 			_set_dark(true)
 	_update_label()
+
+
+func _lie_down() -> void:
+	var marker := _find_location(data.home)
+	if marker == null:
+		_set_present(false)
+		return
+	var bed: Array = BED_SPOTS[data.home]
+	in_bed = true
+	visible = true
+	collision.disabled = true  # Doesn't block the doctor walking around the bed
+	velocity = Vector3.ZERO
+	agent.target_position = global_position
+	global_position = marker.global_position + bed[0]
+	reset_physics_interpolation()
+	if visual:
+		visual.rotation = Vector3(-PI / 2.0, deg_to_rad(bed[1]), 0.0)
+		visual.position.y = BED_HEIGHT
+	else:
+		mesh.rotation = Vector3(-PI / 2.0, deg_to_rad(bed[1]), 0.0)
+		mesh.position.y = BED_HEIGHT
+
+
+func _get_up() -> void:
+	in_bed = false
+	collision.disabled = false
+	if visual:
+		visual.rotation = Vector3.ZERO
+		visual.position.y = 0.0
+	else:
+		mesh.rotation = Vector3.ZERO
+		mesh.position.y = 1.0
+	# Step off the bed onto the floor beside it
+	var marker := _find_location(current_place)
+	if marker and INTERIOR_SLOTS.has(current_place):
+		global_position = _reachable_spot(marker.global_position, marker.global_position + INTERIOR_SLOTS[current_place][0])
+		reset_physics_interpolation()
 
 
 func is_inside() -> bool:
@@ -317,8 +395,39 @@ func is_anemic() -> bool:
 
 
 func claims_sickness() -> bool:
-	# Who says they are ill: the anemic, the frightened, and the vampire hiding from the sun
-	return is_anemic() or worried or (is_vampire() and not GameState.is_night)
+	# Who says they are ill: the anemic, the frightened, the feverish, and the vampire hiding from the sun
+	return is_anemic() or worried or has_flu() or (is_vampire() and not GameState.is_night)
+
+
+func has_flu() -> bool:
+	return flu_days > 0
+
+
+func catch_flu() -> void:
+	if is_vampire() or not is_alive() or has_flu():
+		return
+	flu_days = FLU_DAYS
+	flu_rest = false
+
+
+# Each morning: the sick get better (faster with rest), and the chill may spread
+func _flu_morning() -> void:
+	if has_flu():
+		flu_days -= 2 if flu_rest else 1
+		if flu_days <= 0:
+			flu_days = 0
+			flu_rest = false
+		return
+	if is_vampire() or not is_alive():
+		return
+	var sick := 0
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc != self and npc.is_alive() and npc.has_flu():
+			sick += 1
+	if sick >= FLU_MAX_SICK:
+		return
+	if randf() < 0.04 + 0.08 * sick:  # Rare on its own, more likely when someone is coughing in town
+		catch_flu()
 
 
 func neck_bitten() -> bool:
@@ -501,7 +610,7 @@ func _check_seen_by_doctor() -> void:
 	if state != State.HUNTING or witnessed:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Node3D
-	if player and global_position.distance_to(player.global_position) < witness_range:
+	if player and global_position.distance_to(player.global_position) < witness_range and sees(player):
 		witnessed = true
 		name_label.visible = true  # Close enough to recognize the face
 		var clue := "Night of Day %d, %s: you saw %s sneaking through the dark streets." % [GameState.day, GameState.format_time(GameState.hour), data.npc_name]
@@ -543,7 +652,10 @@ func _go_to_place(place: String) -> void:
 		if INTERIOR_SLOTS.has(place):
 			jitter *= 0.5  # Indoors: stay on the spot
 		var spot: Vector3 = marker.global_position + slots[place_slot] + jitter
-		if INTERIOR_SLOTS.has(place):
+		if data and place == data.home and BED_SPOTS.has(place) \
+				and (_is_bedtime() or state == State.SCARED or hunt_returning):
+			spot = marker.global_position + BED_SPOTS[place][0]  # Off to bed (stops beside it)
+		elif INTERIOR_SLOTS.has(place):
 			spot = _reachable_spot(marker.global_position, spot)
 		go_to(spot)
 
@@ -685,14 +797,33 @@ func _look_around() -> void:
 			add_sighting(night, "person", npc.data.npc_name, place, GameState.hour, same_room)
 
 	var player := get_tree().get_first_node_in_group("player") as Node3D
-	if player and global_position.distance_to(player.global_position) <= sight:
+	# Behind a tree or a wall, the doctor isn't seen at all
+	if player and global_position.distance_to(player.global_position) <= sight and sees(player):
 		var place := GameState.nearest_place(player.global_position)
 		if place != "Clinica":  # Nobody minds the doctor at his own door
-			add_sighting(night, "doctor", "the doctor", place, GameState.hour)
+			var hiding: bool = _is_late(GameState.hour) and player.has_method("is_lurking") \
+					and (player.is_lurking() or player.just_left_cover())
+			add_sighting(night, "doctor_hiding" if hiding else "doctor", "the doctor", place, GameState.hour)
 			if _is_late(GameState.hour):
 				if wary_day != GameState.day + 1:
 					change_affinity(-12.0)
 				wary_day = GameState.day + 1  # Tomorrow they keep their distance
+			if hiding and hid_night != night:
+				hid_night = night
+				change_affinity(-8.0)  # Lurking in the dark is worse than walking by
+
+
+# Line of sight from this person's eyes to someone: walls, trees and props block it
+func sees(target: Node3D) -> bool:
+	if target.has_method("is_hidden") and target.is_hidden():
+		return false  # Inside a bush or tall grass
+	var query := PhysicsRayQueryParameters3D.create(global_position + Vector3(0.0, 1.5, 0.0),
+			target.global_position + Vector3(0.0, 0.5, 0.0))
+	var skip: Array[RID] = [get_rid()]
+	if target is CollisionObject3D:
+		skip.append((target as CollisionObject3D).get_rid())
+	query.exclude = skip
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func add_sighting(night: int, kind: String, who: String, place: String, hour: float, inside := false) -> void:
@@ -751,6 +882,10 @@ func greeting() -> String:
 			GameState.add_clue("Day %d · %s found you collapsed near %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"])])
 			var spot := "my door" if s["place"] == data.home else GameState.place_name(s["place"])
 			return "Doctor! We found you lying in the street near %s this morning. Are you ill... or is it something else?" % spot
+	for s in sightings:
+		if s["night"] == night and s["kind"] == "doctor_hiding":
+			GameState.add_clue("Day %d · %s caught you hiding in the dark near %s at %s and doesn't trust you." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
+			return "I saw you last night, doctor, creeping around in the dark near %s at %s. Who were you hiding from?" % [GameState.place_name(s["place"]), GameState.format_time(s["hour"])]
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor" and _is_late(s["hour"]):
 			GameState.add_clue("Day %d · %s saw you out near %s at %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
@@ -859,6 +994,12 @@ func vitals() -> Dictionary:
 		v.merge({"pulse": "104, weak", "temp": "Cool", "look": "Pale"})
 	else:
 		v.merge({"pulse": "120, faint", "temp": "Cool", "look": "Grey"})
+	if has_flu():
+		# Fever on top of whatever else: warm, and if the blood is fine, a strong quick pulse
+		v["temp"] = ["Feverish", "Fever", "Hot"].pick_random()
+		if blood >= 80.0:
+			v["pulse"] = ["92, strong", "96, strong", "100, strong"].pick_random()
+			v["look"] = ["Flushed", "Sweaty", "Red-nosed"].pick_random()
 	v["sleep"] = _sleep()
 	return v
 
@@ -873,6 +1014,8 @@ func _sleep() -> String:
 		return "Nightmares" if randf() < 0.35 else ["Oversleeps", "Wakes dizzy", "Can't get up"].pick_random()
 	if blood < 80.0:
 		return "Nightmares" if randf() < 0.25 else ["Restless", "Oversleeps", "Wakes tired"].pick_random()
+	if has_flu():
+		return ["Coughs at night", "Restless", "Sweats"].pick_random()
 	if worried:
 		return ["Light", "Restless", "Nightmares"].pick_random()  # Frightened by the outbreak
 	return "Restless" if randf() < 0.2 else "Sound"
@@ -880,7 +1023,9 @@ func _sleep() -> String:
 
 func _exam_text(v: Dictionary) -> String:
 	var parts: Array[String] = ["Pulse %s." % v["pulse"]]
-	if blood >= 80.0 and (is_vampire() or worried):
+	if blood >= 80.0 and has_flu():
+		parts.append("Flushed, forehead burning, a dry cough and a stuffy nose.")
+	elif blood >= 80.0 and (is_vampire() or worried):
 		parts.append("Complains of weakness, but the blood seems fine.")
 	elif blood >= 80.0:
 		parts.append("Good color.")
@@ -890,6 +1035,8 @@ func _exam_text(v: Dictionary) -> String:
 		parts.append("Pale and weak. Clear anemia.")
 	else:
 		parts.append("Grey lips, can barely stand. Severe anemia: one more night like this could kill.")
+	if has_flu() and blood < 80.0:
+		parts.append("Also feverish, with a cough.")
 	if v["temp"] == "Cool" and blood >= ANEMIA_LEVEL:
 		parts.append("Hands a little cool, but it is autumn.")
 	if neck_bitten():
@@ -909,6 +1056,8 @@ func _exam_text(v: Dictionary) -> String:
 			parts.append("Was found at the door at night, with no memory of it.")
 		"Nightmares":
 			parts.append("Sleeps badly, with nightmares.")
+		"Coughs at night", "Sweats":
+			parts.append("Sleeps badly, coughing and sweating.")
 	return " ".join(parts)
 
 
@@ -974,6 +1123,8 @@ func _describe(s: Dictionary) -> String:
 			return "Around %s I saw a dark figure near %s. I couldn't make out a face." % [time, where]
 		"doctor":
 			return "And you, doctor, were near %s around %s." % [where, time]
+		"doctor_hiding":
+			return "And you, doctor, were lurking in the shadows near %s around %s." % [where, time]
 	if s.get("inside", false):
 		return "%s was with me at %s until about %s." % [s["who"], where, time]
 	if _is_late(s["hour"]):
@@ -1004,6 +1155,8 @@ func _on_phase_changed(is_night: bool) -> void:
 		_plan_evening()
 	elif not is_night:
 		tonight = {}
+		if is_alive() and data:
+			_flu_morning()
 
 
 func _plan_evening() -> void:
@@ -1020,8 +1173,8 @@ func _plan_evening() -> void:
 		if npc != self and npc.is_alive() and npc.data and npc.data.home != data.home:
 			friends.append(npc)
 	var roll := randf()
-	if is_anemic():
-		# Too weak to go out
+	if is_anemic() or flu_rest:
+		# Too weak to go out (or the doctor said to rest)
 		kind = "sick"
 		plan = {18: data.home}
 		bed = maxi(data.bedtime - 1, 20)
@@ -1139,9 +1292,9 @@ func answer_clinic() -> String:
 		return "I'll be at the clinic at %s, doctor, as we agreed." % GameState.format_time(appointment_from)
 	if treated_day == GameState.day:
 		return "You already treated me today, doctor. Let the tonic do its work."  # Once per day
-	if booked_day == GameState.day:
-		return "I couldn't make it today, doctor. Ask me again tomorrow."  # One booking per day
-	if blood >= 80.0 and not marked and not is_vampire() and not worried:
+	if booked_day == GameState.day or visit_day == GameState.day:
+		return "I couldn't make it today, doctor. Ask me again tomorrow."  # One visit per day
+	if blood >= 80.0 and not marked and not is_vampire() and not worried and not has_flu():
 		return "Me? I feel fine, doctor. Save your medicine for the sick."
 	if not is_vampire() and affinity < 45.0 and randf() < 0.35:
 		return "Tonics and bloodletting... no, doctor. I don't trust medicine."  # Some refuse out of pride or fear
@@ -1154,6 +1307,10 @@ func answer_clinic() -> String:
 	if appointment_from + 1.0 > 18.0:
 		appointment_day = GameState.day + 1
 		appointment_from = float(randi_range(8, 10))
+	if appointment_day == GameState.day + 1 and visit_day == appointment_day:
+		return "I'm already coming tomorrow, doctor."  # Never two visits on the same day
+	visit_day = appointment_day
+	waiting_announced = false
 	appointment_until = minf(appointment_from + 2.0, 18.0)  # Home before dark
 	# Some patients are late and only turn up in the second hour
 	appointment_arrival = appointment_from
@@ -1204,10 +1361,55 @@ func _check_appointment() -> void:
 	if current_place == "Clinica" and (state == State.INSIDE or state == State.ROUTINE) and player \
 			and player.global_position.distance_to(GameState.place_position("Clinica")) < 6.0 \
 			and global_position.distance_to(GameState.place_position("Clinica")) < 6.0:
-		if GameState.tonics > 0:
-			_treat()
-		else:
-			_no_tonic()
+		# Here and waiting: the doctor decides, in conversation, between the tonic and rest
+		if not waiting_announced and not GameState.in_dialogue:
+			waiting_announced = true
+			EventBus.dialogue_started.emit(data.npc_name, "I'm here for the treatment, doctor. Talk to me when you're ready.")
+
+
+# Waiting at the clinic during their appointment, for the doctor's decision
+func awaiting_treatment() -> bool:
+	return _at_clinic_now() and current_place == "Clinica" and treated_day != GameState.day
+
+
+# The doctor gives the iron tonic (only at the clinic, during the appointment)
+func answer_tonic() -> String:
+	asked["tonic"] = GameState.day
+	if not awaiting_treatment():
+		return "The tonic? At the clinic, doctor, at the time we agreed."
+	if GameState.tonics <= 0:
+		_no_tonic()
+		return "No tonic, doctor? Then why did you call me here..."
+	var feverish := has_flu() and blood >= 80.0
+	_treat()
+	if feverish:
+		GameState.add_clue("Day %d · The tonic did nothing for %s's fever." % [GameState.day, data.npc_name], "evidence")
+		return "Thank you, doctor... though my head still burns."
+	return "Thank you, doctor. I feel stronger already."
+
+
+# Rest and good food: cures a chill in half the time, does nothing for lost blood
+func answer_rest() -> String:
+	asked["rest"] = GameState.day
+	if exams.is_empty() or exams[-1]["day"] != GameState.day:
+		return "Rest? You haven't even examined me today, doctor."
+	if rest_day == GameState.day:
+		return "I know, doctor: bed, broth and warm milk. I'll do as you say."
+	rest_day = GameState.day
+	if awaiting_treatment():
+		treated_day = GameState.day
+		appointment_until = -1.0
+		appointment["status"] = "rest"
+		if state == State.INSIDE:
+			set_state(State.ROUTINE)
+	GameState.add_clue("Day %d · You prescribed rest and good food to %s." % [GameState.day, data.npc_name], "evidence")
+	if has_flu():
+		flu_rest = true
+		change_affinity(6.0)
+		return "Bed and broth... yes, doctor. This fever needs it."
+	if blood < 80.0:
+		return "If you say so, doctor... but I'm so weak, and rest hasn't helped so far."
+	return "Rest? I feel fine, doctor, but I'll take it easy."
 
 
 func _at_clinic_now() -> bool:
@@ -1254,5 +1456,3 @@ func _treat() -> void:
 	GameState.add_clue(note, "evidence")
 	if state == State.INSIDE:
 		set_state(State.ROUTINE)  # Back to their day
-	if not GameState.in_dialogue:
-		EventBus.dialogue_started.emit(data.npc_name, "Thank you, doctor. I feel stronger already.")

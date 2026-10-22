@@ -15,6 +15,7 @@ const ALL := ""
 const EVIDENCE := "#evidence"
 const APPOINTMENTS := "#appointments"
 const CHART_PICK := "#chart"  # Waiting for the player to pick whose chart to open
+const SUPPLIES := "#supplies"  # Coins, tonics, and how to get more
 
 var filter := ALL  # ALL, EVIDENCE or a person's name
 const PER_PAGE := 9  # 3x3 grid; more townsfolk spill onto extra pages
@@ -42,6 +43,9 @@ const BLOOD_RED := Color(0.48, 0.07, 0.07)
 
 var chart_layer: Control
 var sheet: Control
+var chart_npc := ""     # Whose chart is open
+var chart_prev: Label   # Arrows beside the card to flip through the patients
+var chart_next: Label
 
 
 func _ready() -> void:
@@ -63,6 +67,17 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	# With a chart open, left/right (A/D or the arrow keys) flip to the next patient
+	if chart_layer.visible and not event.is_echo():
+		var step := 0
+		if event.is_action_pressed("move_left") or event.is_action_pressed("ui_left"):
+			step = -1
+		elif event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
+			step = 1
+		if step != 0:
+			_step_chart(step)
+			get_viewport().set_input_as_handled()
+			return
 	if not event.is_action_pressed("notebook"):
 		return
 	if chart_layer.visible:
@@ -141,7 +156,8 @@ func _build_filter_bar() -> void:
 	_clear(filter_bar)
 	filter_bar.add_child(_link("All", ALL))
 	filter_bar.add_child(_link("Clinic", EVIDENCE))
-	filter_bar.add_child(_link("Appointments", APPOINTMENTS))
+	filter_bar.add_child(_link("Visits", APPOINTMENTS))
+	filter_bar.add_child(_link("Supplies", SUPPLIES))
 	# Patient chart is always there: opens the selected patient, or asks you to pick one
 	var chart_link := _link("Patient chart", CHART_PICK)
 	if _is_person(filter):
@@ -182,6 +198,9 @@ func _build_entries() -> void:
 	if filter == APPOINTMENTS:
 		_build_appointments()
 		return
+	if filter == SUPPLIES:
+		_build_supplies()
+		return
 	if filter == CHART_PICK:
 		title.text = "Patient chart"
 		entries.text = "Choose a patient on the right page to open their chart."
@@ -212,6 +231,24 @@ func _build_entries() -> void:
 	scroll.scroll_vertical = 0
 
 
+func _build_supplies() -> void:
+	# What the doctor has, and how the clinic's little economy works
+	title.text = "Supplies"
+	var lines: Array[String] = []
+	lines.append("Coins: %d" % GameState.coins)
+	lines.append("Iron tonics ready: %d" % GameState.tonics)
+	if GameState.tonics_ordered > 0:
+		lines.append("Ordered, ready tomorrow morning: %d" % GameState.tonics_ordered)
+	lines.append("— How it works —")
+	lines.append("• Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them).")
+	lines.append("• Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing.")
+	lines.append("• To make more, order the ingredients at the supply cabinet in your clinic, during the day (E at the cabinet). One tonic costs %d coins and is ready the next morning." % GameState.TONIC_PRICE)
+	lines.append("• Coins: the Town Hall pays you %d every morning, and each patient pays %d for their first exam of the day." % [GameState.SALARY, GameState.EXAM_FEE])
+	lines.append("• At night, sleep in the bed at your clinic (E) to rest; stay up too long and you collapse in the street.")
+	entries.text = "\n\n".join(PackedStringArray(lines))
+	scroll.scroll_vertical = 0
+
+
 func _build_appointments() -> void:
 	# Who needs the doctor today, then every clinic visit, newest first
 	title.text = "Appointments"
@@ -239,6 +276,8 @@ func _build_appointments() -> void:
 				status = "absent"
 			"no tonic":
 				status = "no tonic"
+			"rest":
+				status = "rest prescribed"
 		lines.append("• %s · %s – %s · %s" % [a["name"], GameState.format_time(a["from"]), GameState.format_time(a["until"]), status])
 	if lines.is_empty():
 		entries.text = "No appointments yet.\n\nAsk a sick patient to come to the clinic for a treatment."
@@ -380,6 +419,43 @@ func _build_chart_layer() -> void:
 	sheet.size = CHART_SIZE
 	sheet.mouse_filter = Control.MOUSE_FILTER_STOP
 	chart_layer.add_child(sheet)
+	chart_prev = _chart_arrow("‹", -1)
+	chart_next = _chart_arrow("›", 1)
+
+
+func _chart_arrow(symbol: String, step: int) -> Label:
+	var arrow := Label.new()
+	arrow.text = symbol
+	arrow.add_theme_font_size_override("font_size", 120)
+	arrow.add_theme_color_override("font_color", Color(0.93, 0.88, 0.78))
+	arrow.add_theme_color_override("font_outline_color", Color(0.08, 0.06, 0.05))
+	arrow.add_theme_constant_override("outline_size", 14)
+	arrow.mouse_filter = Control.MOUSE_FILTER_STOP
+	arrow.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	arrow.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_step_chart(step))
+	chart_layer.add_child(arrow)
+	return arrow
+
+
+# Everyone with a chart, in the same order as the patients page
+func _chart_people() -> Array:
+	var people := get_tree().get_nodes_in_group("npcs").filter(func(n): return n.data != null)
+	people.sort_custom(func(a, b): return a.data.npc_name.naturalnocasecmp_to(b.data.npc_name) < 0)
+	return people.map(func(n): return n.data.npc_name)
+
+
+func _step_chart(step: int) -> void:
+	var names := _chart_people()
+	var i := names.find(chart_npc)
+	if i < 0 or names.size() < 2:
+		return
+	var next: String = names[(i + step + names.size()) % names.size()]
+	filter = next  # The casebook behind follows along
+	_refresh()
+	Audio.play("page", -6.0)
+	_open_chart(next)
 
 
 func _open_chart(npc_name: String) -> void:
@@ -389,12 +465,16 @@ func _open_chart(npc_name: String) -> void:
 			npc = person
 	if npc == null:
 		return
+	chart_npc = npc_name
 	_clear(sheet)
 	# Fit the card to 92% of the screen height, centered
 	var view := get_viewport().get_visible_rect().size
 	var s := view.y * 0.92 / CHART_SIZE.y
 	sheet.scale = Vector2(s, s)
 	sheet.position = (view - CHART_SIZE * s) / 2.0
+	var arrow_y := view.y / 2.0 - 90.0
+	chart_prev.position = Vector2(sheet.position.x - 90.0, arrow_y)
+	chart_next.position = Vector2(sheet.position.x + CHART_SIZE.x * s + 30.0, arrow_y)
 
 	var paper := TextureRect.new()
 	paper.texture = CHART

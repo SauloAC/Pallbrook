@@ -129,7 +129,16 @@ func _doctor_watching(victim: Node) -> bool:
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if player == null:
 		return false
-	return player.global_position.distance_to(GameState.place_position(victim.data.home)) < watch_range
+	var door := GameState.place_position(victim.data.home)
+	if player.global_position.distance_to(door) >= watch_range:
+		return false
+	if player.has_method("is_hidden") and player.is_hidden():
+		return false  # In a bush or tall grass
+	# A doctor hidden behind a tree or a wall isn't noticed: the vampire goes on, and can be caught
+	var query := PhysicsRayQueryParameters3D.create(door + Vector3(0.0, 1.5, 0.0), player.global_position + Vector3(0.0, 0.5, 0.0))
+	var skip: Array[RID] = [(player as CollisionObject3D).get_rid(), vampire.get_rid()]
+	query.exclude = skip
+	return player.get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _finish_hunt_now() -> void:
@@ -150,8 +159,13 @@ func _seed_outbreak() -> void:
 	for npc in others.slice(0, outbreak_size):
 		npc.feed(randf_range(52.0, 62.0), _pick_trace(npc))
 	# One or two healthy people, frightened by the outbreak, also claim to be ill
-	for npc in others.slice(outbreak_size, outbreak_size + randi_range(1, 2)):
+	var worried_count := randi_range(1, 2)
+	for npc in others.slice(outbreak_size, outbreak_size + worried_count):
 		npc.worried = true
+	# Autumn: someone else may already have a chill (fever, not anemia)
+	var rest := others.slice(outbreak_size + worried_count)
+	if not rest.is_empty() and randf() < 0.6:
+		rest.pick_random().catch_flu()
 
 
 func _pick_victim() -> Node:
@@ -162,8 +176,8 @@ func _pick_victim() -> Node:
 	var victims := []
 	var weak := []
 	for npc in get_tree().get_nodes_in_group("npcs"):
-		if npc != vampire and npc.is_alive() and not npc.is_servant:
-			victims.append(npc)
+		if npc != vampire and npc.is_alive() and not npc.is_servant and not npc.has_flu():
+			victims.append(npc)  # Fever in the blood: the vampire leaves the sick alone
 			if npc.is_anemic():
 				weak.append(npc)
 	if victims.is_empty():

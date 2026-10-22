@@ -12,6 +12,7 @@ const QUESTIONS := [
 	["seen", "Did you see anything unusual last night?"],
 	["exam", "Let me examine you."],
 	["clinic", "Come to the clinic for a treatment."],
+	["rest", "You need rest and good food."],
 	["chat", "How are things?"],
 	["bye", "Goodbye."],
 ]
@@ -22,6 +23,14 @@ var opened_frame := -1
 var npc: Node = null  # Who we are talking to (null = a plain message, like examining a body)
 var choice := 0
 var choices_box: VBoxContainer
+var questions: Array = []  # This conversation's list (the tonic shows up at the clinic)
+
+
+func _questions_for(who: Node) -> Array:
+	var list := QUESTIONS.duplicate()
+	if who.has_method("awaiting_treatment") and who.awaiting_treatment():
+		list.insert(0, ["tonic", "Give the iron tonic."])
+	return list
 
 
 func _ready() -> void:
@@ -47,6 +56,7 @@ func _on_dialogue_started(speaker_name: String, line: String) -> void:
 
 func _on_conversation_started(who: Node) -> void:
 	npc = who
+	questions = _questions_for(who)
 	choice = 0
 	_open(who.data.npc_name, who.greeting())
 	choices_box.visible = true
@@ -69,10 +79,10 @@ func _refresh_choices() -> void:
 	for child in choices_box.get_children():
 		choices_box.remove_child(child)
 		child.queue_free()
-	for i in QUESTIONS.size():
-		var key: String = QUESTIONS[i][0]
+	for i in questions.size():
+		var key: String = questions[i][0]
 		var label := Label.new()
-		label.text = ("» " if i == choice else "   ") + QUESTIONS[i][1]
+		label.text = ("» " if i == choice else "   ") + questions[i][1]
 		label.add_theme_font_size_override("font_size", 20)
 		if i == choice:
 			label.add_theme_color_override("font_color", SELECTED_COLOR)
@@ -91,15 +101,15 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
-		choice = wrapi(choice - 1, 0, QUESTIONS.size())
+		choice = wrapi(choice - 1, 0, questions.size())
 		Audio.play("click", -10.0)
 		_refresh_choices()
 	elif event.is_action_pressed("move_down") or event.is_action_pressed("ui_down"):
-		choice = wrapi(choice + 1, 0, QUESTIONS.size())
+		choice = wrapi(choice + 1, 0, questions.size())
 		Audio.play("click", -10.0)
 		_refresh_choices()
 	elif event.is_action_pressed("interact"):
-		_ask(QUESTIONS[choice][0])
+		_ask(questions[choice][0])
 	elif event.is_action_pressed("ui_cancel"):
 		_close()
 	else:
@@ -117,6 +127,12 @@ func _ask(key: String) -> void:
 			body.text = npc.answer_exam()
 		"clinic":
 			body.text = npc.answer_clinic()
+		"rest":
+			body.text = npc.answer_rest()
+		"tonic":
+			body.text = npc.answer_tonic()
+			questions = _questions_for(npc)  # Treated: the tonic option goes away
+			choice = mini(choice, questions.size() - 1)
 		"chat":
 			body.text = npc.answer_chat()
 		"bye":

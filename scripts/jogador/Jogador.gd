@@ -8,6 +8,23 @@ var spawn_point: Vector3
 var visual: CharacterVisual = null
 var step_timer := 0.0
 const STEP_INTERVAL := 0.42
+const SILHOUETTE := preload("res://assets/shaders/silhouette.gdshader")
+
+# ---------- Hiding at night ----------
+# Standing still right beside something solid (a tree, a wall, a cart) at night counts as
+# lurking. Behind cover nobody sees the doctor; but someone who does catch him lurking late
+# trusts him less than if he were just walking by.
+const LURK_RADIUS := 1.2
+const LURK_SECONDS := 2.0
+var lurk_time := 0.0
+var cover_query: PhysicsShapeQueryParameters3D
+
+# Inside a bush or tall grass (empties named Hide_* in town.glb) the doctor is fully hidden:
+# nobody sees him, not even the vampire. Stepping out late at night in front of someone
+# counts as being caught lurking.
+const EMERGE_SECONDS := 2.5
+var cover_count := 0
+var left_cover_at := -100.0
 
 
 func _ready() -> void:
@@ -18,9 +35,79 @@ func _ready() -> void:
 	visual.position.y = -1.0  # The doctor's body origin sits at the capsule's center
 	if visual.setup("Doctor"):
 		$MeshInstance3D.visible = false
+		_add_silhouette(visual.meshes)
 	else:
 		visual.queue_free()
 		visual = null
+
+	if visual == null:
+		_add_silhouette([$MeshInstance3D])
+	_setup_hiding_spots.call_deferred()
+
+
+func _setup_hiding_spots() -> void:
+	await get_tree().process_frame  # town.glb may finish loading after us
+	for spot in get_tree().current_scene.find_children("Hide_*", "Node3D", true, false):
+		var area := Area3D.new()
+		var shape := CollisionShape3D.new()
+		var sphere := SphereShape3D.new()
+		sphere.radius = 1.0  # The empty's scale in Blender sets the real size
+		shape.shape = sphere
+		area.add_child(shape)
+		area.monitorable = false
+		spot.add_child(area)
+		area.body_entered.connect(func(body: Node3D):
+			if body == self:
+				_set_cover(1))
+		area.body_exited.connect(func(body: Node3D):
+			if body == self:
+				_set_cover(-1))
+
+
+func _set_cover(change: int) -> void:
+	var was_hidden := is_hidden()
+	cover_count = maxi(cover_count + change, 0)
+	if was_hidden and not is_hidden():
+		left_cover_at = Time.get_ticks_msec() / 1000.0
+	# Half see-through while hidden, so the player knows
+	if visual:
+		for mi in visual.meshes:
+			mi.transparency = 0.45 if is_hidden() else 0.0
+
+
+func is_hidden() -> bool:
+	return cover_count > 0
+
+
+func just_left_cover() -> bool:
+	return Time.get_ticks_msec() / 1000.0 - left_cover_at < EMERGE_SECONDS
+
+
+# Shows the doctor's outline through buildings that hide him.
+# Uses the materials' built-in X-ray stencil mode: the body marks the pixels where it is seen,
+# and the outline is only drawn where it is hidden, so his own head never counts as a wall.
+# Falls back to silhouette.gdshader if this Godot has no stencil support.
+const SILHOUETTE_COLOR := Color(0.94, 0.86, 0.66, 0.55)
+
+func _add_silhouette(meshes: Array) -> void:
+	var fallback: ShaderMaterial = null
+	for m in meshes:
+		var mi := m as MeshInstance3D
+		var done := false
+		for i in mi.mesh.get_surface_count():
+			var mat := mi.get_active_material(i) as BaseMaterial3D
+			if mat and "stencil_mode" in mat:
+				if mi.get_surface_override_material(i) != mat:
+					mat = mat.duplicate() as BaseMaterial3D  # Own copy, other bodies keep theirs
+				mat.set("stencil_mode", 2)  # BaseMaterial3D.STENCIL_MODE_XRAY
+				mat.set("stencil_color", SILHOUETTE_COLOR)
+				mi.set_surface_override_material(i, mat)
+				done = true
+		if not done:
+			if fallback == null:
+				fallback = ShaderMaterial.new()
+				fallback.shader = SILHOUETTE
+			mi.material_overlay = fallback
 
 
 func _physics_process(delta: float) -> void:
@@ -49,6 +136,27 @@ func _physics_process(delta: float) -> void:
 		visual.animate(get_real_velocity(), delta)
 	_footsteps(delta)
 	_update_nearby_npc()
+	var still := Vector2(velocity.x, velocity.z).length() < 0.3
+	lurk_time = lurk_time + delta if GameState.is_night and still and _near_cover() else 0.0
+
+
+func is_lurking() -> bool:
+	return lurk_time >= LURK_SECONDS
+
+
+func _near_cover() -> bool:
+	if cover_query == null:
+		var shape := SphereShape3D.new()
+		shape.radius = LURK_RADIUS
+		cover_query = PhysicsShapeQueryParameters3D.new()
+		cover_query.shape = shape
+		cover_query.exclude = [get_rid()]
+	# Raised so the ground under his feet doesn't count as cover
+	cover_query.transform = Transform3D(Basis(), global_position + Vector3(0.0, 0.6, 0.0))
+	for hit in get_world_3d().direct_space_state.intersect_shape(cover_query, 8):
+		if hit["collider"] is StaticBody3D:
+			return true
+	return false
 
 
 func _footsteps(delta: float) -> void:
