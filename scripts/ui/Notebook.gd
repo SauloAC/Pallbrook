@@ -505,11 +505,11 @@ func _blood_bar(vitality: float, old: bool) -> void:
 	drop.size = Vector2(38, 64)
 	drop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sheet.add_child(drop)
-	var title := _label("Blood", 30)
-	title.position = Vector2(130, bar.position.y)
-	title.size = Vector2(115, bar.size.y)
-	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	sheet.add_child(title)
+	var blood_title := _label("Blood", 30)
+	blood_title.position = Vector2(130, bar.position.y)
+	blood_title.size = Vector2(115, bar.size.y)
+	blood_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sheet.add_child(blood_title)
 
 	# Frame drawn in ink, the red fill inside it
 	var frame := Panel.new()

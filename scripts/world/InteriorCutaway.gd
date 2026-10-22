@@ -27,9 +27,9 @@ func _ready() -> void:
 	if parts.is_empty():
 		push_warning("InteriorCutaway: no %s_Roof/_Upper/_Front nodes found" % building)
 	if hide_sign:
-		var sign := get_parent().get_node_or_null("Sign") as Node3D
-		if sign:
-			parts.append(sign)
+		var sign_label := get_parent().get_node_or_null("Sign") as Node3D
+		if sign_label:
+			parts.append(sign_label)
 
 
 func _on_body_entered(body: Node) -> void:

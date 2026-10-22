@@ -6,7 +6,7 @@ Third-party assets used in the game. Keep this list up to date before any public
 - "Vibing Over Venus" — Kevin MacLeod (incompetech.com). Licensed under Creative Commons: By Attribution 4.0. (day.mp3)
 - "Ossuary 5 - Rest" — Kevin MacLeod (incompetech.com). Licensed under Creative Commons: By Attribution 4.0. (night.mp3)
 
-- "Yoiyami-core theme" (yoiyami_core_theme_0) — title screen music (title.ogg). CC0, no attribution required. Source: OpenGameArt.
+- "Yoiyami-core theme" (yoiyami_core_theme_0) — title screen music (title.mp3). CC0, no attribution required. Source: OpenGameArt.
 
 ## Sound effects
 - "Death is Looming" by Scott Elliott — excerpt used as death.ogg. Attribution required. (License: TODO, confirm on the download page)

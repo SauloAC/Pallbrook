@@ -5,7 +5,7 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
 # Places people stay outside at (everything else has a door to go through)
 const OPEN_AIR_PLACES := ["Praca"]
 # Walk-in buildings: people stay visible inside (the roof opens when the doctor enters)
-const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura"]
+const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Escola"]
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -108,6 +108,11 @@ const INTERIOR_SLOTS := {
 	"Prefeitura": [
 		Vector3(1.0, 0.0, -2.0), Vector3(0.2, 0.0, -2.5), Vector3(1.8, 0.0, -2.5), Vector3(1.0, 0.0, -3.2),
 		Vector3(0.0, 0.0, -3.4), Vector3(2.0, 0.0, -3.4), Vector3(0.6, 0.0, -4.0), Vector3(1.4, 0.0, -4.0),
+	],
+	# School (marker at the south door): the teacher's spot first, then the aisle and the front row
+	"Escola": [
+		Vector3(0.0, 0.0, -5.0), Vector3(0.0, 0.0, -3.8), Vector3(0.0, 0.0, -2.6), Vector3(-1.6, 0.0, -1.2),
+		Vector3(1.6, 0.0, -1.2), Vector3(-0.5, 0.0, -4.2), Vector3(0.5, 0.0, -3.2), Vector3(-0.4, 0.0, -2.0),
 	],
 	# Library (marker at the south door): around the reading table, by the shelves and the desks
 	"Biblioteca": [
