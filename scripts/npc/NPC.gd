@@ -5,7 +5,7 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
 # Places people stay outside at (everything else has a door to go through)
 const OPEN_AIR_PLACES := ["Praca"]
 # Walk-in buildings: people stay visible inside (the roof opens when the doctor enters)
-const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Escola"]
+const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Escola", "Igreja"]
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -113,6 +113,11 @@ const INTERIOR_SLOTS := {
 	"Escola": [
 		Vector3(0.0, 0.0, -5.0), Vector3(0.0, 0.0, -3.8), Vector3(0.0, 0.0, -2.6), Vector3(-1.6, 0.0, -1.2),
 		Vector3(1.6, 0.0, -1.2), Vector3(-0.5, 0.0, -4.2), Vector3(0.5, 0.0, -3.2), Vector3(-0.4, 0.0, -2.0),
+	],
+	# Church (marker at the tower door): the priest at the altar, the rest along the aisle
+	"Igreja": [
+		Vector3(0.0, 0.0, -7.05), Vector3(-1.2, 0.0, -7.05), Vector3(1.2, 0.0, -7.05), Vector3(0.0, 0.0, -6.4),
+		Vector3(0.0, 0.0, -5.8), Vector3(0.0, 0.0, -4.8), Vector3(0.0, 0.0, -3.9), Vector3(0.0, 0.0, -3.0),
 	],
 	# Library (marker at the south door): around the reading table, by the shelves and the desks
 	"Biblioteca": [
@@ -1054,23 +1059,49 @@ func _free_grave_slot() -> Node3D:
 
 
 func _make_headstone() -> Node3D:
-	var stone := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = Vector3(0.7, 0.9, 0.18)
-	stone.mesh = box
-	stone.position.y = 0.45
+	# Dark weathered stone with a rounded top and a fresh mound, like the old graves around it
+	var grave := Node3D.new()
 	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(0.55, 0.55, 0.58)
-	stone.material_override = material
+	material.albedo_color = Color(0.2, 0.21, 0.2)
+	material.roughness = 0.95
+	var slab := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(0.6, 0.62, 0.16)
+	slab.mesh = box
+	slab.position.y = 0.31
+	slab.material_override = material
+	grave.add_child(slab)
+	var top := MeshInstance3D.new()
+	var round_top := CylinderMesh.new()
+	round_top.top_radius = 0.3
+	round_top.bottom_radius = 0.3
+	round_top.height = 0.16
+	top.mesh = round_top
+	top.rotation.x = PI / 2.0
+	top.position.y = 0.62
+	top.material_override = material
+	grave.add_child(top)
+	var mound := MeshInstance3D.new()
+	var earth := SphereMesh.new()
+	earth.radius = 0.5
+	earth.height = 0.36
+	mound.mesh = earth
+	mound.scale = Vector3(0.75, 1.0, 1.5)
+	mound.position = Vector3(0.0, 0.0, -0.8)  # Behind the stone, away from the camera
+	var soil := StandardMaterial3D.new()
+	soil.albedo_color = Color(0.17, 0.11, 0.07)
+	soil.roughness = 1.0
+	mound.material_override = soil
+	grave.add_child(mound)
 	var plate := Label3D.new()
 	plate.text = "%s\n%s" % [data.npc_name, data.role]
 	plate.font_size = 48
 	plate.outline_size = 12
 	plate.pixel_size = 0.006
-	plate.position = Vector3(0.0, 0.15, 0.1)  # On the face of the stone, toward the camera
+	plate.position = Vector3(0.0, 0.42, 0.09)  # On the face of the stone, toward the camera
 	plate.modulate = Color(0.9, 0.88, 0.82)
-	stone.add_child(plate)
-	return stone
+	grave.add_child(plate)
+	return grave
 
 
 # ---------- Clinic visits ----------
