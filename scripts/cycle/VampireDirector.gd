@@ -98,6 +98,8 @@ func _run_hunt(victim: Node) -> void:
 	await get_tree().physics_frame
 	while hunting and not vampire.agent.is_navigation_finished():
 		if vampire.witnessed:
+			Playtest.count("vampire_recognized")
+			Playtest.log_line("The doctor recognized the vampire on the street")
 			_abort_hunt()
 			return
 		await get_tree().physics_frame
@@ -105,6 +107,8 @@ func _run_hunt(victim: Node) -> void:
 		return
 	if _doctor_watching(victim) and not _frenzied():  # Starving, it no longer cares who is watching
 		victim.marked = false  # The doctor kept watch: the hold is broken
+		Playtest.count("vampire_scared_off_by_watch")
+		Playtest.log_line("The vampire saw the doctor watching %s's door and fled" % victim.data.npc_name)
 		_abort_hunt("A figure fled from %s's door when it saw the doctor." % victim.data.npc_name)
 		return
 	await get_tree().create_timer(2.0).timeout  # Inside the house...
@@ -190,6 +194,8 @@ func _pick_victim() -> Node:
 
 func _resolve_attack(victim: Node) -> void:
 	var victim_name: String = victim.data.npc_name
+	Playtest.count("vampire_attacks")
+	Playtest.log_line("The vampire attacked %s" % victim_name)
 	# At night the discovery belongs to the next morning
 	var morning := GameState.day + 1 if GameState.is_night else GameState.day
 	var others := 0
@@ -201,6 +207,7 @@ func _resolve_attack(victim: Node) -> void:
 		fed_tonight = true
 		victim.marked = false
 		victim.make_servant()
+		Playtest.count("servants_made")
 		vampire.set_hunger(vampire.blood + 20.0)
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
 		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
@@ -233,6 +240,7 @@ func _resolve_attack(victim: Node) -> void:
 	elif others > 0 and randf() < servant_chance:
 		# Sometimes the bite turns them (only if someone else is left to hunt)
 		victim.make_servant()
+		Playtest.count("servants_made")
 		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
 		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
 	elif starving:

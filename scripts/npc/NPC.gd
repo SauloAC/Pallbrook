@@ -408,6 +408,7 @@ func catch_flu() -> void:
 		return
 	flu_days = FLU_DAYS
 	flu_rest = false
+	Playtest.count("flu_cases")
 
 
 # Each morning: the sick get better (faster with rest), and the chill may spread
@@ -810,6 +811,8 @@ func _look_around() -> void:
 				wary_day = GameState.day + 1  # Tomorrow they keep their distance
 			if hiding and hid_night != night:
 				hid_night = night
+				Playtest.count("caught_lurking")
+				Playtest.log_line("%s caught the doctor lurking near %s" % [data.npc_name, place])
 				change_affinity(-8.0)  # Lurking in the dark is worse than walking by
 
 
@@ -902,6 +905,7 @@ func greeting() -> String:
 
 
 func answer_alibi() -> String:
+	Playtest.count("asked_alibi")
 	asked["alibi"] = GameState.day
 	if is_wary():
 		return _wary_line()
@@ -913,6 +917,7 @@ func answer_alibi() -> String:
 
 
 func answer_seen() -> String:
+	Playtest.count("asked_seen")
 	asked["seen"] = GameState.day
 	if is_wary():
 		return _wary_line()
@@ -945,6 +950,13 @@ func answer_exam() -> String:
 	var record := vitals()
 	var text := _exam_text(record)
 	GameState.add_clue("Day %d · Exam of %s: %s" % [GameState.day, data.npc_name, text], "evidence")
+	Playtest.count("exams")
+	if is_vampire():
+		Playtest.count("exams_of_the_vampire")
+	elif blood < 80.0:
+		Playtest.count("exams_of_bitten")
+	if has_flu():
+		Playtest.count("exams_of_flu")
 	if cared_day != GameState.day:
 		cared_day = GameState.day
 		change_affinity(8.0)
@@ -1320,6 +1332,7 @@ func answer_clinic() -> String:
 	appointment = {"day": appointment_day, "name": data.npc_name, "from": appointment_from,
 			"until": appointment_until, "status": "waiting"}
 	GameState.appointments.append(appointment)
+	Playtest.count("appointments_booked")
 	var when := GameState.format_time(appointment_from)
 	if appointment_day != GameState.day:
 		when = "tomorrow at " + when
@@ -1338,10 +1351,12 @@ func _check_appointment() -> void:
 			if skip_appointment and doctor_was_there:
 				# The doctor waited and they never came
 				appointment["status"] = "absent"
+				Playtest.count("appointments_absent")
 				GameState.add_clue("Day %d · %s never showed up at the clinic." % [GameState.day, data.npc_name])
 			else:
 				# The doctor was not there in time (whether they came or not, he can't tell)
 				appointment["status"] = "missed"
+				Playtest.count("appointments_missed")
 				GameState.add_clue("Day %d · You missed %s's appointment at the clinic." % [GameState.day, data.npc_name])
 				if not skip_appointment:
 					change_affinity(-5.0)  # They went and waited for nothing
@@ -1381,6 +1396,9 @@ func answer_tonic() -> String:
 		_no_tonic()
 		return "No tonic, doctor? Then why did you call me here..."
 	var feverish := has_flu() and blood >= 80.0
+	Playtest.count("tonics_given")
+	if feverish:
+		Playtest.count("tonic_wasted_on_flu")
 	_treat()
 	if feverish:
 		GameState.add_clue("Day %d · The tonic did nothing for %s's fever." % [GameState.day, data.npc_name], "evidence")
@@ -1403,6 +1421,11 @@ func answer_rest() -> String:
 		if state == State.INSIDE:
 			set_state(State.ROUTINE)
 	GameState.add_clue("Day %d · You prescribed rest and good food to %s." % [GameState.day, data.npc_name], "evidence")
+	Playtest.count("rest_prescribed")
+	if has_flu():
+		Playtest.count("rest_for_flu")
+	elif blood < 80.0:
+		Playtest.count("rest_for_bitten")
 	if has_flu():
 		flu_rest = true
 		change_affinity(6.0)

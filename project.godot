@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 EventBus="*uid://cfmwvf2arl7s6"
 GameState="*uid://c7cmllcuhuq77"
 Audio="*res://autoload/Audio.gd"
+Playtest="*res://autoload/Playtest.gd"
 
 [display]
 
@@ -78,5 +79,7 @@ accuse={
 common/physics_interpolation=true
 
 [rendering]
+
+textures/vram_compression/import_etc2_astc=true
 
 rendering_device/driver.windows="d3d12"

@@ -19,7 +19,7 @@ func _ready() -> void:
 
 
 func _on_accusation_requested(npc: Node) -> void:
-	if GameState.game_over or get_tree().paused:
+	if GameState.game_over or get_tree().paused or GameState.reading:
 		return
 	suspect = npc
 	var accused: String = npc.data.npc_name
@@ -55,13 +55,19 @@ func _input(event: InputEvent) -> void:
 			get_tree().paused = false
 	elif mode == Mode.RESULT and event.is_action_pressed("interact"):
 		get_viewport().set_input_as_handled()
-		GameState.reset()
-		get_tree().paused = false
-		get_tree().reload_current_scene()  # Fresh town, new vampire
+		mode = Mode.HIDDEN
+		panel.visible = false
+		# A few playtest questions first, then a fresh town with a new vampire
+		Playtest.show_survey(func():
+			GameState.reset()
+			Playtest.start_run()
+			get_tree().paused = false
+			get_tree().reload_current_scene())
 
 
 func _resolve() -> void:
 	var accused: String = suspect.data.npc_name
+	Playtest.note_accused(accused)
 	if accused == GameState.vampire_name:
 		EventBus.game_ended.emit(true, "You unmasked %s on Day %d. %d townspeople survived." % [accused, GameState.day, _survivors()])
 	else:

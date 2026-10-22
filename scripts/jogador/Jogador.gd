@@ -67,6 +67,8 @@ func _setup_hiding_spots() -> void:
 func _set_cover(change: int) -> void:
 	var was_hidden := is_hidden()
 	cover_count = maxi(cover_count + change, 0)
+	if not was_hidden and is_hidden():
+		Playtest.count("hid_in_bush_or_grass")
 	if was_hidden and not is_hidden():
 		left_cover_at = Time.get_ticks_msec() / 1000.0
 	# Half see-through while hidden, so the player knows
@@ -119,7 +121,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
-	if GameState.in_dialogue:
+	if GameState.in_dialogue or GameState.reading:
 		# Stand still while talking
 		velocity.x = 0.0
 		velocity.z = 0.0
@@ -173,7 +175,7 @@ func _footsteps(delta: float) -> void:
 func _update_nearby_npc() -> void:
 	var closest: Node3D = null
 	var closest_distance := talk_range
-	if GameState.in_dialogue:
+	if GameState.in_dialogue or GameState.reading:
 		closest_distance = 0.0  # Nobody is "nearby" while already talking
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if not npc.can_talk():
@@ -192,7 +194,7 @@ func _update_nearby_npc() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if GameState.in_dialogue or nearby_npc == null:
+	if GameState.in_dialogue or GameState.reading or nearby_npc == null:
 		return
 	if event.is_action_pressed("interact"):
 		nearby_npc.set_highlighted(false)

@@ -15,6 +15,7 @@ const ALL := ""
 const EVIDENCE := "#evidence"
 const APPOINTMENTS := "#appointments"
 const CHART_PICK := "#chart"  # Waiting for the player to pick whose chart to open
+const READING_TIME_SCALE := 0.25  # How fast the world runs while the casebook is open
 const SUPPLIES := "#supplies"  # Coins, tonics, and how to get more
 
 var filter := ALL  # ALL, EVIDENCE or a person's name
@@ -93,13 +94,20 @@ func _open() -> void:
 	_refresh()
 	panel.visible = true
 	Audio.play("book_open", -4.0)
-	get_tree().paused = true  # Time stops while reading
+	# Time doesn't stop while reading, it slows down: thinking is cheap, but not free.
+	# 0 = full pause, 1 = normal speed.
+	GameState.reading = true
+	Engine.time_scale = READING_TIME_SCALE
+	Playtest.reading_started()
+	Playtest.count("casebook_opened")
 
 
 func _close() -> void:
 	panel.visible = false
 	Audio.play("book_close", -4.0)
-	get_tree().paused = false
+	GameState.reading = false
+	Engine.time_scale = 1.0
+	Playtest.reading_stopped()
 
 
 func _set_filter(value: String) -> void:
@@ -466,6 +474,7 @@ func _open_chart(npc_name: String) -> void:
 	if npc == null:
 		return
 	chart_npc = npc_name
+	Playtest.count("charts_opened")
 	_clear(sheet)
 	# Fit the card to 92% of the screen height, centered
 	var view := get_viewport().get_visible_rect().size
