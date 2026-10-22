@@ -116,8 +116,8 @@ const INTERIOR_SLOTS := {
 	],
 	# Church (marker at the tower door): the priest at the altar, the rest along the aisle
 	"Igreja": [
-		Vector3(0.0, 0.0, -7.05), Vector3(-1.2, 0.0, -7.05), Vector3(1.2, 0.0, -7.05), Vector3(0.0, 0.0, -6.4),
-		Vector3(0.0, 0.0, -5.8), Vector3(0.0, 0.0, -4.8), Vector3(0.0, 0.0, -3.9), Vector3(0.0, 0.0, -3.0),
+		Vector3(0.0, 0.0, -6.9), Vector3(-0.9, 0.0, -6.6), Vector3(0.9, 0.0, -6.6), Vector3(-0.4, 0.0, -6.2),
+		Vector3(0.4, 0.0, -6.2), Vector3(0.0, 0.0, -5.2), Vector3(0.0, 0.0, -4.3), Vector3(0.0, 0.0, -3.4),
 	],
 	# Library (marker at the south door): around the reading table, by the shelves and the desks
 	"Biblioteca": [
@@ -542,7 +542,30 @@ func _go_to_place(place: String) -> void:
 		var slots: Array = INTERIOR_SLOTS.get(place, PLACE_SLOTS)
 		if INTERIOR_SLOTS.has(place):
 			jitter *= 0.5  # Indoors: stay on the spot
-		go_to(marker.global_position + slots[place_slot] + jitter)
+		var spot: Vector3 = marker.global_position + slots[place_slot] + jitter
+		if INTERIOR_SLOTS.has(place):
+			spot = _reachable_spot(marker.global_position, spot)
+		go_to(spot)
+
+
+# Indoor spots sit among furniture. If one is off the navigation mesh, or on a patch the
+# streets can't reach, the agent heads for the nearest mesh point instead, which can be
+# outside behind a wall (that's how people ended up stuck behind the church).
+# So slide the spot back toward the door until it can be reached from the square.
+func _reachable_spot(door: Vector3, spot: Vector3) -> Vector3:
+	var map := agent.get_navigation_map()
+	var hub := _find_location("Praca")
+	if hub == null or NavigationServer3D.map_get_iteration_id(map) == 0:
+		return spot
+	for i in 11:
+		var p := spot.lerp(door, i / 10.0)
+		var path := NavigationServer3D.map_get_path(map, hub.global_position, p, true)
+		if path.is_empty():
+			continue
+		var end := path[path.size() - 1]
+		if Vector2(end.x - p.x, end.z - p.z).length() < 0.35:
+			return end
+	return door
 
 
 func _free_slot(place: String) -> int:

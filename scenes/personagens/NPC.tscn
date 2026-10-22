@@ -5,6 +5,7 @@
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_t2dwb"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m2va7"]
+radius = 0.4
 
 [node name="NPC" type="CharacterBody3D" unique_id=2114807663]
 script = ExtResource("1_qyqxh")
