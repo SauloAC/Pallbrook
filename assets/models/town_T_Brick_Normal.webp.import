@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://c8lv7t4odrso0"
 path.s3tc="res://.godot/imported/town_T_Brick_Normal.webp-f4371e1ff9ce73e63c9b06b49b8b5d51.s3tc.ctex"
+path.etc2="res://.godot/imported/town_T_Brick_Normal.webp-f4371e1ff9ce73e63c9b06b49b8b5d51.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/town_T_Brick_Normal.webp"
-dest_files=["res://.godot/imported/town_T_Brick_Normal.webp-f4371e1ff9ce73e63c9b06b49b8b5d51.s3tc.ctex"]
+dest_files=["res://.godot/imported/town_T_Brick_Normal.webp-f4371e1ff9ce73e63c9b06b49b8b5d51.s3tc.ctex", "res://.godot/imported/town_T_Brick_Normal.webp-f4371e1ff9ce73e63c9b06b49b8b5d51.etc2.ctex"]
 
 [params]
 

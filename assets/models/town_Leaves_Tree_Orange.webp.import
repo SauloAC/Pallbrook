@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bs8vabbowevl1"
 path.s3tc="res://.godot/imported/town_Leaves_Tree_Orange.webp-8c73be36d4b4f8bc04a977c9d74bff7d.s3tc.ctex"
+path.etc2="res://.godot/imported/town_Leaves_Tree_Orange.webp-8c73be36d4b4f8bc04a977c9d74bff7d.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/town_Leaves_Tree_Orange.webp"
-dest_files=["res://.godot/imported/town_Leaves_Tree_Orange.webp-8c73be36d4b4f8bc04a977c9d74bff7d.s3tc.ctex"]
+dest_files=["res://.godot/imported/town_Leaves_Tree_Orange.webp-8c73be36d4b4f8bc04a977c9d74bff7d.s3tc.ctex", "res://.godot/imported/town_Leaves_Tree_Orange.webp-8c73be36d4b4f8bc04a977c9d74bff7d.etc2.ctex"]
 
 [params]
 

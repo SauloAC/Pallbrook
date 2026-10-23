@@ -7,6 +7,8 @@ enum Mode { HIDDEN, CONFIRM, RESULT }
 @onready var body: Label = $Panel/VBox/Body
 @onready var hint: Label = $Panel/VBox/Hint
 
+const FIRST_ACCUSATION_DAY := 2
+
 var mode := Mode.HIDDEN
 var suspect: Node = null
 
@@ -20,6 +22,10 @@ func _ready() -> void:
 
 func _on_accusation_requested(npc: Node) -> void:
 	if GameState.game_over or get_tree().paused or GameState.reading:
+		return
+	if GameState.day < FIRST_ACCUSATION_DAY:
+		# The first day is for getting to know the town
+		EventBus.dialogue_started.emit("Doctor", "It's too soon to accuse anyone. Examine people, ask where they were, and watch the town tonight. (Accusations open on Day %d.)" % FIRST_ACCUSATION_DAY)
 		return
 	suspect = npc
 	var accused: String = npc.data.npc_name

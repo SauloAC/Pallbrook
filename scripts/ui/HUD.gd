@@ -9,13 +9,15 @@ const ICON_SLEEP := preload("res://assets/ui/icon_sleep.png")
 const ICON_ACCUSE := preload("res://assets/ui/icon_accuse.png")
 const ICON_BOOK := preload("res://assets/ui/casebook.png")
 
+var accuse_hint: Control  # Hidden on Day 1: no accusations yet
+
 
 func _ready() -> void:
 	_add_hint(null, "WASD", "Move")
 	_add_hint(ICON_TALK, "E", "Talk")
 	_add_hint(ICON_EXAMINE, "E", "Examine")
 	_add_hint(ICON_SLEEP, "E", "Sleep")
-	_add_hint(ICON_ACCUSE, "Q", "Accuse")
+	accuse_hint = _add_hint(ICON_ACCUSE, "Q", "Accuse")
 	_add_hint(ICON_BOOK, "Tab", "Casebook")
 
 
@@ -26,10 +28,11 @@ func _process(_delta: float) -> void:
 			"" if GameState.tonics == 1 else "s"]
 	clock.modulate = Color(1.0, 0.45, 0.45) if GameState.exhaustion > 0.0 else Color.WHITE
 	controls.visible = not GameState.in_dialogue
+	accuse_hint.visible = GameState.day >= 2
 
 
 # One control hint: [icon] KEY Action
-func _add_hint(icon: Texture2D, key: String, action: String) -> void:
+func _add_hint(icon: Texture2D, key: String, action: String) -> Control:
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override("separation", 6)
 
@@ -50,3 +53,4 @@ func _add_hint(icon: Texture2D, key: String, action: String) -> void:
 	box.add_child(label)
 
 	controls.add_child(box)
+	return box

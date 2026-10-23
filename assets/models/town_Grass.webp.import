@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://d3yt7sn13wp2l"
 path.s3tc="res://.godot/imported/town_Grass.webp-ee7d8b061c7d4533ffa1b0af3aeaa200.s3tc.ctex"
+path.etc2="res://.godot/imported/town_Grass.webp-ee7d8b061c7d4533ffa1b0af3aeaa200.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/town_Grass.webp"
-dest_files=["res://.godot/imported/town_Grass.webp-ee7d8b061c7d4533ffa1b0af3aeaa200.s3tc.ctex"]
+dest_files=["res://.godot/imported/town_Grass.webp-ee7d8b061c7d4533ffa1b0af3aeaa200.s3tc.ctex", "res://.godot/imported/town_Grass.webp-ee7d8b061c7d4533ffa1b0af3aeaa200.etc2.ctex"]
 
 [params]
 

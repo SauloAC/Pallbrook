@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dqgnt6g2xiwwh"
 path.s3tc="res://.godot/imported/town_Bark_DeadTree.webp-4902e8a154ad01f08ce4aae3930b2969.s3tc.ctex"
+path.etc2="res://.godot/imported/town_Bark_DeadTree.webp-4902e8a154ad01f08ce4aae3930b2969.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/town_Bark_DeadTree.webp"
-dest_files=["res://.godot/imported/town_Bark_DeadTree.webp-4902e8a154ad01f08ce4aae3930b2969.s3tc.ctex"]
+dest_files=["res://.godot/imported/town_Bark_DeadTree.webp-4902e8a154ad01f08ce4aae3930b2969.s3tc.ctex", "res://.godot/imported/town_Bark_DeadTree.webp-4902e8a154ad01f08ce4aae3930b2969.etc2.ctex"]
 
 [params]
 

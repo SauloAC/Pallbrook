@@ -26,10 +26,24 @@ var choices_box: VBoxContainer
 var questions: Array = []  # This conversation's list (the tonic shows up at the clinic)
 
 
+const CONSULT_QUESTIONS := [
+	["exam", "Let me examine you."],
+	["tonic", "Give the iron tonic."],
+	["rest", "You need rest and good food."],
+	["bye", "Goodbye."],
+]
+
+
+# The list changes as the talk goes on: a patient waiting at the clinic gets a consultation,
+# and rest is only offered once the doctor has examined them today
 func _questions_for(who: Node) -> Array:
-	var list := QUESTIONS.duplicate()
-	if who.has_method("awaiting_treatment") and who.awaiting_treatment():
-		list.insert(0, ["tonic", "Give the iron tonic."])
+	var consult: bool = who.has_method("awaiting_treatment") and who.awaiting_treatment()
+	var examined: bool = who.has_method("examined_today") and who.examined_today()
+	var list: Array = []
+	for q in (CONSULT_QUESTIONS if consult else QUESTIONS):
+		if q[0] == "rest" and not examined:
+			continue
+		list.append(q)
 	return list
 
 
@@ -131,13 +145,17 @@ func _ask(key: String) -> void:
 			body.text = npc.answer_rest()
 		"tonic":
 			body.text = npc.answer_tonic()
-			questions = _questions_for(npc)  # Treated: the tonic option goes away
-			choice = mini(choice, questions.size() - 1)
 		"chat":
 			body.text = npc.answer_chat()
 		"bye":
 			_close()
 			return
+	# Rebuild the list (exam unlocks rest, treatment ends the consultation), keeping the cursor on the same question
+	questions = _questions_for(npc)
+	choice = 0
+	for i in questions.size():
+		if questions[i][0] == key:
+			choice = i
 	_refresh_choices()
 
 

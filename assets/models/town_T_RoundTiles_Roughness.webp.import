@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dn2brvdu7us6s"
 path.s3tc="res://.godot/imported/town_T_RoundTiles_Roughness.webp-f6ad1145f1f4d7508169d7b467d439bf.s3tc.ctex"
+path.etc2="res://.godot/imported/town_T_RoundTiles_Roughness.webp-f6ad1145f1f4d7508169d7b467d439bf.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/town_T_RoundTiles_Roughness.webp"
-dest_files=["res://.godot/imported/town_T_RoundTiles_Roughness.webp-f6ad1145f1f4d7508169d7b467d439bf.s3tc.ctex"]
+dest_files=["res://.godot/imported/town_T_RoundTiles_Roughness.webp-f6ad1145f1f4d7508169d7b467d439bf.s3tc.ctex", "res://.godot/imported/town_T_RoundTiles_Roughness.webp-f6ad1145f1f4d7508169d7b467d439bf.etc2.ctex"]
 
 [params]
 

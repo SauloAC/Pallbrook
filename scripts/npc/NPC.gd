@@ -910,7 +910,10 @@ func answer_alibi() -> String:
 	if is_wary():
 		return _wary_line()
 	if GameState.day == 1:
-		return "Last night? You only arrived this morning, doctor. I was home, like every night."
+		# Before the doctor's first night here: just their usual day, from their routine
+		var usual := _usual_day_text()
+		GameState.add_clue("Day 1 · %s, about yesterday: \"%s\"" % [data.npc_name, usual])
+		return usual
 	var text := _alibi_text(GameState.last_night())
 	GameState.add_clue("Day %d · %s, about last night: \"%s\"" % [GameState.day, data.npc_name, text])
 	return text
@@ -922,7 +925,9 @@ func answer_seen() -> String:
 	if is_wary():
 		return _wary_line()
 	if GameState.day == 1:
-		return "Nothing yet. Pallbrook is quiet, doctor. Mostly."
+		var rumor := _first_day_rumor()
+		GameState.add_clue("Day 1 · %s said: \"%s\"" % [data.npc_name, rumor])
+		return rumor
 	var lines: Array[String] = []
 	if is_servant:
 		lines.append(_servant_sighting())  # A lie that points at someone innocent
@@ -964,6 +969,9 @@ func answer_exam() -> String:
 	record["day"] = GameState.day
 	record["marked"] = marked
 	exams.append(record)
+	if not GameState.casebook_hint_shown:
+		GameState.casebook_hint_shown = true
+		return text + "\n\n(You wrote this down in your casebook. Press Tab to read your notes and open each patient's chart.)"
 	return text
 
 
@@ -1115,7 +1123,53 @@ func _alibi_text(night: int) -> String:
 	return text + ". I went to bed around %s." % GameState.format_time(bed)
 
 
+# Yesterday, before the doctor's first night: an ordinary day, told from their schedule
+func _usual_day_text() -> String:
+	if data.schedule.is_empty():
+		return "Yesterday? Nothing special. I stayed home."
+	var hours: Array = data.schedule.keys()
+	hours.sort()
+	var parts: Array[String] = []
+	var last := ""
+	for h: int in hours:
+		if h >= 18:
+			break
+		var place: String = data.schedule[h]
+		if place == last:
+			continue
+		last = place
+		parts.append("%s from %s" % [_where(place), GameState.format_time(h)])
+	var day_text := ", then ".join(PackedStringArray(parts)) if not parts.is_empty() else "at home"
+	var openers := ["Yesterday? Like any other day.", "Same as always, doctor.", "An ordinary day, nothing more."]
+	var opener: String = openers[data.npc_name.length() % openers.size()]
+	var weak := " I've been tired lately, though." if is_anemic() or has_flu() else ""
+	return "%s I was %s. %s%s" % [opener, day_text, _alibi_text(-1), weak]
+
+
+# Day 1 "did you see anything": what the town already whispers about
+func _first_day_rumor() -> String:
+	if is_anemic():
+		return "Only my own weakness, doctor. I wake up more tired every day, and I don't know why."
+	var pale: Array[String] = []
+	var coughing: Array[String] = []
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc == self or npc.data == null or not npc.is_alive():
+			continue
+		if npc.is_anemic():
+			pale.append(npc.data.npc_name)
+		elif npc.has_flu():
+			coughing.append(npc.data.npc_name)
+	if not pale.is_empty():
+		var who := " and ".join(PackedStringArray(pale))
+		return "Nothing with my own eyes. But %s %s been pale and weak for days. People whisper about a sickness." % [who, "has" if pale.size() == 1 else "have"]
+	if not coughing.is_empty():
+		return "Only %s coughing all day. The cold weather is here." % coughing[0]
+	return "Nothing strange. The dogs barked a little after midnight, that's all."
+
+
 func _where(place: String) -> String:
+	if place == "Casa2" and data.home == "Casa2":
+		return "at the forge"  # Tomas lives and works there
 	if place == data.home and place.begins_with("Casa"):
 		return "at home"
 	if place == "Praca":
@@ -1319,6 +1373,14 @@ func answer_clinic() -> String:
 	if appointment_from + 1.0 > 18.0:
 		appointment_day = GameState.day + 1
 		appointment_from = float(randi_range(8, 10))
+	# One patient per hour: move to the next free hour (today, else tomorrow morning)
+	while _slot_taken(appointment_day, appointment_from):
+		appointment_from += 1.0
+		if appointment_from + 1.0 > 18.0:
+			if appointment_day != GameState.day:
+				break  # Tomorrow is full too: share an hour, rare
+			appointment_day = GameState.day + 1
+			appointment_from = 8.0
 	if appointment_day == GameState.day + 1 and visit_day == appointment_day:
 		return "I'm already coming tomorrow, doctor."  # Never two visits on the same day
 	visit_day = appointment_day
@@ -1336,7 +1398,25 @@ func answer_clinic() -> String:
 	var when := GameState.format_time(appointment_from)
 	if appointment_day != GameState.day:
 		when = "tomorrow at " + when
-	return "Yes... I'll come to the clinic %s. Please be there, doctor." % ("at " + when if appointment_day == GameState.day else when)
+	var reply := "Yes... I'll come to the clinic %s. Please be there, doctor." % ("at " + when if appointment_day == GameState.day else when)
+	# A reminder when there are more patients coming than tonics on the shelf
+	var waiting := 0
+	for a in GameState.appointments:
+		if a["status"] == "waiting":
+			waiting += 1
+	if waiting > GameState.tonics + GameState.tonics_ordered:
+		reply += "\n(You don't have a tonic for every patient. Order ingredients at the clinic cabinet.)"
+		Playtest.count("booked_without_tonic")
+	return reply
+
+
+# Another patient is already expected at the clinic in that hour
+func _slot_taken(day: int, from: float) -> bool:
+	for a in GameState.appointments:
+		if a["status"] == "waiting" and a["day"] == day and a["name"] != data.npc_name \
+				and absf(float(a["from"]) - from) < 1.0:
+			return true
+	return false
 
 
 func _check_appointment() -> void:
@@ -1379,10 +1459,14 @@ func _check_appointment() -> void:
 		# Here and waiting: the doctor decides, in conversation, between the tonic and rest
 		if not waiting_announced and not GameState.in_dialogue:
 			waiting_announced = true
-			EventBus.dialogue_started.emit(data.npc_name, "I'm here for the treatment, doctor. Talk to me when you're ready.")
+			EventBus.dialogue_started.emit(data.npc_name, "I'm here for the treatment, doctor. Examine me if you like, then give me the tonic or tell me what else to do.")
 
 
 # Waiting at the clinic during their appointment, for the doctor's decision
+func examined_today() -> bool:
+	return not exams.is_empty() and exams[-1]["day"] == GameState.day
+
+
 func awaiting_treatment() -> bool:
 	return _at_clinic_now() and current_place == "Clinica" and treated_day != GameState.day
 

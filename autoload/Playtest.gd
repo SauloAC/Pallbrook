@@ -7,7 +7,7 @@ extends Node
 #   macOS:   ~/Library/Application Support/Godot/app_userdata/Pallbrook/playtest
 # Anywhere in the game: Playtest.count("key") to tally something, Playtest.log_line("text") for a line.
 
-const VERSION := "0.1.0"
+const VERSION := "0.1.1"
 const FOLDER := "user://playtest"
 const QUESTIONS := [
 	"Who did you suspect, and why?",

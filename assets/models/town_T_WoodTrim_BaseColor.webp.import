@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ctvqx6b2pjc4p"
 path.s3tc="res://.godot/imported/town_T_WoodTrim_BaseColor.webp-6057ea6287a5cfefbc641cff7f52c501.s3tc.ctex"
+path.etc2="res://.godot/imported/town_T_WoodTrim_BaseColor.webp-6057ea6287a5cfefbc641cff7f52c501.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/town_T_WoodTrim_BaseColor.webp"
-dest_files=["res://.godot/imported/town_T_WoodTrim_BaseColor.webp-6057ea6287a5cfefbc641cff7f52c501.s3tc.ctex"]
+dest_files=["res://.godot/imported/town_T_WoodTrim_BaseColor.webp-6057ea6287a5cfefbc641cff7f52c501.s3tc.ctex", "res://.godot/imported/town_T_WoodTrim_BaseColor.webp-6057ea6287a5cfefbc641cff7f52c501.etc2.ctex"]
 
 [params]
 

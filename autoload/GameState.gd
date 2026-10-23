@@ -7,6 +7,7 @@ var exhaustion := 0.0              # 0.0 = rested, 1.0 = collapses
 var collapsed_in_street := false   # Used by the morning summary later
 var in_dialogue := false
 var reading := false               # The casebook is open: the world slows down (see Notebook)
+var casebook_hint_shown := false   # The first exam points the player to the casebook
 var vampire_name := ""
 var clues: Array[String] = []
 # The casebook: {text, kind ("testimony" or "evidence"), day, people (names mentioned)}
@@ -33,6 +34,7 @@ func reset() -> void:
 	collapsed_in_street = false
 	in_dialogue = false
 	reading = false
+	casebook_hint_shown = false
 	Engine.time_scale = 1.0
 	game_over = false
 	vampire_name = ""

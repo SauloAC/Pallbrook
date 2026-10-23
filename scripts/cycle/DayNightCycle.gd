@@ -25,10 +25,10 @@ func _process(delta: float) -> void:
 	hour += delta / seconds_per_hour
 	if hour >= 24.0:
 		hour -= 24.0
+	GameState.hour = hour  # Set first: phase listeners (dawn reports) read the new hour
 	_check_phase()
 	_update_exhaustion()
 	_update_lighting()
-	GameState.hour = hour
 	if int(hour) != last_hour:
 		last_hour = int(hour)
 		EventBus.hour_changed.emit(last_hour)

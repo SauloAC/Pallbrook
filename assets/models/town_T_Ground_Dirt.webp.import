@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dh8hqotgglsms"
 path.s3tc="res://.godot/imported/town_T_Ground_Dirt.webp-e1c5e37a44bf1c5a53d49ae05b08aae0.s3tc.ctex"
+path.etc2="res://.godot/imported/town_T_Ground_Dirt.webp-e1c5e37a44bf1c5a53d49ae05b08aae0.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/town_T_Ground_Dirt.webp"
-dest_files=["res://.godot/imported/town_T_Ground_Dirt.webp-e1c5e37a44bf1c5a53d49ae05b08aae0.s3tc.ctex"]
+dest_files=["res://.godot/imported/town_T_Ground_Dirt.webp-e1c5e37a44bf1c5a53d49ae05b08aae0.s3tc.ctex", "res://.godot/imported/town_T_Ground_Dirt.webp-e1c5e37a44bf1c5a53d49ae05b08aae0.etc2.ctex"]
 
 [params]
 

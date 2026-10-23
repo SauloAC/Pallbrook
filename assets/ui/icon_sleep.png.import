@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://b38oi7nbegyiu"
 path.s3tc="res://.godot/imported/icon_sleep.png-8707fac88ac358bd0688549a901728ee.s3tc.ctex"
+path.etc2="res://.godot/imported/icon_sleep.png-8707fac88ac358bd0688549a901728ee.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/ui/icon_sleep.png"
-dest_files=["res://.godot/imported/icon_sleep.png-8707fac88ac358bd0688549a901728ee.s3tc.ctex"]
+dest_files=["res://.godot/imported/icon_sleep.png-8707fac88ac358bd0688549a901728ee.s3tc.ctex", "res://.godot/imported/icon_sleep.png-8707fac88ac358bd0688549a901728ee.etc2.ctex"]
 
 [params]
 

@@ -7,6 +7,8 @@ const ICON_SLEEP := preload("res://assets/ui/icon_sleep.png")
 const ICON_CABINET := preload("res://assets/ui/icon_examine.png")
 
 @export var bed_position := Vector3(-1.2, -1.5, -0.4)     # Relative to the Clinica node
+const SLEEP_FROM_HOUR := 22.0  # The first hours of the night are for watching the streets
+
 @export var cabinet_position := Vector3(1.4, -1.5, -1.2)
 
 @onready var prompt: Sprite3D = $Prompt
@@ -29,6 +31,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	get_viewport().set_input_as_handled()
 	if GameState.is_night:
+		if GameState.hour >= 12.0 and GameState.hour < SLEEP_FROM_HOUR:
+			EventBus.dialogue_started.emit("Bed", "Too early to sleep. The night is when things happen.")
+			return
 		EventBus.player_slept.emit()
 		return
 	# Day: one tonic per press
