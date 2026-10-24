@@ -59,11 +59,6 @@ func _ready() -> void:
 	vbox.add_child(filter_bar)
 	vbox.move_child(filter_bar, title.get_index() + 1)
 	_layout_book(vbox)
-	# The right page lists everyone the doctor looks after
-	for child in $Panel/Pages/Suspects.get_children():
-		if child is Label:
-			child.text = "Patients"
-			break
 	_build_chart_layer()
 
 
@@ -123,6 +118,11 @@ func _set_filter(value: String) -> void:
 
 
 func _refresh() -> void:
+	# The right page lists everyone the doctor looks after (set here, so it follows the language)
+	for child in $Panel/Pages/Suspects.get_children():
+		if child is Label:
+			child.text = tr("Patients")
+			break
 	_build_filter_bar()
 	_build_suspects()
 	_build_entries()
@@ -193,11 +193,11 @@ func _on_chart_link() -> void:
 
 func _link(text: String, value: String) -> Label:
 	var label := Label.new()
-	label.text = text
+	label.text = tr(text)
 	label.add_theme_font_size_override("font_size", 18)
 	label.add_theme_color_override("font_color", INK if filter == value else INK_FADED)
 	if filter == value:
-		label.text = "» " + text
+		label.text = "» " + tr(text)
 	_make_clickable(label, value)
 	return label
 
@@ -210,15 +210,15 @@ func _build_entries() -> void:
 		_build_supplies()
 		return
 	if filter == CHART_PICK:
-		title.text = "Patient chart"
-		entries.text = "Choose a patient on the right page to open their chart."
+		title.text = tr("Patient chart")
+		entries.text = tr("Choose a patient on the right page to open their chart.")
 		scroll.scroll_vertical = 0
 		return
 	match filter:
 		ALL:
-			title.text = "Casebook"
+			title.text = tr("Casebook")
 		EVIDENCE:
-			title.text = "Clinic"
+			title.text = tr("Clinic")
 		_:
 			title.text = filter
 
@@ -229,11 +229,11 @@ func _build_entries() -> void:
 			continue
 		if entry["day"] != last_day:
 			last_day = entry["day"]
-			lines.append("— Day %d —" % last_day)
+			lines.append(tr("— Day %d —") % last_day)
 		lines.append("• " + entry["text"])
 
 	if lines.is_empty():
-		entries.text = "Nothing about %s yet." % filter if filter not in [ALL, EVIDENCE] else "Nothing yet."
+		entries.text = tr("Nothing about %s yet.") % tr(filter) if filter not in [ALL, EVIDENCE] else tr("Nothing yet.")
 	else:
 		entries.text = "\n\n".join(PackedStringArray(lines))
 	scroll.scroll_vertical = 0
@@ -241,39 +241,39 @@ func _build_entries() -> void:
 
 func _build_supplies() -> void:
 	# What the doctor has, and how the clinic's little economy works
-	title.text = "Supplies"
+	title.text = tr("Supplies")
 	var lines: Array[String] = []
-	lines.append("Coins: %d" % GameState.coins)
-	lines.append("Iron tonics ready: %d" % GameState.tonics)
+	lines.append(tr("Coins: %d") % GameState.coins)
+	lines.append(tr("Iron tonics ready: %d") % GameState.tonics)
 	if GameState.tonics_ordered > 0:
-		lines.append("Ordered, ready tomorrow morning: %d" % GameState.tonics_ordered)
-	lines.append("— How it works —")
-	lines.append("• Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them).")
-	lines.append("• Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing.")
-	lines.append("• To make more, order the ingredients at the supply cabinet in your clinic, during the day (E at the cabinet). One tonic costs %d coins and is ready the next morning." % GameState.TONIC_PRICE)
-	lines.append("• Coins: the Town Hall pays you %d every morning, and each patient pays %d for their first exam of the day." % [GameState.SALARY, GameState.EXAM_FEE])
-	lines.append("• At night, sleep in the bed at your clinic (E) to rest; stay up too long and you collapse in the street.")
+		lines.append(tr("Ordered, ready tomorrow morning: %d") % GameState.tonics_ordered)
+	lines.append(tr("— How it works —"))
+	lines.append("• " + tr("Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them)."))
+	lines.append("• " + tr("Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing."))
+	lines.append("• " + tr("To make more, order the ingredients at the supply cabinet in your clinic, during the day (E at the cabinet). One tonic costs %d coins and is ready the next morning.") % GameState.TONIC_PRICE)
+	lines.append("• " + tr("Coins: the Town Hall pays you {salary} every morning, and each patient pays {fee} for their first exam of the day.").format({"salary": GameState.SALARY, "fee": GameState.EXAM_FEE}))
+	lines.append("• " + tr("At night, sleep in the bed at your clinic (E) to rest; stay up too long and you collapse in the street."))
 	entries.text = "\n\n".join(PackedStringArray(lines))
 	scroll.scroll_vertical = 0
 
 
 func _build_appointments() -> void:
 	# Who needs the doctor today, then every clinic visit, newest first
-	title.text = "Appointments"
+	title.text = tr("Appointments")
 	var lines: Array[String] = []
 	var urgent: Array[String] = []
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc.is_alive() and npc.marked and npc.talked_day >= npc.marked_day:
-			urgent.append("• %s · visited at night: treat today, or keep watch at the door tonight" % npc.data.npc_name)
+			urgent.append("• %s · " % tr(npc.data.npc_name) + tr("visited at night: treat today, or keep watch at the door tonight"))
 	if not urgent.is_empty():
-		lines.append("— Urgent —")
+		lines.append(tr("— Urgent —"))
 		lines.append_array(urgent)
 	var last_day := -1
 	for i in range(GameState.appointments.size() - 1, -1, -1):
 		var a: Dictionary = GameState.appointments[i]
 		if a["day"] != last_day:
 			last_day = a["day"]
-			lines.append("— Today —" if last_day == GameState.day else "— Day %d —" % last_day)
+			lines.append(tr("— Today —") if last_day == GameState.day else tr("— Day %d —") % last_day)
 		var status := "expected at the clinic"
 		match a["status"]:
 			"treated":
@@ -286,9 +286,9 @@ func _build_appointments() -> void:
 				status = "no tonic"
 			"rest":
 				status = "rest prescribed"
-		lines.append("• %s · %s – %s · %s" % [a["name"], GameState.format_time(a["from"]), GameState.format_time(a["until"]), status])
+		lines.append("• %s · %s – %s · %s" % [tr(a["name"]), GameState.format_time(a["from"]), GameState.format_time(a["until"]), tr(status)])
 	if lines.is_empty():
-		entries.text = "No appointments yet.\n\nAsk a sick patient to come to the clinic for a treatment."
+		entries.text = tr("No appointments yet.") + "\n\n" + tr("Ask a sick patient to come to the clinic for a treatment.")
 	else:
 		entries.text = "\n\n".join(PackedStringArray(lines))
 	scroll.scroll_vertical = 0
@@ -334,7 +334,7 @@ func _build_suspects() -> void:
 		card.add_child(pic)
 
 		var label := Label.new()
-		label.text = ("» " if filter == name_text else "") + name_text
+		label.text = ("» " if filter == name_text else "") + tr(name_text)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.add_theme_color_override("font_color", INK)
 		label.add_theme_font_size_override("font_size", 17)
@@ -342,7 +342,7 @@ func _build_suspects() -> void:
 		card.add_child(label)
 
 		var role := Label.new()
-		role.text = npc.data.role + ("" if npc.is_alive() else " · deceased")
+		role.text = tr(npc.data.role) + ("" if npc.is_alive() else " · " + tr("deceased"))
 		role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		role.add_theme_color_override("font_color", Color(0.17, 0.15, 0.13, 0.7))
 		role.add_theme_font_size_override("font_size", 13)
@@ -506,29 +506,29 @@ func _open_chart(npc_name: String) -> void:
 	var title_font := title.get_theme_font("font")
 
 	# Header lines
-	_line_text(npc.data.npc_name, LINE_X, TOP_LINES[0], 44, title_font)
-	_line_text(npc.data.role, LINE_X, TOP_LINES[1], 30)
+	_line_text(tr(npc.data.npc_name), LINE_X, TOP_LINES[0], 44, title_font)
+	_line_text(tr(npc.data.role), LINE_X, TOP_LINES[1], 30)
 	if not npc.is_alive():
-		_line_text("Deceased" + (" · buried" if npc.buried else ""), LINE_X, TOP_LINES[2], 30, null, BLOOD_RED)
+		_line_text(tr("Deceased") + (" · " + tr("buried") if npc.buried else ""), LINE_X, TOP_LINES[2], 30, null, BLOOD_RED)
 	elif last.is_empty():
-		_line_text("Not examined yet", LINE_X, TOP_LINES[2], 30)
+		_line_text(tr("Not examined yet"), LINE_X, TOP_LINES[2], 30)
 	else:
 		var age: int = GameState.day - int(last["day"])
-		var when := "today" if age == 0 else ("yesterday" if age == 1 else "%d days ago" % age)
-		_line_text("Last examined %s (Day %d)" % [when, last["day"]], LINE_X, TOP_LINES[2], 30)
+		var when := tr("today") if age == 0 else (tr("yesterday") if age == 1 else tr("%d days ago") % age)
+		_line_text(tr("Last examined {when} (Day {day})").format({"when": when, "day": last["day"]}), LINE_X, TOP_LINES[2], 30)
 	if not last.is_empty() and last["trace"] != "":
-		_line_text("Traces: %s" % last["trace"], LINE_X, TOP_LINES[3], 28)
+		_line_text(tr("Traces: %s") % _tr_value(last["trace"]), LINE_X, TOP_LINES[3], 28)
 	if not last.is_empty() and last["old_marks"]:
-		_line_text("Old, healed punctures", LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
+		_line_text(tr("Old, healed punctures"), LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
 	elif npc.is_alive() and npc.marked and npc.talked_day >= npc.marked_day:
-		_line_text("Visited at night: treat today!", LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
+		_line_text(tr("Visited at night: treat today!"), LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
 	if npc.is_alive():
-		_line_text(npc.trust_word(), LINE_X, TOP_LINES[5], 28)
+		_line_text(tr(npc.trust_word()), LINE_X, TOP_LINES[5], 28)
 
 	# Vital signs boxes: pulse, temperature, appearance, sleep
 	var values := ["—", "—", "—", "—"]
 	if not last.is_empty():
-		values = [last["pulse"], last["temp"], last["look"], last.get("sleep", "—")]
+		values = [_tr_value(last["pulse"]), _tr_value(last["temp"]), _tr_value(last["look"]), _tr_value(last.get("sleep", "—"))]
 	for i in 4:
 		var box: Rect2 = BOX_RECTS[i]
 		var label := _label(values[i], 28 if str(values[i]).length() <= 11 else 23)  # Long words shrink to fit
@@ -594,7 +594,7 @@ func _blood_bar(vitality: float, old: bool) -> void:
 	drop.size = Vector2(38, 64)
 	drop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sheet.add_child(drop)
-	var blood_title := _label("Blood", 30)
+	var blood_title := _label(tr("Blood"), 30)
 	blood_title.position = Vector2(130, bar.position.y)
 	blood_title.size = Vector2(115, bar.size.y)
 	blood_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -656,3 +656,15 @@ func _label(text: String, font_size: int, color := INK) -> Label:
 	label.add_theme_color_override("font_color", color)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label
+
+
+# Exam readings are stored in English ("88, quick", "chalk dust (wrist)"); show them in the
+# current language: the number stays, the words are translated.
+func _tr_value(value) -> String:
+	var text := str(value)
+	if text.ends_with(" (wrist)"):
+		return _tr_value(text.trim_suffix(" (wrist)")) + " " + tr("(wrist)")
+	var comma := text.find(", ")
+	if comma > 0 and text.left(comma).is_valid_int():
+		return text.left(comma) + ", " + tr(text.substr(comma + 2))
+	return tr(text)

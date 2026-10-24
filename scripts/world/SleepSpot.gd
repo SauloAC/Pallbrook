@@ -32,14 +32,14 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 	if GameState.is_night:
 		if GameState.hour >= 12.0 and GameState.hour < SLEEP_FROM_HOUR:
-			EventBus.dialogue_started.emit("Bed", "Too early to sleep. The night is when things happen.")
+			EventBus.dialogue_started.emit("Bed", tr("Too early to sleep. The night is when things happen."))
 			return
 		EventBus.player_slept.emit()
 		return
 	# Day: one tonic per press
 	var text := ""
 	if GameState.order_tonic():
-		text = "You ordered the ingredients for one iron tonic (%d coins). It will be ready tomorrow morning.\nCoins left: %d · Tonics ordered: %d" % [GameState.TONIC_PRICE, GameState.coins, GameState.tonics_ordered]
+		text = tr("You ordered the ingredients for one iron tonic ({price} coins). It will be ready tomorrow morning.\nCoins left: {coins} · Tonics ordered: {ordered}").format({"price": GameState.TONIC_PRICE, "coins": GameState.coins, "ordered": GameState.tonics_ordered})
 	else:
-		text = "Iron salts, herbs, a little wine... one tonic costs %d coins, and you have %d." % [GameState.TONIC_PRICE, GameState.coins]
+		text = tr("Iron salts, herbs, a little wine... one tonic costs {price} coins, and you have {coins}.").format({"price": GameState.TONIC_PRICE, "coins": GameState.coins})
 	EventBus.dialogue_started.emit("Supply cabinet", text)

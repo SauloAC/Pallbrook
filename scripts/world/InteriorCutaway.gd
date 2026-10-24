@@ -66,8 +66,8 @@ func _process(_delta: float) -> void:
 
 func _apply(open: bool) -> void:
 	for suffix in parts:
-		var hide: bool = open and not (upstairs and suffix == "_Upper")
-		parts[suffix].visible = not hide
+		var cut: bool = open and not (upstairs and suffix == "_Upper")
+		parts[suffix].visible = not cut
 	if sign_label:
 		sign_label.visible = not open
 	if open:

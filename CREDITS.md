@@ -20,3 +20,4 @@ Third-party assets used in the game. Keep this list up to date before any public
 - 3D buildings and props: "Medieval Village MegaKit", "Fantasy Props MegaKit" and "Stylized Nature MegaKit" (Standard) by Quaternius (quaternius.com). CC0, no attribution required. Textures downscaled to 1024 px; roof tiles darkened.
 - Character portraits, UI art and patient chart: generated with Google Gemini (AI). Steam requires disclosing AI-generated content.
 - Fonts: Cinzel and Lora (Google Fonts, SIL Open Font License).
+- Japanese font: Shippori Mincho by FONTDASU (Google Fonts, SIL Open Font License; license in assets/fonts/ShipporiMincho/OFL.txt).

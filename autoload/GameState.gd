@@ -67,7 +67,7 @@ func add_clue(text: String, kind := "testimony", on_day := -1) -> void:
 func _names_in(text: String) -> Array[String]:
 	var names: Array[String] = []
 	for npc in get_tree().get_nodes_in_group("npcs"):
-		if npc.data and text.contains(npc.data.npc_name):
+		if npc.data and (text.contains(npc.data.npc_name) or text.contains(tr(npc.data.npc_name))):
 			names.append(npc.data.npc_name)
 	return names
 
@@ -82,10 +82,10 @@ func start_day() -> void:
 	day += 1
 	coins += SALARY
 	_roll_weather()
-	add_night_event("The Town Hall paid your salary: %d coins." % SALARY)
+	add_night_event(tr("The Town Hall paid your salary: %d coins.") % SALARY)
 	if tonics_ordered > 0:
 		tonics += tonics_ordered
-		add_night_event("Your order arrived: %d iron tonic%s." % [tonics_ordered, "" if tonics_ordered == 1 else "s"])
+		add_night_event(tr("Your order arrived: 1 iron tonic.") if tonics_ordered == 1 else tr("Your order arrived: %d iron tonics.") % tonics_ordered)
 		tonics_ordered = 0
 	EventBus.phase_changed.emit(false)
 	
@@ -97,9 +97,9 @@ func _roll_weather() -> void:
 	var r := randf()
 	weather = "fog" if r < 0.25 else ("cloudy" if r < 0.55 else "clear")
 	if weather == "fog":
-		add_night_event("A thick fog lies over Pallbrook this morning.")
+		add_night_event(tr("A thick fog lies over Pallbrook this morning."))
 	elif weather == "cloudy":
-		add_night_event("Grey clouds hide the sun today.")
+		add_night_event(tr("Grey clouds hide the sun today."))
 	Playtest.count("days_" + weather)
 
 
@@ -110,15 +110,18 @@ func add_night_event(text: String) -> void:
 	night_events.append(text)
 
 
-# Converts a float hour (e.g. 18.5) into "6:30 PM".
-func format_time(h: float) -> String:
+# Converts a float hour (e.g. 18.5) into "6:30 PM" (or the current language's way;
+# local = false keeps English, for the playtest report).
+func format_time(h: float, local := true) -> String:
 	var hours := int(h) % 24          # % 24 also handles values past midnight (24.5 → 0:30)
 	var minutes := int((h - int(h)) * 6.0) * 10
-	var suffix := "AM" if hours < 12 else "PM"
+	if local and Lang.clock_24h():
+		return "%d:%02d" % [hours, minutes]  # Portuguese and Spanish read the clock 0-23
 	var display_hour := hours % 12
 	if display_hour == 0:
 		display_hour = 12             # Midnight = 12 AM, noon = 12 PM
-	return "%d:%02d %s" % [display_hour, minutes, suffix]
+	var pattern := "%d:%02d AM" if hours < 12 else "%d:%02d PM"
+	return (tr(pattern) if local else pattern) % [display_hour, minutes]
 
 
 # ---------- Places ----------
@@ -141,7 +144,7 @@ const PLACE_NAMES := {
 
 
 func place_name(place: String) -> String:
-	return PLACE_NAMES.get(place, place)
+	return tr(PLACE_NAMES.get(place, place))  # In the current language
 
 
 # The location marker closest to a point in the world (e.g. where someone was seen)

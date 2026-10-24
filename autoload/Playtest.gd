@@ -7,7 +7,7 @@ extends Node
 #   macOS:   ~/Library/Application Support/Godot/app_userdata/Pallbrook/playtest
 # Anywhere in the game: Playtest.count("key") to tally something, Playtest.log_line("text") for a line.
 
-const VERSION := "0.1.1"
+const VERSION := "0.1.2"
 const FOLDER := "user://playtest"
 const QUESTIONS := [
 	"Who did you suspect, and why?",
@@ -67,7 +67,7 @@ func count(key: String, amount := 1) -> void:
 
 
 func log_line(text: String) -> void:
-	lines.append("Day %d %s · %s" % [GameState.day, GameState.format_time(GameState.hour), text])
+	lines.append("Day %d %s · %s" % [GameState.day, GameState.format_time(GameState.hour, false), text])
 
 
 func note_accused(npc_name: String) -> void:
@@ -129,7 +129,7 @@ func _people() -> Array[Dictionary]:
 
 func _report() -> Dictionary:
 	var played := (Time.get_ticks_msec() - started_msec) / 60000.0
-	return {"version": VERSION, "run": run_id, "os": OS.get_name(), "result": result, "ending": ending,
+	return {"version": VERSION, "run": run_id, "os": OS.get_name(), "language": TranslationServer.get_locale(), "result": result, "ending": ending,
 			"vampire": GameState.vampire_name, "accused": accused, "day_reached": GameState.day,
 			"minutes_played": snappedf(played, 0.1), "minutes_reading_casebook": snappedf(reading_msec / 60000.0, 0.1),
 			"casebook_entries": GameState.entries.size(), "appointments": GameState.appointments,
@@ -158,7 +158,7 @@ func _write() -> void:
 func _as_text(r: Dictionary) -> String:
 	var t: Array[String] = []
 	t.append("PALLBROOK PLAYTEST REPORT  (version %s)" % r["version"])
-	t.append("Run %s on %s" % [r["run"], r["os"]])
+	t.append("Run %s on %s · language %s" % [r["run"], r["os"], r["language"]])
 	t.append("")
 	t.append("Result: %s" % r["result"])
 	if r["ending"] != "":
@@ -223,28 +223,28 @@ func show_survey(then: Callable) -> void:
 	box.position = Vector2(-380, -330)
 	box.add_theme_constant_override("separation", 8)
 	survey.add_child(box)
-	box.add_child(_label("A few questions for the playtest", 30))
-	box.add_child(_label("Short answers are fine. They are saved with the report of this run.", 18))
+	box.add_child(_label(tr("A few questions for the playtest"), 30))
+	box.add_child(_label(tr("Short answers are fine. They are saved with the report of this run."), 18))
 	var fields: Array[TextEdit] = []
 	for q in QUESTIONS:
-		box.add_child(_label(q, 20))
+		box.add_child(_label(tr(q), 20))
 		var field := TextEdit.new()
 		field.custom_minimum_size = Vector2(760, 70)
 		field.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 		field.add_theme_font_size_override("font_size", 18)
 		box.add_child(field)
 		fields.append(field)
-	box.add_child(_label("Report folder: " + ProjectSettings.globalize_path(FOLDER), 14))
+	box.add_child(_label(tr("Report folder: ") + ProjectSettings.globalize_path(FOLDER), 14))
 	var buttons := HBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 16)
 	box.add_child(buttons)
 	var save := Button.new()
-	save.text = "Save and open the report folder"
+	save.text = tr("Save and open the report folder")
 	save.add_theme_font_size_override("font_size", 20)
 	save.pressed.connect(func(): _finish_survey(fields, true))
 	buttons.add_child(save)
 	var skip := Button.new()
-	skip.text = "Save without answering"
+	skip.text = tr("Save without answering")
 	skip.add_theme_font_size_override("font_size", 20)
 	skip.pressed.connect(func(): _finish_survey(fields, false))
 	buttons.add_child(skip)

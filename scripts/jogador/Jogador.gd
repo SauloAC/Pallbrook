@@ -26,6 +26,13 @@ const EMERGE_SECONDS := 2.5
 var cover_count := 0
 var left_cover_at := -100.0
 
+# Hiding spots show a small icon over them when the doctor is close, so the player can tell
+# which bushes and tall grass hide him (most of the greenery doesn't)
+const ICON_HIDE := preload("res://assets/ui/icon_hide.png")
+const MARKER_RANGE := 4.0      # Within this distance the nearest spot shows its icon
+const HIDE_TRANSPARENCY := 0.55
+var hide_markers: Array[Sprite3D] = []
+
 
 func _ready() -> void:
 	add_to_group("player")  # Lets the vampire know where the doctor is
@@ -51,7 +58,7 @@ func _setup_hiding_spots() -> void:
 		var area := Area3D.new()
 		var shape := CollisionShape3D.new()
 		var sphere := SphereShape3D.new()
-		sphere.radius = 1.0  # The empty's scale in Blender sets the real size
+		sphere.radius = 1.2  # The empty's scale in Blender sets the real size (about 1 m)
 		shape.shape = sphere
 		area.add_child(shape)
 		area.monitorable = false
@@ -62,6 +69,17 @@ func _setup_hiding_spots() -> void:
 		area.body_exited.connect(func(body: Node3D):
 			if body == self:
 				_set_cover(-1))
+		var marker := Sprite3D.new()
+		marker.texture = ICON_HIDE
+		marker.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		marker.no_depth_test = true  # Drawn over the leaves
+		marker.pixel_size = 0.008
+		marker.position.y = 1.7
+		marker.modulate = Color(1, 1, 1, 0)
+		marker.top_level = true  # Not scaled by the empty
+		spot.add_child(marker)
+		marker.global_position = spot.global_position + Vector3(0.0, 1.7, 0.0)
+		hide_markers.append(marker)
 
 
 func _set_cover(change: int) -> void:
@@ -69,12 +87,14 @@ func _set_cover(change: int) -> void:
 	cover_count = maxi(cover_count + change, 0)
 	if not was_hidden and is_hidden():
 		Playtest.count("hid_in_bush_or_grass")
+		Audio.play("rustle", -8.0, 0.3, 0.1)  # Leaves rustle as he steps in
 	if was_hidden and not is_hidden():
 		left_cover_at = Time.get_ticks_msec() / 1000.0
-	# Half see-through while hidden, so the player knows
+		Audio.play("rustle", -12.0, 0.3, 0.1)
+	# See-through while hidden, so the player knows (the HUD also says "Hidden")
 	if visual:
 		for mi in visual.meshes:
-			mi.transparency = 0.45 if is_hidden() else 0.0
+			mi.transparency = HIDE_TRANSPARENCY if is_hidden() else 0.0
 
 
 func is_hidden() -> bool:
@@ -138,8 +158,25 @@ func _physics_process(delta: float) -> void:
 		visual.animate(get_real_velocity(), delta)
 	_footsteps(delta)
 	_update_nearby_npc()
+	_update_hide_markers(delta)
 	var still := Vector2(velocity.x, velocity.z).length() < 0.3
 	lurk_time = lurk_time + delta if GameState.is_night and still and _near_cover() else 0.0
+
+
+# The nearest hiding spot within reach fades its icon in; the others fade out.
+# While hidden the icon goes away (the HUD note takes over).
+func _update_hide_markers(delta: float) -> void:
+	var nearest: Sprite3D = null
+	var best := MARKER_RANGE
+	if not is_hidden():
+		for marker in hide_markers:
+			var d := Vector2(marker.global_position.x - global_position.x, marker.global_position.z - global_position.z).length()
+			if d < best:
+				best = d
+				nearest = marker
+	for marker in hide_markers:
+		var target := 0.85 if marker == nearest else 0.0
+		marker.modulate.a = move_toward(marker.modulate.a, target, delta * 3.0)
 
 
 func is_lurking() -> bool:

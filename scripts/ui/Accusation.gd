@@ -25,19 +25,19 @@ func _on_accusation_requested(npc: Node) -> void:
 		return
 	if GameState.day < FIRST_ACCUSATION_DAY:
 		# The first day is for getting to know the town
-		EventBus.dialogue_started.emit("Doctor", "It's too soon to accuse anyone. Examine people, ask where they were, and watch the town tonight. (Accusations open on Day %d.)" % FIRST_ACCUSATION_DAY)
+		EventBus.dialogue_started.emit("Doctor", tr("It's too soon to accuse anyone. Examine people, ask where they were, and watch the town tonight. (Accusations open on Day %d.)") % FIRST_ACCUSATION_DAY)
 		return
 	suspect = npc
 	var accused: String = npc.data.npc_name
-	_show(Mode.CONFIRM, "Accuse %s?" % accused,
-		"You are about to name %s as the vampire in front of the whole town.\nThere is no going back." % accused,
-		"[E] Accuse      [Esc] Cancel")
+	_show(Mode.CONFIRM, tr("Accuse %s?") % tr(accused),
+		tr("You are about to name %s as the vampire in front of the whole town.\nThere is no going back.") % tr(accused),
+		tr("[E] Accuse      [Esc] Cancel"))
 
 
 func _on_game_ended(won: bool, message: String) -> void:
 	GameState.game_over = true
-	var heading := "Pallbrook is saved" if won else "Pallbrook is lost"
-	_show(Mode.RESULT, heading, message, "[E] Play again")
+	var heading := tr("Pallbrook is saved") if won else tr("Pallbrook is lost")
+	_show(Mode.RESULT, heading, message, tr("[E] Play again"))
 
 
 func _show(new_mode: Mode, heading: String, text: String, keys: String) -> void:
@@ -75,9 +75,9 @@ func _resolve() -> void:
 	var accused: String = suspect.data.npc_name
 	Playtest.note_accused(accused)
 	if accused == GameState.vampire_name:
-		EventBus.game_ended.emit(true, "You unmasked %s on Day %d. %d townspeople survived." % [accused, GameState.day, _survivors()])
+		EventBus.game_ended.emit(true, tr("You unmasked {name} on Day {day}. {alive} townspeople survived.").format({"name": tr(accused), "day": GameState.day, "alive": _survivors()}))
 	else:
-		EventBus.game_ended.emit(false, "%s was innocent. The real vampire was %s, and now they know you're onto them." % [accused, GameState.vampire_name])
+		EventBus.game_ended.emit(false, tr("{accused} was innocent. The real vampire was {vampire}, and now they know you're onto them.").format({"accused": tr(accused), "vampire": tr(GameState.vampire_name)}))
 
 
 func _survivors() -> int:

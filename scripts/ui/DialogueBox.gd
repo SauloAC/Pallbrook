@@ -65,7 +65,7 @@ func _on_dialogue_started(speaker_name: String, line: String) -> void:
 	npc = null
 	_open(speaker_name, line)
 	choices_box.visible = false
-	hint.text = "[E] Close"
+	hint.text = tr("[E] Close")
 
 
 func _on_conversation_started(who: Node) -> void:
@@ -74,12 +74,12 @@ func _on_conversation_started(who: Node) -> void:
 	choice = 0
 	_open(who.data.npc_name, who.greeting())
 	choices_box.visible = true
-	hint.text = "[W/S] Navigate    [E] Ask/Select    [Esc] Leave"
+	hint.text = tr("[W/S] Navigate    [E] Ask/Select    [Esc] Leave")
 	_refresh_choices()
 
 
 func _open(speaker_name: String, line: String) -> void:
-	speaker.text = speaker_name
+	speaker.text = tr(speaker_name)  # Names and titles (Doctor, Bed...) in the current language
 	body.text = line
 	panel.visible = true
 	GameState.in_dialogue = true
@@ -96,7 +96,7 @@ func _refresh_choices() -> void:
 	for i in questions.size():
 		var key: String = questions[i][0]
 		var label := Label.new()
-		label.text = ("» " if i == choice else "   ") + questions[i][1]
+		label.text = ("» " if i == choice else "   ") + tr(questions[i][1])
 		label.add_theme_font_size_override("font_size", 20)
 		if i == choice:
 			label.add_theme_color_override("font_color", SELECTED_COLOR)

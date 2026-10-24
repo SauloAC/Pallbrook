@@ -109,7 +109,7 @@ func _run_hunt(victim: Node) -> void:
 		victim.marked = false  # The doctor kept watch: the hold is broken
 		Playtest.count("vampire_scared_off_by_watch")
 		Playtest.log_line("The vampire saw the doctor watching %s's door and fled" % victim.data.npc_name)
-		_abort_hunt("A figure fled from %s's door when it saw the doctor." % victim.data.npc_name)
+		_abort_hunt(_t("A figure fled from {name}'s door when it saw the doctor.", {"name": tr(victim.data.npc_name)}))
 		return
 	await get_tree().create_timer(2.0).timeout  # Inside the house...
 	if vampire.witnessed or (_doctor_watching(victim) and not _frenzied()):
@@ -122,11 +122,16 @@ func _run_hunt(victim: Node) -> void:
 	hunting = false
 
 
-func _abort_hunt(event := "A shadow was seen prowling the streets. Nobody died tonight.") -> void:
+func _abort_hunt(event := "") -> void:
 	# Seen by the doctor: flee home, nobody is harmed tonight
 	hunting = false
 	vampire.end_hunt()
-	GameState.add_night_event(event)
+	GameState.add_night_event(event if event != "" else tr("A shadow was seen prowling the streets. Nobody died tonight."))
+
+
+# A night event or clue in the current language ({placeholders} filled after translating)
+func _t(text: String, args := {}) -> String:
+	return Lang.contract(tr(text).format(args))
 
 
 func _doctor_watching(victim: Node) -> bool:
@@ -194,10 +199,12 @@ func _pick_victim() -> Node:
 
 func _resolve_attack(victim: Node) -> void:
 	var victim_name: String = victim.data.npc_name
+	var shown := {"name": tr(victim_name)}  # The name as the current language writes it
 	Playtest.count("vampire_attacks")
 	Playtest.log_line("The vampire attacked %s" % victim_name)
 	# At night the discovery belongs to the next morning
 	var morning := GameState.day + 1 if GameState.is_night else GameState.day
+	shown["day"] = morning
 	var others := 0
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc != victim and npc.is_alive() and not npc.is_servant:
@@ -209,8 +216,8 @@ func _resolve_attack(victim: Node) -> void:
 		victim.make_servant()
 		Playtest.count("servants_made")
 		vampire.set_hunger(vampire.blood + 20.0)
-		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
-		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
+		GameState.add_night_event(_t("During the night, a figure was seen near {name}'s house.", shown))
+		GameState.add_clue(_t("Morning of Day {day}: a figure was seen near {name}'s house.", shown), "evidence", morning)
 		_check_town_lost()
 		return
 	# Feed. Death only comes when the blood runs out.
@@ -225,28 +232,28 @@ func _resolve_attack(victim: Node) -> void:
 	var died: bool = victim.feed(amount, vampire.data.clue_trait if frenzy else _pick_trace(victim))
 	vampire.set_hunger(vampire.blood + minf(amount, had) * blood_gain)
 	if died:
-		GameState.add_night_event("%s was found dead at their doorstep." % victim_name)
-		GameState.add_clue("Morning of Day %d: %s died during the night." % [morning, victim_name], "evidence", morning)
+		GameState.add_night_event(_t("{name} was found dead at their doorstep.", shown))
+		GameState.add_clue(_t("Morning of Day {day}: {name} died during the night.", shown), "evidence", morning)
 		EventBus.npc_died.emit(victim_name)
 	elif frenzy:
 		# No patience to turn anyone: it just feeds, and not quietly
-		GameState.add_night_event("Screams were heard in the night. Someone woke up torn and gravely weak.")
-		GameState.add_clue("Morning of Day %d: screams were heard near %s's house." % [morning, victim_name], "evidence", morning)
+		GameState.add_night_event(tr("Screams were heard in the night. Someone woke up torn and gravely weak."))
+		GameState.add_clue(_t("Morning of Day {day}: screams were heard near {name}'s house.", shown), "evidence", morning)
 	elif others > 0 and randf() < servant_chance and victim.affinity >= 60.0:
 		# They trust the doctor: marked, with one day to warn him
 		victim.marked = true
 		victim.marked_day = morning
-		GameState.add_night_event("Somewhere in Pallbrook, someone woke up weaker than they went to bed.")
+		GameState.add_night_event(tr("Somewhere in Pallbrook, someone woke up weaker than they went to bed."))
 	elif others > 0 and randf() < servant_chance:
 		# Sometimes the bite turns them (only if someone else is left to hunt)
 		victim.make_servant()
 		Playtest.count("servants_made")
-		GameState.add_night_event("During the night, a figure was seen near %s's house." % victim_name)
-		GameState.add_clue("Morning of Day %d: a figure was seen near %s's house." % [morning, victim_name], "evidence", morning)
+		GameState.add_night_event(_t("During the night, a figure was seen near {name}'s house.", shown))
+		GameState.add_clue(_t("Morning of Day {day}: a figure was seen near {name}'s house.", shown), "evidence", morning)
 	elif starving:
-		GameState.add_night_event("Somewhere in Pallbrook, someone woke up gravely weak, as if drained.")
+		GameState.add_night_event(tr("Somewhere in Pallbrook, someone woke up gravely weak, as if drained."))
 	else:
-		GameState.add_night_event("Somewhere in Pallbrook, someone woke up weaker than they went to bed.")
+		GameState.add_night_event(tr("Somewhere in Pallbrook, someone woke up weaker than they went to bed."))
 	_check_town_lost()
 
 
@@ -267,7 +274,7 @@ func _check_town_lost() -> void:
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc.is_alive() and not npc.is_servant:
 			return  # Someone is still free
-	EventBus.game_ended.emit(false, "No one in Pallbrook is free anymore. %s has won." % vampire.data.npc_name)
+	EventBus.game_ended.emit(false, _t("No one in Pallbrook is free anymore. {name} has won.", {"name": tr(vampire.data.npc_name)}))
 
 
 func _offscreen_witness(victim: Node) -> void:

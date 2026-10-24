@@ -48,28 +48,31 @@ func _check_phase() -> void:
 func _update_lighting() -> void:
 	# 0.0 at 6:00 (sunrise), 1.0 at 18:00 (sunset)
 	var t := (hour - 6.0) / 12.0
-	var daylight := clampf(sin(t * PI), 0.0, 1.0)
+	# The sky is already light at 6 AM (the sun rises at 5) and stays light until 7 PM;
+	# full light from about 8 AM to 4 PM
+	var sky_t := (hour - 5.0) / 14.0
+	var daylight := clampf(sin(sky_t * PI) * 1.7, 0.0, 1.0)
 
 	# Clouds and fog dim the sun and grey its colour (the weather is rolled at dawn)
 	var sun_max := 1.0
 	var grey := 0.0
 	if GameState.weather == "cloudy":
-		sun_max = 0.55
+		sun_max = 0.75
 		grey = 0.6
 	elif GameState.weather == "fog":
-		sun_max = 0.7
+		sun_max = 0.85
 		grey = 0.45
 	if sun:
 		sun.rotation_degrees.x = -lerpf(15.0, 165.0, clampf(t, 0.0, 1.0))
-		sun.light_energy = lerpf(0.15, sun_max, daylight)
+		sun.light_energy = lerpf(0.25, sun_max, daylight)  # Moonlight: dark, but streets still readable
 		# Bluish moonlight at night, warm white during the day (greyer under clouds)
 		var day_color := Color(1.0, 0.95, 0.85).lerp(Color(0.82, 0.85, 0.9), grey)
 		sun.light_color = Color(0.5, 0.6, 1.0).lerp(day_color, daylight)
 
 	if world_environment and world_environment.environment:
 		var env := world_environment.environment
-		env.background_energy_multiplier = lerpf(0.05, 1.0, daylight) * lerpf(1.0, 0.7, grey)
-		env.ambient_light_energy = lerpf(0.25, 1.0, daylight)
+		env.background_energy_multiplier = lerpf(0.15, 1.0, daylight) * lerpf(1.0, 0.8, grey)
+		env.ambient_light_energy = lerpf(0.7, 1.0, daylight)  # Night: dark blue, never pitch black
 		env.fog_enabled = GameState.weather == "fog"
 		if env.fog_enabled:
 			env.fog_light_color = Color(0.72, 0.75, 0.8)
@@ -91,9 +94,12 @@ func _update_exhaustion() -> void:
 func _collapse() -> void:
 	var finders := _report_collapse()
 	if finders.is_empty():
-		GameState.add_night_event("You collapsed in the street. Someone may have seen the doctor lying there.")
+		GameState.add_night_event(tr("You collapsed in the street. Someone may have seen the doctor lying there."))
 	else:
-		GameState.add_night_event("You collapsed in the street. %s found you there at dawn." % " and ".join(PackedStringArray(finders)))
+		var who := PackedStringArray()
+		for finder in finders:
+			who.append(tr(finder))
+		GameState.add_night_event(Lang.contract(tr("You collapsed in the street. {who} found you there at dawn.").format({"who": tr(" and ").join(who)})))
 	GameState.collapsed_in_street = true
 	EventBus.player_collapsed.emit()
 	_skip_to_morning()
@@ -101,7 +107,7 @@ func _collapse() -> void:
 func _on_player_slept() -> void:
 	if is_collapsing:
 		return
-	GameState.add_night_event("You slept at the clinic.")
+	GameState.add_night_event(tr("You slept at the clinic."))
 	_skip_to_morning()  # Slept safely: no consequence
 
 func _skip_to_morning() -> void:

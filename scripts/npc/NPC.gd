@@ -492,11 +492,11 @@ func _servant_line() -> String:
 		return "..."
 	var suspect: String = suspects.pick_random().data.npc_name
 	var lies := [
-		"Have you noticed how strange %s has been lately?",
-		"I wouldn't trust %s if I were you, doctor.",
-		"I saw %s wandering around late at night.",
+		"Have you noticed how strange {name} has been lately?",
+		"I wouldn't trust {name} if I were you, doctor.",
+		"I saw {name} wandering around late at night.",
 	]
-	return lies.pick_random() % suspect
+	return _t(lies.pick_random(), {"name": _n(suspect)})
 
 # ---------- Movement ----------
 
@@ -635,7 +635,8 @@ func _check_seen_by_doctor() -> void:
 	if player and global_position.distance_to(player.global_position) < witness_range and sees(player):
 		witnessed = true
 		name_label.visible = true  # Close enough to recognize the face
-		var clue := "Night of Day %d, %s: you saw %s sneaking through the dark streets." % [GameState.day, GameState.format_time(GameState.hour), data.npc_name]
+		var clue := _t("Night of Day {day}, {time}: you saw {name} sneaking through the dark streets.",
+				{"day": GameState.day, "time": GameState.format_time(GameState.hour), "name": _n(data.npc_name)})
 		GameState.add_clue(clue, "evidence")
 
 # ---------- Schedule ----------
@@ -796,13 +797,13 @@ func _pick_random_destination() -> void:
 func _examine_body() -> void:
 	examined = true
 	_update_label()
-	var trace := body_trace if body_trace != "" else "nothing unusual"
+	var trace := tr(body_trace) if body_trace != "" else tr("nothing unusual")
 	exams.append({"day": GameState.day, "pulse": "None", "temp": "Cold", "look": "Dead",
 			"sleep": "—", "vitality": 0.0, "marks": true, "old_marks": false,
 			"trace": body_trace, "dead": true})
-	var text := "Bite marks on the neck. On the clothes, traces of %s." % trace
-	GameState.add_clue("Body of %s: %s" % [data.npc_name, text], "evidence")
-	EventBus.dialogue_started.emit("Body of %s" % data.npc_name, text)
+	var text := _t("Bite marks on the neck. On the clothes, traces of {trace}.", {"trace": trace})
+	GameState.add_clue(_t("Body of {name}: {text}", {"name": _n(data.npc_name), "text": text}), "evidence")
+	EventBus.dialogue_started.emit(_t("Body of {name}", {"name": _n(data.npc_name)}), text)
 
 
 func _is_bedtime() -> bool:
@@ -889,6 +890,17 @@ func _night_order(hour: float) -> float:
 
 # ---------- Conversation ----------
 
+# A line in the current language: the English text is the key (see localization/strings.csv),
+# {placeholders} are filled in after translating, so each language can order the sentence its own way.
+func _t(text: String, args := {}) -> String:
+	return Lang.contract(tr(text).format(args))
+
+
+# A townsperson's name as the current language writes it
+func _n(person: String) -> String:
+	return tr(person)
+
+
 func is_wary() -> bool:
 	return GameState.day <= wary_day or affinity < 20.0
 
@@ -916,31 +928,33 @@ func greeting() -> String:
 		talked_day = GameState.day
 		change_affinity(6.0)  # A daily visit builds trust
 	if marked and marked_day == GameState.day:
-		GameState.add_clue("Day %d · %s was visited in the night and fears it will come back tonight." % [GameState.day, data.npc_name], "evidence")
-		return "Doctor... last night something stood by my bed. I couldn't move, and now my neck burns. Please, it will come back tonight."
+		GameState.add_clue(_t("Day {day} · {name} was visited in the night and fears it will come back tonight.", {"day": GameState.day, "name": _n(data.npc_name)}), "evidence")
+		return tr("Doctor... last night something stood by my bed. I couldn't move, and now my neck burns. Please, it will come back tonight.")
 	var night := GameState.last_night()
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor_collapsed":
-			GameState.add_clue("Day %d · %s found you collapsed near %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"])])
-			var spot := "my door" if s["place"] == data.home else GameState.place_name(s["place"])
-			return "Doctor! We found you lying in the street near %s this morning. Are you ill... or is it something else?" % spot
+			GameState.add_clue(_t("Day {day} · {name} found you collapsed near {place} and keeps their distance.", {"day": GameState.day, "name": _n(data.npc_name), "place": GameState.place_name(s["place"])}))
+			var spot := tr("my door") if s["place"] == data.home else GameState.place_name(s["place"])
+			return _t("Doctor! We found you lying in the street near {place} this morning. Are you ill... or is it something else?", {"place": spot})
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor_hiding":
-			GameState.add_clue("Day %d · %s caught you hiding in the dark near %s at %s and doesn't trust you." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
-			return "I saw you last night, doctor, creeping around in the dark near %s at %s. Who were you hiding from?" % [GameState.place_name(s["place"]), GameState.format_time(s["hour"])]
+			var hid := {"day": GameState.day, "name": _n(data.npc_name), "place": GameState.place_name(s["place"]), "time": GameState.format_time(s["hour"])}
+			GameState.add_clue(_t("Day {day} · {name} caught you hiding in the dark near {place} at {time} and doesn't trust you.", hid))
+			return _t("I saw you last night, doctor, creeping around in the dark near {place} at {time}. Who were you hiding from?", hid)
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor" and _is_late(s["hour"]):
-			GameState.add_clue("Day %d · %s saw you out near %s at %s and keeps their distance." % [GameState.day, data.npc_name, GameState.place_name(s["place"]), GameState.format_time(s["hour"])])
-			return "I saw you near %s at %s last night, doctor. Decent folk are home by then." % [GameState.place_name(s["place"]), GameState.format_time(s["hour"])]
+			var out := {"day": GameState.day, "name": _n(data.npc_name), "place": GameState.place_name(s["place"]), "time": GameState.format_time(s["hour"])}
+			GameState.add_clue(_t("Day {day} · {name} saw you out near {place} at {time} and keeps their distance.", out))
+			return _t("I saw you near {place} at {time} last night, doctor. Decent folk are home by then.", out)
 	if claims_sickness():
 		var sick := ["This sickness... I can barely stand, doctor.",
 				"Forgive me, doctor. The light hurts my eyes these days.",
 				"I'm so tired. Is it the same thing the others have?"]
-		return sick[(GameState.day + data.npc_name.length()) % sick.size()]
+		return tr(sick[(GameState.day + data.npc_name.length()) % sick.size()])
 	if is_servant:
-		return "Doctor. What is it now?"
+		return tr("Doctor. What is it now?")
 	var hellos := ["Good day, doctor.", "Doctor. Need something?", "Ah, doctor. Any news?"]
-	return hellos[(GameState.day + line_index) % hellos.size()]
+	return tr(hellos[(GameState.day + line_index) % hellos.size()])
 
 
 func answer_alibi() -> String:
@@ -951,10 +965,10 @@ func answer_alibi() -> String:
 	if GameState.day == 1:
 		# Before the doctor's first night here: just their usual day, from their routine
 		var usual := _usual_day_text()
-		GameState.add_clue("Day 1 · %s, about yesterday: \"%s\"" % [data.npc_name, usual])
+		GameState.add_clue(_t("Day {day} · {name}, about yesterday: \"{text}\"", {"day": 1, "name": _n(data.npc_name), "text": usual}))
 		return usual
 	var text := _alibi_text(GameState.last_night())
-	GameState.add_clue("Day %d · %s, about last night: \"%s\"" % [GameState.day, data.npc_name, text])
+	GameState.add_clue(_t("Day {day} · {name}, about last night: \"{text}\"", {"day": GameState.day, "name": _n(data.npc_name), "text": text}))
 	return text
 
 
@@ -965,7 +979,7 @@ func answer_seen() -> String:
 		return _wary_line()
 	if GameState.day == 1:
 		var rumor := _first_day_rumor()
-		GameState.add_clue("Day 1 · %s said: \"%s\"" % [data.npc_name, rumor])
+		GameState.add_clue(_t("Day {day} · {name} said: \"{text}\"", {"day": 1, "name": _n(data.npc_name), "text": rumor}))
 		return rumor
 	var lines: Array[String] = []
 	if is_servant:
@@ -977,23 +991,23 @@ func answer_seen() -> String:
 		seen.sort_custom(func(a, b): return _weight(a) > _weight(b))
 		for s in seen.slice(0, 3):
 			lines.append(_describe(s))
-	var text := "No. I slept through the night." if lines.is_empty() else " ".join(lines)
-	GameState.add_clue("Day %d · %s saw: \"%s\"" % [GameState.day, data.npc_name, text])
+	var text := tr("No. I slept through the night.") if lines.is_empty() else Lang.join_sentences(lines)
+	GameState.add_clue(_t("Day {day} · {name} saw: \"{text}\"", {"day": GameState.day, "name": _n(data.npc_name), "text": text}))
 	return text
 
 
 func answer_exam() -> String:
 	asked["exam"] = GameState.day
 	if is_wary():
-		return "I'd rather you didn't touch me today, doctor."
+		return tr("I'd rather you didn't touch me today, doctor.")
 	if cared_day == GameState.day and not exams.is_empty():
-		return "You already examined me today, doctor. Nothing has changed since."  # Once per day
+		return tr("You already examined me today, doctor. Nothing has changed since.")  # Once per day
 	exam_count += 1
 	if bite_spots.has("wrist") and not wrist_found and (exam_count >= 2 or randf() < 0.35):
 		wrist_found = true  # A closer look this time: under the sleeve
 	var record := vitals()
 	var text := _exam_text(record)
-	GameState.add_clue("Day %d · Exam of %s: %s" % [GameState.day, data.npc_name, text], "evidence")
+	GameState.add_clue(_t("Day {day} · Exam of {name}: {text}", {"day": GameState.day, "name": _n(data.npc_name), "text": text}), "evidence")
 	Playtest.count("exams")
 	if is_vampire():
 		Playtest.count("exams_of_the_vampire")
@@ -1010,7 +1024,7 @@ func answer_exam() -> String:
 	exams.append(record)
 	if not GameState.casebook_hint_shown:
 		GameState.casebook_hint_shown = true
-		return text + "\n\n(You wrote this down in your casebook. Press Tab to read your notes and open each patient's chart.)"
+		return text + "\n\n" + tr("(You wrote this down in your casebook. Press Tab to read your notes and open each patient's chart.)")
 	return text
 
 
@@ -1081,68 +1095,68 @@ func _sleep() -> String:
 
 
 func _exam_text(v: Dictionary) -> String:
-	var parts: Array[String] = ["Pulse %s." % v["pulse"]]
+	var parts: Array[String] = [_t("Pulse {pulse}.", {"pulse": Lang.value(v["pulse"])})]
 	if blood >= 80.0 and has_flu():
-		parts.append("Flushed, forehead burning, a dry cough and a stuffy nose.")
+		parts.append(tr("Flushed, forehead burning, a dry cough and a stuffy nose."))
 	elif blood >= 80.0 and (is_vampire() or worried):
-		parts.append("Complains of weakness, but the blood seems fine.")
+		parts.append(tr("Complains of weakness, but the blood seems fine."))
 	elif blood >= 80.0:
-		parts.append("Good color.")
+		parts.append(tr("Good color."))
 	elif blood >= ANEMIA_LEVEL:
-		parts.append("A little pale. Mild anemia.")
+		parts.append(tr("A little pale. Mild anemia."))
 	elif blood >= 25.0:
-		parts.append("Pale and weak. Clear anemia.")
+		parts.append(tr("Pale and weak. Clear anemia."))
 	else:
-		parts.append("Grey lips, can barely stand. Severe anemia: one more night like this could kill.")
+		parts.append(tr("Grey lips, can barely stand. Severe anemia: one more night like this could kill."))
 	if has_flu() and blood < 80.0:
-		parts.append("Also feverish, with a cough.")
+		parts.append(tr("Also feverish, with a cough."))
 	if v["temp"] == "Cool" and blood >= ANEMIA_LEVEL:
-		parts.append("Hands a little cool, but it is autumn.")
+		parts.append(tr("Hands a little cool, but it is autumn."))
 	if neck_bitten():
-		parts.append("Two small punctures on the neck. On the collar, traces of %s." % bite_traces[-1])
+		parts.append(_t("Two small punctures on the neck. On the collar, traces of {trace}.", {"trace": tr(bite_traces[-1])}))
 	elif bite_spots.has("wrist") and wrist_found:
-		parts.append("No marks on the neck, but two small punctures inside the wrist. On the cuff, traces of %s." % bite_traces[-1])
+		parts.append(_t("No marks on the neck, but two small punctures inside the wrist. On the cuff, traces of {trace}.", {"trace": tr(bite_traces[-1])}))
 	elif not is_servant:
-		parts.append("No marks on the neck.")
+		parts.append(tr("No marks on the neck."))
 	if is_servant:
-		parts.append("The punctures are old and healed, and the eyes flinch from the window.")
+		parts.append(tr("The punctures are old and healed, and the eyes flinch from the window."))
 	match str(v.get("sleep", "")):
 		"Night terrors":
-			parts.append("Wakes screaming: dreams of something leaning over the bed.")
+			parts.append(tr("Wakes screaming: dreams of something leaning over the bed."))
 		"Hallucinations":
-			parts.append("Swears a figure stands at the foot of the bed each night.")
+			parts.append(tr("Swears a figure stands at the foot of the bed each night."))
 		"Sleepwalks":
-			parts.append("Was found at the door at night, with no memory of it.")
+			parts.append(tr("Was found at the door at night, with no memory of it."))
 		"Nightmares":
-			parts.append("Sleeps badly, with nightmares.")
+			parts.append(tr("Sleeps badly, with nightmares."))
 		"Coughs at night", "Sweats":
-			parts.append("Sleeps badly, coughing and sweating.")
-	return " ".join(parts)
+			parts.append(tr("Sleeps badly, coughing and sweating."))
+	return Lang.join_sentences(parts)
 
 
 func answer_chat() -> String:
 	asked["chat"] = GameState.day
 	if is_wary():
-		return "I'd rather not chat today, doctor."
+		return tr("I'd rather not chat today, doctor.")
 	var line := "..."
 	if is_servant:
 		line = _servant_line()
 	elif not data.dialogue_lines.is_empty():
 		# Go through the lines in order, looping back to the start
-		line = data.dialogue_lines[line_index % data.dialogue_lines.size()]
+		line = tr(data.dialogue_lines[line_index % data.dialogue_lines.size()])
 		line_index += 1
-	GameState.add_clue("%s said: \"%s\"" % [data.npc_name, line])
+	GameState.add_clue(_t("{name} said: \"{text}\"", {"name": _n(data.npc_name), "text": line}))
 	return line
 
 
 func _wary_line() -> String:
-	return "I have nothing to tell you today, doctor."
+	return tr("I have nothing to tell you today, doctor.")
 
 
 func _alibi_text(night: int) -> String:
 	# What they really did that evening. The vampire tells this too: a lie by omission.
 	if data.schedule.is_empty():
-		return "At home, asleep."
+		return tr("At home, asleep.")
 	var plan: Dictionary = data.schedule
 	var bed := data.bedtime
 	var last_place := _scheduled_place(18)
@@ -1150,22 +1164,22 @@ func _alibi_text(night: int) -> String:
 		plan = plans[night]["schedule"]
 		bed = plans[night]["bedtime"]
 		last_place = plan.get(18, last_place)
-	var text := "From 6 PM I was %s" % _where(last_place)
+	var text := _t("From {time} I was {where}", {"time": GameState.format_time(18), "where": _where(last_place)})
 	var hours := plan.keys()
 	hours.sort()
 	for h: int in hours:
 		if h > 18 and h < bed and plan[h] != last_place:
 			last_place = plan[h]
-			text += ", then %s from %s" % [_where(last_place), GameState.format_time(h)]
+			text += _t(", then {where} from {time}", {"where": _where(last_place), "time": GameState.format_time(h)})
 	if last_place != data.home:
-		text += ", then I went home"
-	return text + ". I went to bed around %s." % GameState.format_time(bed)
+		text += tr(", then I went home")
+	return text + _t(". I went to bed around {time}.", {"time": GameState.format_time(bed)})
 
 
 # Yesterday, before the doctor's first night: an ordinary day, told from their schedule
 func _usual_day_text() -> String:
 	if data.schedule.is_empty():
-		return "Yesterday? Nothing special. I stayed home."
+		return tr("Yesterday? Nothing special. I stayed home.")
 	var hours: Array = data.schedule.keys()
 	hours.sort()
 	var parts: Array[String] = []
@@ -1177,43 +1191,45 @@ func _usual_day_text() -> String:
 		if place == last:
 			continue
 		last = place
-		parts.append("%s from %s" % [_where(place), GameState.format_time(h)])
-	var day_text := ", then ".join(PackedStringArray(parts)) if not parts.is_empty() else "at home"
+		parts.append(_t("{where} from {time}", {"where": _where(place), "time": GameState.format_time(h)}))
+	var day_text := tr(", then ").join(PackedStringArray(parts)) if not parts.is_empty() else tr("at home")
 	var openers := ["Yesterday? Like any other day.", "Same as always, doctor.", "An ordinary day, nothing more."]
-	var opener: String = openers[data.npc_name.length() % openers.size()]
-	var weak := " I've been tired lately, though." if is_anemic() or has_flu() else ""
-	return "%s I was %s. %s%s" % [opener, day_text, _alibi_text(-1), weak]
+	var opener: String = tr(openers[data.npc_name.length() % openers.size()])
+	var weak := tr(" I've been tired lately, though.") if is_anemic() or has_flu() else ""
+	return _t("{opener} I was {day}. {evening}{weak}", {"opener": opener, "day": day_text, "evening": _alibi_text(-1), "weak": weak})
 
 
 # Day 1 "did you see anything": what the town already whispers about
 func _first_day_rumor() -> String:
 	if is_anemic():
-		return "Only my own weakness, doctor. I wake up more tired every day, and I don't know why."
+		return tr("Only my own weakness, doctor. I wake up more tired every day, and I don't know why.")
 	var pale: Array[String] = []
 	var coughing: Array[String] = []
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc == self or npc.data == null or not npc.is_alive():
 			continue
 		if npc.is_anemic():
-			pale.append(npc.data.npc_name)
+			pale.append(_n(npc.data.npc_name))
 		elif npc.has_flu():
-			coughing.append(npc.data.npc_name)
+			coughing.append(_n(npc.data.npc_name))
 	if not pale.is_empty():
-		var who := " and ".join(PackedStringArray(pale))
-		return "Nothing with my own eyes. But %s %s been pale and weak for days. People whisper about a sickness." % [who, "has" if pale.size() == 1 else "have"]
+		var who := tr(" and ").join(PackedStringArray(pale))
+		if pale.size() == 1:
+			return _t("Nothing with my own eyes. But {who} has been pale and weak for days. People whisper about a sickness.", {"who": who})
+		return _t("Nothing with my own eyes. But {who} have been pale and weak for days. People whisper about a sickness.", {"who": who})
 	if not coughing.is_empty():
-		return "Only %s coughing all day. The cold weather is here." % coughing[0]
-	return "Nothing strange. The dogs barked a little after midnight, that's all."
+		return _t("Only {name} coughing all day. The cold weather is here.", {"name": coughing[0]})
+	return tr("Nothing strange. The dogs barked a little after midnight, that's all.")
 
 
 func _where(place: String) -> String:
 	if place == "Casa2" and data.home == "Casa2":
-		return "at the forge"  # Tomas lives and works there
+		return tr("at the forge")  # Tomas lives and works there
 	if place == data.home and place.begins_with("Casa"):
-		return "at home"
+		return tr("at home")
 	if place == "Praca":
-		return "in the square"
-	return "at " + GameState.place_name(place)
+		return tr("in the square")
+	return _t("at {place}", {"place": GameState.place_name(place)})
 
 
 func _weight(s: Dictionary) -> float:
@@ -1223,18 +1239,19 @@ func _weight(s: Dictionary) -> float:
 func _describe(s: Dictionary) -> String:
 	var time := GameState.format_time(s["hour"])
 	var where := GameState.place_name(s["place"])
+	var a := {"time": time, "place": where, "name": _n(str(s["who"]))}
 	match s["kind"]:
 		"figure":
-			return "Around %s I saw a dark figure near %s. I couldn't make out a face." % [time, where]
+			return _t("Around {time} I saw a dark figure near {place}. I couldn't make out a face.", a)
 		"doctor":
-			return "And you, doctor, were near %s around %s." % [where, time]
+			return _t("And you, doctor, were near {place} around {time}.", a)
 		"doctor_hiding":
-			return "And you, doctor, were lurking in the shadows near %s around %s." % [where, time]
+			return _t("And you, doctor, were lurking in the shadows near {place} around {time}.", a)
 	if s.get("inside", false):
-		return "%s was with me at %s until about %s." % [s["who"], where, time]
+		return _t("{name} was with me at {place} until about {time}.", a)
 	if _is_late(s["hour"]):
-		return "I saw %s out near %s around %s. At that hour!" % [s["who"], where, time]
-	return "I saw %s passing near %s around %s." % [s["who"], where, time]
+		return _t("I saw {name} out near {place} around {time}. At that hour!", a)
+	return _t("I saw {name} passing near {place} around {time}.", a)
 
 
 func _servant_sighting() -> String:
@@ -1243,11 +1260,11 @@ func _servant_sighting() -> String:
 		if npc != self and npc.is_alive() and npc.data.npc_name != GameState.vampire_name:
 			innocents.append(npc)
 	if innocents.is_empty():
-		return "Nothing. Nothing at all."
+		return tr("Nothing. Nothing at all.")
 	var target = innocents.pick_random()
 	var place: String = GameState.PLACE_NAMES.keys().pick_random()
 	var time := GameState.format_time(snappedf(randf_range(22.5, 24.5), 1.0 / 6.0))
-	return "I saw %s sneaking near %s around %s. Ask them where they were." % [target.data.npc_name, GameState.place_name(place), time]
+	return _t("I saw {name} sneaking near {place} around {time}. Ask them where they were.", {"name": _n(target.data.npc_name), "place": GameState.place_name(place), "time": time})
 
 
 # ---------- Burial ----------
@@ -1325,9 +1342,9 @@ func _bury() -> void:
 	var slot := _free_grave_slot()
 	if slot:
 		slot.add_child(_make_headstone())
-	GameState.add_night_event("%s was buried in the cemetery beyond the bridge." % data.npc_name)
+	GameState.add_night_event(_t("{name} was buried in the cemetery beyond the bridge.", {"name": _n(data.npc_name)}))
 	if not examined:
-		GameState.add_clue("Day %d · %s was buried before you examined the body." % [GameState.day, data.npc_name], "evidence")
+		GameState.add_clue(_t("Day {day} · {name} was buried before you examined the body.", {"day": GameState.day, "name": _n(data.npc_name)}), "evidence")
 
 
 func _free_grave_slot() -> Node3D:
@@ -1375,7 +1392,8 @@ func _make_headstone() -> Node3D:
 	mound.material_override = soil
 	grave.add_child(mound)
 	var plate := Label3D.new()
-	plate.text = "%s\n%s" % [data.npc_name, data.role]
+	plate.text = "%s\n%s" % [_n(data.npc_name), tr(data.role)]
+	plate.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED  # Already in the current language
 	plate.font_size = 48
 	plate.outline_size = 12
 	plate.pixel_size = 0.006
@@ -1390,19 +1408,19 @@ func _make_headstone() -> Node3D:
 func answer_clinic() -> String:
 	asked["clinic"] = GameState.day
 	if GameState.is_night:
-		return "At this hour? Ask me tomorrow, doctor."
+		return tr("At this hour? Ask me tomorrow, doctor.")
 	if is_wary():
-		return "I'll manage on my own, thank you."
+		return tr("I'll manage on my own, thank you.")
 	if appointment_until >= 0.0:
-		return "I'll be at the clinic at %s, doctor, as we agreed." % GameState.format_time(appointment_from)
+		return _t("I'll be at the clinic at {time}, doctor, as we agreed.", {"time": GameState.format_time(appointment_from)})
 	if treated_day == GameState.day:
-		return "You already treated me today, doctor. Let the tonic do its work."  # Once per day
+		return tr("You already treated me today, doctor. Let the tonic do its work.")  # Once per day
 	if booked_day == GameState.day or visit_day == GameState.day:
-		return "I couldn't make it today, doctor. Ask me again tomorrow."  # One visit per day
+		return tr("I couldn't make it today, doctor. Ask me again tomorrow.")  # One visit per day
 	if blood >= 80.0 and not marked and not is_vampire() and not worried and not has_flu():
-		return "Me? I feel fine, doctor. Save your medicine for the sick."
+		return tr("Me? I feel fine, doctor. Save your medicine for the sick.")
 	if not is_vampire() and affinity < 45.0 and randf() < 0.35:
-		return "Tonics and bloodletting... no, doctor. I don't trust medicine."  # Some refuse out of pride or fear
+		return tr("Tonics and bloodletting... no, doctor. I don't trust medicine.")  # Some refuse out of pride or fear
 	# The vampire says yes and never comes (the sun). Weak patients sometimes can't make it either.
 	booked_day = GameState.day
 	skip_appointment = is_vampire() or randf() < 0.25
@@ -1421,7 +1439,7 @@ func answer_clinic() -> String:
 			appointment_day = GameState.day + 1
 			appointment_from = 8.0
 	if appointment_day == GameState.day + 1 and visit_day == appointment_day:
-		return "I'm already coming tomorrow, doctor."  # Never two visits on the same day
+		return tr("I'm already coming tomorrow, doctor.")  # Never two visits on the same day
 	visit_day = appointment_day
 	waiting_announced = false
 	appointment_until = minf(appointment_from + 2.0, 18.0)  # Home before dark
@@ -1435,16 +1453,16 @@ func answer_clinic() -> String:
 	GameState.appointments.append(appointment)
 	Playtest.count("appointments_booked")
 	var when := GameState.format_time(appointment_from)
+	var reply := _t("Yes... I'll come to the clinic at {time}. Please be there, doctor.", {"time": when})
 	if appointment_day != GameState.day:
-		when = "tomorrow at " + when
-	var reply := "Yes... I'll come to the clinic %s. Please be there, doctor." % ("at " + when if appointment_day == GameState.day else when)
+		reply = _t("Yes... I'll come to the clinic tomorrow at {time}. Please be there, doctor.", {"time": when})
 	# A reminder when there are more patients coming than tonics on the shelf
 	var waiting := 0
 	for a in GameState.appointments:
 		if a["status"] == "waiting":
 			waiting += 1
 	if waiting > GameState.tonics + GameState.tonics_ordered:
-		reply += "\n(You don't have a tonic for every patient. Order ingredients at the clinic cabinet.)"
+		reply += "\n" + tr("(You don't have a tonic for every patient. Order ingredients at the clinic cabinet.)")
 		Playtest.count("booked_without_tonic")
 	return reply
 
@@ -1471,12 +1489,12 @@ func _check_appointment() -> void:
 				# The doctor waited and they never came
 				appointment["status"] = "absent"
 				Playtest.count("appointments_absent")
-				GameState.add_clue("Day %d · %s never showed up at the clinic." % [GameState.day, data.npc_name])
+				GameState.add_clue(_t("Day {day} · {name} never showed up at the clinic.", {"day": GameState.day, "name": _n(data.npc_name)}))
 			else:
 				# The doctor was not there in time (whether they came or not, he can't tell)
 				appointment["status"] = "missed"
 				Playtest.count("appointments_missed")
-				GameState.add_clue("Day %d · You missed %s's appointment at the clinic." % [GameState.day, data.npc_name])
+				GameState.add_clue(_t("Day {day} · You missed {name}'s appointment at the clinic.", {"day": GameState.day, "name": _n(data.npc_name)}))
 				if not skip_appointment:
 					change_affinity(-5.0)  # They went and waited for nothing
 		skip_appointment = false
@@ -1498,7 +1516,7 @@ func _check_appointment() -> void:
 		# Here and waiting: the doctor decides, in conversation, between the tonic and rest
 		if not waiting_announced and not GameState.in_dialogue:
 			waiting_announced = true
-			EventBus.dialogue_started.emit(data.npc_name, "I'm here for the treatment, doctor. Examine me if you like, then give me the tonic or tell me what else to do.")
+			EventBus.dialogue_started.emit(data.npc_name, tr("I'm here for the treatment, doctor. Examine me if you like, then give me the tonic or tell me what else to do."))
 
 
 # Waiting at the clinic during their appointment, for the doctor's decision
@@ -1514,28 +1532,28 @@ func awaiting_treatment() -> bool:
 func answer_tonic() -> String:
 	asked["tonic"] = GameState.day
 	if not awaiting_treatment():
-		return "The tonic? At the clinic, doctor, at the time we agreed."
+		return tr("The tonic? At the clinic, doctor, at the time we agreed.")
 	if GameState.tonics <= 0:
 		_no_tonic()
-		return "No tonic, doctor? Then why did you call me here..."
+		return tr("No tonic, doctor? Then why did you call me here...")
 	var feverish := has_flu() and blood >= 80.0
 	Playtest.count("tonics_given")
 	if feverish:
 		Playtest.count("tonic_wasted_on_flu")
 	_treat()
 	if feverish:
-		GameState.add_clue("Day %d · The tonic did nothing for %s's fever." % [GameState.day, data.npc_name], "evidence")
-		return "Thank you, doctor... though my head still burns."
-	return "Thank you, doctor. I feel stronger already."
+		GameState.add_clue(_t("Day {day} · The tonic did nothing for {name}'s fever.", {"day": GameState.day, "name": _n(data.npc_name)}), "evidence")
+		return tr("Thank you, doctor... though my head still burns.")
+	return tr("Thank you, doctor. I feel stronger already.")
 
 
 # Rest and good food: cures a chill in half the time, does nothing for lost blood
 func answer_rest() -> String:
 	asked["rest"] = GameState.day
 	if exams.is_empty() or exams[-1]["day"] != GameState.day:
-		return "Rest? You haven't even examined me today, doctor."
+		return tr("Rest? You haven't even examined me today, doctor.")
 	if rest_day == GameState.day:
-		return "I know, doctor: bed, broth and warm milk. I'll do as you say."
+		return tr("I know, doctor: bed, broth and warm milk. I'll do as you say.")
 	rest_day = GameState.day
 	if awaiting_treatment():
 		treated_day = GameState.day
@@ -1543,7 +1561,7 @@ func answer_rest() -> String:
 		appointment["status"] = "rest"
 		if state == State.INSIDE:
 			set_state(State.ROUTINE)
-	GameState.add_clue("Day %d · You prescribed rest and good food to %s." % [GameState.day, data.npc_name], "evidence")
+	GameState.add_clue(_t("Day {day} · You prescribed rest and good food to {name}.", {"day": GameState.day, "name": _n(data.npc_name)}), "evidence")
 	Playtest.count("rest_prescribed")
 	if has_flu():
 		Playtest.count("rest_for_flu")
@@ -1552,10 +1570,10 @@ func answer_rest() -> String:
 	if has_flu():
 		flu_rest = true
 		change_affinity(6.0)
-		return "Bed and broth... yes, doctor. This fever needs it."
+		return tr("Bed and broth... yes, doctor. This fever needs it.")
 	if blood < 80.0:
-		return "If you say so, doctor... but I'm so weak, and rest hasn't helped so far."
-	return "Rest? I feel fine, doctor, but I'll take it easy."
+		return tr("If you say so, doctor... but I'm so weak, and rest hasn't helped so far.")
+	return tr("Rest? I feel fine, doctor, but I'll take it easy.")
 
 
 func _at_clinic_now() -> bool:
@@ -1572,11 +1590,11 @@ func _no_tonic() -> void:
 	appointment_until = -1.0
 	appointment["status"] = "no tonic"
 	change_affinity(-3.0)
-	GameState.add_clue("Day %d · %s came to the clinic, but you had no tonic left." % [GameState.day, data.npc_name])
+	GameState.add_clue(_t("Day {day} · {name} came to the clinic, but you had no tonic left.", {"day": GameState.day, "name": _n(data.npc_name)}))
 	if state == State.INSIDE:
 		set_state(State.ROUTINE)
 	if not GameState.in_dialogue:
-		EventBus.dialogue_started.emit(data.npc_name, "No tonic, doctor? Then why did you call me here...")
+		EventBus.dialogue_started.emit(data.npc_name, tr("No tonic, doctor? Then why did you call me here..."))
 
 
 func _treat() -> void:
@@ -1596,9 +1614,9 @@ func _treat() -> void:
 	record["treated"] = true
 	record["marked"] = false
 	exams.append(record)
-	var note := "Day %d · You treated %s at the clinic: an iron tonic and rest." % [GameState.day, data.npc_name]
+	var note := _t("Day {day} · You treated {name} at the clinic: an iron tonic and rest.", {"day": GameState.day, "name": _n(data.npc_name)})
 	if was_marked:
-		note += " The night visitor's hold on them is broken."
+		note += tr(" The night visitor's hold on them is broken.")
 	GameState.add_clue(note, "evidence")
 	if state == State.INSIDE:
 		set_state(State.ROUTINE)  # Back to their day

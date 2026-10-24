@@ -1,0 +1,389 @@
+keys,en,ja,pt_BR,es
+Move,Move,移動,Andar,Moverse
+Talk,Talk,話す,Conversar,Hablar
+Examine,Examine,診察,Examinar,Examinar
+Sleep,Sleep,眠る,Dormir,Dormir
+Accuse,Accuse,告発,Acusar,Acusar
+Casebook,Casebook,診療録,Caderno,Cuaderno
+Day,Day,昼,Dia,Día
+Night,Night,夜,Noite,Noche
+Day %d,Day %d,%d日目,Dia %d,Día %d
+Night %d,Night %d,%d日目の夜,Noite %d,Noche %d
+Clear,Clear,晴れ,Céu limpo,Despejado
+Cloudy,Cloudy,曇り,Nublado,Nublado
+Fog,Fog,霧,Neblina,Niebla
+%d coins,%d coins,%d枚の硬貨,%d moedas,%d monedas
+1 tonic,1 tonic,強壮剤 1本,1 tônico,1 tónico
+%d tonics,%d tonics,強壮剤 %d本,%d tônicos,%d tónicos
+%d:%02d AM,%d:%02d AM,午前%d:%02d,%d:%02d da manhã,%d:%02d a. m.
+%d:%02d PM,%d:%02d PM,午後%d:%02d,%d:%02d da tarde,%d:%02d p. m.
+"Autumn.
+
+Pallbrook's doctor vanished one night without a word. Since then, a strange anemia has spread through the town: people wake pale and weak, and some no longer wake at all.
+
+You are the physician sent to stop the outbreak.
+
+By day, visit the sick, examine them and ask what they saw. By night, get back to the clinic before 1 AM.
+
+This sickness has a cause, and it walks among them. When you are sure who it is, accuse them. You only get one chance.","Autumn.
+
+Pallbrook's doctor vanished one night without a word. Since then, a strange anemia has spread through the town: people wake pale and weak, and some no longer wake at all.
+
+You are the physician sent to stop the outbreak.
+
+By day, visit the sick, examine them and ask what they saw. By night, get back to the clinic before 1 AM.
+
+This sickness has a cause, and it walks among them. When you are sure who it is, accuse them. You only get one chance.","秋。
+
+パルブルックの医者が、ある夜、何も言わずに姿を消した。それ以来、奇妙な貧血が町に広がっている。人々は青ざめ、衰弱して目を覚まし、二度と目覚めない者もいる。
+
+あなたは、この流行を食い止めるために遣わされた医師だ。
+
+昼は病人を訪ね、診察し、何を見たのか尋ねること。夜は午前1時までに診療所へ戻ること。
+
+この病には原因がある。そしてそれは、人々の間を歩いている。正体を確信したら、告発せよ。機会は一度きりだ。","Outono.
+
+O médico de Pallbrook desapareceu certa noite sem dizer uma palavra. Desde então, uma estranha anemia se espalhou pela cidade: as pessoas acordam pálidas e fracas, e algumas não acordam mais.
+
+Você é o médico enviado para conter o surto.
+
+De dia, visite os doentes, examine-os e pergunte o que viram. À noite, volte à clínica antes da 1 da manhã.
+
+Esta doença tem uma causa, e ela anda entre eles. Quando tiver certeza de quem é, acuse. Você só tem uma chance.","Otoño.
+
+El médico de Pallbrook desapareció una noche sin decir palabra. Desde entonces, una extraña anemia se ha extendido por el pueblo: la gente despierta pálida y débil, y algunos ya no despiertan.
+
+Eres el médico enviado para detener el brote.
+
+De día, visita a los enfermos, examínalos y pregúntales qué vieron. De noche, vuelve a la clínica antes de la 1 de la madrugada.
+
+Esta enfermedad tiene una causa, y camina entre ellos. Cuando estés seguro de quién es, acúsalo. Solo tienes una oportunidad."
+PALLBROOK,PALLBROOK,パルブルック,PALLBROOK,PALLBROOK
+[E] Begin,[E] Begin,[E] はじめる,[E] Começar,[E] Comenzar
+[E] Continue,[E] Continue,[E] 続ける,[E] Continuar,[E] Continuar
+[E] Close,[E] Close,[E] 閉じる,[E] Fechar,[E] Cerrar
+[Tab] Close,[Tab] Close,[Tab] 閉じる,[Tab] Fechar,[Tab] Cerrar
+Morning of Day %d,Morning of Day %d,%d日目の朝,Manhã do Dia %d,Mañana del Día %d
+The night passed in silence.,The night passed in silence.,夜は静かに過ぎた。,A noite passou em silêncio.,La noche pasó en silencio.
+The Town Hall paid your salary: %d coins.,The Town Hall paid your salary: %d coins.,町役場から給金が支払われた：硬貨%d枚。,A Prefeitura pagou seu salário: %d moedas.,El Ayuntamiento te pagó el salario: %d monedas.
+Your order arrived: 1 iron tonic.,Your order arrived: 1 iron tonic.,注文の品が届いた：鉄の強壮剤 1本。,Seu pedido chegou: 1 tônico de ferro.,Llegó tu pedido: 1 tónico de hierro.
+Your order arrived: %d iron tonics.,Your order arrived: %d iron tonics.,注文の品が届いた：鉄の強壮剤 %d本。,Seu pedido chegou: %d tônicos de ferro.,Llegó tu pedido: %d tónicos de hierro.
+A thick fog lies over Pallbrook this morning.,A thick fog lies over Pallbrook this morning.,今朝、パルブルックは濃い霧に包まれている。,Uma neblina espessa cobre Pallbrook esta manhã.,Una espesa niebla cubre Pallbrook esta mañana.
+Grey clouds hide the sun today.,Grey clouds hide the sun today.,今日は灰色の雲が太陽を隠している。,Nuvens cinzentas escondem o sol hoje.,Hoy unas nubes grises ocultan el sol.
+Doctor,Doctor,医師,Doutor,Doctor
+Bed,Bed,ベッド,Cama,Cama
+Supply cabinet,Supply cabinet,薬品棚,Armário de suprimentos,Armario de suministros
+[W/S] Navigate    [E] Ask/Select    [Esc] Leave,[W/S] Navigate    [E] Ask/Select    [Esc] Leave,[W/S] 選ぶ    [E] 尋ねる/決定    [Esc] 立ち去る,[W/S] Navegar    [E] Perguntar/Escolher    [Esc] Sair,[W/S] Navegar    [E] Preguntar/Elegir    [Esc] Salir
+Where were you last night?,Where were you last night?,昨夜はどこにいましたか？,Onde você estava ontem à noite?,¿Dónde estuvo anoche?
+Did you see anything unusual last night?,Did you see anything unusual last night?,昨夜、何か変わったものを見ませんでしたか？,Viu algo estranho ontem à noite?,¿Vio algo extraño anoche?
+Let me examine you.,Let me examine you.,診察させてください。,Deixe-me examiná-lo.,Déjeme examinarle.
+Come to the clinic for a treatment.,Come to the clinic for a treatment.,治療のために診療所へ来てください。,Venha à clínica para um tratamento.,Venga a la clínica para un tratamiento.
+You need rest and good food.,You need rest and good food.,休養と栄養のある食事が必要です。,Você precisa de repouso e boa comida.,Necesita reposo y buena comida.
+How are things?,How are things?,調子はどうですか？,Como vão as coisas?,¿Cómo van las cosas?
+Goodbye.,Goodbye.,失礼します。,Até logo.,Adiós.
+Give the iron tonic.,Give the iron tonic.,鉄の強壮剤を渡す。,Dar o tônico de ferro.,Dar el tónico de hierro.
+Too early to sleep. The night is when things happen.,Too early to sleep. The night is when things happen.,眠るにはまだ早い。事が起きるのは夜だ。,Cedo demais para dormir. É à noite que as coisas acontecem.,Es muy temprano para dormir. Es de noche cuando pasan las cosas.
+"You ordered the ingredients for one iron tonic ({price} coins). It will be ready tomorrow morning.
+Coins left: {coins} · Tonics ordered: {ordered}","You ordered the ingredients for one iron tonic ({price} coins). It will be ready tomorrow morning.
+Coins left: {coins} · Tonics ordered: {ordered}","鉄の強壮剤1本分の材料を注文した（硬貨{price}枚）。明朝には出来上がる。
+残りの硬貨：{coins} · 注文中の強壮剤：{ordered}","Você encomendou os ingredientes para um tônico de ferro ({price} moedas). Estará pronto amanhã de manhã.
+Moedas restantes: {coins} · Tônicos encomendados: {ordered}","Encargaste los ingredientes para un tónico de hierro ({price} monedas). Estará listo mañana por la mañana.
+Monedas restantes: {coins} · Tónicos encargados: {ordered}"
+"Iron salts, herbs, a little wine... one tonic costs {price} coins, and you have {coins}.","Iron salts, herbs, a little wine... one tonic costs {price} coins, and you have {coins}.",鉄塩、薬草、少しの葡萄酒……強壮剤1本は硬貨{price}枚。手持ちは{coins}枚だ。,"Sais de ferro, ervas, um pouco de vinho... um tônico custa {price} moedas, e você tem {coins}.","Sales de hierro, hierbas, un poco de vino... un tónico cuesta {price} monedas, y tienes {coins}."
+"It's too soon to accuse anyone. Examine people, ask where they were, and watch the town tonight. (Accusations open on Day %d.)","It's too soon to accuse anyone. Examine people, ask where they were, and watch the town tonight. (Accusations open on Day %d.)",誰かを告発するにはまだ早い。人々を診察し、どこにいたか尋ね、今夜は町を見張ること。（告発は%d日目から可能）,"Ainda é cedo para acusar alguém. Examine as pessoas, pergunte onde estavam e vigie a cidade esta noite. (As acusações abrem no Dia %d.)","Es demasiado pronto para acusar a nadie. Examina a la gente, pregunta dónde estuvieron y vigila el pueblo esta noche. (Las acusaciones se abren el Día %d.)"
+Accuse %s?,Accuse %s?,%sを告発しますか？,Acusar %s?,¿Acusar a %s?
+"You are about to name %s as the vampire in front of the whole town.
+There is no going back.","You are about to name %s as the vampire in front of the whole town.
+There is no going back.","町じゅうの前で、%sを吸血鬼として名指ししようとしている。
+もう後戻りはできない。","Você está prestes a apontar %s como o vampiro diante de toda a cidade.
+Não há volta.","Estás a punto de señalar a %s como el vampiro delante de todo el pueblo.
+No hay vuelta atrás."
+[E] Accuse      [Esc] Cancel,[E] Accuse      [Esc] Cancel,[E] 告発する      [Esc] やめる,[E] Acusar      [Esc] Cancelar,[E] Acusar      [Esc] Cancelar
+Pallbrook is saved,Pallbrook is saved,パルブルックは救われた,Pallbrook está salva,Pallbrook se ha salvado
+Pallbrook is lost,Pallbrook is lost,パルブルックは失われた,Pallbrook está perdida,Pallbrook está perdido
+[E] Play again,[E] Play again,[E] もう一度遊ぶ,[E] Jogar de novo,[E] Jugar de nuevo
+You unmasked {name} on Day {day}. {alive} townspeople survived.,You unmasked {name} on Day {day}. {alive} townspeople survived.,{day}日目、あなたは{name}の正体を暴いた。生き残った町民は{alive}人。,Você desmascarou {name} no Dia {day}. {alive} moradores sobreviveram.,Desenmascaraste a {name} el Día {day}. Sobrevivieron {alive} vecinos.
+"{accused} was innocent. The real vampire was {vampire}, and now they know you're onto them.","{accused} was innocent. The real vampire was {vampire}, and now they know you're onto them.",{accused}は無実だった。本当の吸血鬼は{vampire}。そして今、あなたに気づかれたことを知っている。,"{accused} era inocente. O verdadeiro vampiro era {vampire}, e agora sabe que você está na pista.","{accused} era inocente. El verdadero vampiro era {vampire}, y ahora sabe que le sigues la pista."
+Patients,Patients,患者,Pacientes,Pacientes
+Suspects,Suspects,容疑者,Suspeitos,Sospechosos
+All,All,すべて,Tudo,Todo
+Clinic,Clinic,診療所,Clínica,Clínica
+Visits,Visits,往診,Consultas,Visitas
+Supplies,Supplies,備品,Suprimentos,Suministros
+Patient chart,Patient chart,カルテ,Ficha do paciente,Ficha del paciente
+Choose a patient on the right page to open their chart.,Choose a patient on the right page to open their chart.,右のページで患者を選ぶと、カルテが開く。,Escolha um paciente na página da direita para abrir a ficha.,Elige un paciente en la página derecha para abrir su ficha.
+— Day %d —,— Day %d —,— %d日目 —,— Dia %d —,— Día %d —
+— Today —,— Today —,— 今日 —,— Hoje —,— Hoy —
+— Urgent —,— Urgent —,— 至急 —,— Urgente —,— Urgente —
+— How it works —,— How it works —,— 手引き —,— Como funciona —,— Cómo funciona —
+Nothing about %s yet.,Nothing about %s yet.,%sについては、まだ何もない。,Nada sobre %s ainda.,Nada sobre %s todavía.
+Nothing yet.,Nothing yet.,まだ何もない。,Nada ainda.,Nada todavía.
+Coins: %d,Coins: %d,硬貨：%d枚,Moedas: %d,Monedas: %d
+Iron tonics ready: %d,Iron tonics ready: %d,用意できた鉄の強壮剤：%d本,Tônicos de ferro prontos: %d,Tónicos de hierro listos: %d
+"Ordered, ready tomorrow morning: %d","Ordered, ready tomorrow morning: %d",注文済み（明朝に用意）：%d本,"Encomendados, prontos amanhã de manhã: %d","Encargados, listos mañana por la mañana: %d"
+"Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them).","Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them).",鉄の強壮剤：衰弱した患者、または噛まれた患者を一人治療できる。診療所に来るよう頼み、約束の時間にそこにいて、渡すこと（話しかける）。,"Tônico de ferro: trata um paciente fraco ou mordido. Peça que venha à clínica, esteja lá no horário combinado e entregue a ele (converse com ele).","Tónico de hierro: trata a un paciente débil o mordido. Pídele que venga a la clínica, está allí a la hora acordada y dáselo (habla con él)."
+"Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing.","Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing.",病人がみな噛まれたわけではない。秋の風邪は熱と強い脈と咳をもたらす。強壮剤は効かないので、代わりに休養と栄養のある食事を勧めること（診察の後、または診療所で）。費用はかからない。,"Nem todo doente foi mordido: os resfriados de outono trazem febre, pulso forte e tosse. O tônico não faz nada por eles; receite repouso e boa comida (depois de um exame, ou na clínica). Não custa nada.","No todos los enfermos fueron mordidos: los resfriados de otoño traen fiebre, pulso fuerte y tos. El tónico no les sirve; receta reposo y buena comida (después de un examen, o en la clínica). No cuesta nada."
+"To make more, order the ingredients at the supply cabinet in your clinic, during the day (E at the cabinet). One tonic costs %d coins and is ready the next morning.","To make more, order the ingredients at the supply cabinet in your clinic, during the day (E at the cabinet). One tonic costs %d coins and is ready the next morning.",強壮剤を増やすには、昼のうちに診療所の薬品棚で材料を注文すること（棚の前で E）。1本は硬貨%d枚で、翌朝に出来上がる。,"Para fazer mais, encomende os ingredientes no armário de suprimentos da clínica, durante o dia (E no armário). Um tônico custa %d moedas e fica pronto na manhã seguinte.","Para hacer más, encarga los ingredientes en el armario de suministros de tu clínica, durante el día (E en el armario). Un tónico cuesta %d monedas y está listo a la mañana siguiente."
+"Coins: the Town Hall pays you {salary} every morning, and each patient pays {fee} for their first exam of the day.","Coins: the Town Hall pays you {salary} every morning, and each patient pays {fee} for their first exam of the day.",硬貨：毎朝、町役場から{salary}枚が支払われ、患者はその日最初の診察ごとに{fee}枚を払う。,"Moedas: a Prefeitura paga {salary} toda manhã, e cada paciente paga {fee} pelo primeiro exame do dia.","Monedas: el Ayuntamiento te paga {salary} cada mañana, y cada paciente paga {fee} por su primer examen del día."
+"At night, sleep in the bed at your clinic (E) to rest; stay up too long and you collapse in the street.","At night, sleep in the bed at your clinic (E) to rest; stay up too long and you collapse in the street.",夜は診療所のベッドで眠って休むこと（E）。起きていすぎると、通りで倒れてしまう。,"À noite, durma na cama da clínica (E) para descansar; se ficar acordado demais, você desmaia na rua.","De noche, duerme en la cama de tu clínica (E) para descansar; si te quedas despierto demasiado tiempo, te desplomas en la calle."
+Appointments,Appointments,予約,Consultas marcadas,Citas
+"visited at night: treat today, or keep watch at the door tonight","visited at night: treat today, or keep watch at the door tonight",夜に襲われた：今日治療するか、今夜その戸口を見張ること,"visitado à noite: trate hoje, ou vigie a porta esta noite","visitado de noche: trátalo hoy, o vigila su puerta esta noche"
+expected at the clinic,expected at the clinic,診療所で待ち合わせ,esperado na clínica,esperado en la clínica
+treated,treated,治療済み,tratado,tratado
+missed,missed,すれ違い,perdida,no acudió
+absent,absent,不在,ausente,ausente
+no tonic,no tonic,強壮剤なし,sem tônico,sin tónico
+rest prescribed,rest prescribed,休養を指示,repouso receitado,reposo recetado
+No appointments yet.,No appointments yet.,まだ予約はない。,Nenhuma consulta ainda.,Aún no hay citas.
+Ask a sick patient to come to the clinic for a treatment.,Ask a sick patient to come to the clinic for a treatment.,病人に、治療のため診療所へ来るよう頼もう。,Peça a um paciente doente que venha à clínica para um tratamento.,Pide a un paciente enfermo que venga a la clínica para un tratamiento.
+deceased,deceased,故人,falecido,fallecido
+Deceased,Deceased,死亡,Falecido,Fallecido
+buried,buried,埋葬済み,enterrado,enterrado
+Not examined yet,Not examined yet,未診察,Ainda não examinado,Aún no examinado
+today,today,今日,hoje,hoy
+yesterday,yesterday,昨日,ontem,ayer
+%d days ago,%d days ago,%d日前,há %d dias,hace %d días
+Last examined {when} (Day {day}),Last examined {when} (Day {day}),最終診察：{when}（{day}日目）,Último exame {when} (Dia {day}),Último examen: {when} (Día {day})
+Traces: %s,Traces: %s,痕跡：%s,Vestígios: %s,Rastros: %s
+"Old, healed punctures","Old, healed punctures",古い、治った刺し傷,"Perfurações antigas, cicatrizadas","Punciones antiguas, cicatrizadas"
+Visited at night: treat today!,Visited at night: treat today!,夜に襲われた：今日中に治療を！,Visitado à noite: trate hoje!,Visitado de noche: ¡trátalo hoy!
+Blood,Blood,血液,Sangue,Sangre
+Trusts you,Trusts you,あなたを信頼している,Confia em você,Confía en ti
+Friendly,Friendly,友好的,Amigável,Amistoso
+Guarded,Guarded,警戒している,Desconfiado,Receloso
+Distrusts you,Distrusts you,あなたを信用していない,Não confia em você,Desconfía de ti
+slow,slow,遅い,lento,lento
+steady,steady,安定,regular,regular
+quick,quick,速い,rápido,rápido
+weak,weak,弱い,fraco,débil
+faint,faint,微弱,muito fraco,muy débil
+strong,strong,強い,forte,fuerte
+None,None,なし,Nenhum,Ninguno
+Cold,Cold,冷たい,Frio,Frío
+Cool,Cool,ひんやり,Fresco,Fresco
+Normal,Normal,平熱,Normal,Normal
+Feverish,Feverish,微熱,Febril,Febril
+Fever,Fever,発熱,Febre,Fiebre
+Hot,Hot,高熱,Quente,Caliente
+Dead,Dead,死亡,Morto,Muerto
+Good color,Good color,血色良好,Corado,Buen color
+A little pale,A little pale,やや蒼白,Um pouco pálido,Algo pálido
+Pale,Pale,蒼白,Pálido,Pálido
+Grey,Grey,土気色,Acinzentado,Grisáceo
+Flushed,Flushed,紅潮,Ruborizado,Sonrojado
+Sweaty,Sweaty,汗ばむ,Suado,Sudoroso
+Red-nosed,Red-nosed,赤鼻,Nariz vermelho,Nariz roja
+Sound,Sound,熟睡,Profundo,Profundo
+Light,Light,浅い,Leve,Ligero
+Restless,Restless,寝苦しい,Agitado,Inquieto
+Oversleeps,Oversleeps,寝過ごす,Dorme demais,Duerme de más
+Night terrors,Night terrors,夜驚,Terrores noturnos,Terrores nocturnos
+Hallucinations,Hallucinations,幻覚,Alucinações,Alucinaciones
+Sleepwalks,Sleepwalks,夢遊,Sonambulismo,Sonámbulo
+Dreamless,Dreamless,夢を見ない,Sem sonhos,Sin sueños
+Nightmares,Nightmares,悪夢,Pesadelos,Pesadillas
+Wakes dizzy,Wakes dizzy,目覚めにめまい,Acorda tonto,Despierta mareado
+Can't get up,Can't get up,起き上がれない,Não consegue levantar,No puede levantarse
+Wakes tired,Wakes tired,疲れて目覚める,Acorda cansado,Despierta cansado
+Coughs at night,Coughs at night,夜に咳き込む,Tosse à noite,Tose de noche
+Sweats,Sweats,寝汗,Suores,Sudores
+(wrist),(wrist),（手首）,(pulso),(muñeca)
+loose threads,loose threads,ほつれた糸,fios soltos,hilos sueltos
+stamp ink,stamp ink,印章のインク,tinta de carimbo,tinta de sello
+wine stains,wine stains,葡萄酒の染み,manchas de vinho,manchas de vino
+candle wax,candle wax,蝋燭の蝋,cera de vela,cera de vela
+chalk dust,chalk dust,チョークの粉,pó de giz,polvo de tiza
+old paper dust,old paper dust,古紙の埃,pó de papel velho,polvo de papel viejo
+forge soot,forge soot,鍛冶場の煤,fuligem da forja,hollín de forja
+Clara,Clara,クララ,Clara,Clara
+Hugo,Hugo,ユーゴ,Hugo,Hugo
+Marta,Marta,マルタ,Marta,Marta
+Elias,Elias,エリアス,Elias,Elías
+Sarah,Sarah,サラ,Sarah,Sarah
+Sophia,Sophia,ソフィア,Sophia,Sophia
+Tomas,Tomas,トマス,Tomás,Tomás
+Seamstress,Seamstress,仕立て屋,Costureira,Costurera
+Mayor,Mayor,町長,Prefeito,Alcalde
+Innkeeper,Innkeeper,宿屋の女将,Taverneira,Posadera
+Priest,Priest,神父,Padre,Sacerdote
+Teacher,Teacher,教師,Professora,Maestra
+Librarian,Librarian,司書,Bibliotecária,Bibliotecaria
+Blacksmith,Blacksmith,鍛冶屋,Ferreiro,Herrero
+Library,Library,図書館,Biblioteca,Biblioteca
+School,School,学校,Escola,Escuela
+Church,Church,教会,Igreja,Iglesia
+Town Hall,Town Hall,町役場,Prefeitura,Ayuntamiento
+Tavern,Tavern,酒場,Taverna,Taberna
+Clara's House,Clara's House,クララの家,Casa da Clara,Casa de Clara
+Tomas's Forge,Tomas's Forge,トマスの鍛冶場,Forja do Tomás,Forja de Tomás
+Sophia's House,Sophia's House,ソフィアの家,Casa da Sophia,Casa de Sophia
+Sarah's House,Sarah's House,サラの家,Casa da Sarah,Casa de Sarah
+Mayor's House,Mayor's House,町長の家,Casa do Prefeito,Casa del Alcalde
+A few questions for the playtest,A few questions for the playtest,テストプレイについての質問,Algumas perguntas sobre o playtest,Unas preguntas sobre la prueba
+Short answers are fine. They are saved with the report of this run.,Short answers are fine. They are saved with the report of this run.,短い答えで構いません。このプレイの記録と一緒に保存されます。,Respostas curtas bastam. Elas são salvas com o relatório desta partida.,Basta con respuestas cortas. Se guardan con el informe de esta partida.
+"Who did you suspect, and why?","Who did you suspect, and why?",誰を疑いましたか？その理由は？,"De quem você suspeitou, e por quê?","¿De quién sospechaste, y por qué?"
+What was the most confusing thing?,What was the most confusing thing?,いちばん分かりにくかったことは？,O que foi mais confuso?,¿Qué fue lo más confuso?
+What did you enjoy most?,What did you enjoy most?,いちばん楽しかったことは？,Do que você mais gostou?,¿Qué es lo que más disfrutaste?
+"Anything else? (bugs, ideas, what you'd change)","Anything else? (bugs, ideas, what you'd change)",ほかに何かありますか？（不具合、アイデア、変えたいところ）,"Mais alguma coisa? (bugs, ideias, o que você mudaria)","¿Algo más? (errores, ideas, qué cambiarías)"
+Report folder: ,Report folder: ,記録フォルダ：,Pasta do relatório: ,Carpeta del informe: 
+Save and open the report folder,Save and open the report folder,保存して記録フォルダを開く,Salvar e abrir a pasta do relatório,Guardar y abrir la carpeta del informe
+Save without answering,Save without answering,答えずに保存,Salvar sem responder,Guardar sin responder
+Change language,Change language,言語を切り替える,Mudar idioma,Cambiar idioma
+"Night of Day {day}, {time}: you saw {name} sneaking through the dark streets.","Night of Day {day}, {time}: you saw {name} sneaking through the dark streets.",{day}日目の夜、{time}：暗い通りをこそこそ歩く{name}を見た。,"Noite do Dia {day}, {time}: você viu {name} se esgueirando pelas ruas escuras.","Noche del Día {day}, {time}: viste a {name} deslizándose por las calles oscuras."
+nothing unusual,nothing unusual,特に変わったものはない,nada de incomum,nada fuera de lo común
+"Bite marks on the neck. On the clothes, traces of {trace}.","Bite marks on the neck. On the clothes, traces of {trace}.",首に噛み跡。服には{trace}の痕跡。,"Marcas de mordida no pescoço. Nas roupas, vestígios de {trace}.","Marcas de mordedura en el cuello. En la ropa, rastros de {trace}."
+Body of {name}: {text},Body of {name}: {text},{name}の遺体：{text},Corpo de {name}: {text},Cuerpo de {name}: {text}
+Body of {name},Body of {name},{name}の遺体,Corpo de {name},Cuerpo de {name}
+Day {day} · {name} was visited in the night and fears it will come back tonight.,Day {day} · {name} was visited in the night and fears it will come back tonight.,{day}日目 · {name}は夜に何かの訪問を受け、今夜また来るのではと怯えている。,Dia {day} · {name} recebeu uma visita durante a noite e teme que ela volte hoje.,Día {day} · {name} recibió una visita durante la noche y teme que vuelva esta noche.
+"Doctor... last night something stood by my bed. I couldn't move, and now my neck burns. Please, it will come back tonight.","Doctor... last night something stood by my bed. I couldn't move, and now my neck burns. Please, it will come back tonight.",先生……昨夜、何かが私のベッドのそばに立っていたんです。体が動かなくて、今も首が焼けるように痛い。お願いです、あれは今夜また来ます。,"Doutor... ontem à noite havia algo ao lado da minha cama. Eu não conseguia me mexer, e agora meu pescoço arde. Por favor, vai voltar esta noite.","Doctor... anoche había algo junto a mi cama. No podía moverme, y ahora me arde el cuello. Por favor, volverá esta noche."
+Day {day} · {name} found you collapsed near {place} and keeps their distance.,Day {day} · {name} found you collapsed near {place} and keeps their distance.,{day}日目 · {name}は{place}の近くで倒れているあなたを見つけ、距離を置いている。,Dia {day} · {name} encontrou você desmaiado perto de {place} e agora mantém distância.,Día {day} · {name} te encontró desmayado cerca de {place} y ahora guarda las distancias.
+my door,my door,うちの戸口,a minha porta,mi puerta
+Doctor! We found you lying in the street near {place} this morning. Are you ill... or is it something else?,Doctor! We found you lying in the street near {place} this morning. Are you ill... or is it something else?,先生！今朝、{place}の近くの通りで倒れているのを見つけましたよ。ご病気ですか……それとも、何か別の理由が？,Doutor! Encontramos você caído na rua perto de {place} hoje de manhã. Está doente... ou é outra coisa?,¡Doctor! Esta mañana lo encontramos tirado en la calle cerca de {place}. ¿Está enfermo... o es otra cosa?
+Day {day} · {name} caught you hiding in the dark near {place} at {time} and doesn't trust you.,Day {day} · {name} caught you hiding in the dark near {place} at {time} and doesn't trust you.,{day}日目 · {name}は{time}に{place}の近くの暗がりに隠れるあなたを見て、信用していない。,Dia {day} · {name} pegou você escondido no escuro perto de {place} às {time} e não confia em você.,Día {day} · {name} te sorprendió escondido en la oscuridad cerca de {place} a las {time} y no confía en ti.
+"I saw you last night, doctor, creeping around in the dark near {place} at {time}. Who were you hiding from?","I saw you last night, doctor, creeping around in the dark near {place} at {time}. Who were you hiding from?",昨夜、見ましたよ、先生。{time}に{place}の近くの暗がりをこそこそ歩いていたでしょう。誰から隠れていたんです？,"Eu vi você ontem à noite, doutor, rondando no escuro perto de {place} às {time}. De quem estava se escondendo?","Lo vi anoche, doctor, merodeando en la oscuridad cerca de {place} a las {time}. ¿De quién se escondía?"
+Day {day} · {name} saw you out near {place} at {time} and keeps their distance.,Day {day} · {name} saw you out near {place} at {time} and keeps their distance.,{day}日目 · {name}は{time}に{place}の近くを出歩くあなたを見て、距離を置いている。,Dia {day} · {name} viu você na rua perto de {place} às {time} e agora mantém distância.,Día {day} · {name} te vio en la calle cerca de {place} a las {time} y ahora guarda las distancias.
+"I saw you near {place} at {time} last night, doctor. Decent folk are home by then.","I saw you near {place} at {time} last night, doctor. Decent folk are home by then.",昨夜{time}に、{place}の近くで先生を見かけましたよ。まともな人間なら、その時間には家にいるものです。,"Eu vi você perto de {place} às {time} ontem à noite, doutor. Gente direita já está em casa a essa hora.","Lo vi cerca de {place} a las {time} anoche, doctor. La gente decente ya está en casa a esa hora."
+Doctor. What is it now?,Doctor. What is it now?,先生。今度は何です？,Doutor. O que foi agora?,Doctor. ¿Qué pasa ahora?
+"Day {day} · {name}, about yesterday: ""{text}""","Day {day} · {name}, about yesterday: ""{text}""",{day}日目 · {name}、昨日について：「{text}」,"Dia {day} · {name}, sobre ontem: ""{text}""","Día {day} · {name}, sobre ayer: ""{text}"""
+"Day {day} · {name}, about last night: ""{text}""","Day {day} · {name}, about last night: ""{text}""",{day}日目 · {name}、昨夜について：「{text}」,"Dia {day} · {name}, sobre ontem à noite: ""{text}""","Día {day} · {name}, sobre anoche: ""{text}"""
+"Day {day} · {name} said: ""{text}""","Day {day} · {name} said: ""{text}""",{day}日目 · {name}の話：「{text}」,"Dia {day} · {name} disse: ""{text}""","Día {day} · {name} dijo: ""{text}"""
+No. I slept through the night.,No. I slept through the night.,いいえ。朝までぐっすり眠っていました。,Não. Dormi a noite inteira.,No. Dormí toda la noche.
+"Day {day} · {name} saw: ""{text}""","Day {day} · {name} saw: ""{text}""",{day}日目 · {name}が見たもの：「{text}」,"Dia {day} · {name} viu: ""{text}""","Día {day} · {name} vio: ""{text}"""
+"I'd rather you didn't touch me today, doctor.","I'd rather you didn't touch me today, doctor.",今日は触らないでいただけますか、先生。,"Prefiro que não me toque hoje, doutor.","Preferiría que no me tocara hoy, doctor."
+"You already examined me today, doctor. Nothing has changed since.","You already examined me today, doctor. Nothing has changed since.",今日はもう診ていただきましたよ、先生。あれから何も変わっていません。,"O senhor já me examinou hoje, doutor. Nada mudou desde então.","Ya me examinó hoy, doctor. Nada ha cambiado desde entonces."
+Day {day} · Exam of {name}: {text},Day {day} · Exam of {name}: {text},{day}日目 · {name}の診察：{text},Dia {day} · Exame de {name}: {text},Día {day} · Examen de {name}: {text}
+(You wrote this down in your casebook. Press Tab to read your notes and open each patient's chart.),(You wrote this down in your casebook. Press Tab to read your notes and open each patient's chart.),（診療録に書き留めた。Tabキーでメモを読み、患者ごとのカルテを開ける。）,(Você anotou isso no caderno. Aperte Tab para ler suas anotações e abrir a ficha de cada paciente.),(Lo anotaste en tu cuaderno. Pulsa Tab para leer tus notas y abrir la ficha de cada paciente.)
+Pulse {pulse}.,Pulse {pulse}.,脈拍{pulse}。,Pulso {pulse}.,Pulso {pulse}.
+"Flushed, forehead burning, a dry cough and a stuffy nose.","Flushed, forehead burning, a dry cough and a stuffy nose.",顔は紅潮し、額は熱く、乾いた咳と鼻づまり。,"Rosto corado, testa ardendo, tosse seca e nariz entupido.","Ruborizado, la frente ardiendo, tos seca y nariz tapada."
+"Complains of weakness, but the blood seems fine.","Complains of weakness, but the blood seems fine.",だるさを訴えるが、血の巡りに問題はなさそうだ。,"Queixa-se de fraqueza, mas o sangue parece bem.","Se queja de debilidad, pero la sangre parece estar bien."
+Good color.,Good color.,血色は良い。,Boa cor.,Buen color.
+A little pale. Mild anemia.,A little pale. Mild anemia.,やや蒼白。軽い貧血。,Um pouco pálido. Anemia leve.,Algo pálido. Anemia leve.
+Pale and weak. Clear anemia.,Pale and weak. Clear anemia.,蒼白で衰弱している。明らかな貧血。,Pálido e fraco. Anemia evidente.,Pálido y débil. Anemia evidente.
+"Grey lips, can barely stand. Severe anemia: one more night like this could kill.","Grey lips, can barely stand. Severe anemia: one more night like this could kill.",唇は土気色で、立っているのもやっと。重い貧血：もう一晩こんな夜があれば命に関わる。,"Lábios acinzentados, mal se aguenta em pé. Anemia grave: mais uma noite assim pode matar.","Labios grises, apenas se tiene en pie. Anemia grave: una noche más así podría matar."
+"Also feverish, with a cough.","Also feverish, with a cough.",熱と咳もある。,Também com febre e tosse.,También con fiebre y tos.
+"Hands a little cool, but it is autumn.","Hands a little cool, but it is autumn.",手が少し冷たいが、秋だから無理もない。,"Mãos um pouco frias, mas é outono.","Manos algo frías, pero es otoño."
+"Two small punctures on the neck. On the collar, traces of {trace}.","Two small punctures on the neck. On the collar, traces of {trace}.",首に小さな刺し傷が二つ。襟には{trace}の痕跡。,"Duas pequenas perfurações no pescoço. Na gola, vestígios de {trace}.","Dos pequeñas punciones en el cuello. En el cuello de la camisa, rastros de {trace}."
+"No marks on the neck, but two small punctures inside the wrist. On the cuff, traces of {trace}.","No marks on the neck, but two small punctures inside the wrist. On the cuff, traces of {trace}.",首に跡はないが、手首の内側に小さな刺し傷が二つ。袖口には{trace}の痕跡。,"Nenhuma marca no pescoço, mas duas pequenas perfurações na parte interna do pulso. No punho da manga, vestígios de {trace}.","Ninguna marca en el cuello, pero dos pequeñas punciones en el interior de la muñeca. En el puño, rastros de {trace}."
+No marks on the neck.,No marks on the neck.,首に跡はない。,Nenhuma marca no pescoço.,Ninguna marca en el cuello.
+"The punctures are old and healed, and the eyes flinch from the window.","The punctures are old and healed, and the eyes flinch from the window.",刺し傷は古く、もう治っている。そして目は窓の光を避ける。,"As perfurações são antigas e cicatrizadas, e os olhos fogem da janela.","Las punciones son antiguas y están cicatrizadas, y los ojos rehúyen la ventana."
+Wakes screaming: dreams of something leaning over the bed.,Wakes screaming: dreams of something leaning over the bed.,悲鳴を上げて目覚める。何かがベッドに覆いかぶさる夢を見るという。,Acorda gritando: sonha com algo debruçado sobre a cama.,Despierta gritando: sueña con algo inclinado sobre la cama.
+Swears a figure stands at the foot of the bed each night.,Swears a figure stands at the foot of the bed each night.,毎晩ベッドの足元に人影が立つと言い張る。,Jura que um vulto fica ao pé da cama todas as noites.,Jura que una figura se queda a los pies de la cama cada noche.
+"Was found at the door at night, with no memory of it.","Was found at the door at night, with no memory of it.",夜、戸口に立っているところを見つかったが、本人に覚えはない。,"Foi encontrado à porta durante a noite, sem lembrar de nada.","Lo encontraron en la puerta de noche, sin recordar nada."
+"Sleeps badly, with nightmares.","Sleeps badly, with nightmares.",悪夢でよく眠れない。,"Dorme mal, com pesadelos.","Duerme mal, con pesadillas."
+"Sleeps badly, coughing and sweating.","Sleeps badly, coughing and sweating.",咳と寝汗でよく眠れない。,"Dorme mal, tossindo e suando.","Duerme mal, tosiendo y sudando."
+"I'd rather not chat today, doctor.","I'd rather not chat today, doctor.",今日は話したくありません、先生。,"Prefiro não conversar hoje, doutor.","Prefiero no conversar hoy, doctor."
+"{name} said: ""{text}""","{name} said: ""{text}""",{name}の話：「{text}」,"{name} disse: ""{text}""","{name} dijo: ""{text}"""
+"I have nothing to tell you today, doctor.","I have nothing to tell you today, doctor.",今日はお話しすることはありません、先生。,"Não tenho nada para lhe dizer hoje, doutor.","No tengo nada que decirle hoy, doctor."
+"At home, asleep.","At home, asleep.",家で寝ていました。,"Em casa, dormindo.","En casa, durmiendo."
+From {time} I was {where},From {time} I was {where},{time}から{where}にいました,A partir das {time} fiquei {where},Desde las {time} estuve {where}
+", then {where} from {time}",", then {where} from {time}",。その後、{time}から{where}に行きました,", depois {where} a partir das {time}",", luego {where} desde las {time}"
+", then I went home",", then I went home",。それから家に帰りました,", depois fui para casa",", luego me fui a casa"
+. I went to bed around {time}.,. I went to bed around {time}.,。{time}頃に寝ました。,. Fui dormir por volta das {time}.,. Me acosté hacia las {time}.
+Yesterday? Nothing special. I stayed home.,Yesterday? Nothing special. I stayed home.,昨日ですか？特に何も。ずっと家にいました。,Ontem? Nada de especial. Fiquei em casa.,¿Ayer? Nada especial. Me quedé en casa.
+{where} from {time},{where} from {time},{time}から{where},{where} a partir das {time},{where} desde las {time}
+", then ",", then ",、その後,", depois ",", luego "
+at home,at home,家,em casa,en casa
+" I've been tired lately, though."," I've been tired lately, though.",でも、最近は疲れ気味で。, Mas ando cansado ultimamente., Aunque últimamente ando cansado.
+{opener} I was {day}. {evening}{weak},{opener} I was {day}. {evening}{weak},{opener}{day}にいました。{evening}{weak},{opener} Fiquei {day}. {evening}{weak},{opener} Estuve {day}. {evening}{weak}
+"Only my own weakness, doctor. I wake up more tired every day, and I don't know why.","Only my own weakness, doctor. I wake up more tired every day, and I don't know why.",自分の体の弱さくらいです、先生。毎朝、前の日より疲れて目が覚めるんです。理由はわかりません。,"Só a minha própria fraqueza, doutor. Acordo mais cansado a cada dia, e não sei por quê.","Solo mi propia debilidad, doctor. Cada día despierto más cansado, y no sé por qué."
+ and , and ,と, e , y 
+Nothing with my own eyes. But {who} has been pale and weak for days. People whisper about a sickness.,Nothing with my own eyes. But {who} has been pale and weak for days. People whisper about a sickness.,自分の目では何も。でも{who}は何日も青ざめて弱っています。病気だと噂されていますよ。,Nada com meus próprios olhos. Mas {who} anda pálido e fraco há dias. O povo cochicha sobre uma doença.,Nada con mis propios ojos. Pero {who} lleva días pálido y débil. La gente murmura sobre una enfermedad.
+Nothing with my own eyes. But {who} have been pale and weak for days. People whisper about a sickness.,Nothing with my own eyes. But {who} have been pale and weak for days. People whisper about a sickness.,自分の目では何も。でも{who}は何日も青ざめて弱っています。病気だと噂されていますよ。,Nada com meus próprios olhos. Mas {who} andam pálidos e fracos há dias. O povo cochicha sobre uma doença.,Nada con mis propios ojos. Pero {who} llevan días pálidos y débiles. La gente murmura sobre una enfermedad.
+Only {name} coughing all day. The cold weather is here.,Only {name} coughing all day. The cold weather is here.,{name}が一日中咳をしているくらいです。寒くなってきましたからね。,Só {name} tossindo o dia todo. O frio chegou.,Solo {name} tosiendo todo el día. Ya llegó el frío.
+"Nothing strange. The dogs barked a little after midnight, that's all.","Nothing strange. The dogs barked a little after midnight, that's all.",変わったことは何も。夜中過ぎに犬が少し吠えていたくらいです。,"Nada de estranho. Os cachorros latiram um pouco depois da meia-noite, só isso.","Nada raro. Los perros ladraron un poco pasada la medianoche, eso es todo."
+at the forge,at the forge,鍛冶場,na forja,en la forja
+in the square,in the square,広場,na praça,en la plaza
+at {place},at {place},{place},em {place},en {place}
+Around {time} I saw a dark figure near {place}. I couldn't make out a face.,Around {time} I saw a dark figure near {place}. I couldn't make out a face.,{time}頃、{place}の近くで黒い人影を見ました。顔はわかりませんでした。,Por volta das {time} vi um vulto escuro perto de {place}. Não consegui ver o rosto.,Hacia las {time} vi una figura oscura cerca de {place}. No pude distinguir la cara.
+"And you, doctor, were near {place} around {time}.","And you, doctor, were near {place} around {time}.",それに先生、あなたも{time}頃に{place}の近くにいましたね。,"E o senhor, doutor, estava perto de {place} por volta das {time}.","Y usted, doctor, estaba cerca de {place} hacia las {time}."
+"And you, doctor, were lurking in the shadows near {place} around {time}.","And you, doctor, were lurking in the shadows near {place} around {time}.",それに先生、あなたは{time}頃に{place}の近くの物陰に潜んでいましたね。,"E o senhor, doutor, estava espreitando nas sombras perto de {place} por volta das {time}.","Y usted, doctor, acechaba entre las sombras cerca de {place} hacia las {time}."
+{name} was with me at {place} until about {time}.,{name} was with me at {place} until about {time}.,{time}頃まで、{name}が{place}で一緒にいました。,{name} esteve comigo em {place} até umas {time}.,{name} estuvo conmigo en {place} hasta eso de las {time}.
+I saw {name} out near {place} around {time}. At that hour!,I saw {name} out near {place} around {time}. At that hour!,{time}頃、{place}の近くで{name}を見ました。あんな時間に！,Vi {name} na rua perto de {place} por volta das {time}. Àquela hora!,"Vi a {name} fuera, cerca de {place}, hacia las {time}. ¡A esas horas!"
+I saw {name} passing near {place} around {time}.,I saw {name} passing near {place} around {time}.,{time}頃、{place}の近くを通る{name}を見ました。,Vi {name} passando perto de {place} por volta das {time}.,Vi a {name} pasar cerca de {place} hacia las {time}.
+Nothing. Nothing at all.,Nothing. Nothing at all.,何も。何もありません。,Nada. Nada mesmo.,Nada. Nada en absoluto.
+I saw {name} sneaking near {place} around {time}. Ask them where they were.,I saw {name} sneaking near {place} around {time}. Ask them where they were.,{time}頃、{place}の近くをこそこそ歩く{name}を見ました。どこにいたのか聞いてみてください。,Vi {name} se esgueirando perto de {place} por volta das {time}. Pergunte onde estava.,Vi a {name} merodeando cerca de {place} hacia las {time}. Pregúntele dónde estaba.
+{name} was buried in the cemetery beyond the bridge.,{name} was buried in the cemetery beyond the bridge.,{name}は橋の向こうの墓地に埋葬された。,{name} foi sepultado no cemitério além da ponte.,"{name} fue enterrado en el cementerio, al otro lado del puente."
+Day {day} · {name} was buried before you examined the body.,Day {day} · {name} was buried before you examined the body.,{day}日目 · 遺体を調べる前に、{name}は埋葬された。,Dia {day} · {name} foi sepultado antes que você examinasse o corpo.,Día {day} · {name} fue enterrado antes de que examinaras el cuerpo.
+"At this hour? Ask me tomorrow, doctor.","At this hour? Ask me tomorrow, doctor.",こんな時間に？明日にしてください、先生。,"A esta hora? Pergunte amanhã, doutor.","¿A estas horas? Pregúnteme mañana, doctor."
+"I'll manage on my own, thank you.","I'll manage on my own, thank you.",自分でなんとかします、どうも。,"Eu me viro sozinho, obrigado.","Me las arreglaré solo, gracias."
+"I'll be at the clinic at {time}, doctor, as we agreed.","I'll be at the clinic at {time}, doctor, as we agreed.",約束どおり、{time}に診療所へ行きますよ、先生。,"Estarei na clínica às {time}, doutor, como combinamos.","Estaré en la clínica a las {time}, doctor, como acordamos."
+"You already treated me today, doctor. Let the tonic do its work.","You already treated me today, doctor. Let the tonic do its work.",今日はもう治療していただきました、先生。強壮剤が効くのを待ちます。,"O senhor já me tratou hoje, doutor. Deixe o tônico fazer efeito.","Ya me trató hoy, doctor. Deje que el tónico haga su efecto."
+"I couldn't make it today, doctor. Ask me again tomorrow.","I couldn't make it today, doctor. Ask me again tomorrow.",今日は行けませんでした、先生。また明日声をかけてください。,"Não consegui ir hoje, doutor. Pergunte de novo amanhã.","Hoy no pude ir, doctor. Pregúnteme otra vez mañana."
+"Me? I feel fine, doctor. Save your medicine for the sick.","Me? I feel fine, doctor. Save your medicine for the sick.",私ですか？元気ですよ、先生。薬は病人のために取っておいてください。,"Eu? Estou bem, doutor. Guarde o remédio para os doentes.","¿Yo? Me siento bien, doctor. Guarde la medicina para los enfermos."
+"Tonics and bloodletting... no, doctor. I don't trust medicine.","Tonics and bloodletting... no, doctor. I don't trust medicine.",強壮剤に瀉血……いいえ、先生。医術は信用していません。,"Tônicos e sangrias... não, doutor. Não confio em remédios.","Tónicos y sangrías... no, doctor. No me fío de la medicina."
+"I'm already coming tomorrow, doctor.","I'm already coming tomorrow, doctor.",明日はもう伺うことになっていますよ、先生。,"Já vou amanhã, doutor.","Ya voy mañana, doctor."
+"Yes... I'll come to the clinic at {time}. Please be there, doctor.","Yes... I'll come to the clinic at {time}. Please be there, doctor.",はい……{time}に診療所へ行きます。いてくださいね、先生。,"Sim... vou à clínica às {time}. Por favor, esteja lá, doutor.","Sí... iré a la clínica a las {time}. Por favor, esté allí, doctor."
+"Yes... I'll come to the clinic tomorrow at {time}. Please be there, doctor.","Yes... I'll come to the clinic tomorrow at {time}. Please be there, doctor.",はい……明日の{time}に診療所へ行きます。いてくださいね、先生。,"Sim... vou à clínica amanhã às {time}. Por favor, esteja lá, doutor.","Sí... iré a la clínica mañana a las {time}. Por favor, esté allí, doctor."
+(You don't have a tonic for every patient. Order ingredients at the clinic cabinet.),(You don't have a tonic for every patient. Order ingredients at the clinic cabinet.),（患者全員分の強壮剤がない。診療所の薬品棚で材料を注文しよう。）,(Você não tem tônico para todos os pacientes. Encomende ingredientes no armário da clínica.),(No tienes tónico para todos los pacientes. Encarga ingredientes en el armario de la clínica.)
+Day {day} · {name} never showed up at the clinic.,Day {day} · {name} never showed up at the clinic.,{day}日目 · {name}は診療所に来なかった。,Dia {day} · {name} não apareceu na clínica.,Día {day} · {name} nunca se presentó en la clínica.
+Day {day} · You missed {name}'s appointment at the clinic.,Day {day} · You missed {name}'s appointment at the clinic.,{day}日目 · 診療所での{name}との約束に間に合わなかった。,Dia {day} · Você perdeu a consulta de {name} na clínica.,Día {day} · Faltaste a la cita de {name} en la clínica.
+"I'm here for the treatment, doctor. Examine me if you like, then give me the tonic or tell me what else to do.","I'm here for the treatment, doctor. Examine me if you like, then give me the tonic or tell me what else to do.",治療に来ました、先生。よければ診察して、それから強壮剤をいただくか、どうすればいいか教えてください。,"Vim para o tratamento, doutor. Examine-me se quiser, e depois me dê o tônico ou diga o que mais devo fazer.","Vengo por el tratamiento, doctor. Examíneme si quiere, y luego deme el tónico o dígame qué más hacer."
+"The tonic? At the clinic, doctor, at the time we agreed.","The tonic? At the clinic, doctor, at the time we agreed.",強壮剤ですか？診療所で、約束の時間にお願いします、先生。,"O tônico? Na clínica, doutor, no horário combinado.","¿El tónico? En la clínica, doctor, a la hora acordada."
+"No tonic, doctor? Then why did you call me here...","No tonic, doctor? Then why did you call me here...",強壮剤がない、ですって？じゃあ何のために呼んだんです……,"Sem tônico, doutor? Então por que me chamou aqui...","¿No hay tónico, doctor? Entonces, ¿para qué me llamó..."
+Day {day} · The tonic did nothing for {name}'s fever.,Day {day} · The tonic did nothing for {name}'s fever.,{day}日目 · 強壮剤は{name}の熱には効かなかった。,Dia {day} · O tônico não fez nada pela febre de {name}.,Día {day} · El tónico no hizo nada por la fiebre de {name}.
+"Thank you, doctor... though my head still burns.","Thank you, doctor... though my head still burns.",ありがとうございます、先生……でも、まだ頭が熱いです。,"Obrigado, doutor... embora minha cabeça ainda arda.","Gracias, doctor... aunque la cabeza todavía me arde."
+"Thank you, doctor. I feel stronger already.","Thank you, doctor. I feel stronger already.",ありがとうございます、先生。もう力が戻ってきた気がします。,"Obrigado, doutor. Já me sinto mais forte.","Gracias, doctor. Ya me siento más fuerte."
+"Rest? You haven't even examined me today, doctor.","Rest? You haven't even examined me today, doctor.",休養？今日はまだ診てもいないじゃないですか、先生。,"Repouso? O senhor nem me examinou hoje, doutor.","¿Reposo? Ni siquiera me ha examinado hoy, doctor."
+"I know, doctor: bed, broth and warm milk. I'll do as you say.","I know, doctor: bed, broth and warm milk. I'll do as you say.",わかっていますよ、先生。寝床とスープと温かい牛乳。言われたとおりにします。,"Eu sei, doutor: cama, caldo e leite morno. Farei como diz.","Lo sé, doctor: cama, caldo y leche caliente. Haré lo que dice."
+Day {day} · You prescribed rest and good food to {name}.,Day {day} · You prescribed rest and good food to {name}.,{day}日目 · {name}に休養と栄養のある食事を指示した。,Dia {day} · Você receitou repouso e boa comida a {name}.,Día {day} · Recetaste reposo y buena comida a {name}.
+"Bed and broth... yes, doctor. This fever needs it.","Bed and broth... yes, doctor. This fever needs it.",寝床とスープ……そうですね、先生。この熱にはそれが要ります。,"Cama e caldo... sim, doutor. Esta febre precisa disso.","Cama y caldo... sí, doctor. Esta fiebre lo necesita."
+"If you say so, doctor... but I'm so weak, and rest hasn't helped so far.","If you say so, doctor... but I'm so weak, and rest hasn't helped so far.",先生がそうおっしゃるなら……でも、ひどく弱っていて、休んでも今まで良くならなかったんです。,"Se o senhor diz, doutor... mas estou tão fraco, e o repouso não ajudou até agora.","Si usted lo dice, doctor... pero estoy tan débil, y el reposo no ha ayudado hasta ahora."
+"Rest? I feel fine, doctor, but I'll take it easy.","Rest? I feel fine, doctor, but I'll take it easy.",休養ですか？元気なんですけどね、先生。まあ、無理はしません。,"Repouso? Estou bem, doutor, mas vou pegar leve.","¿Reposo? Me siento bien, doctor, pero me lo tomaré con calma."
+"Day {day} · {name} came to the clinic, but you had no tonic left.","Day {day} · {name} came to the clinic, but you had no tonic left.",{day}日目 · {name}は診療所に来たが、強壮剤が残っていなかった。,"Dia {day} · {name} veio à clínica, mas você não tinha mais tônico.","Día {day} · {name} vino a la clínica, pero no te quedaba tónico."
+Day {day} · You treated {name} at the clinic: an iron tonic and rest.,Day {day} · You treated {name} at the clinic: an iron tonic and rest.,{day}日目 · 診療所で{name}を治療した：鉄の強壮剤と休養。,Dia {day} · Você tratou {name} na clínica: um tônico de ferro e repouso.,Día {day} · Trataste a {name} en la clínica: un tónico de hierro y reposo.
+ The night visitor's hold on them is broken., The night visitor's hold on them is broken.,夜の訪問者の呪縛は解けた。, O domínio do visitante noturno foi quebrado., El dominio del visitante nocturno se ha roto.
+A figure fled from {name}'s door when it saw the doctor.,A figure fled from {name}'s door when it saw the doctor.,医師の姿を見て、人影が{name}の戸口から逃げ去った。,Um vulto fugiu da porta de {name} ao ver o médico.,Una figura huyó de la puerta de {name} al ver al doctor.
+A shadow was seen prowling the streets. Nobody died tonight.,A shadow was seen prowling the streets. Nobody died tonight.,通りをうろつく影が目撃された。今夜は誰も死ななかった。,Uma sombra foi vista rondando as ruas. Ninguém morreu esta noite.,Se vio una sombra merodeando por las calles. Nadie murió esta noche.
+"During the night, a figure was seen near {name}'s house.","During the night, a figure was seen near {name}'s house.",夜の間に、{name}の家の近くで人影が目撃された。,"Durante a noite, um vulto foi visto perto da casa de {name}.","Durante la noche, se vio una figura cerca de la casa de {name}."
+Morning of Day {day}: a figure was seen near {name}'s house.,Morning of Day {day}: a figure was seen near {name}'s house.,{day}日目の朝：{name}の家の近くで人影が目撃された。,Manhã do Dia {day}: um vulto foi visto perto da casa de {name}.,Mañana del Día {day}: se vio una figura cerca de la casa de {name}.
+{name} was found dead at their doorstep.,{name} was found dead at their doorstep.,{name}が自宅の戸口で死んでいるのが見つかった。,Encontraram {name} sem vida à porta de casa.,Encontraron a {name} sin vida a la puerta de su casa.
+Morning of Day {day}: {name} died during the night.,Morning of Day {day}: {name} died during the night.,{day}日目の朝：{name}が夜のうちに亡くなった。,Manhã do Dia {day}: {name} morreu durante a noite.,Mañana del Día {day}: {name} murió durante la noche.
+Screams were heard in the night. Someone woke up torn and gravely weak.,Screams were heard in the night. Someone woke up torn and gravely weak.,夜中に悲鳴が聞こえた。誰かが引き裂かれ、ひどく衰弱して目を覚ました。,Gritos foram ouvidos durante a noite. Alguém acordou dilacerado e gravemente fraco.,Se oyeron gritos en la noche. Alguien despertó desgarrado y gravemente débil.
+Morning of Day {day}: screams were heard near {name}'s house.,Morning of Day {day}: screams were heard near {name}'s house.,{day}日目の朝：{name}の家の近くで悲鳴が聞こえた。,Manhã do Dia {day}: gritos foram ouvidos perto da casa de {name}.,Mañana del Día {day}: se oyeron gritos cerca de la casa de {name}.
+"Somewhere in Pallbrook, someone woke up weaker than they went to bed.","Somewhere in Pallbrook, someone woke up weaker than they went to bed.",パルブルックのどこかで、誰かが眠る前より弱って目を覚ました。,"Em algum lugar de Pallbrook, alguém acordou mais fraco do que foi dormir.","En algún lugar de Pallbrook, alguien despertó más débil de lo que se acostó."
+"Somewhere in Pallbrook, someone woke up gravely weak, as if drained.","Somewhere in Pallbrook, someone woke up gravely weak, as if drained.",パルブルックのどこかで、誰かが吸い尽くされたようにひどく衰弱して目を覚ました。,"Em algum lugar de Pallbrook, alguém acordou gravemente fraco, como se tivesse sido drenado.","En algún lugar de Pallbrook, alguien despertó gravemente débil, como si lo hubieran desangrado."
+No one in Pallbrook is free anymore. {name} has won.,No one in Pallbrook is free anymore. {name} has won.,パルブルックに自由な者はもういない。{name}の勝利だ。,Ninguém em Pallbrook está livre agora. {name} venceu.,Ya nadie en Pallbrook es libre. {name} ha ganado.
+You collapsed in the street. Someone may have seen the doctor lying there.,You collapsed in the street. Someone may have seen the doctor lying there.,あなたは通りで倒れた。医師が倒れているところを誰かに見られたかもしれない。,Você desmaiou na rua. Alguém pode ter visto o médico caído ali.,Te desplomaste en la calle. Alguien pudo haber visto al doctor tirado allí.
+You collapsed in the street. {who} found you there at dawn.,You collapsed in the street. {who} found you there at dawn.,あなたは通りで倒れた。夜明けに{who}があなたを見つけた。,Você desmaiou na rua. {who} encontrou você ali ao amanhecer.,Te desplomaste en la calle. {who} te encontró allí al amanecer.
+You slept at the clinic.,You slept at the clinic.,診療所で眠った。,Você dormiu na clínica.,Dormiste en la clínica.
+"This sickness... I can barely stand, doctor.","This sickness... I can barely stand, doctor.",この病気……立っているのもやっとです、先生。,"Esta doença... mal consigo ficar de pé, doutor.","Esta enfermedad... apenas puedo tenerme en pie, doctor."
+"Forgive me, doctor. The light hurts my eyes these days.","Forgive me, doctor. The light hurts my eyes these days.",すみません、先生。この頃は光が目にしみるんです。,"Perdoe-me, doutor. A luz tem machucado meus olhos ultimamente.","Perdóneme, doctor. Estos días la luz me hace daño en los ojos."
+I'm so tired. Is it the same thing the others have?,I'm so tired. Is it the same thing the others have?,とても疲れているんです。ほかの人たちと同じ病気でしょうか？,Estou tão cansado. É a mesma coisa que os outros têm?,Estoy tan cansado. ¿Es lo mismo que tienen los demás?
+"Good day, doctor.","Good day, doctor.",こんにちは、先生。,"Bom dia, doutor.","Buenos días, doctor."
+Doctor. Need something?,Doctor. Need something?,先生。何かご用ですか？,Doutor. Precisa de algo?,Doctor. ¿Necesita algo?
+"Ah, doctor. Any news?","Ah, doctor. Any news?",ああ、先生。何か新しいことは？,"Ah, doutor. Alguma novidade?","Ah, doctor. ¿Alguna novedad?"
+Yesterday? Like any other day.,Yesterday? Like any other day.,昨日ですか？いつもと同じですよ。,Ontem? Como qualquer outro dia.,¿Ayer? Como cualquier otro día.
+"Same as always, doctor.","Same as always, doctor.",いつもどおりです、先生。,"O mesmo de sempre, doutor.","Lo de siempre, doctor."
+"An ordinary day, nothing more.","An ordinary day, nothing more.",普通の一日でした、それだけです。,"Um dia comum, nada mais.","Un día corriente, nada más."
+Have you noticed how strange {name} has been lately?,Have you noticed how strange {name} has been lately?,最近の{name}、様子がおかしいと思いませんか？,Já reparou como {name} anda estranho ultimamente?,¿Ha notado lo raro que está {name} últimamente?
+"I wouldn't trust {name} if I were you, doctor.","I wouldn't trust {name} if I were you, doctor.",私なら{name}は信用しませんね、先生。,"Eu não confiaria em {name} se fosse o senhor, doutor.","Yo no me fiaría de {name} si fuera usted, doctor."
+I saw {name} wandering around late at night.,I saw {name} wandering around late at night.,夜遅くに{name}がうろついているのを見ました。,Vi {name} andando por aí tarde da noite.,Vi a {name} deambulando tarde por la noche.
+"I’m sewing a new dress. For a funeral, sadly.","I’m sewing a new dress. For a funeral, sadly.",新しいドレスを縫っているんです。残念ながら、葬式用の。,"Estou costurando um vestido novo. Para um funeral, infelizmente.","Estoy cosiendo un vestido nuevo. Para un funeral, por desgracia."
+I don’t go out after dark. No one should.,I don’t go out after dark. No one should.,暗くなってからは出歩きません。誰もそうすべきじゃない。,Não saio depois que escurece. Ninguém deveria.,No salgo después del anochecer. Nadie debería.
+"Welcome to Pallbrook! A quiet town, I assure you.","Welcome to Pallbrook! A quiet town, I assure you.",パルブルックへようこそ！静かな町ですよ、保証します。,"Bem-vindo a Pallbrook! Uma cidade tranquila, eu garanto.","¡Bienvenido a Pallbrook! Un pueblo tranquilo, se lo aseguro."
+"If you hear rumors, ignore them. People here love a good story.","If you hear rumors, ignore them. People here love a good story.",噂を耳にしても気にしないでください。ここの人たちは作り話が大好きでね。,"Se ouvir boatos, ignore. O povo daqui adora uma boa história.","Si oye rumores, ignórelos. A la gente de aquí le encanta una buena historia."
+"First drink’s on the house, doctor.","First drink’s on the house, doctor.",最初の一杯は店のおごりですよ、先生。,"A primeira bebida é por conta da casa, doutor.","La primera copa corre por cuenta de la casa, doctor."
+"I heard footsteps on the roof last night. Cats, must be... cats.","I heard footsteps on the roof last night. Cats, must be... cats.",昨夜、屋根の上で足音がしたんです。猫でしょう……きっと猫です。,"Ouvi passos no telhado ontem à noite. Gatos, devem ser... gatos.","Anoche oí pasos en el tejado. Gatos, deben de ser... gatos."
+"May God protect you, doctor. The nights here have grown too long.","May God protect you, doctor. The nights here have grown too long.",神のご加護がありますように、先生。この町の夜は長くなりすぎました。,"Que Deus o proteja, doutor. As noites aqui ficaram longas demais.","Que Dios lo proteja, doctor. Las noches aquí se han vuelto demasiado largas."
+"I pray for this town every morning. Lately, I pray more.","I pray for this town every morning. Lately, I pray more.",毎朝この町のために祈っています。近頃は、祈る時間が増えました。,"Rezo por esta cidade todas as manhãs. Ultimamente, rezo mais.","Rezo por este pueblo cada mañana. Últimamente, rezo más."
+Half my pupils stayed home this week. Their parents say they are just tired.,Half my pupils stayed home this week. Their parents say they are just tired.,今週は生徒の半分が休みました。親たちは、ただ疲れているだけだと言います。,Metade dos meus alunos ficou em casa esta semana. Os pais dizem que estão só cansados.,La mitad de mis alumnos se quedó en casa esta semana. Sus padres dicen que solo están cansados.
+"Children notice things, doctor. They say someone walks the streets at night.","Children notice things, doctor. They say someone walks the streets at night.",子どもはいろいろ気づくものです、先生。夜に誰かが通りを歩いている、と言うんです。,"As crianças percebem as coisas, doutor. Dizem que alguém anda pelas ruas à noite.","Los niños se dan cuenta de las cosas, doctor. Dicen que alguien camina por las calles de noche."
+Every book in this town has been read twice. Except the ones about this town.,Every book in this town has been read twice. Except the ones about this town.,この町の本はどれも二度は読まれています。この町についての本を除いてね。,Todo livro desta cidade já foi lido duas vezes. Menos os que falam desta cidade.,Cada libro de este pueblo se ha leído dos veces. Excepto los que tratan de este pueblo.
+The old records stop forty years ago. Someone tore the pages out.,The old records stop forty years ago. Someone tore the pages out.,古い記録は四十年前で途切れています。誰かがページを破り取ったんです。,Os registros antigos param há quarenta anos. Alguém arrancou as páginas.,Los registros antiguos se detienen hace cuarenta años. Alguien arrancó las páginas.
+"Iron doesn’t lie, doctor. People do.","Iron doesn’t lie, doctor. People do.",鉄は嘘をつきません、先生。嘘をつくのは人間です。,"O ferro não mente, doutor. As pessoas mentem.","El hierro no miente, doctor. La gente sí."
+I hammer all day. At night I sleep like a rock... almost.,I hammer all day. At night I sleep like a rock... almost.,一日中槌を振るっていますからね。夜は石のように眠ります……まあ、だいたいは。,Martelo o dia todo. À noite durmo como uma pedra... quase.,Martilleo todo el día. De noche duermo como un tronco... casi.
+the Clinic,the Clinic,診療所,a clínica,la clínica
+the Tavern,the Tavern,酒場,a taverna,la taberna
+the Church,the Church,教会,a igreja,la iglesia
+the School,the School,学校,a escola,la escuela
+the Town Hall,the Town Hall,町役場,a prefeitura,el ayuntamiento
+the Library,the Library,図書館,a biblioteca,la biblioteca
+the square,the square,広場,a praça,la plaza
+Clara's house,Clara's house,クララの家,a casa da Clara,la casa de Clara
+Tomas's forge,Tomas's forge,トマスの鍛冶場,a forja do Tomás,la forja de Tomás
+Sophia's house,Sophia's house,ソフィアの家,a casa da Sophia,la casa de Sophia
+Sarah's house,Sarah's house,サラの家,a casa da Sarah,la casa de Sarah
+the Mayor's house,the Mayor's house,町長の家,a casa do prefeito,la casa del alcalde
+"Development build {version}. This game is still in development: this is not the final version, and every aspect of the game is subject to change.","Development build {version}. This game is still in development: this is not the final version, and every aspect of the game is subject to change.",開発版 {version}。本作は開発中です。これは最終版ではなく、ゲームのあらゆる要素は変更される可能性があります。,"Versão de desenvolvimento {version}. Este jogo ainda está em desenvolvimento: esta não é a versão final, e todos os aspectos do jogo estão sujeitos a mudanças.","Versión de desarrollo {version}. Este juego aún está en desarrollo: esta no es la versión final, y todos los aspectos del juego están sujetos a cambios."
+Hidden: nobody can see you here,Hidden: nobody can see you here,隠れている：ここなら誰にも見られない,Escondido: ninguém consegue ver você aqui,Escondido: nadie puede verte aquí
+Brightness: %d%%,Brightness: %d%%,明るさ：%d%%,Brilho: %d%%,Brillo: %d%%

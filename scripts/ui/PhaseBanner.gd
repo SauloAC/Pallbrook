@@ -15,7 +15,7 @@ func _on_player_collapsed() -> void:
 	create_tween().tween_property(fade, "modulate:a", 1.0, 1.5)  # Fade to black
 
 func _on_phase_changed(is_night: bool) -> void:
-	label.text = ("Night %d" if is_night else "Day %d") % GameState.day
+	label.text = (tr("Night %d") if is_night else tr("Day %d")) % GameState.day
 	var tween := create_tween()
 	tween.tween_property(label, "modulate:a", 1.0, 1.0)
 	tween.tween_interval(2.0)
