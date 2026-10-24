@@ -5,7 +5,7 @@ extends Node3D
 # Models are the Quaternius "Ultimate Animated Character Pack" (CC0).
 
 const MODEL_DIR := "res://assets/models/characters/"
-const SCALE := 0.6          # The pack's people are ~3.3 m tall; this makes them ~2 m like the capsules
+const SCALE := 0.51         # The pack's people are ~3.3 m tall; this makes them ~1.7 m, so the kit's doors and rooms read right
 const TURN_SPEED := 10.0
 const PALE := Color(0.92, 0.9, 0.88)
 

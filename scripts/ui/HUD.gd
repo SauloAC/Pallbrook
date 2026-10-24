@@ -23,6 +23,8 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	var phase := "Night" if GameState.is_night else "Day"
+	if not GameState.is_night:
+		phase += "   ·   " + GameState.weather_name()
 	clock.text = "Day %d   ·   %s   ·   %s   ·   %d coins   ·   %d tonic%s" % [GameState.day,
 			GameState.format_time(GameState.hour), phase, GameState.coins, GameState.tonics,
 			"" if GameState.tonics == 1 else "s"]

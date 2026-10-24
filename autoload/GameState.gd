@@ -16,6 +16,9 @@ var entries: Array[Dictionary] = []
 var appointments: Array[Dictionary] = []
 var game_over := false
 var intro_seen := false
+var weather := "clear"           # Today's sky: clear, cloudy or fog (rolled at dawn)
+var open_building := ""          # The walk-in building the doctor is standing in (roof hidden)
+var open_upstairs := false       # ...and whether he is on its upper floor
 
 # ---------- The doctor's purse ----------
 const SALARY := 3        # Paid by the Town Hall every morning
@@ -38,6 +41,9 @@ func reset() -> void:
 	Engine.time_scale = 1.0
 	game_over = false
 	vampire_name = ""
+	weather = "clear"
+	open_building = ""
+	open_upstairs = false
 	night_events.clear()
 	clues.clear()
 	coins = 4
@@ -75,6 +81,7 @@ func start_day() -> void:
 	is_night = false
 	day += 1
 	coins += SALARY
+	_roll_weather()
 	add_night_event("The Town Hall paid your salary: %d coins." % SALARY)
 	if tonics_ordered > 0:
 		tonics += tonics_ordered
@@ -83,6 +90,21 @@ func start_day() -> void:
 	EventBus.phase_changed.emit(false)
 	
 var night_events: Array[String] = []
+
+
+# Autumn sky. A well-fed vampire can walk under clouds or fog, so the weather matters.
+func _roll_weather() -> void:
+	var r := randf()
+	weather = "fog" if r < 0.25 else ("cloudy" if r < 0.55 else "clear")
+	if weather == "fog":
+		add_night_event("A thick fog lies over Pallbrook this morning.")
+	elif weather == "cloudy":
+		add_night_event("Grey clouds hide the sun today.")
+	Playtest.count("days_" + weather)
+
+
+func weather_name() -> String:
+	return {"clear": "Clear", "cloudy": "Cloudy", "fog": "Fog"}.get(weather, "Clear")
 
 func add_night_event(text: String) -> void:
 	night_events.append(text)

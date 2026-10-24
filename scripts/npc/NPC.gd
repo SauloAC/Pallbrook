@@ -158,8 +158,14 @@ const BED_SPOTS := {
 	"CasaSophia": [Vector3(-1.0, 0.0, -3.7), 90.0],
 	"CasaSarah": [Vector3(2.55, 0.0, -3.8), 90.0],
 	"CasaHugo": [Vector3(2.7, 0.0, -3.8), 90.0],
+	"Taverna": [Vector3(1.45, 3.12, -6.85), -90.0],  # Marta sleeps upstairs, by the window (feet at the foot of the bed, head to the wall)
 }
 const BED_HEIGHT := 0.6
+# Upstairs beds: where to walk to first (on the upper floor, beside the bed), relative to the door.
+# The bed itself has no navigation mesh, and its nearest mesh point can be outside the house.
+const BED_APPROACH := {
+	"Taverna": Vector3(0.6, 3.12, -6.6),
+}
 var in_bed := false
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
@@ -275,12 +281,19 @@ func _lie_down() -> void:
 	agent.target_position = global_position
 	global_position = marker.global_position + bed[0]
 	reset_physics_interpolation()
+	if bed_upstairs() and GameState.open_building == data.home and not GameState.open_upstairs:
+		visible = false  # The upper floor is cut away while the doctor is downstairs
 	if visual:
 		visual.rotation = Vector3(-PI / 2.0, deg_to_rad(bed[1]), 0.0)
 		visual.position.y = BED_HEIGHT
 	else:
 		mesh.rotation = Vector3(-PI / 2.0, deg_to_rad(bed[1]), 0.0)
 		mesh.position.y = BED_HEIGHT
+
+
+# A bed on the upper floor: hidden with that floor when the doctor walks in downstairs
+func bed_upstairs() -> bool:
+	return data != null and BED_SPOTS.has(data.home) and BED_SPOTS[data.home][0].y > 1.0
 
 
 func _get_up() -> void:
@@ -396,7 +409,15 @@ func is_anemic() -> bool:
 
 func claims_sickness() -> bool:
 	# Who says they are ill: the anemic, the frightened, the feverish, and the vampire hiding from the sun
-	return is_anemic() or worried or has_flu() or (is_vampire() and not GameState.is_night)
+	return is_anemic() or worried or has_flu() or (is_vampire() and not GameState.is_night and not walks_by_day())
+
+
+# A well-fed vampire can go out under clouds or fog, but by day it is only a person: no powers,
+# no hunting. Hungry or weak, it hasn't the strength and stays in bed.
+const VAMPIRE_DAY_FED := 70.0
+
+func walks_by_day() -> bool:
+	return is_vampire() and GameState.weather != "clear" and blood >= VAMPIRE_DAY_FED
 
 
 func has_flu() -> bool:
@@ -656,6 +677,8 @@ func _go_to_place(place: String) -> void:
 		if data and place == data.home and BED_SPOTS.has(place) \
 				and (_is_bedtime() or state == State.SCARED or hunt_returning):
 			spot = marker.global_position + BED_SPOTS[place][0]  # Off to bed (stops beside it)
+			if BED_APPROACH.has(place):
+				spot = _upstairs_spot(marker, place)
 		elif INTERIOR_SLOTS.has(place):
 			spot = _reachable_spot(marker.global_position, spot)
 		go_to(spot)
@@ -679,6 +702,22 @@ func _reachable_spot(door: Vector3, spot: Vector3) -> Vector3:
 		if Vector2(end.x - p.x, end.z - p.z).length() < 0.35:
 			return end
 	return door
+
+
+# Up the stairs to the side of the bed. If the upper floor can't be reached (navigation mesh
+# not baked up there), wait inside on the ground floor instead of walking round the outside.
+func _upstairs_spot(marker: Node3D, place: String) -> Vector3:
+	var target: Vector3 = marker.global_position + BED_APPROACH[place]
+	var map := agent.get_navigation_map()
+	var hub := _find_location("Praca")
+	if hub and NavigationServer3D.map_get_iteration_id(map) != 0:
+		var path := NavigationServer3D.map_get_path(map, hub.global_position, target, true)
+		if not path.is_empty():
+			var end := path[path.size() - 1]
+			if Vector2(end.x - target.x, end.z - target.z).length() < 0.5 and absf(end.y - target.y) < 0.6:
+				return end
+	var slots: Array = INTERIOR_SLOTS.get(place, [Vector3.ZERO])
+	return _reachable_spot(marker.global_position, marker.global_position + slots[0])
 
 
 func _free_slot(place: String) -> int:
@@ -705,7 +744,7 @@ func _place_for_hour(hour: int) -> String:
 		place = _plan_place(tonight, hour)
 	if not GameState.is_night:
 		# The sick stay in bed. The vampire hides from the sun and blames the same sickness.
-		if is_anemic() or ((is_vampire() or worried) and hour >= 8 and hour < 17):
+		if is_anemic() or (((is_vampire() and not walks_by_day()) or worried) and hour >= 8 and hour < 17):
 			return data.home
 	# Servants avoid the open square during the day
 	if is_servant and not GameState.is_night and place == "Praca":

@@ -8,6 +8,11 @@ extends Node
 @export var night_start_hour := 18.0
 @export var exhaustion_start_hour := 0.0
 @export var collapse_hour := 1.0
+# Fog days: a thin haze over everything, thicker close to the ground so roofs rise out of it.
+# Tweak these on the node in the inspector while the game runs.
+@export var fog_density := 0.004
+@export var fog_height := 2.5          # Above this the fog thins out
+@export var fog_height_density := 0.2  # How fast it thickens below fog_height
 
 var hour: float
 var is_collapsing := false
@@ -45,16 +50,33 @@ func _update_lighting() -> void:
 	var t := (hour - 6.0) / 12.0
 	var daylight := clampf(sin(t * PI), 0.0, 1.0)
 
+	# Clouds and fog dim the sun and grey its colour (the weather is rolled at dawn)
+	var sun_max := 1.0
+	var grey := 0.0
+	if GameState.weather == "cloudy":
+		sun_max = 0.55
+		grey = 0.6
+	elif GameState.weather == "fog":
+		sun_max = 0.7
+		grey = 0.45
 	if sun:
 		sun.rotation_degrees.x = -lerpf(15.0, 165.0, clampf(t, 0.0, 1.0))
-		sun.light_energy = lerpf(0.15, 1.0, daylight)
-		# Bluish moonlight at night, warm white during the day
-		sun.light_color = Color(0.5, 0.6, 1.0).lerp(Color(1.0, 0.95, 0.85), daylight)
+		sun.light_energy = lerpf(0.15, sun_max, daylight)
+		# Bluish moonlight at night, warm white during the day (greyer under clouds)
+		var day_color := Color(1.0, 0.95, 0.85).lerp(Color(0.82, 0.85, 0.9), grey)
+		sun.light_color = Color(0.5, 0.6, 1.0).lerp(day_color, daylight)
 
 	if world_environment and world_environment.environment:
 		var env := world_environment.environment
-		env.background_energy_multiplier = lerpf(0.05, 1.0, daylight)
+		env.background_energy_multiplier = lerpf(0.05, 1.0, daylight) * lerpf(1.0, 0.7, grey)
 		env.ambient_light_energy = lerpf(0.25, 1.0, daylight)
+		env.fog_enabled = GameState.weather == "fog"
+		if env.fog_enabled:
+			env.fog_light_color = Color(0.72, 0.75, 0.8)
+			env.fog_light_energy = lerpf(0.08, 1.0, daylight)
+			env.fog_density = fog_density
+			env.fog_height = fog_height
+			env.fog_height_density = fog_height_density
 
 func _update_exhaustion() -> void:
 	# Only between midnight and sunrise
