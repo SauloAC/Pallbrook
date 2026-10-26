@@ -21,3 +21,4 @@ Third-party assets used in the game. Keep this list up to date before any public
 - Character portraits, UI art and patient chart: generated with Google Gemini (AI). Steam requires disclosing AI-generated content.
 - Fonts: Cinzel and Lora (Google Fonts, SIL Open Font License).
 - Japanese font: Shippori Mincho by FONTDASU (Google Fonts, SIL Open Font License; license in assets/fonts/ShipporiMincho/OFL.txt).
+- Handwriting font (the old doctor's diary): Caveat by The Caveat Project Authors (Google Fonts, SIL Open Font License; license in assets/fonts/Caveat/OFL.txt).

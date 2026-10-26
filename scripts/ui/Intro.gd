@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-const INTRO := "Autumn.\n\nPallbrook's doctor vanished one night without a word. Since then, a strange anemia has spread through the town: people wake pale and weak, and some no longer wake at all.\n\nYou are the physician sent to stop the outbreak.\n\nBy day, visit the sick, examine them and ask what they saw. By night, get back to the clinic before 1 AM.\n\nThis sickness has a cause, and it walks among them. When you are sure who it is, accuse them. You only get one chance."
+const INTRO := "Autumn.\n\nPallbrook's doctor vanished one night without a word. Since then, a strange anemia has spread through the town: people wake pale and weak, and some no longer wake at all.\n\nYou are the physician sent to stop the outbreak.\n\nBy day, visit the sick, examine them and ask what they saw. By night, get back to the clinic before 1 AM.\n\nThis sickness has a cause, and it walks among them. When you are sure who it is, bring them before the town. You get two hearings."
 
 @onready var background: Control = $Background
 @onready var title: Label = $Background/Title

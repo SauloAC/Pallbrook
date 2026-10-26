@@ -17,11 +17,26 @@ const APPOINTMENTS := "#appointments"
 const CHART_PICK := "#chart"  # Waiting for the player to pick whose chart to open
 const READING_TIME_SCALE := 0.25  # How fast the world runs while the casebook is open
 const SUPPLIES := "#supplies"  # Coins, tonics, and how to get more
+const NIGHTS := "#nights"      # Who was where each night, and the cross-check
+const DIARY := "#diary"        # The old doctor's sheets (filled in a later step)
 
-var filter := ALL  # ALL, EVIDENCE or a person's name
+var filter := NIGHTS  # NIGHTS, ALL, EVIDENCE... or a person's name
 const PER_PAGE := 9  # 3x3 grid; more townsfolk spill onto extra pages
 var townsfolk_page := 0
 var filter_bar: HBoxContainer
+
+# ---------- Bookmarks ----------
+# Ribbons sticking out of the right edge of the book, one per section. Q/E turn to the
+# previous/next one. Each opens a filter value (the person filters live inside Clues).
+const RIBBONS := [["Nights", NIGHTS], ["Patients", CHART_PICK], ["Clues", ALL], ["Diary", DIARY],
+		["Visits", APPOINTMENTS], ["Supplies", SUPPLIES]]
+const RIBBON_SIZE := Vector2(134, 40)
+const RIBBON_HIDDEN := 30.0   # How much of each ribbon is tucked under the book
+const BOOK_SHIFT := -40.0     # The book sits a little left of centre, so the ribbons fit on screen
+const RIBBON_PAPER := Color(0.87, 0.8, 0.66)
+const RIBBON_EDGE := Color(0.42, 0.33, 0.24)
+const RIBBON_RED := Color(0.55, 0.12, 0.09)
+var ribbon_box: VBoxContainer
 
 # ---------- Patient chart ----------
 const CHART := preload("res://assets/ui/patient_chart.png")
@@ -42,6 +57,36 @@ const NOTE_X := 474.0
 const NOTE_LINES := [861, 913, 965, 1018, 1070, 1123, 1175, 1227, 1280]
 const BLOOD_RED := Color(0.48, 0.07, 0.07)
 
+# ---------- Nights table and cross-check ----------
+# Left page: one row per townsperson, one column per night. Right page: pick a mark, then a
+# witness, and read what each said side by side. Marks only become ✓ or (!) once the doctor
+# has compared them himself.
+const NIGHTS_SHOWN := 6
+const MARKS := {
+	"match": preload("res://assets/ui/casebook/mark_check.png"),
+	"conflict": preload("res://assets/ui/casebook/mark_conflict.png"),
+	"alibi": preload("res://assets/ui/casebook/mark_alibi.png"),
+	"dead": preload("res://assets/ui/casebook/mark_dead.png"),
+	"refused": preload("res://assets/ui/casebook/mark_refused.png"),
+	"victim": preload("res://assets/ui/casebook/mark_victim.png"),
+	"": preload("res://assets/ui/casebook/mark_none.png"),
+}
+const MARK_SELECT := preload("res://assets/ui/casebook/mark_select.png")
+const BOX_EMPTY := preload("res://assets/ui/casebook/box_empty.png")
+const BOX_CHECKED := preload("res://assets/ui/casebook/box_checked.png")
+# Ready-made phrases for the doctor's notes (Dark Souls style): click a blank to change it
+const CLAIMS := ["says they stayed home", "says they were asleep", "claims to be ill", "saw someone at night",
+		"saw nothing", "refused to talk"]
+const CONNECTORS := [", but", ", and", ", so"]
+const OBSERVATIONS := ["was out late at night", "was near a victim's house", "walked around by day",
+		"may be lying", "may be mistaken", "may be covering for someone", "is telling the truth"]
+var remark_choice := [0, 0, 0, 0]  # Person, claim, connector, observation
+var nights_box: VBoxContainer
+var nights_first := 0      # First night shown (0 = the latest nights)
+var sel_person := ""       # The mark picked on the nights table
+var sel_night := 0
+var sel_witness := ""      # Who it is being compared with
+
 var chart_layer: Control
 var sheet: Control
 var chart_npc := ""     # Whose chart is open
@@ -58,8 +103,17 @@ func _ready() -> void:
 	var vbox: VBoxContainer = $Panel/Pages/VBox
 	vbox.add_child(filter_bar)
 	vbox.move_child(filter_bar, title.get_index() + 1)
+	nights_box = VBoxContainer.new()
+	nights_box.add_theme_constant_override("separation", 6)
+	nights_box.visible = false
+	nights_box.size_flags_vertical = Control.SIZE_EXPAND_FILL  # Keeps the key hints at the bottom of the page
+	vbox.add_child(nights_box)
+	vbox.move_child(nights_box, scroll.get_index())
 	_layout_book(vbox)
+	_build_ribbons()
 	_build_chart_layer()
+	_build_diary_layer()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL  # Keeps the key hints at the bottom of the page
 
 
 func _input(event: InputEvent) -> void:
@@ -72,6 +126,41 @@ func _input(event: InputEvent) -> void:
 			step = 1
 		if step != 0:
 			_step_chart(step)
+			get_viewport().set_input_as_handled()
+			return
+	# Q/E: the previous/next bookmark (only while the book is open, not over a chart)
+	# An open diary sheet: W/S pick a loose piece, A/D a gap, E puts it there
+	if diary_layer.visible and not event.is_echo():
+		var handled := true
+		if event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
+			_cycle_pick(-1)
+		elif event.is_action_pressed("move_down") or event.is_action_pressed("ui_down"):
+			_cycle_pick(1)
+		elif event.is_action_pressed("move_left") or event.is_action_pressed("ui_left"):
+			_cycle_gap(-1)
+		elif event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
+			_cycle_gap(1)
+		elif event.is_action_pressed("interact"):
+			if diary_gap == "":
+				_cycle_gap(1)
+			_try_place(diary_gap)
+		else:
+			handled = false
+		if handled:
+			get_viewport().set_input_as_handled()
+			return
+	# An open diary sheet: Esc or Tab puts it down
+	if diary_layer.visible and (event.is_action_pressed("notebook") or event.is_action_pressed("ui_cancel")):
+		_close_sheet()
+		get_viewport().set_input_as_handled()
+		return
+	if panel.visible and not chart_layer.visible and not diary_layer.visible and not event.is_echo():
+		if event.is_action_pressed("accuse"):
+			_turn_ribbon(-1)
+			get_viewport().set_input_as_handled()
+			return
+		if event.is_action_pressed("interact"):
+			_turn_ribbon(1)
 			get_viewport().set_input_as_handled()
 			return
 	if not event.is_action_pressed("notebook"):
@@ -88,6 +177,7 @@ func _input(event: InputEvent) -> void:
 func _open() -> void:
 	_refresh()
 	panel.visible = true
+	ribbon_box.visible = true
 	Audio.play("book_open", -4.0)
 	# Time doesn't stop while reading, it slows down: thinking is cheap, but not free.
 	# 0 = full pause, 1 = normal speed.
@@ -99,6 +189,7 @@ func _open() -> void:
 
 func _close() -> void:
 	panel.visible = false
+	ribbon_box.visible = false
 	Audio.play("book_close", -4.0)
 	GameState.reading = false
 	Engine.time_scale = 1.0
@@ -111,8 +202,8 @@ func _set_filter(value: String) -> void:
 		_refresh()
 		_open_chart(value)
 		return
-	# Clicking the active person again goes back to everything
-	filter = ALL if value == filter and value != ALL else value
+	# Clicking the active person again goes back to everything (tabs just stay open)
+	filter = ALL if value == filter and _is_person(value) else value
 	Audio.play("page", -6.0)
 	_refresh()
 
@@ -121,11 +212,15 @@ func _refresh() -> void:
 	# The right page lists everyone the doctor looks after (set here, so it follows the language)
 	for child in $Panel/Pages/Suspects.get_children():
 		if child is Label:
-			child.text = tr("Patients")
+			child.text = tr("Compare") if filter == NIGHTS else (tr("Loose pieces") if filter == DIARY else tr("Patients"))
 			break
 	_build_filter_bar()
 	_build_suspects()
 	_build_entries()
+	_build_ribbons()
+	var hint := get_node_or_null("Panel/Pages/VBox/Hint") as Label
+	if hint:
+		hint.text = tr("[Tab] Close") + "     " + tr("[Q/E] Turn bookmark")
 
 
 # ---------- Book layout ----------
@@ -144,8 +239,8 @@ func _layout_book(left_page: Control) -> void:
 	style.content_margin_bottom = 40.0
 	book.add_theme_stylebox_override("panel", style)
 	book.custom_minimum_size = BOOK_SIZE
-	book.offset_left = -BOOK_SIZE.x / 2.0
-	book.offset_right = BOOK_SIZE.x / 2.0
+	book.offset_left = -BOOK_SIZE.x / 2.0 + BOOK_SHIFT
+	book.offset_right = BOOK_SIZE.x / 2.0 + BOOK_SHIFT
 	book.offset_top = -BOOK_SIZE.y / 2.0
 	book.offset_bottom = BOOK_SIZE.y / 2.0
 	var pages: HBoxContainer = $Panel/Pages
@@ -161,25 +256,110 @@ func _layout_book(left_page: Control) -> void:
 # ---------- Left page ----------
 
 func _build_filter_bar() -> void:
+	# The sections moved to the bookmarks; what is left here are the filters of Clues
 	_clear(filter_bar)
+	filter_bar.visible = _ribbon_of(filter) == ALL
+	if not filter_bar.visible:
+		return
+	filter_bar.add_theme_constant_override("separation", 10)
 	filter_bar.add_child(_link("All", ALL))
 	filter_bar.add_child(_link("Clinic", EVIDENCE))
-	filter_bar.add_child(_link("Visits", APPOINTMENTS))
-	filter_bar.add_child(_link("Supplies", SUPPLIES))
-	# Patient chart is always there: opens the selected patient, or asks you to pick one
-	var chart_link := _link("Patient chart", CHART_PICK)
 	if _is_person(filter):
+		filter_bar.add_child(_link(filter, filter))
+		# This person's chart, one click away
+		var chart_link := _link("Patient chart", CHART_PICK)
 		chart_link.add_theme_color_override("font_color", BLOOD_RED)
-	for connection in chart_link.gui_input.get_connections():
-		chart_link.gui_input.disconnect(connection["callable"])
-	chart_link.gui_input.connect(func(event: InputEvent):
+		for connection in chart_link.gui_input.get_connections():
+			chart_link.gui_input.disconnect(connection["callable"])
+		chart_link.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				_on_chart_link.call_deferred())
+		filter_bar.add_child(chart_link)
+
+
+# ---------- Bookmarks ----------
+
+# Which bookmark a filter value belongs to
+func _ribbon_of(value: String) -> String:
+	if value in [NIGHTS, CHART_PICK, DIARY, APPOINTMENTS, SUPPLIES]:
+		return value
+	return ALL  # Everything, the clinic's own findings, or one person: all part of Clues
+
+
+func _build_ribbons() -> void:
+	if ribbon_box == null:
+		# Behind the book, sticking out of its right edge
+		ribbon_box = VBoxContainer.new()
+		ribbon_box.add_theme_constant_override("separation", 8)
+		ribbon_box.set_anchors_preset(Control.PRESET_CENTER)
+		ribbon_box.offset_left = BOOK_SIZE.x / 2.0 + BOOK_SHIFT - RIBBON_HIDDEN
+		ribbon_box.offset_top = -BOOK_SIZE.y / 2.0 + 46.0
+		ribbon_box.visible = panel.visible
+		add_child(ribbon_box)
+		move_child(ribbon_box, panel.get_index())  # Drawn before (under) the book
+	_clear(ribbon_box)
+	var active := _ribbon_of(filter)
+	var font: Font = title.get_theme_font("font")
+	for entry in RIBBONS:
+		var value: String = entry[1]
+		var on := value == active
+		var tab := PanelContainer.new()
+		var style := StyleBoxFlat.new()
+		style.bg_color = RIBBON_PAPER if on else RIBBON_PAPER.darkened(0.12)
+		style.border_color = RIBBON_EDGE
+		style.set_border_width_all(2)
+		style.corner_radius_top_right = 6
+		style.corner_radius_bottom_right = 6
+		style.content_margin_left = RIBBON_HIDDEN  # The part hidden under the book
+		style.content_margin_right = 6.0
+		style.shadow_color = Color(0, 0, 0, 0.35)
+		style.shadow_size = 3
+		tab.add_theme_stylebox_override("panel", style)
+		tab.custom_minimum_size = RIBBON_SIZE
+		var label := Label.new()
+		label.text = tr(entry[0])
+		label.add_theme_font_override("font", font)
+		label.add_theme_font_size_override("font_size", 13 if label.text.length() <= 8 else 11)
+		label.clip_text = true
+		label.add_theme_color_override("font_color", RIBBON_RED if on else INK)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tab.add_child(label)
+		# The open one sticks out a little further
+		var row := MarginContainer.new()
+		row.add_theme_constant_override("margin_left", 8 if on else 0)
+		row.add_child(tab)
+		_make_ribbon_clickable(tab, value)
+		ribbon_box.add_child(row)
+
+
+func _make_ribbon_clickable(tab: Control, value: String) -> void:
+	tab.mouse_filter = Control.MOUSE_FILTER_STOP
+	tab.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	tab.gui_input.connect(func(event: InputEvent):
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			_on_chart_link.call_deferred())
-	filter_bar.add_child(chart_link)
+			_open_ribbon.call_deferred(value))
+
+
+func _open_ribbon(value: String) -> void:
+	if _ribbon_of(filter) == value and value != ALL:
+		return
+	filter = value
+	Audio.play("page", -6.0)
+	_refresh()
+
+
+func _turn_ribbon(step: int) -> void:
+	var index := 0
+	for i in RIBBONS.size():
+		if RIBBONS[i][1] == _ribbon_of(filter):
+			index = i
+	_open_ribbon(RIBBONS[posmod(index + step, RIBBONS.size())][1])
 
 
 func _is_person(value: String) -> bool:
-	return value not in [ALL, EVIDENCE, APPOINTMENTS, CHART_PICK]
+	return value not in [ALL, EVIDENCE, APPOINTMENTS, CHART_PICK, SUPPLIES, NIGHTS, DIARY]
 
 
 func _on_chart_link() -> void:
@@ -194,7 +374,7 @@ func _on_chart_link() -> void:
 func _link(text: String, value: String) -> Label:
 	var label := Label.new()
 	label.text = tr(text)
-	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_font_size_override("font_size", 16)
 	label.add_theme_color_override("font_color", INK if filter == value else INK_FADED)
 	if filter == value:
 		label.text = "» " + tr(text)
@@ -203,6 +383,15 @@ func _link(text: String, value: String) -> Label:
 
 
 func _build_entries() -> void:
+	scroll.visible = filter not in [NIGHTS, DIARY]
+	nights_box.visible = filter in [NIGHTS, DIARY]
+	if filter == NIGHTS:
+		_build_nights()
+		return
+	if filter == DIARY:
+		_clear(nights_box)
+		_build_diary_sheets()
+		return
 	if filter == APPOINTMENTS:
 		_build_appointments()
 		return
@@ -216,7 +405,7 @@ func _build_entries() -> void:
 		return
 	match filter:
 		ALL:
-			title.text = tr("Casebook")
+			title.text = tr("Clues")
 		EVIDENCE:
 			title.text = tr("Clinic")
 		_:
@@ -307,6 +496,20 @@ func _matches(entry: Dictionary) -> bool:
 
 func _build_suspects() -> void:
 	_clear(suspect_list)
+	if filter == NIGHTS:
+		_build_compare()
+		return
+	if filter == DIARY:
+		var holder := ScrollContainer.new()
+		holder.custom_minimum_size = Vector2(0, 360)  # A long tray scrolls, the book never grows
+		holder.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		suspect_list.add_child(holder)
+		var tray := VBoxContainer.new()
+		tray.add_theme_constant_override("separation", 6)
+		tray.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		holder.add_child(tray)
+		_build_diary_tray(tray)
+		return
 	# Small cards in three columns: portrait, name, role underneath
 	var grid := GridContainer.new()
 	grid.columns = 3
@@ -391,6 +594,392 @@ func _turn_arrow(symbol: String, step: int, enabled: bool) -> Label:
 				townsfolk_page += step
 				_build_suspects.call_deferred())
 	return arrow
+
+
+# ---------- Nights table (left page) ----------
+
+func _build_nights() -> void:
+	title.text = tr("Where was everyone?")
+	_clear(nights_box)
+	var last := GameState.last_night()
+	if last < 1:
+		nights_box.add_child(_ink_label(tr("No nights yet. Tomorrow, ask people where they were tonight."), 16, true))
+		return
+	nights_box.add_child(_ink_label(tr("Pick a mark, then compare it with what someone else saw."), 13, true, INK_FADED))
+	# The latest nights by default; older ones with the arrows
+	var count := mini(NIGHTS_SHOWN, last)
+	var first := nights_first if nights_first > 0 else last - count + 1
+	first = clampi(first, 1, last - count + 1)
+	var grid := GridContainer.new()
+	grid.columns = count + 1
+	grid.add_theme_constant_override("h_separation", 2)
+	grid.add_theme_constant_override("v_separation", 0)
+	nights_box.add_child(grid)
+	grid.add_child(_ink_label(tr("night"), 12, false, INK_FADED))
+	for n in range(first, first + count):
+		var head := _ink_label(str(n), 14, false, BLOOD_RED if n == sel_night else INK)
+		head.custom_minimum_size = Vector2(36, 0)
+		head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		grid.add_child(head)
+	for npc in _chart_people_nodes():
+		var who: String = npc.data.npc_name
+		var name_row := HBoxContainer.new()
+		name_row.add_theme_constant_override("separation", 6)
+		name_row.custom_minimum_size = Vector2(118, 30)
+		var pic := TextureRect.new()
+		pic.texture = npc.data.portrait
+		pic.custom_minimum_size = Vector2(24, 24)
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		name_row.add_child(pic)
+		var name_label := _ink_label(tr(who), 14, false, BLOOD_RED if who == sel_person else INK)
+		name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_row.add_child(name_label)
+		grid.add_child(name_row)
+		for n in range(first, first + count):
+			grid.add_child(_night_cell(npc, n))
+	# Older or newer nights
+	if last > count:
+		var bar := HBoxContainer.new()
+		bar.alignment = BoxContainer.ALIGNMENT_CENTER
+		bar.add_theme_constant_override("separation", 18)
+		bar.add_child(_nights_arrow("‹", first - 1, first > 1))
+		bar.add_child(_ink_label(tr("Nights {from}–{to}").format({"from": first, "to": first + count - 1}), 13, false))
+		bar.add_child(_nights_arrow("›", first + 1, first + count - 1 < last))
+		nights_box.add_child(bar)
+	nights_box.add_child(_legend())
+
+
+func _night_cell(npc: Node, night: int) -> Control:
+	var who: String = npc.data.npc_name
+	var mark := GameState.night_mark(night, who)
+	var clickable := true
+	if not npc.is_alive() and npc.found_day <= night:
+		mark = "dead"
+		clickable = false
+	elif not npc.is_alive() and npc.found_day == night + 1:
+		mark = "victim"  # Died that night
+	var cell := Control.new()
+	cell.custom_minimum_size = Vector2(36, 30)
+	if who == sel_person and night == sel_night:
+		cell.add_child(_mark_rect(MARK_SELECT, 30.0))
+	cell.add_child(_mark_rect(MARKS[mark], 22.0))
+	if clickable:
+		cell.mouse_filter = Control.MOUSE_FILTER_STOP
+		cell.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		cell.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				_select_mark.call_deferred(who, night))
+	return cell
+
+
+func _mark_rect(texture: Texture2D, side: float) -> TextureRect:
+	var rect := TextureRect.new()
+	rect.texture = texture
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.size = Vector2(side, side)
+	rect.position = Vector2((36.0 - side) / 2.0, (30.0 - side) / 2.0)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return rect
+
+
+func _select_mark(who: String, night: int) -> void:
+	sel_person = who
+	sel_night = night
+	sel_witness = ""
+	remark_choice = [0, 0, 0, 0]
+	Audio.play("page", -10.0)
+	_refresh()
+
+
+func _nights_arrow(symbol: String, first: int, enabled: bool) -> Label:
+	var arrow := _ink_label(symbol, 24, false, INK if enabled else INK_FADED)
+	if enabled:
+		arrow.mouse_filter = Control.MOUSE_FILTER_STOP
+		arrow.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		arrow.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				nights_first = first
+				_build_nights.call_deferred())
+	return arrow
+
+
+func _legend() -> Control:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 0)
+	var rows := [[["match", "matches"], ["conflict", "doesn't match"], ["alibi", "told, not checked"]],
+			[["", "not asked"], ["refused", "refused to say"], ["victim", "died that night"]],
+			[["dead", "dead"]]]
+	for row in rows:
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 4)
+		for item in row:
+			var pic := TextureRect.new()
+			pic.texture = MARKS[item[0]]
+			pic.custom_minimum_size = Vector2(16, 16)
+			pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			line.add_child(pic)
+			var words := _ink_label(tr(item[1]), 11, false, INK_FADED)
+			words.custom_minimum_size.x = 96
+			line.add_child(words)
+		box.add_child(line)
+	return box
+
+
+# ---------- Cross-check (right page) ----------
+
+func _build_compare() -> void:
+	if sel_person == "" or sel_night < 1:
+		suspect_list.add_child(_ink_label(tr("Choose a mark on the left page: a person on a night. Then pick a witness here to read what both of them said."), 15, true))
+		return
+	var subject := _npc(sel_person)
+	var heading := _ink_label(tr("{name} · Night {night}").format({"name": tr(sel_person), "night": sel_night}), 20, false)
+	suspect_list.add_child(heading)
+	# What the person said about their own evening
+	var alibi: Dictionary = GameState.alibis.get("%d|%s" % [sel_night, sel_person], {})
+	if alibi.is_empty() and GameState.refused(sel_night, sel_person, "alibi"):
+		suspect_list.add_child(_said_block(subject, tr("{name} said:").format({"name": tr(sel_person)}),
+				tr("{name} refused to say where they were that night.").format({"name": tr(sel_person)}), true))
+	elif alibi.is_empty():
+		suspect_list.add_child(_said_block(subject, tr("{name} said:").format({"name": tr(sel_person)}),
+				tr("You didn't ask {name} where they were that night.").format({"name": tr(sel_person)}), true))
+	else:
+		suspect_list.add_child(_said_block(subject, tr("{name} said:").format({"name": tr(sel_person)}),
+				tr("“{text}”").format({"text": alibi["text"]}), false))
+	suspect_list.add_child(_ink_label("— " + tr("compare with") + " —", 13, false, BLOOD_RED))
+	suspect_list.get_child(-1).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Everyone else; those who weren't asked what they saw that night are faded
+	var grid := GridContainer.new()
+	grid.columns = 6
+	grid.add_theme_constant_override("h_separation", 4)
+	suspect_list.add_child(grid)
+	for npc in _chart_people_nodes():
+		var who: String = npc.data.npc_name
+		if who == sel_person:
+			continue
+		var card := VBoxContainer.new()
+		card.add_theme_constant_override("separation", 0)
+		card.custom_minimum_size.x = 54
+		var pic := TextureRect.new()
+		pic.texture = npc.data.portrait
+		pic.custom_minimum_size = Vector2(36, 36)
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(pic)
+		var label := _ink_label(tr(who), 11, false, BLOOD_RED if who == sel_witness else INK)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(label)
+		if not GameState.has_report(sel_night, who):
+			card.modulate = Color(1, 1, 1, 0.4)
+		card.mouse_filter = Control.MOUSE_FILTER_STOP
+		card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		card.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				_compare_with.call_deferred(who))
+		grid.add_child(card)
+	if sel_witness == "":
+		return
+	# What the witness said about this person that night
+	var witness := _npc(sel_witness)
+	var words := ""
+	var faded := false
+	if GameState.refused(sel_night, sel_witness, "seen"):
+		words = tr("{witness} refused to say what they saw that night.").format({"witness": tr(sel_witness)})
+		faded = true
+	elif not GameState.has_report(sel_night, sel_witness):
+		words = tr("You didn't ask {witness} what they saw that night.").format({"witness": tr(sel_witness)})
+		faded = true
+	else:
+		var seen := GameState.sightings_of(sel_night, sel_witness, sel_person)
+		if seen.is_empty():
+			words = tr("{witness} didn't mention {name}.").format({"witness": tr(sel_witness), "name": tr(sel_person)})
+			faded = true
+		else:
+			var lines: Array = []
+			for s in seen:
+				lines.append(witness._describe(s) if witness else "")
+			words = tr("“{text}”").format({"text": Lang.join_sentences(lines)})
+	suspect_list.add_child(_said_block(witness, tr("{name} said:").format({"name": tr(sel_witness)}), words, faded))
+	# The verdict, once both sides were heard
+	var result: String = GameState.crosschecks.get("%d|%s|%s" % [sel_night, sel_person, sel_witness], "")
+	if result == "conflict":
+		suspect_list.add_child(_ink_label(tr("This doesn't match what {name} said.").format({"name": tr(sel_person)}), 15, true, BLOOD_RED))
+	elif result == "match":
+		suspect_list.add_child(_ink_label(tr("This matches what {name} said.").format({"name": tr(sel_person)}), 15, true))
+	elif alibi.is_empty() and not GameState.sightings_of(sel_night, sel_witness, sel_person).is_empty():
+		suspect_list.add_child(_ink_label(tr("Ask {name} where they were that night, then compare.").format({"name": tr(sel_person)}), 14, true, INK_FADED))
+	if result == "match" or result == "conflict":
+		suspect_list.add_child(_belief_block())
+	suspect_list.add_child(_remark_block())
+
+
+# "Who do you believe?" The game never says who is right: servants lie too.
+func _belief_block() -> Control:
+	var key := "%d|%s|%s" % [sel_night, sel_person, sel_witness]
+	var current: String = GameState.beliefs.get(key, "unsure")
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 0)
+	box.add_child(_ink_label(tr("Who do you believe?"), 15, false))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	for option in [["subject", tr(sel_person)], ["witness", tr(sel_witness)], ["unsure", tr("Not sure yet")]]:
+		var choice := HBoxContainer.new()
+		choice.add_theme_constant_override("separation", 3)
+		var tick := TextureRect.new()
+		tick.texture = BOX_CHECKED if current == option[0] else BOX_EMPTY
+		tick.custom_minimum_size = Vector2(22, 22)
+		tick.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tick.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tick.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		choice.add_child(tick)
+		var words := _ink_label(option[1], 14, false)
+		words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		choice.add_child(words)
+		choice.mouse_filter = Control.MOUSE_FILTER_STOP
+		choice.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		var value: String = option[0]
+		choice.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				GameState.beliefs[key] = value
+				Playtest.count("belief_" + value)
+				Audio.play("click", -10.0)
+				_build_suspects.call_deferred())
+		row.add_child(choice)
+	box.add_child(row)
+	if GameState.knows("servants"):  # Only once he has learned that the bitten can serve it
+		box.add_child(_ink_label(tr("Either one could be lying: servants lie too."), 12, false, INK_FADED))
+	return box
+
+
+# A note made of blanks: [person] [claim] [connector] [observation]. Left click changes a blank,
+# right click goes back; "Write it down" files it in the casebook.
+func _remark_block() -> Control:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 2)
+	box.add_child(_ink_label(tr("Remark"), 15, false))
+	var people := [sel_person, sel_witness]
+	var options := [people, CLAIMS, CONNECTORS, OBSERVATIONS]
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 6)
+	flow.custom_minimum_size.x = 300
+	for i in 4:
+		var list: Array = options[i]
+		var pick: int = posmod(remark_choice[i], list.size())
+		var text: String = tr(list[pick])
+		flow.add_child(_blank(text, i, list.size()))
+	box.add_child(flow)
+	var write := _ink_label(tr("[Write it down]"), 14, false, BLOOD_RED)
+	write.mouse_filter = Control.MOUSE_FILTER_STOP
+	write.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	write.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_write_remark.call_deferred(options))
+	box.add_child(write)
+	box.add_child(_ink_label(tr("Click a word to change it (right click goes back)."), 12, false, INK_FADED))
+	return box
+
+
+# One blank of the note: the word, underlined in ink
+func _blank(text: String, index: int, count: int) -> Control:
+	var blank := VBoxContainer.new()
+	blank.add_theme_constant_override("separation", -2)
+	var word := _ink_label(text, 14, false, BLOOD_RED if index != 2 else INK)
+	word.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	blank.add_child(word)
+	var line := ColorRect.new()
+	line.color = Color(0.17, 0.15, 0.13, 0.55)
+	line.custom_minimum_size = Vector2(0, 1)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	blank.add_child(line)
+	blank.mouse_filter = Control.MOUSE_FILTER_STOP
+	blank.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	blank.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed:
+			var step := 1 if event.button_index == MOUSE_BUTTON_LEFT else (-1 if event.button_index == MOUSE_BUTTON_RIGHT else 0)
+			if step != 0:
+				remark_choice[index] = posmod(remark_choice[index] + step, count)
+				Audio.play("click", -14.0)
+				_build_suspects.call_deferred())
+	return blank
+
+
+func _write_remark(options: Array) -> void:
+	var words := []
+	for i in 4:
+		var list: Array = options[i]
+		words.append(tr(list[posmod(remark_choice[i], list.size())]))
+	var text := Lang.contract(tr("{person} {claim}{connector} {observation}.").format(
+			{"person": words[0], "claim": words[1], "connector": words[2], "observation": words[3]}))
+	var person: String = options[0][posmod(remark_choice[0], 2)]
+	GameState.add_remark(sel_night, [person], text)
+	Audio.play("page", -6.0)
+	_refresh()
+
+
+func _compare_with(witness: String) -> void:
+	sel_witness = witness
+	remark_choice = [0, 0, 0, 0]
+	if GameState.has_alibi(sel_night, sel_person) and GameState.has_report(sel_night, witness):
+		var key := "%d|%s|%s" % [sel_night, sel_person, witness]
+		var first_time := not GameState.crosschecks.has(key)
+		var result := GameState.cross_check(sel_night, sel_person, witness)
+		if result == "conflict" and first_time:
+			Audio.play("clue", -4.0)  # Found a lie (or a mistake)
+		else:
+			Audio.play("page", -10.0)
+	else:
+		Audio.play("page", -10.0)
+	_refresh()
+
+
+# A portrait beside "Name said:" and their words
+func _said_block(npc: Node, who_said: String, words: String, faded: bool) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	var pic := TextureRect.new()
+	if npc and npc.data:
+		pic.texture = npc.data.portrait
+	pic.custom_minimum_size = Vector2(44, 44)
+	pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pic.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(pic)
+	var text := VBoxContainer.new()
+	text.add_theme_constant_override("separation", 0)
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.add_child(_ink_label(who_said, 12, false, INK_FADED))
+	text.add_child(_ink_label(words, 14, true, INK_FADED if faded else INK))
+	row.add_child(text)
+	return row
+
+
+func _ink_label(text: String, size: int, wrap_text: bool, color := INK) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED  # Already translated
+	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_color_override("font_color", color)
+	if wrap_text:
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.custom_minimum_size.x = 300
+	return label
+
+
+func _npc(person: String) -> Node:
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc.data and npc.data.npc_name == person:
+			return npc
+	return null
+
+
+func _chart_people_nodes() -> Array:
+	var people := get_tree().get_nodes_in_group("npcs").filter(func(n): return n.data != null)
+	people.sort_custom(func(a, b): return a.data.npc_name.naturalnocasecmp_to(b.data.npc_name) < 0)
+	return people
 
 
 # ---------- Helpers ----------
@@ -668,3 +1257,294 @@ func _tr_value(value) -> String:
 	if comma > 0 and text.left(comma).is_valid_int():
 		return text.left(comma) + ", " + tr(text.substr(comma + 2))
 	return tr(text)
+
+
+# ---------- The old doctor's diary ----------
+# Left page: the sheets, in order, with the pieces each still misses. Right page: the loose
+# pieces found in town. Open a sheet, pick a loose piece and click the gap it fits.
+
+const SHEET_SIZE := Vector2(470, 520)
+const SHEET_VIEW := preload("res://scripts/ui/DiarySheetView.gd")
+const PAPER_ART := "res://assets/ui/diary/sheet.png"
+const PIECE_PAPER := {"A": Color(0.95, 0.91, 0.82), "B": Color(0.91, 0.86, 0.74), "C": Color(0.93, 0.88, 0.78),
+		"W": Color(0.95, 0.91, 0.82)}
+var diary_pick := ""        # The loose piece in hand ("5C")
+var diary_sheet := 0        # The sheet open on top of the book
+var diary_layer: Control
+var diary_gap := ""         # The gap chosen with the keys on the open sheet ("B")
+var diary_paper: VBoxContainer   # The sheet's heading
+var diary_view                    # The sheet itself, torn into its pieces (DiarySheetView)
+var diary_learned: Label
+var paper_art: Texture2D
+var diary_tray: VBoxContainer
+var diary_msg: Label
+const HAND_FONT := "res://assets/fonts/Caveat/Caveat-Regular.ttf"  # The old doctor's handwriting
+var hand_font: Font
+
+
+func _build_diary_sheets() -> void:
+	title.text = tr("The Old Doctor's Diary")
+	nights_box.add_child(_ink_label(tr("Click a sheet to open it. Pick a loose piece, then click the gap it fits."), 13, true, INK_FADED))
+	for p: Dictionary in Diary.pages():
+		var id := int(p["id"])
+		if p.get("hidden", false) and not Diary.is_found("%dW" % id):
+			continue  # The last page only shows up once found
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		var head := _ink_label(tr("Sheet %d") % id, 15, false, BLOOD_RED if id == diary_sheet else INK)
+		head.custom_minimum_size.x = 70
+		row.add_child(head)
+		var done := Diary.is_complete(p)
+		var words := Diary.title(p) if done else Diary.piece_text(p, "A").get_slice("\n", 0)
+		var label := _ink_label(words, 13, false, INK if done else INK_FADED)
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.clip_text = true
+		row.add_child(label)
+		if not p.get("whole", false):
+			var status := PackedStringArray()
+			for letter in ["A", "B", "C"]:
+				status.append(letter + ("✓" if Diary.is_placed("%d%s" % [id, letter]) else "·"))
+			row.add_child(_ink_label(" ".join(status), 13, false, INK if done else INK_FADED))
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		row.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		row.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				_open_sheet.call_deferred(id))
+		nights_box.add_child(row)
+
+
+# The loose pieces: found in town, not yet fitted
+func _loose_pieces() -> Array[String]:
+	var list: Array[String] = []
+	for piece: String in GameState.diary.get("found", {}):
+		if not Diary.is_placed(piece):
+			list.append(piece)
+	list.sort()
+	return list
+
+
+func _build_diary_tray(box: VBoxContainer) -> void:
+	_clear(box)
+	var loose := _loose_pieces()
+	if loose.is_empty():
+		box.add_child(_ink_label(tr("No torn pieces yet. They could be anywhere in town."), 14, true, INK_FADED))
+		return
+	for piece in loose:
+		var p := Diary.page(int(piece.left(-1)))
+		var card := PanelContainer.new()
+		var style: StyleBox
+		if paper_art:
+			var paper_style := StyleBoxTexture.new()
+			paper_style.texture = paper_art
+			paper_style.modulate_color = Color(1.0, 0.8, 0.74) if piece == diary_pick else Color.WHITE
+			style = paper_style
+		else:
+			var flat := StyleBoxFlat.new()
+			flat.bg_color = PIECE_PAPER[piece.right(1)]
+			style = flat
+		style.set_content_margin_all(10)
+		card.add_theme_stylebox_override("panel", style)
+		var inside := VBoxContainer.new()
+		inside.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var preview := Diary.piece_text(p, piece.right(1)).split("\n")
+		var short := "\n".join(preview.slice(0, 2)) + ("\n…" if preview.size() > 2 else "")
+		var words := _hand(_ink_label(("» " if piece == diary_pick else "") + short, 17, true, BLOOD_RED if piece == diary_pick else INK))
+		words.custom_minimum_size.x = 230
+		words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		inside.add_child(words)
+		var where := _ink_label(Lang.contract(tr("Found at {place} · Day {day}")).format({"place": Diary.place_words(GameState.diary["spots"].get(piece, "")),
+				"day": GameState.diary["found"][piece]}), 11, false, INK_FADED)
+		where.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		inside.add_child(where)
+		card.add_child(inside)
+		card.mouse_filter = Control.MOUSE_FILTER_STOP
+		card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		card.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				_pick_piece.call_deferred(piece))
+		box.add_child(card)
+
+
+func _pick_piece(piece: String) -> void:
+	diary_pick = "" if diary_pick == piece else piece
+	Audio.play("page", -10.0)
+	if diary_layer.visible:
+		_fill_sheet()
+	_refresh()
+
+
+func _build_diary_layer() -> void:
+	if ResourceLoader.exists(HAND_FONT):
+		hand_font = load(HAND_FONT)
+	if ResourceLoader.exists(PAPER_ART):
+		paper_art = load(PAPER_ART)
+	diary_layer = Control.new()
+	diary_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	diary_layer.visible = false
+	add_child(diary_layer)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.55)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed:
+			_close_sheet())  # Click outside to put the sheet down
+	diary_layer.add_child(dim)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 24)
+	row.set_anchors_preset(Control.PRESET_CENTER)
+	row.offset_left = -(SHEET_SIZE.x + 24.0 + 300.0) / 2.0
+	row.offset_top = -SHEET_SIZE.y / 2.0 - 40.0
+	diary_layer.add_child(row)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6)
+	row.add_child(column)
+	diary_paper = VBoxContainer.new()
+	column.add_child(diary_paper)
+	diary_view = SHEET_VIEW.new()
+	diary_view.custom_minimum_size = SHEET_SIZE
+	diary_view.paper = paper_art
+	diary_view.hand = hand_font
+	diary_view.gap_clicked.connect(func(letter: String): _try_place.call_deferred(letter))
+	column.add_child(diary_view)
+	diary_learned = _ink_label("", 15, true, Color(0.95, 0.8, 0.45))
+	diary_learned.custom_minimum_size.x = SHEET_SIZE.x
+	column.add_child(diary_learned)
+	var side := VBoxContainer.new()
+	side.add_theme_constant_override("separation", 10)
+	side.custom_minimum_size.x = 300
+	row.add_child(side)
+	var tray_title := _ink_label(tr("Loose pieces"), 18, false, Color(0.93, 0.91, 0.86))
+	tray_title.add_theme_font_override("font", title.get_theme_font("font"))
+	side.add_child(tray_title)
+	var tray_scroll := ScrollContainer.new()
+	tray_scroll.custom_minimum_size = Vector2(300, 380)
+	tray_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	side.add_child(tray_scroll)
+	diary_tray = VBoxContainer.new()
+	diary_tray.add_theme_constant_override("separation", 6)
+	diary_tray.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tray_scroll.add_child(diary_tray)
+	diary_msg = _ink_label("", 14, true, Color(0.95, 0.8, 0.45))
+	side.add_child(diary_msg)
+	side.add_child(_ink_label(tr("[W/S] Pick a piece    [A/D] Choose a gap") + "\n" + tr("[E] Put it there    [Esc] Back"), 13, true, Color(0.93, 0.91, 0.86)))
+
+
+func _open_sheet(id: int) -> void:
+	diary_sheet = id
+	diary_gap = ""
+	diary_msg.text = ""
+	diary_layer.visible = true
+	Audio.play("page", -6.0)
+	_fill_sheet()
+	_refresh()
+
+
+func _close_sheet() -> void:
+	diary_layer.visible = false
+	diary_sheet = 0
+	_refresh()
+
+
+func _fill_sheet() -> void:
+	_clear(diary_paper)
+	_build_diary_tray(diary_tray)
+	for child in diary_view.get_children():
+		if child is ScrollContainer:
+			child.queue_free()
+	var p := Diary.page(diary_sheet)
+	if p.is_empty():
+		return
+	var head := _ink_label(tr("Sheet %d") % diary_sheet + ("  ·  " + Diary.title(p) if Diary.is_complete(p) else ""), 18, false, Color(0.93, 0.91, 0.86))
+	head.add_theme_font_override("font", title.get_theme_font("font"))
+	diary_paper.add_child(head)
+	diary_learned.text = Diary.learned(p) if Diary.is_complete(p) else ""
+	if p.get("whole", false):
+		diary_view.show_sheet(diary_sheet, [], [], {}, "")
+		var holder := ScrollContainer.new()  # A long letter scrolls inside the sheet
+		holder.position = Vector2(34, 30)
+		holder.size = SHEET_SIZE - Vector2(68, 60)
+		holder.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		diary_view.add_child(holder)
+		var text := _hand(_ink_label(Diary.whole_text(p), 20, true))
+		text.custom_minimum_size.x = SHEET_SIZE.x - 90.0
+		holder.add_child(text)
+		return
+	var placed := {}
+	for letter in ["A", "B", "C"]:
+		if Diary.is_placed("%d%s" % [diary_sheet, letter]):
+			placed[letter] = true
+	diary_view.show_sheet(diary_sheet, p["layout"], Diary.lines(p), placed, diary_gap)
+
+
+func _try_place(letter: String) -> void:
+	if letter == "":
+		return
+	diary_gap = letter
+	var gap_piece := "%d%s" % [diary_sheet, letter]
+	if diary_pick == "":
+		diary_msg.text = tr("Pick a loose piece first, then click the gap it fits.")
+	elif diary_pick == gap_piece:
+		GameState.diary["placed"][gap_piece] = true
+		diary_pick = ""
+		Audio.play("page", -4.0)
+		Playtest.count("diary_pieces_fitted")
+		diary_msg.text = ""
+		diary_gap = ""
+		var p := Diary.page(diary_sheet)
+		if Diary.is_complete(p):
+			_sheet_completed(p)
+	elif diary_pick.left(-1) == str(diary_sheet):
+		diary_msg.text = tr("Right sheet, wrong gap.")
+	else:
+		diary_msg.text = tr("The tear doesn't match: this piece belongs to another sheet.")
+	_fill_sheet()
+	_refresh()
+
+
+func _sheet_completed(p: Dictionary) -> void:
+	diary_msg.text = tr("The sheet is whole again.")
+	if p.has("lore"):
+		GameState.learn(p["lore"])
+	Playtest.count("diary_sheets_completed")
+	Playtest.log_line("Completed diary sheet %d" % int(p["id"]))
+	GameState.add_clue(tr("Day {day} · The old doctor's diary, sheet {n} ({title}): {learned}").format({"day": GameState.day,
+			"n": int(p["id"]), "title": Diary.title(p), "learned": Diary.learned(p)}), "evidence")
+
+
+func _cycle_pick(step: int) -> void:
+	var loose := _loose_pieces()
+	if loose.is_empty():
+		return
+	var at := loose.find(diary_pick)
+	diary_pick = loose[posmod(at + step, loose.size()) if at >= 0 else (0 if step > 0 else loose.size() - 1)]
+	Audio.play("page", -12.0)
+	_fill_sheet()
+	_refresh()
+
+
+# The gaps still open on this sheet, left to right, top to bottom
+func _open_gaps() -> Array[String]:
+	var gaps: Array[String] = []
+	var p := Diary.page(diary_sheet)
+	for pair: Array in p.get("layout", []):
+		for letter: String in pair:
+			if not Diary.is_placed("%d%s" % [diary_sheet, letter]) and letter not in gaps:
+				gaps.append(letter)
+	return gaps
+
+
+func _cycle_gap(step: int) -> void:
+	var gaps := _open_gaps()
+	if gaps.is_empty():
+		diary_gap = ""
+		return
+	var at := gaps.find(diary_gap)
+	diary_gap = gaps[posmod(at + step, gaps.size()) if at >= 0 else 0]
+	_fill_sheet()
+
+
+# The old doctor's words in his own hand (falls back to the book's font if the file is missing)
+func _hand(label: Label) -> Label:
+	if hand_font:
+		label.add_theme_font_override("font", hand_font)
+	return label

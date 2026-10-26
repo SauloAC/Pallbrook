@@ -11,6 +11,7 @@ const FIRST_ACCUSATION_DAY := 2
 
 var mode := Mode.HIDDEN
 var suspect: Node = null
+var hearing: Hearing  # The hearing itself, at 7 PM at the Town Hall
 
 
 func _ready() -> void:
@@ -18,6 +19,9 @@ func _ready() -> void:
 	panel.visible = false
 	EventBus.accusation_requested.connect(_on_accusation_requested)
 	EventBus.game_ended.connect(_on_game_ended)
+	hearing = Hearing.new()
+	hearing.setup(panel.get_theme_stylebox("panel"), title.get_theme_font("font"))
+	add_child(hearing)
 
 
 func _on_accusation_requested(npc: Node) -> void:
@@ -27,11 +31,18 @@ func _on_accusation_requested(npc: Node) -> void:
 		# The first day is for getting to know the town
 		EventBus.dialogue_started.emit("Doctor", tr("It's too soon to accuse anyone. Examine people, ask where they were, and watch the town tonight. (Accusations open on Day %d.)") % FIRST_ACCUSATION_DAY)
 		return
+	if GameState.hearings_held >= GameState.MAX_HEARINGS:
+		EventBus.dialogue_started.emit("Doctor", tr("The town will not gather for you again. You will have to stop it some other way."))
+		return
+	if not GameState.hearing.is_empty():
+		EventBus.dialogue_started.emit("Doctor", Lang.contract(tr("A hearing is already called against {name}.").format({"name": tr(GameState.hearing["accused"])})))
+		return
 	suspect = npc
 	var accused: String = npc.data.npc_name
-	_show(Mode.CONFIRM, tr("Accuse %s?") % tr(accused),
-		tr("You are about to name %s as the vampire in front of the whole town.\nThere is no going back.") % tr(accused),
-		tr("[E] Accuse      [Esc] Cancel"))
+	var args := {"name": tr(accused), "day": hearing.day_if_called_now(), "left": GameState.MAX_HEARINGS - GameState.hearings_held}
+	_show(Mode.CONFIRM, Lang.contract(tr("Call a hearing against {name}?").format(args)),
+		Lang.contract(tr("At 7 PM on Day {day} the town will gather at the Town Hall. You will present your evidence and call witnesses, then the town will vote.\nWord travels fast: {name} will know. Hearings left: {left}.").format(args)),
+		tr("[E] Call the hearing      [Esc] Cancel"))
 
 
 func _on_game_ended(won: bool, message: String) -> void:
@@ -72,17 +83,13 @@ func _input(event: InputEvent) -> void:
 
 
 func _resolve() -> void:
+	mode = Mode.HIDDEN
+	panel.visible = false
+	get_tree().paused = false
 	var accused: String = suspect.data.npc_name
-	Playtest.note_accused(accused)
-	if accused == GameState.vampire_name:
-		EventBus.game_ended.emit(true, tr("You unmasked {name} on Day {day}. {alive} townspeople survived.").format({"name": tr(accused), "day": GameState.day, "alive": _survivors()}))
-	else:
-		EventBus.game_ended.emit(false, tr("{accused} was innocent. The real vampire was {vampire}, and now they know you're onto them.").format({"accused": tr(accused), "vampire": tr(GameState.vampire_name)}))
-
-
-func _survivors() -> int:
-	var count := 0
-	for npc in get_tree().get_nodes_in_group("npcs"):
-		if npc.is_alive() and not npc.is_servant and npc.data.npc_name != GameState.vampire_name:
-			count += 1
-	return count
+	var day := hearing.day_if_called_now()
+	GameState.hearing = {"accused": accused, "day": day}
+	Playtest.count("hearings_called")
+	var args := {"name": tr(accused), "day": day}
+	GameState.add_clue(Lang.contract(tr("Day {day} · You called a hearing against {name}, at 7 PM at the Town Hall.").format(args)), "evidence")
+	EventBus.dialogue_started.emit("Doctor", Lang.contract(tr("The hearing against {name} is set: Day {day}, 7 PM, at the Town Hall. Gather what you can until then.").format(args)))

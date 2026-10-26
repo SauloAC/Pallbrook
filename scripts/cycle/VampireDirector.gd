@@ -3,6 +3,7 @@ extends Node
 # Picks the secret vampire and runs their nightly hunt
 
 @export_range(0.0, 1.0) var servant_chance := 0.35
+@export var townsfolk_per_servant := 3  # At most one servant for every this many townsfolk (2 of 7)
 @export_range(0.0, 1.0) var clue_reliability := 0.75  # Chance the trace points to the real vampire
 @export var hunt_start_hour := 22.5  # Earliest the vampire leaves home
 @export var hunt_end_hour := 24.5    # Latest (24.5 = 00:30)
@@ -21,7 +22,24 @@ var fed_tonight := false
 var frenzy_tonight := false  # Decided at nightfall, before any feeding
 var hunting := false
 var hunt_victim: Node = null
+
+# ---------- Meeting the doctor at night ----------
+# 1. It notices him from afar (he didn't see its face): it gives up for tonight, and its next
+#    bite leaves someone else's trace on purpose.
+# 2. They see each other up close: it chases him. He gets away by breaking its line of sight
+#    for a few seconds, reaching a safe place (church, a garden with garlic, over the bridge)
+#    or lasting until dawn.
+# 3. It reaches him: the game ends.
+const CHASE_TRIGGER := 7.0     # Mutual sighting closer than this starts the chase
+const CATCH_RANGE := 1.1       # Contact, or as good as
+const LOSE_SECONDS := 4.0      # Out of its sight this long and it gives up
+const SAFE_GIVE_UP := 8.0      # Waiting at the edge of a safe place this long, then it leaves
+var chasing := false
+var chased_tonight := false     # One chase a night: after that it heads home
+var plant_false_trace := false  # Next bite leaves someone else's trace (it knows it was seen)
+var safe_zones: SafeZones
 var hunt_hour := 23.0
+var relentless := false        # Tonight's chase is for the doctor: no giving up
 
 
 func _ready() -> void:
@@ -39,6 +57,12 @@ func _choose_vampire() -> void:
 	GameState.vampire_name = vampire.data.npc_name
 	vampire.set_hunger(randf_range(65.0, 80.0))  # Fed recently, before the doctor came
 	_seed_outbreak()
+	safe_zones = SafeZones.new()
+	add_child(safe_zones)
+	safe_zones.setup(GameState.vampire_name)
+	var diary := Diary.new()  # The old doctor's torn pages, hidden around town
+	add_child(diary)
+	diary.setup(GameState.vampire_name)
 	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
 
 
@@ -47,14 +71,23 @@ func _on_phase_changed(is_night: bool) -> void:
 		return
 	if is_night:
 		acted_tonight = false
+		chased_tonight = false
 		fed_tonight = false
 		frenzy_tonight = _frenzied()
-		if frenzy_tonight:
+		# Two nights after it learned his face (and he didn't bring it to justice), it comes for him
+		GameState.doom_tonight = GameState.come_night >= 0 and GameState.day >= GameState.come_night
+		if GameState.doom_tonight:
+			hunt_hour = randf_range(20.5, 21.5)
+			Playtest.log_line("Tonight the vampire comes for the doctor")
+		elif frenzy_tonight:
 			hunt_hour = randf_range(20.5, 22.0)  # Can't wait: hunts while people are still up
 		else:
 			hunt_hour = randf_range(hunt_start_hour, hunt_end_hour)
 		return
 	# Dawn
+	GameState.doom_tonight = false
+	if chasing:
+		_end_chase(true)
 	if hunting:
 		_finish_hunt_now()
 	elif not acted_tonight:
@@ -79,10 +112,26 @@ func _frenzied() -> bool:
 
 
 func _process(_delta: float) -> void:
-	if GameState.game_over or vampire == null or acted_tonight or hunting or not GameState.is_night:
+	if GameState.game_over or vampire == null or not GameState.is_night:
+		return
+	# Face to face with the doctor, at any point of its night (going out or coming back)
+	if not chasing and not chased_tonight and vampire.state == vampire.State.HUNTING and vampire.witnessed and vampire.noticed_doctor:
+		var player := get_tree().get_first_node_in_group("player") as Node3D
+		if player and vampire.global_position.distance_to(player.global_position) < CHASE_TRIGGER:
+			_start_chase()
+			return
+	if acted_tonight or hunting:
 		return
 	# Hours after midnight count as 24+, so 00:30 = 24.5
 	var h := GameState.hour if GameState.hour >= 12.0 else GameState.hour + 24.0
+	if GameState.doom_tonight and not chasing and h >= hunt_hour:
+		# No victim tonight: it goes straight for the doctor, wherever he is
+		acted_tonight = true
+		var player := get_tree().get_first_node_in_group("player") as Node3D
+		if player:
+			vampire.start_hunt(GameState.nearest_place(player.global_position))
+			_start_chase(true)
+		return
 	if h >= hunt_hour and h < 25.0:
 		var victim := _pick_victim()
 		if victim:
@@ -96,10 +145,19 @@ func _run_hunt(victim: Node) -> void:
 	vampire.start_hunt(victim.data.home)
 	# Walk to the victim's door, unless the doctor spots us
 	await get_tree().physics_frame
+	var counted := false
 	while hunting and not vampire.agent.is_navigation_finished():
-		if vampire.witnessed:
+		if chasing:
+			return  # Face to face: the chase took over
+		if vampire.witnessed and not counted:
+			counted = true  # Seen from hiding: the doctor knows, the vampire doesn't
 			Playtest.count("vampire_recognized")
 			Playtest.log_line("The doctor recognized the vampire on the street")
+		if vampire.noticed_doctor and not vampire.witnessed:
+			# Spotted from afar: not tonight, and next time it covers its tracks
+			Playtest.count("vampire_noticed_doctor")
+			Playtest.log_line("The vampire noticed the doctor from afar and gave up")
+			plant_false_trace = true
 			_abort_hunt()
 			return
 		await get_tree().physics_frame
@@ -112,7 +170,9 @@ func _run_hunt(victim: Node) -> void:
 		_abort_hunt(_t("A figure fled from {name}'s door when it saw the doctor.", {"name": tr(victim.data.npc_name)}))
 		return
 	await get_tree().create_timer(2.0).timeout  # Inside the house...
-	if vampire.witnessed or (_doctor_watching(victim) and not _frenzied()):
+	if chasing:
+		return
+	if vampire.noticed_doctor or (_doctor_watching(victim) and not _frenzied()):
 		_abort_hunt()
 		return
 	if not hunting:
@@ -199,6 +259,7 @@ func _pick_victim() -> Node:
 
 func _resolve_attack(victim: Node) -> void:
 	var victim_name: String = victim.data.npc_name
+	var night := GameState.day if GameState.is_night else GameState.day - 1  # The night it happened
 	var shown := {"name": tr(victim_name)}  # The name as the current language writes it
 	Playtest.count("vampire_attacks")
 	Playtest.log_line("The vampire attacked %s" % victim_name)
@@ -209,13 +270,17 @@ func _resolve_attack(victim: Node) -> void:
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc != victim and npc.is_alive() and not npc.is_servant:
 			others += 1
-	# A marked person who was not saved during the day is turned now
+	# A marked person who was not saved during the day is turned now (if there is room:
+	# otherwise the mark fades and it simply feeds)
+	if victim.marked and _servant_slots(victim) <= 0:
+		victim.marked = false
 	if victim.marked:
 		fed_tonight = true
 		victim.marked = false
 		victim.make_servant()
 		Playtest.count("servants_made")
 		vampire.set_hunger(vampire.blood + 20.0)
+		GameState.record_attack(night, victim_name, victim.data.home)
 		GameState.add_night_event(_t("During the night, a figure was seen near {name}'s house.", shown))
 		GameState.add_clue(_t("Morning of Day {day}: a figure was seen near {name}'s house.", shown), "evidence", morning)
 		_check_town_lost()
@@ -231,6 +296,8 @@ func _resolve_attack(victim: Node) -> void:
 	# In a frenzy it is careless: the trace always points to the real vampire
 	var died: bool = victim.feed(amount, vampire.data.clue_trait if frenzy else _pick_trace(victim))
 	vampire.set_hunger(vampire.blood + minf(amount, had) * blood_gain)
+	if died or frenzy:
+		GameState.record_attack(night, victim_name, victim.data.home)  # Everyone heard of it
 	if died:
 		GameState.add_night_event(_t("{name} was found dead at their doorstep.", shown))
 		GameState.add_clue(_t("Morning of Day {day}: {name} died during the night.", shown), "evidence", morning)
@@ -239,15 +306,16 @@ func _resolve_attack(victim: Node) -> void:
 		# No patience to turn anyone: it just feeds, and not quietly
 		GameState.add_night_event(tr("Screams were heard in the night. Someone woke up torn and gravely weak."))
 		GameState.add_clue(_t("Morning of Day {day}: screams were heard near {name}'s house.", shown), "evidence", morning)
-	elif others > 0 and randf() < servant_chance and victim.affinity >= 60.0:
+	elif others > 0 and _servant_slots() > 0 and randf() < servant_chance and victim.affinity >= 60.0:
 		# They trust the doctor: marked, with one day to warn him
 		victim.marked = true
 		victim.marked_day = morning
 		GameState.add_night_event(tr("Somewhere in Pallbrook, someone woke up weaker than they went to bed."))
-	elif others > 0 and randf() < servant_chance:
+	elif others > 0 and _servant_slots() > 0 and randf() < servant_chance:
 		# Sometimes the bite turns them (only if someone else is left to hunt)
 		victim.make_servant()
 		Playtest.count("servants_made")
+		GameState.record_attack(night, victim_name, victim.data.home)
 		GameState.add_night_event(_t("During the night, a figure was seen near {name}'s house.", shown))
 		GameState.add_clue(_t("Morning of Day {day}: a figure was seen near {name}'s house.", shown), "evidence", morning)
 	elif starving:
@@ -257,8 +325,25 @@ func _resolve_attack(victim: Node) -> void:
 	_check_town_lost()
 
 
+# Not everyone bitten becomes a servant: only those it chooses, and only a few at a time.
+# A town of servants would never vote against it, however much they trust the doctor.
+# Marked people (turning tomorrow) hold a place too; `turning` is one about to be turned now.
+func _servant_slots(turning: Node = null) -> int:
+	var townsfolk := 0
+	var taken := 0
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc == vampire or npc.data == null:
+			continue
+		townsfolk += 1
+		if npc.is_alive() and (npc.is_servant or (npc.marked and npc != turning)):
+			taken += 1
+	return maxi(1, floori(townsfolk / float(townsfolk_per_servant))) - taken
+
+
 func _pick_trace(victim: Node) -> String:
-	if randf() < clue_reliability:
+	if plant_false_trace:
+		plant_false_trace = false  # Seen recently: this time it leaves someone else's trace
+	elif randf() < clue_reliability:
 		return vampire.data.clue_trait  # The real trace
 	# Misleading trace: someone innocent (never the victim)
 	var others := []
@@ -301,3 +386,127 @@ func _offscreen_witness(victim: Node) -> void:
 		witness.add_sighting(night, "person", vampire.data.npc_name, place, h)  # Saw the face
 	else:
 		witness.add_sighting(night, "figure", "", place, h)
+
+
+# ---------- The chase ----------
+
+func _start_chase(for_the_doctor := false) -> void:
+	chasing = true
+	relentless = for_the_doctor
+	chased_tonight = true
+	hunting = false  # Whatever it was doing, the doctor comes first now
+	vampire.chasing = true
+	vampire.hunt_returning = false
+	GameState.chased = true
+	GameState.faced_night = GameState.day  # The day only turns at dawn
+	GameState.faced_by = vampire.data.npc_name
+	Playtest.count("chases")
+	Playtest.log_line("The vampire saw the doctor face to face and chased him")
+	Audio.play("clue", -2.0)
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var out_of_sight := 0.0
+	var waiting := 0.0
+	var retarget := 0.0
+	var target := player.global_position
+	while chasing:
+		await get_tree().physics_frame
+		if not chasing or GameState.game_over or not GameState.is_night:
+			return
+		var delta := get_physics_process_delta_time()
+		# Measured on the ground: the doctor's origin sits a metre up, at his capsule's centre
+		var gap: Vector3 = vampire.global_position - player.global_position
+		var distance := Vector2(gap.x, gap.z).length()
+		if distance < CATCH_RANGE and not safe_zones.is_safe(player.global_position):
+			_caught()
+			return
+		if safe_zones.is_safe(player.global_position):
+			# It stops at the edge and waits
+			target = safe_zones.wait_point(player.global_position)
+			waiting += delta
+			if waiting > SAFE_GIVE_UP and not relentless:  # Tonight it waits until dawn
+				_end_chase(false)
+				return
+		else:
+			waiting = 0.0
+			if relentless or vampire.sees(player, true):  # A bush won't hide him; tonight nothing will
+				out_of_sight = 0.0
+				target = player.global_position
+			else:
+				out_of_sight += delta  # Goes on to where it last saw him
+				if out_of_sight > LOSE_SECONDS:
+					_end_chase(false)
+					return
+		retarget -= delta
+		if retarget <= 0.0:
+			retarget = 0.25
+			vampire.go_to(target)
+
+
+# He lived through the night it came for him, but the town saw where: a doctor who sleeps on
+# the church floor or crouched in someone's vegetable patch is a man with something to fear.
+func _hid_all_night() -> void:
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var where := safe_zones.kind(player.global_position) if player else ""
+	var lines := {"church": "Word spread that the doctor spent the night on the church floor. People trust him a little less.",
+			"garden": "Word spread that the doctor spent the night crouched in someone's garden. People trust him a little less.",
+			"river": "Word spread that the doctor spent the night among the graves beyond the bridge. People trust him a little less."}
+	if not lines.has(where):
+		return
+	GameState.add_night_event(tr(lines[where]))
+	Playtest.count("hid_from_the_vampire")
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc != vampire and npc.is_alive():
+			npc.change_affinity(-6.0)
+
+
+# The doctor got away (or the sun came up). It knows he saw its face.
+func _end_chase(dawn: bool) -> void:
+	if not chasing:
+		return
+	chasing = false
+	GameState.chased = false
+	if relentless:
+		relentless = false
+		if dawn:
+			vampire.stop_hunt()
+		else:
+			vampire.end_hunt()
+		GameState.add_night_event(tr("It hunted you all night, and waited where it could not follow. At dawn it was gone. It will come again tonight."))
+		_hid_all_night()
+		return
+	var first := not GameState.hunted_by_vampire
+	GameState.recognize(GameState.faced_night + 3)  # Two nights to bring it before the town
+	if dawn:
+		vampire.stop_hunt()
+	else:
+		vampire.end_hunt()
+	Playtest.count("chases_escaped")
+	Playtest.log_line("The doctor escaped the chase")
+	GameState.add_night_event(tr("You saw its face, and it saw yours. You got away, but it knows."))
+	if first:
+		GameState.add_night_event(tr("You have two nights to bring it before the town. Then it will come for you."))
+
+
+func _caught() -> void:
+	chasing = false
+	GameState.chased = false
+	Playtest.count("caught_by_vampire")
+	Playtest.log_line("The vampire caught the doctor")
+	GameState.in_dialogue = true  # Stops the doctor where he stands
+	Audio.play("death")
+	# The night closes in red, then the end
+	var layer := CanvasLayer.new()
+	layer.layer = 40
+	add_child(layer)
+	var red := ColorRect.new()
+	red.color = Color(0.35, 0.0, 0.0, 0.0)
+	red.set_anchors_preset(Control.PRESET_FULL_RECT)
+	red.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(red)
+	var tween := create_tween()
+	tween.tween_property(red, "color:a", 0.9, 1.2)
+	await tween.finished
+	await get_tree().create_timer(0.8).timeout
+	layer.queue_free()
+	GameState.in_dialogue = false
+	EventBus.game_ended.emit(false, tr("It caught you in the dark. In the morning they buried you beyond the bridge. Pallbrook will need another doctor."))

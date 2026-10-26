@@ -25,7 +25,7 @@ You are the physician sent to stop the outbreak.
 
 By day, visit the sick, examine them and ask what they saw. By night, get back to the clinic before 1 AM.
 
-This sickness has a cause, and it walks among them. When you are sure who it is, accuse them. You only get one chance.","Autumn.
+This sickness has a cause, and it walks among them. When you are sure who it is, bring them before the town. You get two hearings.","Autumn.
 
 Pallbrook's doctor vanished one night without a word. Since then, a strange anemia has spread through the town: people wake pale and weak, and some no longer wake at all.
 
@@ -33,7 +33,7 @@ You are the physician sent to stop the outbreak.
 
 By day, visit the sick, examine them and ask what they saw. By night, get back to the clinic before 1 AM.
 
-This sickness has a cause, and it walks among them. When you are sure who it is, accuse them. You only get one chance.","秋。
+This sickness has a cause, and it walks among them. When you are sure who it is, bring them before the town. You get two hearings.","秋。
 
 パルブルックの医者が、ある夜、何も言わずに姿を消した。それ以来、奇妙な貧血が町に広がっている。人々は青ざめ、衰弱して目を覚まし、二度と目覚めない者もいる。
 
@@ -41,7 +41,7 @@ This sickness has a cause, and it walks among them. When you are sure who it is,
 
 昼は病人を訪ね、診察し、何を見たのか尋ねること。夜は午前1時までに診療所へ戻ること。
 
-この病には原因がある。そしてそれは、人々の間を歩いている。正体を確信したら、告発せよ。機会は一度きりだ。","Outono.
+この病には原因がある。そしてそれは、人々の間を歩いている。正体を確信したら、町の前に引き出せ。審問の機会は二度だけだ。","Outono.
 
 O médico de Pallbrook desapareceu certa noite sem dizer uma palavra. Desde então, uma estranha anemia se espalhou pela cidade: as pessoas acordam pálidas e fracas, e algumas não acordam mais.
 
@@ -49,7 +49,7 @@ Você é o médico enviado para conter o surto.
 
 De dia, visite os doentes, examine-os e pergunte o que viram. À noite, volte à clínica antes da 1 da manhã.
 
-Esta doença tem uma causa, e ela anda entre eles. Quando tiver certeza de quem é, acuse. Você só tem uma chance.","Otoño.
+Esta doença tem uma causa, e ela anda entre eles. Quando tiver certeza de quem é, leve-o diante da cidade. Você tem duas audiências.","Otoño.
 
 El médico de Pallbrook desapareció una noche sin decir palabra. Desde entonces, una extraña anemia se ha extendido por el pueblo: la gente despierta pálida y débil, y algunos ya no despiertan.
 
@@ -57,7 +57,7 @@ Eres el médico enviado para detener el brote.
 
 De día, visita a los enfermos, examínalos y pregúntales qué vieron. De noche, vuelve a la clínica antes de la 1 de la madrugada.
 
-Esta enfermedad tiene una causa, y camina entre ellos. Cuando estés seguro de quién es, acúsalo. Solo tienes una oportunidad."
+Esta enfermedad tiene una causa, y camina entre ellos. Cuando estés seguro de quién es, llévalo ante el pueblo. Tienes dos audiencias."
 PALLBROOK,PALLBROOK,パルブルック,PALLBROOK,PALLBROOK
 [E] Begin,[E] Begin,[E] はじめる,[E] Começar,[E] Comenzar
 [E] Continue,[E] Continue,[E] 続ける,[E] Continuar,[E] Continuar
@@ -387,3 +387,152 @@ the Mayor's house,the Mayor's house,町長の家,a casa do prefeito,la casa del 
 "Development build {version}. This game is still in development: this is not the final version, and every aspect of the game is subject to change.","Development build {version}. This game is still in development: this is not the final version, and every aspect of the game is subject to change.",開発版 {version}。本作は開発中です。これは最終版ではなく、ゲームのあらゆる要素は変更される可能性があります。,"Versão de desenvolvimento {version}. Este jogo ainda está em desenvolvimento: esta não é a versão final, e todos os aspectos do jogo estão sujeitos a mudanças.","Versión de desarrollo {version}. Este juego aún está en desarrollo: esta no es la versión final, y todos los aspectos del juego están sujetos a cambios."
 Hidden: nobody can see you here,Hidden: nobody can see you here,隠れている：ここなら誰にも見られない,Escondido: ninguém consegue ver você aqui,Escondido: nadie puede verte aquí
 Brightness: %d%%,Brightness: %d%%,明るさ：%d%%,Brilho: %d%%,Brillo: %d%%
+Nights,Nights,夜ごと,Noites,Noches
+Compare,Compare,照合,Comparar,Comparar
+Where was everyone?,Where was everyone?,皆はどこにいた？,Onde estava cada um?,¿Dónde estaba cada uno?
+"No nights yet. Tomorrow, ask people where they were tonight.","No nights yet. Tomorrow, ask people where they were tonight.",まだ夜の記録はない。明日、今夜どこにいたか皆に尋ねよう。,"Ainda não há noites. Amanhã, pergunte às pessoas onde estavam esta noite.","Aún no hay noches. Mañana, pregunta a la gente dónde estuvo esta noche."
+"Pick a mark, then compare it with what someone else saw.","Pick a mark, then compare it with what someone else saw.",印を選び、ほかの誰かが見たことと照らし合わせよう。,Escolha uma marca e compare com o que outra pessoa viu.,Elige una marca y compárala con lo que vio otra persona.
+night,night,夜,noite,noche
+Nights {from}–{to},Nights {from}–{to},{from}〜{to}日目の夜,Noites {from}–{to},Noches {from}–{to}
+matches,matches,一致,confere,coincide
+doesn't match,doesn't match,食い違い,não confere,no coincide
+"told, not checked","told, not checked",証言あり・未照合,"contou, não conferido","lo contó, sin comprobar"
+not asked,not asked,未聴取,não perguntado,sin preguntar
+died that night,died that night,その夜に死亡,morreu nessa noite,murió esa noche
+dead,dead,死亡,morto,muerto
+Choose a mark on the left page: a person on a night. Then pick a witness here to read what both of them said.,Choose a mark on the left page: a person on a night. Then pick a witness here to read what both of them said.,左のページで印（ある人物のある夜）を選び、ここで証人を選ぶと、二人の証言を並べて読める。,Escolha uma marca na página da esquerda: uma pessoa numa noite. Depois escolha aqui uma testemunha para ler o que os dois disseram.,Elige una marca en la página izquierda: una persona en una noche. Luego elige aquí a un testigo para leer lo que dijeron ambos.
+{name} · Night {night},{name} · Night {night},{name} · {night}日目の夜,{name} · Noite {night},{name} · Noche {night}
+{name} said:,{name} said:,{name}の証言：,{name} disse:,{name} dijo:
+You didn't ask {name} where they were that night.,You didn't ask {name} where they were that night.,その夜どこにいたか、{name}にはまだ尋ねていない。,Você não perguntou a {name} onde estava nessa noite.,No le preguntaste a {name} dónde estuvo esa noche.
+“{text}”,“{text}”,「{text}」,“{text}”,«{text}»
+compare with,compare with,照らし合わせる相手,comparar com,comparar con
+You didn't ask {witness} what they saw that night.,You didn't ask {witness} what they saw that night.,その夜に何を見たか、{witness}にはまだ尋ねていない。,Você não perguntou a {witness} o que viu nessa noite.,No le preguntaste a {witness} qué vio esa noche.
+{witness} didn't mention {name}.,{witness} didn't mention {name}.,{witness}は{name}について何も言わなかった。,{witness} não mencionou {name}.,{witness} no mencionó a {name}.
+This doesn't match what {name} said.,This doesn't match what {name} said.,{name}の証言と食い違う。,Isto não confere com o que {name} disse.,Esto no coincide con lo que dijo {name}.
+This matches what {name} said.,This matches what {name} said.,{name}の証言と一致する。,Isto confere com o que {name} disse.,Esto coincide con lo que dijo {name}.
+"Ask {name} where they were that night, then compare.","Ask {name} where they were that night, then compare.",その夜どこにいたか{name}に尋ねてから、照らし合わせよう。,Pergunte a {name} onde estava nessa noite e depois compare.,Pregúntale a {name} dónde estuvo esa noche y luego compara.
+refused to say,refused to say,証言拒否,recusou-se a dizer,se negó a decirlo
+{name} refused to say where they were that night.,{name} refused to say where they were that night.,{name}はその夜どこにいたか言おうとしなかった。,{name} se recusou a dizer onde estava nessa noite.,{name} se negó a decir dónde estuvo esa noche.
+{witness} refused to say what they saw that night.,{witness} refused to say what they saw that night.,{witness}はその夜に何を見たか言おうとしなかった。,{witness} se recusou a dizer o que viu nessa noite.,{witness} se negó a decir qué vio esa noche.
+Day {day} · {name} found you collapsed inside {place} and keeps their distance.,Day {day} · {name} found you collapsed inside {place} and keeps their distance.,{day}日目 · {name}は{place}の中で倒れているあなたを見つけ、距離を置いている。,Dia {day} · {name} encontrou você desmaiado dentro de {place} e agora mantém distância.,Día {day} · {name} te encontró desmayado dentro de {place} y ahora guarda las distancias.
+Doctor! I found you collapsed in my own house this morning. What were you doing in here?,Doctor! I found you collapsed in my own house this morning. What were you doing in here?,先生！今朝、うちの中で倒れているのを見つけましたよ。ここで何をしていたんです？,Doutor! Encontrei você desmaiado dentro da minha casa hoje de manhã. O que estava fazendo aqui?,¡Doctor! Esta mañana lo encontré desmayado dentro de mi casa. ¿Qué hacía usted aquí?
+Doctor! I found you collapsed inside {place} this morning. Are you ill... or is it something else?,Doctor! I found you collapsed inside {place} this morning. Are you ill... or is it something else?,先生！今朝、{place}の中で倒れているのを見つけましたよ。ご病気ですか……それとも、何か別の理由が？,Doutor! Encontrei você desmaiado dentro de {place} hoje de manhã. Está doente... ou é outra coisa?,¡Doctor! Esta mañana lo encontré desmayado dentro de {place}. ¿Está enfermo... o es otra cosa?
+You collapsed inside {place}. Nobody was there to see it; you woke on the floor at dawn.,You collapsed inside {place}. Nobody was there to see it; you woke on the floor at dawn.,あなたは{place}の中で倒れた。見ていた者はおらず、夜明けに床の上で目を覚ました。,Você desmaiou dentro de {place}. Ninguém estava lá para ver; você acordou no chão ao amanhecer.,Te desplomaste dentro de {place}. Nadie estaba allí para verlo; despertaste en el suelo al amanecer.
+You collapsed inside {place}. {who} found you there at dawn.,You collapsed inside {place}. {who} found you there at dawn.,あなたは{place}の中で倒れた。夜明けに{who}があなたを見つけた。,Você desmaiou dentro de {place}. {who} encontrou você ali ao amanhecer.,Te desplomaste dentro de {place}. {who} te encontró allí al amanecer.
+Night {night} · Your note: {text},Night {night} · Your note: {text},{night}日目の夜 · あなたのメモ：{text},Noite {night} · Sua anotação: {text},Noche {night} · Tu nota: {text}
+Who do you believe?,Who do you believe?,どちらを信じる？,Em quem você acredita?,¿A quién le crees?
+Not sure yet,Not sure yet,まだわからない,Ainda não sei,Aún no lo sé
+Either one could be lying: servants lie too.,Either one could be lying: servants lie too.,どちらかが嘘をついているかもしれない。下僕も嘘をつく。,Qualquer um dos dois pode estar mentindo: servos também mentem.,Cualquiera de los dos podría mentir: los siervos también mienten.
+Remark,Remark,所見,Observação,Observación
+[Write it down],[Write it down],［書き留める］,[Anotar],[Anotar]
+Click a word to change it (right click goes back).,Click a word to change it (right click goes back).,言葉をクリックして変える（右クリックで戻る）。,Clique numa palavra para trocá-la (botão direito volta).,Haz clic en una palabra para cambiarla (clic derecho vuelve).
+{person} {claim}{connector} {observation}.,{person} {claim}{connector} {observation}.,{person}は{claim}。{connector}{observation}。,{person} {claim}{connector} {observation}.,{person} {claim}{connector} {observation}.
+says they stayed home,says they stayed home,家にいたと言っている,diz que ficou em casa,dice que se quedó en casa
+says they were asleep,says they were asleep,眠っていたと言っている,diz que estava dormindo,dice que dormía
+claims to be ill,claims to be ill,病気だと言っている,diz que está doente,dice que se siente mal
+saw someone at night,saw someone at night,夜に誰かを見たと言う,viu alguém à noite,vio a alguien de noche
+saw nothing,saw nothing,何も見ていないと言う,não viu nada,no vio nada
+refused to talk,refused to talk,話すのを拒んだ,se recusou a falar,se negó a hablar
+", but",", but",しかし、,", mas",", pero"
+", and",", and",そして、,", e",", y"
+", so",", so",だから、,", então",", así que"
+was out late at night,was out late at night,夜遅くに外にいた,estava na rua tarde da noite,estaba en la calle de madrugada
+was near a victim's house,was near a victim's house,被害者の家の近くにいた,estava perto da casa de uma vítima,estaba cerca de la casa de una víctima
+walked around by day,walked around by day,昼間に出歩いていた,andava por aí de dia,andaba por ahí de día
+may be lying,may be lying,嘘をついているかもしれない,pode estar mentindo,puede estar mintiendo
+may be mistaken,may be mistaken,勘違いしているかもしれない,pode ter se confundido,puede haberse confundido
+may be covering for someone,may be covering for someone,誰かをかばっているかもしれない,pode estar acobertando alguém,puede estar encubriendo a alguien
+is telling the truth,is telling the truth,本当のことを言っている,diz a verdade,dice la verdad
+"You saw its face, and it saw yours. You got away, but it knows.","You saw its face, and it saw yours. You got away, but it knows.",あなたはその顔を見た。そして、それもあなたの顔を見た。逃げ切ったが、向こうは知っている。,"Você viu o rosto dele, e ele viu o seu. Você escapou, mas ele sabe.","Viste su cara, y él vio la tuya. Escapaste, pero lo sabe."
+It caught you in the dark. In the morning they buried you beyond the bridge. Pallbrook will need another doctor.,It caught you in the dark. In the morning they buried you beyond the bridge. Pallbrook will need another doctor.,暗闇の中で、それはあなたを捕らえた。翌朝、あなたは橋の向こうに葬られた。パルブルックには、また新しい医師が必要になる。,"Ele pegou você no escuro. De manhã, enterraram você além da ponte. Pallbrook vai precisar de outro médico.",Te atrapó en la oscuridad. Por la mañana te enterraron al otro lado del puente. Pallbrook necesitará otro médico.
+Not with that thing outside. Get somewhere safe first.,Not with that thing outside. Get somewhere safe first.,あれが外にいるうちは眠れない。まずは安全な場所へ。,"Não com aquilo lá fora. Primeiro, vá para um lugar seguro.","No con esa cosa ahí fuera. Primero, ve a un lugar seguro."
+It won't follow you here.,It won't follow you here.,ここまでは追ってこない。,Aqui ele não entra.,Aquí no te seguirá.
+It's coming after you. Run!,It's coming after you. Run!,追ってくる。走れ！,Ele está vindo atrás de você. Corra!,Viene a por ti. ¡Corre!
+my house,my house,うちの家,a minha casa,mi casa
+my forge,my forge,うちの鍛冶場,a minha forja,mi forja
+"Day {day} · {name} spoke to you oddly, as if they knew where you were last night.","Day {day} · {name} spoke to you oddly, as if they knew where you were last night.",{day}日目 · {name}の話しぶりが妙だった。昨夜あなたがどこにいたか知っているかのように。,"Dia {day} · {name} falou com você de um jeito estranho, como se soubesse onde você esteve ontem à noite.","Día {day} · {name} le habló de forma extraña, como si supiera dónde estuvo usted anoche."
+"You look tired, doctor. Long night? You should stay indoors after dark. People get hurt.","You look tired, doctor. Long night? You should stay indoors after dark. People get hurt.",お疲れのようですね、先生。長い夜でしたか？暗くなったら家にいるべきですよ。怪我をする人もいますから。,"O senhor parece cansado, doutor. Noite longa? Devia ficar em casa depois que escurece. As pessoas se machucam.","Parece cansado, doctor. ¿Una noche larga? Debería quedarse en casa cuando oscurece. La gente sale herida."
+Doctor. You walk fast for a man your age. Mind where you walk at night.,Doctor. You walk fast for a man your age. Mind where you walk at night.,先生。そのお年にしては足が速いのですね。夜はどこを歩くか気をつけて。,Doutor. O senhor anda rápido para a sua idade. Cuidado por onde anda à noite.,Doctor. Camina rápido para su edad. Cuidado por dónde anda de noche.
+"Whatever you think you saw last night, doctor, the dark plays tricks. Sleep well tonight.","Whatever you think you saw last night, doctor, the dark plays tricks. Sleep well tonight.",昨夜何を見たと思っているにせよ、先生、暗闇は人を欺くものです。今夜はよくお休みください。,"Seja lá o que o senhor acha que viu ontem à noite, doutor, o escuro engana. Durma bem esta noite.","Sea lo que sea que crea que vio anoche, doctor, la oscuridad engaña. Que duerma bien esta noche."
+The hearing against {name} will not take place.,The hearing against {name} will not take place.,{name}に対する審問は行われない。,A audiência contra {name} não vai acontecer.,La audiencia contra {name} no se celebrará.
+"Night {night}: you saw {name}'s face in the dark, and it ran after you.","Night {night}: you saw {name}'s face in the dark, and it ran after you.",{night}日目の夜：暗闇で{name}の顔を見た。そしてそれはあなたを追ってきた。,"Noite {night}: você viu o rosto de {name} no escuro, e aquilo correu atrás de você.","Noche {night}: viste el rostro de {name} en la oscuridad, y te persiguió."
+Night {night}: you saw {name} sneaking through the dark streets.,Night {night}: you saw {name} sneaking through the dark streets.,{night}日目の夜：暗い通りを忍び歩く{name}を見た。,Noite {night}: você viu {name} se esgueirando pelas ruas escuras.,Noche {night}: viste a {name} merodeando por las calles oscuras.
+Night {night}: {witness}'s account doesn't fit where {name} said they were.,Night {night}: {witness}'s account doesn't fit where {name} said they were.,{night}日目の夜：{witness}の証言は、{name}が言った居場所と合わない。,Noite {night}: o relato de {witness} não bate com onde {name} disse que estava.,Noche {night}: el relato de {witness} no encaja con dónde dijo {name} que estaba.
+"Night {night}: {witness} saw {name} near {place} at {time}, the night {victim} was attacked.","Night {night}: {witness} saw {name} near {place} at {time}, the night {victim} was attacked.",{night}日目の夜：{witness}は{time}に{place}の近くで{name}を見た。{victim}が襲われた夜だ。,"Noite {night}: {witness} viu {name} perto de {place} às {time}, na noite em que {victim} foi atacado.","Noche {night}: {witness} vio a {name} cerca de {place} a las {time}, la noche en que atacaron a {victim}."
+Night {night}: {witness} saw {name} out near {place} at {time}.,Night {night}: {witness} saw {name} out near {place} at {time}.,{night}日目の夜：{witness}は{time}に{place}の近くで外にいる{name}を見た。,Noite {night}: {witness} viu {name} na rua perto de {place} às {time}.,"Noche {night}: {witness} vio a {name} fuera, cerca de {place}, a las {time}."
+"{name} looks anemic, yet in {count} exams you never found a single bite.","{name} looks anemic, yet in {count} exams you never found a single bite.",{name}は貧血に見えるが、{count}回の診察で噛み跡は一つも見つからなかった。,"{name} parece anêmico, mas em {count} exames você nunca achou uma única mordida.","{name} parece anémico, pero en {count} exámenes nunca encontraste ni una mordedura."
+Traces of {trace} on {victim}'s clothes point to {name}.,Traces of {trace} on {victim}'s clothes point to {name}.,{victim}の服に残った{trace}の痕跡は{name}を指している。,Os vestígios de {trace} nas roupas de {victim} apontam para {name}.,Los rastros de {trace} en la ropa de {victim} apuntan a {name}.
+The hearing of {name},The hearing of {name},{name}の審問,A audiência de {name},La audiencia de {name}
+The town has gathered at the Town Hall. Choose the evidence you will present (up to 3).,The town has gathered at the Town Hall. Choose the evidence you will present (up to 3).,町の人々が役場に集まった。提出する証拠を選べ（3つまで）。,A cidade se reuniu na Prefeitura. Escolha as provas que vai apresentar (até 3).,El pueblo se ha reunido en el Ayuntamiento. Elige las pruebas que presentarás (hasta 3).
+The town has gathered at the Town Hall. Your casebook holds nothing solid against them: you will have to rely on witnesses and your word.,The town has gathered at the Town Hall. Your casebook holds nothing solid against them: you will have to rely on witnesses and your word.,町の人々が役場に集まった。手帳には確かな証拠が何もない。証人とあなたの言葉に頼るしかない。,A cidade se reuniu na Prefeitura. Seu caderno não tem nada sólido contra essa pessoa: você vai depender de testemunhas e da sua palavra.,El pueblo se ha reunido en el Ayuntamiento. Tu cuaderno no tiene nada sólido contra esa persona: dependerás de testigos y de tu palabra.
+Who will you call to speak (up to 2)? Only those who trust you will stand up.,Who will you call to speak (up to 2)? Only those who trust you will stand up.,誰に証言させるか（2人まで）？あなたを信頼する者だけが立ち上がる。,Quem você vai chamar para falar (até 2)? Só quem confia em você vai se levantar.,¿A quién llamarás a hablar (hasta 2)? Solo se levantarán quienes confían en ti.
+Nobody told you they saw the accused at night. There is no one to call.,Nobody told you they saw the accused at night. There is no one to call.,夜に被告を見たと話した者はいない。呼べる証人はいない。,Ninguém contou ter visto o acusado à noite. Não há quem chamar.,Nadie te dijo haber visto al acusado de noche. No hay a quién llamar.
+Go on,Go on,先へ進む,Continuar,Seguir
+[W/S] Choose    [E] Mark / Go on,[W/S] Choose    [E] Mark / Go on,[W/S] 選ぶ    [E] 印をつける／進む,[W/S] Escolher    [E] Marcar / Continuar,[W/S] Elegir    [E] Marcar / Seguir
+{witness}: saw {name} near {place} (night {night}),{witness}: saw {name} near {place} (night {night}),{witness}：{place}の近くで{name}を見た（{night}日目の夜）,{witness}: viu {name} perto de {place} (noite {night}),{witness}: vio a {name} cerca de {place} (noche {night})
+{name}: guilty,{name}: guilty,{name}：有罪,{name}: culpado,{name}: culpable
+{name}: not guilty,{name}: not guilty,{name}：無罪,{name}: inocente,{name}: inocente
+The town votes.,The town votes.,町が投票する。,A cidade vota.,El pueblo vota.
+{yes} of {total} say guilty.,{yes} of {total} say guilty.,{total}人中{yes}人が有罪とした。,{yes} de {total} dizem culpado.,{yes} de {total} dicen culpable.
+You stand before the town with nothing but your suspicion.,You stand before the town with nothing but your suspicion.,あなたは疑いだけを手に、町の前に立つ。,Você se apresenta diante da cidade com nada além da sua suspeita.,Te presentas ante el pueblo sin nada más que tu sospecha.
+You lay out your case:,You lay out your case:,あなたは主張を述べる：,Você apresenta o seu caso:,Expones tu caso:
+"{witness} stands, shaking: ""It made me lie to you, doctor. It's {name}. I saw them that night near {place}, and God forgive me, I kept quiet.""","{witness} stands, shaking: ""It made me lie to you, doctor. It's {name}. I saw them that night near {place}, and God forgive me, I kept quiet.""",{witness}が震えながら立ち上がる。「あれに嘘をつかされていました、先生。{name}です。あの夜、{place}の近くで見たのに、黙っていたんです。神よ、お許しを」,"{witness} se levanta, tremendo: ""Aquilo me fez mentir para o senhor, doutor. É {name}. Eu vi naquela noite perto de {place} e, Deus me perdoe, fiquei calado.""","{witness} se levanta, temblando: ""Me obligó a mentirle, doctor. Es {name}. Lo vi esa noche cerca de {place} y, que Dios me perdone, callé."""
+"{witness} looks at {name} and goes pale: ""I... I don't remember anything, doctor. I must have been mistaken.""","{witness} looks at {name} and goes pale: ""I... I don't remember anything, doctor. I must have been mistaken.""",{witness}は{name}を見て青ざめる。「わ…私は何も覚えていません、先生。きっと見間違いです」,"{witness} olha para {name} e empalidece: ""Eu... eu não lembro de nada, doutor. Devo ter me enganado.""","{witness} mira a {name} y palidece: ""Yo... no recuerdo nada, doctor. Debí de equivocarme."""
+"{witness} won't stand: ""I'll not speak up there for you, doctor.""","{witness} won't stand: ""I'll not speak up there for you, doctor.""",{witness}は立ち上がらない。「あなたのために証言する気はありません、先生」,"{witness} não se levanta: ""Não vou falar lá na frente pelo senhor, doutor.""","{witness} no se levanta: ""No hablaré allí arriba por usted, doctor."""
+"{witness}: ""On the night of Day {night} I saw {name} near {place}, around {time}.""","{witness}: ""On the night of Day {night} I saw {name} near {place}, around {time}.""",{witness}：「{night}日目の夜、{time}頃に{place}の近くで{name}を見ました」,"{witness}: ""Na noite do dia {night} eu vi {name} perto de {place}, por volta das {time}.""","{witness}: ""La noche del día {night} vi a {name} cerca de {place}, hacia las {time}."""
+"{witness}: ""On the night of Day {night} I saw {name} near {place}, around {time}. At that hour, when decent folk are asleep.""","{witness}: ""On the night of Day {night} I saw {name} near {place}, around {time}. At that hour, when decent folk are asleep.""",{witness}：「{night}日目の夜、{time}頃に{place}の近くで{name}を見ました。まともな人なら寝ている時間に」,"{witness}: ""Na noite do dia {night} eu vi {name} perto de {place}, por volta das {time}. Àquela hora, quando gente direita está dormindo.""","{witness}: ""La noche del día {night} vi a {name} cerca de {place}, hacia las {time}. A esas horas, cuando la gente decente duerme."""
+"{servant} stands up: ""{name} was with me all that night. I'd swear it before God.""","{servant} stands up: ""{name} was with me all that night. I'd swear it before God.""",{servant}が立ち上がる。「{name}はあの夜ずっと私と一緒でした。神に誓います」,"{servant} se levanta: ""{name} passou a noite toda comigo. Juro diante de Deus.""","{servant} se levanta: ""{name} estuvo conmigo toda esa noche. Lo juro ante Dios."""
+"{name}: ""Doctor, you are tired and frightened. You see monsters in every shadow. I have nothing to hide.""","{name}: ""Doctor, you are tired and frightened. You see monsters in every shadow. I have nothing to hide.""",{name}：「先生、あなたは疲れて怯えているんです。どの影にも怪物を見ている。私には隠すことなど何もありません」,"{name}: ""Doutor, o senhor está cansado e com medo. Vê monstros em cada sombra. Eu não tenho nada a esconder.""","{name}: ""Doctor, está cansado y asustado. Ve monstruos en cada sombra. No tengo nada que ocultar."""
+"{name}: ""I have lived here all my life. I'm no monster, and you all know it.""","{name}: ""I have lived here all my life. I'm no monster, and you all know it.""",{name}：「私は生まれてからずっとここで暮らしてきた。怪物なんかじゃない。皆知っているでしょう」,"{name}: ""Eu vivi aqui a vida toda. Não sou nenhum monstro, e todos vocês sabem disso.""","{name}: ""He vivido aquí toda mi vida. No soy ningún monstruo, y todos lo saben."""
+Guilty,Guilty,有罪,Culpado,Culpable
+Not guilty,Not guilty,無罪,Inocente,Inocente
+The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun.,The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun.,町は{name}を有罪とした。人々は{name}を役場の地下室へ引きずっていき、日の出を待つ。,A cidade considerou {name} culpado. Arrastam {name} para o porão da Prefeitura e esperam o sol nascer.,El pueblo ha declarado culpable a {name}. Arrastran a {name} al sótano del Ayuntamiento y esperan al sol.
+"The town has found {name} guilty and locked them in the cellar of the Town Hall. Tonight, Pallbrook will sleep a little easier.","The town has found {name} guilty and locked them in the cellar of the Town Hall. Tonight, Pallbrook will sleep a little easier.",町は{name}を有罪とし、役場の地下室に閉じ込めた。今夜、パルブルックは少しだけ安心して眠るだろう。,"A cidade considerou {name} culpado e trancou no porão da Prefeitura. Esta noite, Pallbrook vai dormir um pouco mais tranquila.","El pueblo ha declarado culpable a {name} y lo ha encerrado en el sótano del Ayuntamiento. Esta noche, Pallbrook dormirá un poco más tranquilo."
+"The town lets {name} go. As the crowd breaks up, {name} turns and looks straight at you.","The town lets {name} go. As the crowd breaks up, {name} turns and looks straight at you.",町は{name}を釈放した。人々が散っていく中、{name}は振り返り、まっすぐあなたを見た。,"A cidade deixa {name} ir. Enquanto a multidão se dispersa, {name} se vira e olha direto para você.","El pueblo deja ir a {name}. Mientras la multitud se dispersa, {name} se gira y te mira fijamente."
+"The town lets {name} go. {name} won't forgive you soon, and people whisper as you pass.","The town lets {name} go. {name} won't forgive you soon, and people whisper as you pass.",町は{name}を釈放した。{name}はしばらくあなたを許さないだろう。あなたが通ると人々がささやく。,"A cidade deixa {name} ir. {name} não vai perdoar você tão cedo, e as pessoas cochicham quando você passa.","El pueblo deja ir a {name}. {name} no te perdonará pronto, y la gente murmura a tu paso."
+The town will not gather for you again.,The town will not gather for you again.,町が再びあなたのために集まることはない。,A cidade não vai se reunir por você de novo.,El pueblo no volverá a reunirse por ti.
+The town will not gather for you again. You will have to stop it some other way.,The town will not gather for you again. You will have to stop it some other way.,町が再びあなたのために集まることはない。別の方法で止めるしかない。,A cidade não vai se reunir por você de novo. Você vai ter que detê-lo de outro jeito.,El pueblo no volverá a reunirse por ti. Tendrás que detenerlo de otra manera.
+A hearing is already called against {name}.,A hearing is already called against {name}.,{name}に対する審問はすでに召集されている。,Já há uma audiência marcada contra {name}.,Ya hay una audiencia convocada contra {name}.
+Call a hearing against {name}?,Call a hearing against {name}?,{name}に対する審問を召集しますか？,Convocar uma audiência contra {name}?,¿Convocar una audiencia contra {name}?
+"At 7 PM on Day {day} the town will gather at the Town Hall. You will present your evidence and call witnesses, then the town will vote.
+Word travels fast: {name} will know. Hearings left: {left}.","At 7 PM on Day {day} the town will gather at the Town Hall. You will present your evidence and call witnesses, then the town will vote.
+Word travels fast: {name} will know. Hearings left: {left}.","{day}日目の午後7時、町の人々が役場に集まる。あなたは証拠を示し、証人を呼び、町が投票する。
+噂はすぐに広まる。{name}にも知られるだろう。残りの審問：{left}","Às 19h do dia {day} a cidade vai se reunir na Prefeitura. Você vai apresentar suas provas e chamar testemunhas, e então a cidade vota.
+A notícia corre rápido: {name} vai ficar sabendo. Audiências restantes: {left}.","A las 19:00 del día {day} el pueblo se reunirá en el Ayuntamiento. Presentarás tus pruebas y llamarás a testigos, y luego el pueblo votará.
+Las noticias vuelan: {name} se enterará. Audiencias restantes: {left}."
+[E] Call the hearing      [Esc] Cancel,[E] Call the hearing      [Esc] Cancel,[E] 審問を召集する      [Esc] やめる,[E] Convocar a audiência      [Esc] Cancelar,[E] Convocar la audiencia      [Esc] Cancelar
+"Day {day} · You called a hearing against {name}, at 7 PM at the Town Hall.","Day {day} · You called a hearing against {name}, at 7 PM at the Town Hall.",{day}日目 · 役場で午後7時に、{name}に対する審問を召集した。,"Dia {day} · Você convocou uma audiência contra {name}, às 19h na Prefeitura.","Día {day} · Convocaste una audiencia contra {name}, a las 19:00 en el Ayuntamiento."
+"The hearing against {name} is set: Day {day}, 7 PM, at the Town Hall. Gather what you can until then.","The hearing against {name} is set: Day {day}, 7 PM, at the Town Hall. Gather what you can until then.",{name}に対する審問が決まった。{day}日目の午後7時、役場にて。それまでに集められるものを集めよう。,"A audiência contra {name} está marcada: dia {day}, 19h, na Prefeitura. Reúna o que puder até lá.","La audiencia contra {name} está fijada: día {day}, 19:00, en el Ayuntamiento. Reúne lo que puedas hasta entonces."
+It knows your face. Nights left: %d,It knows your face. Nights left: %d,あれはあなたの顔を知っている。残りの夜：%d,Ele conhece o seu rosto. Noites restantes: %d,Conoce tu rostro. Noches restantes: %d
+It knows your face. Tonight it comes for you.,It knows your face. Tonight it comes for you.,あれはあなたの顔を知っている。今夜、あなたを狙ってくる。,Ele conhece o seu rosto. Esta noite ele vem atrás de você.,Conoce tu rostro. Esta noche viene a por ti.
+"Hearing against {name}: Day {day}, 7 PM","Hearing against {name}: Day {day}, 7 PM",{name}の審問：{day}日目 午後7時,"Audiência contra {name}: dia {day}, 19h","Audiencia contra {name}: día {day}, 19:00"
+"It hunted you all night, and waited where it could not follow. At dawn it was gone. It will come again tonight.","It hunted you all night, and waited where it could not follow. At dawn it was gone. It will come again tonight.",あれは一晩中あなたを追い、近づけない場所の外で待っていた。夜明けには消えていた。今夜もまた来るだろう。,"Ele caçou você a noite toda e esperou onde não podia entrar. Ao amanhecer, tinha sumido. Esta noite ele volta.",Te cazó toda la noche y esperó donde no podía seguirte. Al amanecer se había ido. Esta noche volverá.
+You have two nights to bring it before the town. Then it will come for you.,You have two nights to bring it before the town. Then it will come for you.,二晩のうちにあれを町の前に引き出せ。さもなければ、あれがあなたを狙ってくる。,"Você tem duas noites para levá-lo diante da cidade. Depois disso, ele vem atrás de você.",Tienes dos noches para llevarlo ante el pueblo. Después vendrá a por ti.
+You fell where it could reach you. It did not wait for dawn. Pallbrook will need another doctor.,You fell where it could reach you. It did not wait for dawn. Pallbrook will need another doctor.,あなたはあれの手が届く場所で倒れた。あれは夜明けを待たなかった。パルブルックには、また新しい医師が必要になる。,Você caiu onde ele podia alcançá-lo. Ele não esperou o amanhecer. Pallbrook vai precisar de outro médico.,Caíste donde podía alcanzarte. No esperó al amanecer. Pallbrook necesitará otro médico.
+It came for you at the clinic while you slept. Pallbrook will need another doctor.,It came for you at the clinic while you slept. Pallbrook will need another doctor.,あなたが眠っている間に、あれは診療所へやって来た。パルブルックには、また新しい医師が必要になる。,Ele veio atrás de você na clínica enquanto você dormia. Pallbrook vai precisar de outro médico.,Vino a por ti a la clínica mientras dormías. Pallbrook necesitará otro médico.
+Word spread that the doctor spent the night on the church floor. People trust him a little less.,Word spread that the doctor spent the night on the church floor. People trust him a little less.,医者が教会の床で夜を明かしたという噂が広まった。人々の信頼が少し落ちた。,Correu a notícia de que o médico passou a noite no chão da igreja. As pessoas confiam um pouco menos nele.,Se corrió la voz de que el doctor pasó la noche en el suelo de la iglesia. La gente confía un poco menos en él.
+Word spread that the doctor spent the night crouched in someone's garden. People trust him a little less.,Word spread that the doctor spent the night crouched in someone's garden. People trust him a little less.,医者が誰かの菜園にうずくまって夜を明かしたという噂が広まった。人々の信頼が少し落ちた。,Correu a notícia de que o médico passou a noite agachado na horta de alguém. As pessoas confiam um pouco menos nele.,Se corrió la voz de que el doctor pasó la noche agazapado en el huerto de alguien. La gente confía un poco menos en él.
+Word spread that the doctor spent the night among the graves beyond the bridge. People trust him a little less.,Word spread that the doctor spent the night among the graves beyond the bridge. People trust him a little less.,医者が橋の向こうの墓場で夜を明かしたという噂が広まった。人々の信頼が少し落ちた。,Correu a notícia de que o médico passou a noite entre os túmulos além da ponte. As pessoas confiam um pouco menos nele.,Se corrió la voz de que el doctor pasó la noche entre las tumbas al otro lado del puente. La gente confía un poco menos en él.
+Clues,Clues,手がかり,Pistas,Pistas
+Diary,Diary,日記,Diário,Diario
+[Q/E] Turn bookmark,[Q/E] Turn bookmark,[Q/E] しおりをめくる,[Q/E] Trocar de marcador,[Q/E] Cambiar de marcador
+The Old Doctor's Diary,The Old Doctor's Diary,前任の医師の日記,O diário do antigo médico,El diario del antiguo médico
+"The old doctor's loose sheets will be kept here, with the torn pieces you find in town.","The old doctor's loose sheets will be kept here, with the torn pieces you find in town.",前任の医師のばらばらの紙片は、町で見つけた切れ端と一緒にここに保管される。,"As folhas soltas do antigo médico vão ficar aqui, junto com os pedaços rasgados que você achar pela cidade.","Las hojas sueltas del antiguo médico se guardarán aquí, junto con los trozos rotos que encuentres en el pueblo."
+Sheet %d,Sheet %d,%d枚目,Folha %d,Hoja %d
+Loose pieces,Loose pieces,ばらばらの切れ端,Pedaços soltos,Trozos sueltos
+"Click a sheet to open it. Pick a loose piece, then click the gap it fits.","Click a sheet to open it. Pick a loose piece, then click the gap it fits.",紙をクリックして開く。切れ端を選び、合う欠けた部分をクリックする。,Clique numa folha para abri-la. Escolha um pedaço solto e clique na lacuna onde ele encaixa.,Haz clic en una hoja para abrirla. Elige un trozo suelto y haz clic en el hueco donde encaja.
+No torn pieces yet. They could be anywhere in town.,No torn pieces yet. They could be anywhere in town.,まだ切れ端はない。町のどこにあってもおかしくない。,Nenhum pedaço rasgado ainda. Podem estar em qualquer lugar da cidade.,Aún no hay trozos rotos. Podrían estar en cualquier parte del pueblo.
+Found at {place} · Day {day},Found at {place} · Day {day},{place}で発見 · {day}日目,Achado em {place} · Dia {day},Encontrado en {place} · Día {day}
+[Esc] Back,[Esc] Back,[Esc] 戻る,[Esc] Voltar,[Esc] Volver
+"Pick a loose piece first, then click the gap it fits.","Pick a loose piece first, then click the gap it fits.",まず切れ端を選び、それから合う欠けた部分をクリックする。,"Escolha primeiro um pedaço solto, depois clique na lacuna onde ele encaixa.",Elige primero un trozo suelto y luego haz clic en el hueco donde encaja.
+"Right sheet, wrong gap.","Right sheet, wrong gap.",紙は合っているが、場所が違う。,"Folha certa, lacuna errada.","Hoja correcta, hueco equivocado."
+The tear doesn't match: this piece belongs to another sheet.,The tear doesn't match: this piece belongs to another sheet.,破れ目が合わない。この切れ端は別の紙のものだ。,O rasgo não bate: este pedaço é de outra folha.,El desgarro no encaja: este trozo es de otra hoja.
+The sheet is whole again.,The sheet is whole again.,紙は元通りになった。,A folha está inteira de novo.,La hoja vuelve a estar entera.
+"Day {day} · The old doctor's diary, sheet {n} ({title}): {learned}","Day {day} · The old doctor's diary, sheet {n} ({title}): {learned}",{day}日目 · 前任の医師の日記、{n}枚目（{title}）：{learned},"Dia {day} · Diário do antigo médico, folha {n} ({title}): {learned}","Día {day} · Diario del antiguo médico, hoja {n} ({title}): {learned}"
+[E] Pick up,[E] Pick up,[E] 拾う,[E] Pegar,[E] Recoger
+"A whole sheet in the old doctor's hand, hidden among the graves. You put it in your casebook (Tab, Diary).","A whole sheet in the old doctor's hand, hidden among the graves. You put it in your casebook (Tab, Diary).",墓の間に隠された、前任の医師の筆跡の一枚。手帳にしまった（Tab、日記）。,"Uma folha inteira com a letra do antigo médico, escondida entre os túmulos. Você a guarda no caderno (Tab, Diário).","Una hoja entera con la letra del antiguo médico, escondida entre las tumbas. La guardas en tu cuaderno (Tab, Diario)."
+"A torn piece of the old doctor's diary. You tuck it into your casebook (Tab, Diary).","A torn piece of the old doctor's diary. You tuck it into your casebook (Tab, Diary).",前任の医師の日記の切れ端だ。手帳に挟んだ（Tab、日記）。,"Um pedaço rasgado do diário do antigo médico. Você o guarda no caderno (Tab, Diário).","Un trozo roto del diario del antiguo médico. Lo guardas en tu cuaderno (Tab, Diario)."
+the bridge,the bridge,橋,a ponte,el puente
+the graves beyond the bridge,the graves beyond the bridge,橋の向こうの墓地,os túmulos além da ponte,las tumbas al otro lado del puente
+[W/S] Pick a piece    [A/D] Choose a gap,[W/S] Pick a piece    [A/D] Choose a gap,[W/S] 切れ端を選ぶ    [A/D] 欠けた部分を選ぶ,[W/S] Escolher pedaço    [A/D] Escolher lacuna,[W/S] Elegir trozo    [A/D] Elegir hueco
+[E] Put it there    [Esc] Back,[E] Put it there    [Esc] Back,[E] そこに置く    [Esc] 戻る,[E] Encaixar    [Esc] Voltar,[E] Colocarlo    [Esc] Volver

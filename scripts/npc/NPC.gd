@@ -15,7 +15,12 @@ const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Esco
 @export var witness_range := 5.0  # How close the doctor must be to recognize a hunting vampire
 
 var hunt_returning := false
-var witnessed := false
+var witnessed := false        # The doctor got close enough to see its face (as the vampire)
+var noticed_doctor := false   # It saw the doctor watching (as the vampire)
+var chasing := false          # Running after the doctor (as the vampire)
+const NOTICE_RANGE := 11.0    # How far a hunting vampire notices a doctor in the open
+const CHASE_SPEED := 1.8      # Times the walking speed while chasing: 4.5, the doctor walks at 5
+                              # (rested he slowly pulls away; tired after midnight, it catches him)
 var is_dark := false
 var normal_color: Color
 var state: State = State.ROUTINE
@@ -263,6 +268,7 @@ func set_state(new_state: State) -> void:
 		State.HUNTING:
 			_set_present(true)
 			witnessed = false
+			noticed_doctor = false
 			name_label.visible = false  # Just a dark shape in the night
 			_set_dark(true)
 	_update_label()
@@ -319,7 +325,17 @@ func is_inside() -> bool:
 
 
 func is_alive() -> bool:
-	return state != State.DEAD
+	return state != State.DEAD and not jailed
+
+
+var jailed := false  # Condemned at a hearing: locked in the Town Hall cellar
+
+func jail() -> void:
+	jailed = true
+	marked = false
+	_set_present(false)
+	set_process(false)
+	set_physics_process(false)
 
 
 func die(trace: String = "") -> void:
@@ -351,6 +367,8 @@ func _update_label() -> void:
 
 func can_talk() -> bool:
 	# Talk to the living, examine the dead (once)
+	if jailed:
+		return false
 	return state == State.ROUTINE or state == State.INSIDE \
 			or (state == State.DEAD and not examined and not buried)
 
@@ -528,6 +546,8 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 
 	var current_speed := speed * (1.8 if state == State.SCARED or state == State.HUNTING else 1.0)
+	if chasing:
+		current_speed = speed * CHASE_SPEED
 
 	if state == State.TALKING or agent.is_navigation_finished():
 		velocity.x = 0.0
@@ -591,12 +611,14 @@ func start_hunt(place: String) -> void:
 
 
 func end_hunt() -> void:
+	chasing = false
 	hunt_returning = true
 	_go_to_place(data.home)
 
 
 func stop_hunt() -> void:
 	# Dawn arrived mid-hunt: drop everything and return to daily life
+	chasing = false
 	hunt_returning = false
 	set_state(State.ROUTINE)
 
@@ -628,21 +650,34 @@ func _process(delta: float) -> void:
 		_check_appointment()
 
 
+# Two separate things while hunting: the doctor seeing its face (close, a clear line, even from
+# inside a bush), and the vampire noticing the doctor (further away, but not if he is hidden).
 func _check_seen_by_doctor() -> void:
-	if state != State.HUNTING or witnessed:
+	if state != State.HUNTING:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Node3D
-	if player and global_position.distance_to(player.global_position) < witness_range and sees(player):
+	if player == null:
+		return
+	var distance := global_position.distance_to(player.global_position)
+	if not noticed_doctor and distance < NOTICE_RANGE and sees(player):
+		noticed_doctor = true
+	if witnessed:
+		return
+	if distance < witness_range and sees(player, true):
 		witnessed = true
 		name_label.visible = true  # Close enough to recognize the face
 		var clue := _t("Night of Day {day}, {time}: you saw {name} sneaking through the dark streets.",
 				{"day": GameState.day, "time": GameState.format_time(GameState.hour), "name": _n(data.npc_name)})
 		GameState.add_clue(clue, "evidence")
+		var nights: Array = GameState.saw_hunting.get(data.npc_name, [])
+		if not nights.has(GameState.day):
+			nights.append(GameState.day)
+		GameState.saw_hunting[data.npc_name] = nights
 
 # ---------- Schedule ----------
 
 func _on_hour_changed(_hour: int) -> void:
-	if wander or data == null or state == State.DEAD:
+	if wander or data == null or state == State.DEAD or jailed:
 		return
 	if state == State.SLEEPING:
 		if not GameState.is_night:
@@ -835,7 +870,10 @@ func _look_around() -> void:
 		if npc.state == State.HUNTING and distance > RECOGNIZE_RANGE:
 			add_sighting(night, "figure", "", place, GameState.hour)  # Too dark to see who
 		else:
-			add_sighting(night, "person", npc.data.npc_name, place, GameState.hour, same_room)
+			# Where they were heading (their routine), so someone just walking past isn't
+			# taken for a liar later. A hunter's errand is no routine, so it isn't kept.
+			var heading: String = npc.current_place if npc.state != State.HUNTING else ""
+			add_sighting(night, "person", npc.data.npc_name, place, GameState.hour, same_room, heading)
 
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	# Behind a tree or a wall, the doctor isn't seen at all
@@ -857,8 +895,8 @@ func _look_around() -> void:
 
 
 # Line of sight from this person's eyes to someone: walls, trees and props block it
-func sees(target: Node3D) -> bool:
-	if target.has_method("is_hidden") and target.is_hidden():
+func sees(target: Node3D, ignore_hiding := false) -> bool:
+	if not ignore_hiding and target.has_method("is_hidden") and target.is_hidden():
 		return false  # Inside a bush or tall grass
 	var query := PhysicsRayQueryParameters3D.create(global_position + Vector3(0.0, 1.5, 0.0),
 			target.global_position + Vector3(0.0, 0.5, 0.0))
@@ -869,15 +907,17 @@ func sees(target: Node3D) -> bool:
 	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
-func add_sighting(night: int, kind: String, who: String, place: String, hour: float, inside := false) -> void:
+func add_sighting(night: int, kind: String, who: String, place: String, hour: float, inside := false, heading := "") -> void:
 	# One entry per person per night, updated to the last time they were seen
 	for s in sightings:
 		if s["night"] == night and s["kind"] == kind and s["who"] == who and (kind != "figure" or s["place"] == place):
 			s["place"] = place
 			s["hour"] = hour
 			s["inside"] = inside
+			s["heading"] = heading
 			return
-	sightings.append({"night": night, "kind": kind, "who": who, "place": place, "hour": hour, "inside": inside})
+	sightings.append({"night": night, "kind": kind, "who": who, "place": place, "hour": hour, "inside": inside,
+			"heading": heading})
 
 
 func _is_late(hour: float) -> bool:
@@ -933,7 +973,14 @@ func greeting() -> String:
 	var night := GameState.last_night()
 	for s in sightings:
 		if s["night"] == night and s["kind"] == "doctor_collapsed":
-			GameState.add_clue(_t("Day {day} · {name} found you collapsed near {place} and keeps their distance.", {"day": GameState.day, "name": _n(data.npc_name), "place": GameState.place_name(s["place"])}))
+			var where := {"day": GameState.day, "name": _n(data.npc_name), "place": GameState.place_name(s["place"])}
+			if s.get("inside", false):
+				# He fell inside a building: only whoever was in there knows
+				GameState.add_clue(_t("Day {day} · {name} found you collapsed inside {place} and keeps their distance.", where))
+				if s["place"] == data.home:
+					return tr("Doctor! I found you collapsed in my own house this morning. What were you doing in here?")
+				return _t("Doctor! I found you collapsed inside {place} this morning. Are you ill... or is it something else?", where)
+			GameState.add_clue(_t("Day {day} · {name} found you collapsed near {place} and keeps their distance.", where))
 			var spot := tr("my door") if s["place"] == data.home else GameState.place_name(s["place"])
 			return _t("Doctor! We found you lying in the street near {place} this morning. Are you ill... or is it something else?", {"place": spot})
 	for s in sightings:
@@ -946,6 +993,15 @@ func greeting() -> String:
 			var out := {"day": GameState.day, "name": _n(data.npc_name), "place": GameState.place_name(s["place"]), "time": GameState.format_time(s["hour"])}
 			GameState.add_clue(_t("Day {day} · {name} saw you out near {place} at {time} and keeps their distance.", out))
 			return _t("I saw you near {place} at {time} last night, doctor. Decent folk are home by then.", out)
+	if is_vampire() and GameState.faced_night == night:
+		# It knows he saw its face last night. It won't say so, but it wants him to know.
+		if not was_asked("faced"):
+			asked["faced"] = GameState.day
+			GameState.add_clue(_t("Day {day} · {name} spoke to you oddly, as if they knew where you were last night.", {"day": GameState.day, "name": _n(data.npc_name)}))
+		var cold := ["You look tired, doctor. Long night? You should stay indoors after dark. People get hurt.",
+				"Doctor. You walk fast for a man your age. Mind where you walk at night.",
+				"Whatever you think you saw last night, doctor, the dark plays tricks. Sleep well tonight."]
+		return tr(cold[GameState.day % cold.size()])
 	if claims_sickness():
 		var sick := ["This sickness... I can barely stand, doctor.",
 				"Forgive me, doctor. The light hurts my eyes these days.",
@@ -961,14 +1017,19 @@ func answer_alibi() -> String:
 	Playtest.count("asked_alibi")
 	asked["alibi"] = GameState.day
 	if is_wary():
+		if GameState.day > 1:
+			GameState.record_refusal(GameState.last_night(), data.npc_name, "alibi")
 		return _wary_line()
 	if GameState.day == 1:
 		# Before the doctor's first night here: just their usual day, from their routine
 		var usual := _usual_day_text()
 		GameState.add_clue(_t("Day {day} · {name}, about yesterday: \"{text}\"", {"day": 1, "name": _n(data.npc_name), "text": usual}))
 		return usual
-	var text := _alibi_text(GameState.last_night())
+	var night := GameState.last_night()
+	var text := _alibi_text(night)
 	GameState.add_clue(_t("Day {day} · {name}, about last night: \"{text}\"", {"day": GameState.day, "name": _n(data.npc_name), "text": text}))
+	var told := _told_plan(night)
+	GameState.record_alibi(night, data.npc_name, told["plan"], told["bed"], data.home, text)
 	return text
 
 
@@ -976,21 +1037,27 @@ func answer_seen() -> String:
 	Playtest.count("asked_seen")
 	asked["seen"] = GameState.day
 	if is_wary():
+		if GameState.day > 1:
+			GameState.record_refusal(GameState.last_night(), data.npc_name, "seen")
 		return _wary_line()
 	if GameState.day == 1:
 		var rumor := _first_day_rumor()
 		GameState.add_clue(_t("Day {day} · {name} said: \"{text}\"", {"day": 1, "name": _n(data.npc_name), "text": rumor}))
 		return rumor
 	var lines: Array[String] = []
+	var night := GameState.last_night()
+	var told: Array = []  # What they actually said, kept for the casebook's cross-check
 	if is_servant:
 		lines.append(_servant_sighting())  # A lie that points at someone innocent
+		told.append(servant_lie)
 	else:
-		var night := GameState.last_night()
 		var seen := sightings.filter(func(s): return s["night"] == night and s["kind"] != "doctor_collapsed")
 		# Most worrying first: dark figures, then whatever happened latest
 		seen.sort_custom(func(a, b): return _weight(a) > _weight(b))
 		for s in seen.slice(0, 3):
 			lines.append(_describe(s))
+			told.append(s)
+	GameState.record_report(night, data.npc_name, told)
 	var text := tr("No. I slept through the night.") if lines.is_empty() else Lang.join_sentences(lines)
 	GameState.add_clue(_t("Day {day} · {name} saw: \"{text}\"", {"day": GameState.day, "name": _n(data.npc_name), "text": text}))
 	return text
@@ -1176,6 +1243,24 @@ func _alibi_text(night: int) -> String:
 	return text + _t(". I went to bed around {time}.", {"time": GameState.format_time(bed)})
 
 
+# The evening as they told it: where they were from 6 PM, and when they went to bed
+func _told_plan(night: int) -> Dictionary:
+	if data.schedule.is_empty():
+		return {"plan": {18: data.home}, "bed": data.bedtime}
+	var plan: Dictionary = data.schedule
+	var bed := data.bedtime
+	var last_place := _scheduled_place(18)
+	if plans.has(night):
+		plan = plans[night]["schedule"]
+		bed = plans[night]["bedtime"]
+		last_place = plan.get(18, last_place)
+	var told := {18: last_place}
+	for h: int in plan.keys():
+		if h > 18 and h < bed:
+			told[h] = plan[h]
+	return {"plan": told, "bed": bed}
+
+
 # Yesterday, before the doctor's first night: an ordinary day, told from their schedule
 func _usual_day_text() -> String:
 	if data.schedule.is_empty():
@@ -1239,6 +1324,8 @@ func _weight(s: Dictionary) -> float:
 func _describe(s: Dictionary) -> String:
 	var time := GameState.format_time(s["hour"])
 	var where := GameState.place_name(s["place"])
+	if s["place"] == data.home:
+		where = tr("my forge") if data.home == "Casa2" else tr("my house")  # Never their own name
 	var a := {"time": time, "place": where, "name": _n(str(s["who"]))}
 	match s["kind"]:
 		"figure":
@@ -1254,6 +1341,8 @@ func _describe(s: Dictionary) -> String:
 	return _t("I saw {name} passing near {place} around {time}.", a)
 
 
+var servant_lie := {}  # The made-up sighting behind the last lie, for the cross-check
+
 func _servant_sighting() -> String:
 	var innocents := []
 	for npc in get_tree().get_nodes_in_group("npcs"):
@@ -1263,7 +1352,10 @@ func _servant_sighting() -> String:
 		return tr("Nothing. Nothing at all.")
 	var target = innocents.pick_random()
 	var place: String = GameState.PLACE_NAMES.keys().pick_random()
-	var time := GameState.format_time(snappedf(randf_range(22.5, 24.5), 1.0 / 6.0))
+	var lie_hour := fposmod(snappedf(randf_range(22.5, 24.5), 1.0 / 6.0), 24.0)
+	var time := GameState.format_time(lie_hour)
+	servant_lie = {"night": GameState.last_night(), "kind": "person", "who": target.data.npc_name,
+			"place": place, "hour": lie_hour, "inside": false}
 	return _t("I saw {name} sneaking near {place} around {time}. Ask them where they were.", {"name": _n(target.data.npc_name), "place": GameState.place_name(place), "time": time})
 
 

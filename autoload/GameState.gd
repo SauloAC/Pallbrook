@@ -20,6 +20,35 @@ var weather := "clear"           # Today's sky: clear, cloudy or fog (rolled at 
 var open_building := ""          # The walk-in building the doctor is standing in (roof hidden)
 var open_upstairs := false       # ...and whether he is on its upper floor
 
+# ---------- What people said about each night (for the casebook's cross-check) ----------
+# The doctor compares statements by hand: pick a person and a night, then a witness.
+# Nothing is marked as true or false until he does.
+var alibis := {}       # "night|name" -> {plan: {hour: place}, bed: hour, home: place, text}
+var reports := {}      # "night|witness" -> Array of sightings as told {kind, who, place, hour, inside}
+var crosschecks := {}  # "night|subject|witness" -> "match", "conflict" or "silent"
+var refusals := {}     # "night|name|alibi" or "night|name|seen" -> true: they wouldn't say
+var beliefs := {}      # "night|subject|witness" -> "subject", "witness" or "unsure": who the doctor believes
+var remarks: Array[Dictionary] = []  # The doctor's own notes: {night, people, text}
+# What the doctor has learned about the creature (e.g. "servants": the bitten can lie for it).
+# Hints in the casebook only appear once he knows. Filled by the old doctor's diary (to come).
+var lore := {}
+var chased := false             # The vampire is running after the doctor right now
+var hunted_by_vampire := false  # He saw its face and got away: it knows
+var faced_night := -1           # The last night it chased him (it greets him differently next day)
+var faced_by := ""              # ...and who it was
+var saw_hunting := {}           # name -> nights the doctor saw them sneaking out to hunt
+var come_night := -1            # The night it comes for the doctor (two nights after it knows him)
+var doom_tonight := false       # Tonight is that night
+
+# ---------- The hearing (see Hearing.gd) ----------
+const MAX_HEARINGS := 2
+var hearing := {}               # The one called: {accused, day}; empty when none is pending
+var hearings_held := 0
+# Attacks the whole town heard about: {night, victim, home}
+var attacks: Array[Dictionary] = []
+# The old doctor's diary (see Diary.gd): {spots, found, placed, last_name}
+var diary := {}
+
 # ---------- The doctor's purse ----------
 const SALARY := 3        # Paid by the Town Hall every morning
 const EXAM_FEE := 1      # Each patient pays for their first exam of the day
@@ -51,6 +80,166 @@ func reset() -> void:
 	tonics_ordered = 0
 	entries.clear()
 	appointments.clear()
+	alibis.clear()
+	reports.clear()
+	crosschecks.clear()
+	refusals.clear()
+	beliefs.clear()
+	remarks.clear()
+	lore.clear()
+	chased = false
+	hunted_by_vampire = false
+	faced_night = -1
+	faced_by = ""
+	saw_hunting.clear()
+	come_night = -1
+	doom_tonight = false
+	hearing = {}
+	hearings_held = 0
+	attacks.clear()
+	diary = {}
+
+# ---------- Cross-checking statements ----------
+
+func record_alibi(night: int, person: String, plan: Dictionary, bed: int, home: String, text: String) -> void:
+	alibis["%d|%s" % [night, person]] = {"plan": plan.duplicate(), "bed": bed, "home": home, "text": text}
+
+
+func record_report(night: int, witness: String, told: Array) -> void:
+	reports["%d|%s" % [night, witness]] = told.duplicate(true)
+
+
+# It knows the doctor's face: on night `night` it comes for him (the earliest date stands)
+func recognize(night: int) -> void:
+	hunted_by_vampire = true
+	if come_night < 0 or night < come_night:
+		come_night = night
+
+
+# Nights left before it comes, counting tonight (0 = tonight it comes; -1 = it doesn't know him)
+func nights_left() -> int:
+	return come_night - day if come_night >= 0 else -1
+
+
+func record_attack(night: int, victim: String, home: String) -> void:
+	attacks.append({"night": night, "victim": victim, "home": home})
+
+
+# Who was attacked at that place that night ("" = nobody the town heard of)
+func attack_at(night: int, place: String) -> String:
+	for a in attacks:
+		if a["night"] == night and a["home"] == place:
+			return a["victim"]
+	return ""
+
+
+func learn(topic: String) -> void:
+	if not lore.has(topic):
+		lore[topic] = day
+		Playtest.count("learned_" + topic)
+
+
+func knows(topic: String) -> bool:
+	return lore.has(topic)
+
+
+# A note the doctor wrote himself from ready-made phrases (also filed in the casebook)
+func add_remark(night: int, people: Array, text: String) -> void:
+	remarks.append({"night": night, "people": people.duplicate(), "text": text})
+	add_clue(tr("Night {night} · Your note: {text}").format({"night": night, "text": text}), "remark")
+	Playtest.count("remarks_written")
+
+
+func record_refusal(night: int, person: String, question: String) -> void:
+	refusals["%d|%s|%s" % [night, person, question]] = true
+
+
+# They wouldn't answer that question about that night (and never did later)
+func refused(night: int, person: String, question: String) -> bool:
+	if question == "alibi" and has_alibi(night, person):
+		return false
+	if question == "seen" and has_report(night, person):
+		return false
+	return refusals.has("%d|%s|%s" % [night, person, question])
+
+
+func has_alibi(night: int, person: String) -> bool:
+	return alibis.has("%d|%s" % [night, person])
+
+
+func has_report(night: int, witness: String) -> bool:
+	return reports.has("%d|%s" % [night, witness])
+
+
+# What the witness said about the subject that night (sightings of that person only)
+func sightings_of(night: int, witness: String, subject: String) -> Array:
+	var told: Array = reports.get("%d|%s" % [night, witness], [])
+	return told.filter(func(s): return s["kind"] == "person" and s["who"] == subject)
+
+
+# The doctor compares one witness against one alibi. Returns "match", "conflict" or "silent"
+# (the witness said nothing about that person), and remembers it for the nights table.
+func cross_check(night: int, subject: String, witness: String) -> String:
+	var seen := sightings_of(night, witness, subject)
+	var result := "silent"
+	var alibi: Dictionary = alibis.get("%d|%s" % [night, subject], {})
+	if not seen.is_empty() and not alibi.is_empty():
+		result = "match"
+		for s in seen:
+			if not _fits_alibi(alibi, s):
+				result = "conflict"
+				break
+	var key := "%d|%s|%s" % [night, subject, witness]
+	if not crosschecks.has(key) and result != "silent":
+		Playtest.count("crosscheck_" + result)
+	crosschecks[key] = result
+	return result
+
+
+# Night table mark for one person and night: "conflict", "match", "alibi" (told, not checked
+# yet) or "" (not asked)
+func night_mark(night: int, person: String) -> String:
+	var mark := "alibi" if has_alibi(night, person) else ("refused" if refused(night, person, "alibi") else "")
+	for key: String in crosschecks:
+		var parts := key.split("|")
+		if int(parts[0]) == night and parts[1] == person:
+			if crosschecks[key] == "conflict":
+				return "conflict"
+			if crosschecks[key] == "match":
+				mark = "match"
+	return mark
+
+
+# Where the alibi puts someone at an hour of the night (after bedtime: at home, in bed)
+func _alibi_place(alibi: Dictionary, at_hour: float) -> String:
+	var h := at_hour + 24.0 if at_hour < 12.0 else at_hour  # 1 AM comes after 11 PM
+	var bed := float(alibi["bed"])
+	if bed < 12.0:
+		bed += 24.0
+	if h >= bed:
+		return alibi["home"]
+	var plan: Dictionary = alibi["plan"]
+	var hours := plan.keys()
+	hours.sort()
+	var place: String = plan[hours[0]]
+	for k in hours:
+		var key_h := float(k) + 24.0 if int(k) < 12 else float(k)
+		if key_h <= h:
+			place = plan[k]
+	return place
+
+
+# A sighting fits if the alibi puts them there at that hour, give or take half an hour for the
+# walk between places (it used to be an hour, which let almost everything fit)
+# places. Someone seen walking counts where they were heading too (they pass other places).
+func _fits_alibi(alibi: Dictionary, s: Dictionary) -> bool:
+	var heading: String = s.get("heading", "")
+	for offset in [0.0, -0.5, 0.5]:
+		var there := _alibi_place(alibi, fposmod(float(s["hour"]) + offset, 24.0))
+		if there == s["place"] or (heading != "" and there == heading):
+			return true
+	return false
+
 
 # kind: "testimony" (what people say) or "evidence" (what the doctor saw or found)
 # on_day: which day the casebook files it under (default: today)

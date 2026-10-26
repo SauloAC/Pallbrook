@@ -11,6 +11,8 @@ const ICON_BOOK := preload("res://assets/ui/casebook.png")
 
 var accuse_hint: Control  # Hidden on Day 1: no accusations yet
 var hidden_note: Label    # Shown while the doctor is hidden in a bush or tall grass
+var chase_note: Label     # Shown while the vampire is chasing him
+var doom_note: Label      # It knows his face: nights left before it comes for him
 
 
 func _ready() -> void:
@@ -23,6 +25,22 @@ func _ready() -> void:
 	hidden_note.add_theme_constant_override("outline_size", 8)
 	hidden_note.visible = false
 	add_child(hidden_note)
+	chase_note = Label.new()
+	chase_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	chase_note.position = Vector2(276.0, 90.0)
+	chase_note.size = Vector2(600.0, 40.0)
+	chase_note.add_theme_font_size_override("font_size", 26)
+	chase_note.add_theme_color_override("font_outline_color", Color.BLACK)
+	chase_note.add_theme_constant_override("outline_size", 10)
+	chase_note.visible = false
+	add_child(chase_note)
+	doom_note = Label.new()
+	doom_note.position = Vector2(20.0, 62.0)  # Under the hidden note
+	doom_note.add_theme_font_size_override("font_size", 18)
+	doom_note.add_theme_color_override("font_color", Color(0.9, 0.35, 0.3))
+	doom_note.add_theme_color_override("font_outline_color", Color.BLACK)
+	doom_note.add_theme_constant_override("outline_size", 8)
+	add_child(doom_note)
 
 
 # The language can change on the title screen, after the HUD is built
@@ -56,6 +74,26 @@ func _process(_delta: float) -> void:
 	hidden_note.visible = player != null and player.has_method("is_hidden") and player.is_hidden()
 	if hidden_note.visible:
 		hidden_note.text = tr("Hidden: nobody can see you here")
+	chase_note.visible = GameState.chased
+	if GameState.chased:
+		var zones := get_tree().get_first_node_in_group("safe_zones")
+		var safe: bool = player != null and zones != null and zones.is_safe(player.global_position)
+		chase_note.text = tr("It won't follow you here.") if safe else tr("It's coming after you. Run!")
+		chase_note.add_theme_color_override("font_color", Color(0.75, 0.85, 0.7) if safe else Color(0.9, 0.25, 0.2))
+		hidden_note.visible = false  # A bush won't hide him from something that saw him go in
+	var left := GameState.nights_left()
+	doom_note.visible = left >= 0 and not GameState.game_over
+	if left > 0:
+		doom_note.text = tr("It knows your face. Nights left: %d") % left
+	elif left == 0:
+		doom_note.text = tr("It knows your face. Tonight it comes for you.")
+	if not GameState.hearing.is_empty():
+		doom_note.visible = true
+		doom_note.add_theme_color_override("font_color", Color(0.95, 0.8, 0.45))
+		doom_note.text = Lang.contract(tr("Hearing against {name}: Day {day}, 7 PM").format({"name": tr(GameState.hearing["accused"]), "day": GameState.hearing["day"]})) + \
+				(("   ·   " + doom_note.text) if left >= 0 else "")
+	else:
+		doom_note.add_theme_color_override("font_color", Color(0.9, 0.35, 0.3))
 	controls.visible = not GameState.in_dialogue
 	accuse_hint.visible = GameState.day >= 2
 

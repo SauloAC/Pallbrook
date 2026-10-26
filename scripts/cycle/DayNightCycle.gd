@@ -63,7 +63,12 @@ func _update_lighting() -> void:
 		sun_max = 0.85
 		grey = 0.45
 	if sun:
-		sun.rotation_degrees.x = -lerpf(15.0, 165.0, clampf(t, 0.0, 1.0))
+		# By day it crosses east to west; by night the moon swings slowly back, so the light never
+		# jumps (at midnight it used to flip from one horizon to the other in a single frame)
+		var angle := lerpf(15.0, 165.0, t)
+		if t < 0.0 or t > 1.0:
+			angle = lerpf(165.0, 15.0, fposmod(hour - 18.0, 24.0) / 12.0)
+		sun.rotation_degrees.x = -angle
 		sun.light_energy = lerpf(0.25, sun_max, daylight)  # Moonlight: dark, but streets still readable
 		# Bluish moonlight at night, warm white during the day (greyer under clouds)
 		var day_color := Color(1.0, 0.95, 0.85).lerp(Color(0.82, 0.85, 0.9), grey)
@@ -92,14 +97,23 @@ func _update_exhaustion() -> void:
 		GameState.exhaustion = 0.0
 
 func _collapse() -> void:
-	var finders := _report_collapse()
-	if finders.is_empty():
+	if GameState.doom_tonight and not _safe_here():
+		EventBus.game_ended.emit(false, tr("You fell where it could reach you. It did not wait for dawn. Pallbrook will need another doctor."))
+		return
+	var building := GameState.open_building  # Fell inside a walk-in building ("" = in the street)
+	var finders := _report_collapse(building)
+	var who := PackedStringArray()
+	for finder in finders:
+		who.append(tr(finder))
+	var args := {"who": tr(" and ").join(who), "place": GameState.place_name(building)}
+	if building != "" and finders.is_empty():
+		GameState.add_night_event(Lang.contract(tr("You collapsed inside {place}. Nobody was there to see it; you woke on the floor at dawn.").format(args)))
+	elif building != "":
+		GameState.add_night_event(Lang.contract(tr("You collapsed inside {place}. {who} found you there at dawn.").format(args)))
+	elif finders.is_empty():
 		GameState.add_night_event(tr("You collapsed in the street. Someone may have seen the doctor lying there."))
 	else:
-		var who := PackedStringArray()
-		for finder in finders:
-			who.append(tr(finder))
-		GameState.add_night_event(Lang.contract(tr("You collapsed in the street. {who} found you there at dawn.").format({"who": tr(" and ").join(who)})))
+		GameState.add_night_event(Lang.contract(tr("You collapsed in the street. {who} found you there at dawn.").format(args)))
 	GameState.collapsed_in_street = true
 	EventBus.player_collapsed.emit()
 	_skip_to_morning()
@@ -107,8 +121,17 @@ func _collapse() -> void:
 func _on_player_slept() -> void:
 	if is_collapsing:
 		return
+	if GameState.doom_tonight:
+		EventBus.game_ended.emit(false, tr("It came for you at the clinic while you slept. Pallbrook will need another doctor."))
+		return
 	GameState.add_night_event(tr("You slept at the clinic."))
 	_skip_to_morning()  # Slept safely: no consequence
+
+func _safe_here() -> bool:
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var zones := get_tree().get_first_node_in_group("safe_zones")
+	return player != null and zones != null and zones.is_safe(player.global_position)
+
 
 func _skip_to_morning() -> void:
 	is_collapsing = true
@@ -117,9 +140,11 @@ func _skip_to_morning() -> void:
 	is_collapsing = false
 
 
-# The two neighbors living closest to where the doctor fell find him at dawn.
-# They will mention it, and keep their distance for the day.
-func _report_collapse() -> Array[String]:
+# In the street: the two neighbors living closest to where the doctor fell find him at dawn.
+# Inside a building: only whoever is in that building (awake or asleep there) finds him;
+# an empty building keeps the secret. Someone who saw him walk in can only say that.
+# Those who find him will mention it, and keep their distance for the day.
+func _report_collapse(building := "") -> Array[String]:
 	var names: Array[String] = []
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if player == null:
@@ -128,12 +153,16 @@ func _report_collapse() -> Array[String]:
 	var place := GameState.nearest_place(spot)
 	var neighbors := []
 	for npc in get_tree().get_nodes_in_group("npcs"):
-		if npc.data and npc.is_alive():
+		if npc.data and npc.is_alive() and (building == "" or npc.current_place == building):
 			neighbors.append(npc)
-	neighbors.sort_custom(func(a, b):
-		return GameState.place_position(a.data.home).distance_to(spot) < GameState.place_position(b.data.home).distance_to(spot))
-	for npc in neighbors.slice(0, 2):
-		npc.add_sighting(GameState.day, "doctor_collapsed", "the doctor", place, hour)
+	if building != "":
+		place = building
+	else:
+		neighbors.sort_custom(func(a, b):
+			return GameState.place_position(a.data.home).distance_to(spot) < GameState.place_position(b.data.home).distance_to(spot))
+		neighbors = neighbors.slice(0, 2)
+	for npc in neighbors:
+		npc.add_sighting(GameState.day, "doctor_collapsed", "the doctor", place, hour, building != "")
 		npc.wary_day = GameState.day + 1
 		npc.change_affinity(-15.0)
 		names.append(npc.data.npc_name)

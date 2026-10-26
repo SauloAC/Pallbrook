@@ -31,6 +31,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	get_viewport().set_input_as_handled()
 	if GameState.is_night:
+		if GameState.chased:
+			EventBus.dialogue_started.emit("Bed", tr("Not with that thing outside. Get somewhere safe first."))
+			return
 		if GameState.hour >= 12.0 and GameState.hour < SLEEP_FROM_HOUR:
 			EventBus.dialogue_started.emit("Bed", tr("Too early to sleep. The night is when things happen."))
 			return
