@@ -20,7 +20,7 @@ const SUPPLIES := "#supplies"  # Coins, tonics, and how to get more
 const NIGHTS := "#nights"      # Who was where each night, and the cross-check
 const DIARY := "#diary"        # The old doctor's sheets (filled in a later step)
 
-var filter := NIGHTS  # NIGHTS, ALL, EVIDENCE... or a person's name
+var filter := CHART_PICK  # NIGHTS, ALL, EVIDENCE... or a person's name
 const PER_PAGE := 9  # 3x3 grid; more townsfolk spill onto extra pages
 var townsfolk_page := 0
 var filter_bar: HBoxContainer
@@ -28,8 +28,8 @@ var filter_bar: HBoxContainer
 # ---------- Bookmarks ----------
 # Ribbons sticking out of the right edge of the book, one per section. Q/E turn to the
 # previous/next one. Each opens a filter value (the person filters live inside Clues).
-const RIBBONS := [["Nights", NIGHTS], ["Patients", CHART_PICK], ["Clues", ALL], ["Diary", DIARY],
-		["Visits", APPOINTMENTS], ["Supplies", SUPPLIES]]
+const RIBBONS := [["Patients", CHART_PICK], ["Visits", APPOINTMENTS], ["Supplies", SUPPLIES],
+		["Diary", DIARY], ["Clues", ALL], ["Nights", NIGHTS]]
 const RIBBON_SIZE := Vector2(134, 40)
 const RIBBON_HIDDEN := 30.0   # How much of each ribbon is tucked under the book
 const BOOK_SHIFT := -40.0     # The book sits a little left of centre, so the ribbons fit on screen
@@ -197,10 +197,14 @@ func _close() -> void:
 
 
 func _set_filter(value: String) -> void:
-	if filter == CHART_PICK and _is_person(value):
-		filter = value
+	if _is_person(value):
+		if filter in [CHART_PICK, APPOINTMENTS, SUPPLIES, DIARY]:
+			_open_chart(value)  # From the patients' page: their chart
+			return
+		clue_person = "" if clue_person == value else value  # Elsewhere: their clues
+		filter = ALL
+		Audio.play("page", -6.0)
 		_refresh()
-		_open_chart(value)
 		return
 	# Clicking the active person again goes back to everything (tabs just stay open)
 	filter = ALL if value == filter and _is_person(value) else value
@@ -209,10 +213,15 @@ func _set_filter(value: String) -> void:
 
 
 func _refresh() -> void:
+	# The old person and clinic filters now live in the Clues chips
+	if filter == EVIDENCE or _is_person(filter):
+		clue_topic = "evidence" if filter == EVIDENCE else clue_topic
+		clue_person = filter if _is_person(filter) else clue_person
+		filter = ALL
 	# The right page lists everyone the doctor looks after (set here, so it follows the language)
 	for child in $Panel/Pages/Suspects.get_children():
 		if child is Label:
-			child.text = tr("Compare") if filter == NIGHTS else (tr("Loose pieces") if filter == DIARY else tr("Patients"))
+			child.text = tr("Compare") if filter == NIGHTS else (tr("Loose pieces") if filter == DIARY else (tr("The clue") if filter in [ALL, EVIDENCE] else tr("Patients")))
 			break
 	_build_filter_bar()
 	_build_suspects()
@@ -258,7 +267,7 @@ func _layout_book(left_page: Control) -> void:
 func _build_filter_bar() -> void:
 	# The sections moved to the bookmarks; what is left here are the filters of Clues
 	_clear(filter_bar)
-	filter_bar.visible = _ribbon_of(filter) == ALL
+	filter_bar.visible = false  # The Clues page has its own filter chips now
 	if not filter_bar.visible:
 		return
 	filter_bar.add_theme_constant_override("separation", 10)
@@ -383,14 +392,21 @@ func _link(text: String, value: String) -> Label:
 
 
 func _build_entries() -> void:
-	scroll.visible = filter not in [NIGHTS, DIARY]
-	nights_box.visible = filter in [NIGHTS, DIARY]
+	if filter == EVIDENCE:
+		filter = ALL
+		clue_topic = "evidence"
+	scroll.visible = filter not in [NIGHTS, DIARY, ALL]
+	nights_box.visible = filter in [NIGHTS, DIARY, ALL]
 	if filter == NIGHTS:
 		_build_nights()
 		return
 	if filter == DIARY:
 		_clear(nights_box)
 		_build_diary_sheets()
+		return
+	if filter == ALL:
+		_clear(nights_box)
+		_build_clues()
 		return
 	if filter == APPOINTMENTS:
 		_build_appointments()
@@ -498,6 +514,9 @@ func _build_suspects() -> void:
 	_clear(suspect_list)
 	if filter == NIGHTS:
 		_build_compare()
+		return
+	if filter == ALL:
+		_build_clue_detail()
 		return
 	if filter == DIARY:
 		var holder := ScrollContainer.new()
@@ -1285,10 +1304,13 @@ var hand_font: Font
 func _build_diary_sheets() -> void:
 	title.text = tr("The Old Doctor's Diary")
 	nights_box.add_child(_ink_label(tr("Click a sheet to open it. Pick a loose piece, then click the gap it fits."), 13, true, INK_FADED))
+	var shown := 0
 	for p: Dictionary in Diary.pages():
 		var id := int(p["id"])
-		if p.get("hidden", false) and not Diary.is_found("%dW" % id):
-			continue  # The last page only shows up once found
+		# A sheet shows up once the doctor has found some of it
+		if not (Diary.is_found("%dW" % id) or Diary.is_found("%dA" % id) or Diary.is_found("%dB" % id) or Diary.is_found("%dC" % id)):
+			continue
+		shown += 1
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		var head := _ink_label(tr("Sheet %d") % id, 15, false, BLOOD_RED if id == diary_sheet else INK)
@@ -1311,6 +1333,8 @@ func _build_diary_sheets() -> void:
 			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 				_open_sheet.call_deferred(id))
 		nights_box.add_child(row)
+	if shown == 0:
+		nights_box.add_child(_ink_label(tr("No sheets yet. Your predecessor must have left something at the clinic."), 14, true, INK_FADED))
 
 
 # The loose pieces: found in town, not yet fitted
@@ -1548,3 +1572,210 @@ func _hand(label: Label) -> Label:
 	if hand_font:
 		label.add_theme_font_override("font", hand_font)
 	return label
+
+
+# ---------- Clues: filters and marks ----------
+# Every clue in the casebook, newest first, narrowed by person, day, place and topic (click a
+# chip to step through its options, right-click to step back). Pick one to mark it important,
+# doubtful or discarded: important clues about the accused are offered as evidence at a hearing.
+
+const TOPICS := ["", "testimony", "evidence", "remark", "important", "doubtful"]
+const TOPIC_NAMES := {"": "All", "testimony": "What people said", "evidence": "Your findings",
+		"remark": "Your notes", "important": "Marked important", "doubtful": "Marked doubtful"}
+const MARK_GLYPHS := {"important": "(!)", "doubtful": "?", "discarded": "–", "": "·"}
+var clue_person := ""
+var clue_day := 0
+var clue_place := ""
+var clue_topic := ""
+var clue_sel := -1        # Index in GameState.entries of the clue picked on the left
+
+
+func _build_clues() -> void:
+	title.text = tr("Clues")
+	var chips := HFlowContainer.new()
+	chips.add_theme_constant_override("h_separation", 6)
+	chips.add_theme_constant_override("v_separation", 4)
+	nights_box.add_child(chips)
+	var people := [""]
+	for npc in _chart_people_nodes():
+		people.append(npc.data.npc_name)
+	var days := [0]
+	for d in range(GameState.day, 0, -1):
+		days.append(d)
+	var places := [""]
+	places.append_array(GameState.PLACE_NAMES.keys())
+	chips.add_child(_chip(tr("Person"), tr(clue_person) if clue_person != "" else tr("All"), func(step: int):
+		clue_person = people[posmod(people.find(clue_person) + step, people.size())]))
+	chips.add_child(_chip(tr("Day"), str(clue_day) if clue_day > 0 else tr("All"), func(step: int):
+		clue_day = days[posmod(days.find(clue_day) + step, days.size())]))
+	chips.add_child(_chip(tr("Place"), GameState.place_name(clue_place) if clue_place != "" else tr("All"), func(step: int):
+		clue_place = places[posmod(places.find(clue_place) + step, places.size())]))
+	chips.add_child(_chip(tr("Topic"), tr(TOPIC_NAMES[clue_topic]), func(step: int):
+		clue_topic = TOPICS[posmod(TOPICS.find(clue_topic) + step, TOPICS.size())]))
+	var holder := ScrollContainer.new()
+	holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	holder.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	nights_box.add_child(holder)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 6)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	holder.add_child(list)
+	var shown := 0
+	for i in range(GameState.entries.size() - 1, -1, -1):
+		var entry: Dictionary = GameState.entries[i]
+		if not _clue_matches(entry):
+			continue
+		shown += 1
+		list.add_child(_clue_row(i, entry))
+	if shown == 0:
+		list.add_child(_ink_label(tr("Nothing yet.") if GameState.entries.is_empty() else tr("No clue matches these filters."), 15, true, INK_FADED))
+
+
+func _clue_matches(entry: Dictionary) -> bool:
+	if clue_person != "" and clue_person not in entry["people"]:
+		return false
+	if clue_day > 0 and int(entry["day"]) != clue_day:
+		return false
+	var mark: String = entry.get("mark", "")
+	match clue_topic:
+		"testimony", "evidence", "remark":
+			if entry["kind"] != clue_topic:
+				return false
+		"important", "doubtful":
+			if mark != clue_topic:
+				return false
+	if clue_place != "":
+		# Place names come with their article ("the Tavern", "a taverna"): match the name itself
+		var words := GameState.place_name(clue_place).split(" ", false)
+		if words.size() > 1 and words[0].to_lower() in ["the", "a", "o", "la", "el", "os", "as"]:
+			words.remove_at(0)
+		if not String(entry["text"]).to_lower().contains(" ".join(words).to_lower()):
+			return false
+	return true
+
+
+func _clue_row(index: int, entry: Dictionary) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	var mark: String = entry.get("mark", "")
+	var glyph := _ink_label(MARK_GLYPHS[mark], 15, false, BLOOD_RED if mark == "important" else INK_FADED)
+	glyph.custom_minimum_size.x = 26
+	glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(glyph)
+	var text := RichTextLabel.new()
+	text.bbcode_enabled = true
+	text.fit_content = true
+	text.scroll_active = false
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text.add_theme_font_size_override("normal_font_size", 14)
+	text.add_theme_font_size_override("bold_font_size", 14)
+	text.add_theme_color_override("default_color", INK_FADED if mark == "discarded" else INK)
+	var words := String(entry["text"]).replace("[", "[lb]")
+	if mark == "discarded":
+		words = "[s]" + words + "[/s]"
+	elif index == clue_sel:
+		words = "[b]" + words + "[/b]"
+	text.text = words
+	row.add_child(text)
+	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	row.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	row.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			clue_sel = index
+			Audio.play("page", -12.0)
+			_refresh.call_deferred())
+	return row
+
+
+# A filter chip: "Person: Sarah". Left click steps forward, right click back.
+func _chip(label: String, value: String, step: Callable) -> Control:
+	var chip := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.17, 0.15, 0.13, 0.06 if value == tr("All") else 0.14)
+	style.border_color = Color(0.42, 0.33, 0.24, 0.6)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.content_margin_left = 8.0
+	style.content_margin_right = 8.0
+	chip.add_theme_stylebox_override("panel", style)
+	var text := _ink_label(label + ": " + value, 13, false, INK if value != tr("All") else INK_FADED)
+	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(text)
+	chip.mouse_filter = Control.MOUSE_FILTER_STOP
+	chip.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	chip.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
+			step.call(1 if event.button_index == MOUSE_BUTTON_LEFT else -1)
+			Audio.play("page", -12.0)
+			_refresh.call_deferred())
+	return chip
+
+
+# Right page: the clue picked, its marks, and what would go before the town
+func _build_clue_detail() -> void:
+	if clue_sel < 0 or clue_sel >= GameState.entries.size():
+		suspect_list.add_child(_ink_label(tr("Pick a clue on the left to mark it."), 15, true, INK_FADED))
+	else:
+		var entry: Dictionary = GameState.entries[clue_sel]
+		var text := _ink_label(entry["text"], 16, true)
+		text.custom_minimum_size.x = 320
+		suspect_list.add_child(text)
+		var who := PackedStringArray()
+		for person: String in entry["people"]:
+			who.append(tr(person))
+		suspect_list.add_child(_ink_label((tr("Day %d") % int(entry["day"])) + ("  ·  " + ", ".join(who) if not who.is_empty() else ""), 12, false, INK_FADED))
+		var buttons := HBoxContainer.new()
+		buttons.add_theme_constant_override("separation", 8)
+		for pair in [["important", "Important"], ["doubtful", "Doubtful"], ["discarded", "Discard"]]:
+			buttons.add_child(_mark_button(pair[0], tr(pair[1]), entry))
+		suspect_list.add_child(buttons)
+	var spacer := Control.new()
+	spacer.custom_minimum_size.y = 10
+	suspect_list.add_child(spacer)
+	var head := _ink_label(tr("For the hearing"), 15, false)
+	head.add_theme_font_override("font", title.get_theme_font("font"))
+	suspect_list.add_child(head)
+	suspect_list.add_child(_ink_label(tr("Clues you mark important are offered as evidence when you bring someone before the town. Up to 3 go before them."), 12, true, INK_FADED))
+	var marked := 0
+	for i in range(GameState.entries.size() - 1, -1, -1):
+		var e: Dictionary = GameState.entries[i]
+		if e.get("mark", "") == "important":
+			marked += 1
+			if marked <= 5:
+				var line := _ink_label("(!) " + String(e["text"]), 12, true, INK)
+				line.max_lines_visible = 2
+				suspect_list.add_child(line)
+	if marked == 0:
+		suspect_list.add_child(_ink_label(tr("None marked yet."), 12, false, INK_FADED))
+	elif marked > 5:
+		suspect_list.add_child(_ink_label(tr("…and %d more.") % (marked - 5), 12, false, INK_FADED))
+
+
+func _mark_button(mark: String, text: String, entry: Dictionary) -> Control:
+	var on: bool = entry.get("mark", "") == mark
+	var button := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(BLOOD_RED, 0.12) if on else Color(0, 0, 0, 0)
+	style.border_color = BLOOD_RED if on else Color(0.42, 0.33, 0.24, 0.6)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(3)
+	style.content_margin_left = 10.0
+	style.content_margin_right = 10.0
+	style.content_margin_top = 3.0
+	style.content_margin_bottom = 3.0
+	button.add_theme_stylebox_override("panel", style)
+	var label := _ink_label(text, 14, false, BLOOD_RED if on else INK)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(label)
+	button.mouse_filter = Control.MOUSE_FILTER_STOP
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			entry["mark"] = "" if on else mark
+			Playtest.count("clues_marked_" + mark)
+			Audio.play("page", -10.0)
+			_refresh.call_deferred())
+	return button

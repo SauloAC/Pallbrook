@@ -23,7 +23,11 @@ var cover_query: PhysicsShapeQueryParameters3D
 # nobody sees him, not even the vampire. Stepping out late at night in front of someone
 # counts as being caught lurking.
 const EMERGE_SECONDS := 2.5
-var cover_count := 0
+# Measured on the ground from the spot's centre to the doctor's, so only stepping right into
+# the leaves hides him (an overlap sphere reached well past the plant)
+const HIDE_RADIUS := 0.9       # Times the empty's scale: tall grass ~1 m, bushes ~0.7 m
+var hide_spots: Array[Node3D] = []
+var in_cover := false
 var left_cover_at := -100.0
 
 # Hiding spots show a small icon over them when the doctor is close, so the player can tell
@@ -55,20 +59,7 @@ func _ready() -> void:
 func _setup_hiding_spots() -> void:
 	await get_tree().process_frame  # town.glb may finish loading after us
 	for spot in get_tree().current_scene.find_children("Hide_*", "Node3D", true, false):
-		var area := Area3D.new()
-		var shape := CollisionShape3D.new()
-		var sphere := SphereShape3D.new()
-		sphere.radius = 1.2  # The empty's scale in Blender sets the real size (about 1 m)
-		shape.shape = sphere
-		area.add_child(shape)
-		area.monitorable = false
-		spot.add_child(area)
-		area.body_entered.connect(func(body: Node3D):
-			if body == self:
-				_set_cover(1))
-		area.body_exited.connect(func(body: Node3D):
-			if body == self:
-				_set_cover(-1))
+		hide_spots.append(spot)
 		var marker := Sprite3D.new()
 		marker.texture = ICON_HIDE
 		marker.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -82,9 +73,21 @@ func _setup_hiding_spots() -> void:
 		hide_markers.append(marker)
 
 
-func _set_cover(change: int) -> void:
+func _update_cover() -> void:
+	var inside := false
+	for spot in hide_spots:
+		var reach := HIDE_RADIUS * spot.global_transform.basis.get_scale().x
+		var gap := spot.global_position - global_position
+		if Vector2(gap.x, gap.z).length() < reach and absf(gap.y) < 2.0:
+			inside = true
+			break
+	if inside != in_cover:
+		_set_cover(inside)
+
+
+func _set_cover(inside: bool) -> void:
 	var was_hidden := is_hidden()
-	cover_count = maxi(cover_count + change, 0)
+	in_cover = inside
 	if not was_hidden and is_hidden():
 		Playtest.count("hid_in_bush_or_grass")
 		Audio.play("rustle", -8.0, 0.3, 0.1)  # Leaves rustle as he steps in
@@ -98,7 +101,7 @@ func _set_cover(change: int) -> void:
 
 
 func is_hidden() -> bool:
-	return cover_count > 0
+	return in_cover
 
 
 func just_left_cover() -> bool:
@@ -158,6 +161,7 @@ func _physics_process(delta: float) -> void:
 		visual.animate(get_real_velocity(), delta)
 	_footsteps(delta)
 	_update_nearby_npc()
+	_update_cover()
 	_update_hide_markers(delta)
 	var still := Vector2(velocity.x, velocity.z).length() < 0.3
 	lurk_time = lurk_time + delta if GameState.is_night and still and _near_cover() else 0.0

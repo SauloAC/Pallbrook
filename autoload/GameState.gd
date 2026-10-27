@@ -39,6 +39,7 @@ var faced_by := ""              # ...and who it was
 var saw_hunting := {}           # name -> nights the doctor saw them sneaking out to hunt
 var come_night := -1            # The night it comes for the doctor (two nights after it knows him)
 var doom_tonight := false       # Tonight is that night
+var known_since := -1           # The night it learned his face (that night doesn't count down)
 
 # ---------- The hearing (see Hearing.gd) ----------
 const MAX_HEARINGS := 2
@@ -93,6 +94,7 @@ func reset() -> void:
 	faced_by = ""
 	saw_hunting.clear()
 	come_night = -1
+	known_since = -1
 	doom_tonight = false
 	hearing = {}
 	hearings_held = 0
@@ -114,11 +116,18 @@ func recognize(night: int) -> void:
 	hunted_by_vampire = true
 	if come_night < 0 or night < come_night:
 		come_night = night
+		known_since = day
 
 
-# Nights left before it comes, counting tonight (0 = tonight it comes; -1 = it doesn't know him)
+# Free nights left before it comes (0 = tonight it comes; -1 = it doesn't know him).
+# The count starts with the next night: the night it saw him is not one of them.
 func nights_left() -> int:
-	return come_night - day if come_night >= 0 else -1
+	if come_night < 0:
+		return -1
+	var left := come_night - day
+	if is_night and day == known_since:
+		left -= 1
+	return left
 
 
 func record_attack(night: int, victim: String, home: String) -> void:
@@ -362,10 +371,11 @@ func last_night() -> int:
 	return day - 1
 
 
-func order_tonic() -> bool:
-	if coins < TONIC_PRICE:
+func order_tonic(count := 1) -> bool:
+	if count < 1 or coins < TONIC_PRICE * count:
 		return false
-	coins -= TONIC_PRICE
-	tonics_ordered += 1
-	Playtest.count("tonics_ordered")
+	coins -= TONIC_PRICE * count
+	tonics_ordered += count
+	for i in count:
+		Playtest.count("tonics_ordered")
 	return true

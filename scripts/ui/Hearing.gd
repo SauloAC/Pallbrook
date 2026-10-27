@@ -6,7 +6,10 @@ extends CanvasLayer
 # to three pieces of evidence from his casebook, calls up to two witnesses, hears the
 # defence, and the town votes. Two hearings per run.
 #   Guilty and the vampire: the town is saved (for now: the old doctor's act comes later).
-#   Guilty but innocent: they are locked up, the town trusts the doctor less, the hunt goes on.
+#   Guilty but innocent: they are shut outside the town gate, the town trusts the doctor less,
+#   the hunt goes on.
+# A frightened town wants a full case: three pieces of evidence and two witnesses who speak.
+# Short of that, only those who trust the doctor deeply weigh his case at all.
 #   Acquitted and the vampire: it walks free and it knows; two nights later it comes for him.
 #   Acquitted and innocent: they won't forgive him soon.
 
@@ -14,6 +17,7 @@ const HOUR := 19.0
 const MAX_EVIDENCE := 3
 const MAX_WITNESSES := 2
 const GUILTY_SCORE := 4.0     # A voter's conviction needed to say "guilty"
+const DEEP_TRUST := 80.0      # Without a full case, only voters this close to the doctor listen
 const PANEL_SIZE := Vector2(820, 560)
 
 enum Step { NONE, EVIDENCE, WITNESSES, TESTIMONY, VOTE, VERDICT }
@@ -168,12 +172,20 @@ func _collect_evidence() -> Array[Dictionary]:
 		if found.begins_with(trait_name) and found != "":
 			list.append({"text": _t("Traces of {trace} on {victim}'s clothes point to {name}.", {"trace": tr(trait_name), "victim": _n(npc.data.npc_name), "name": _n(who)}),
 					"weight": 1.5})
-	# No duplicates; the strongest first, and no more than fits on the page
-	list.sort_custom(func(a, b): return a["weight"] > b["weight"])
+	# Clues the doctor marked important in his casebook, about this person
+	for entry: Dictionary in GameState.entries:
+		if entry.get("mark", "") == "important" and who in entry["people"]:
+			list.append({"text": "(!) " + String(entry["text"]), "weight": 1.5 if entry["kind"] == "evidence" else 1.0,
+					"marked": true})
+	# No duplicates; the doctor's marked clues first, then the strongest, no more than fits
+	list.sort_custom(func(a, b):
+		if a.get("marked", false) != b.get("marked", false):
+			return a.get("marked", false)
+		return a["weight"] > b["weight"])
 	var seen := {}
 	var unique: Array[Dictionary] = []
 	for item in list:
-		if unique.size() >= 7:
+		if unique.size() >= 8:
 			break
 		if not seen.has(item["text"]):
 			seen[item["text"]] = true
@@ -214,7 +226,7 @@ func _go(new_step: Step) -> void:
 	match step:
 		Step.EVIDENCE:
 			title.text = _t("The hearing of {name}", {"name": _n(accused.data.npc_name)})
-			body.text = tr("The town has gathered at the Town Hall. Choose the evidence you will present (up to 3).")
+			body.text = tr("The town has gathered at the Town Hall. Choose the evidence you will present (up to 3). The town will want all three, and two witnesses.")
 			if evidence.is_empty():
 				body.text = tr("The town has gathered at the Town Hall. Your casebook holds nothing solid against them: you will have to rely on witnesses and your word.")
 		Step.WITNESSES:
@@ -339,6 +351,7 @@ func _press() -> void:
 # ---------- What is said ----------
 
 var case_weight := 0.0      # Evidence and testimony, before each voter's own view
+var full_case := false      # Three pieces of evidence and two witnesses who spoke
 var doctor_word := 0.0      # The part that is only the doctor's word (weighed by trust)
 
 
@@ -347,6 +360,7 @@ func _testimony() -> Array[String]:
 	var who: String = accused.data.npc_name
 	case_weight = 0.0
 	doctor_word = 0.0
+	var spoke := 0
 	var shown := PackedStringArray()
 	for item in evidence:
 		if item["picked"]:
@@ -372,6 +386,7 @@ func _testimony() -> Array[String]:
 				# It made them lie. They trust the doctor more than they fear it.
 				said.append(_t("{witness} stands, shaking: \"It made me lie to you, doctor. It's {name}. I saw them that night near {place}, and God forgive me, I kept quiet.\"", args))
 				case_weight += 3.0
+				spoke += 1
 				GameState.learn("servants")
 			else:
 				said.append(_t("{witness} looks at {name} and goes pale: \"I... I don't remember anything, doctor. I must have been mistaken.\"", args))
@@ -384,6 +399,8 @@ func _testimony() -> Array[String]:
 				line = "{witness}: \"On the night of Day {night} I saw {name} near {place}, around {time}. At that hour, when decent folk are asleep.\""
 			said.append(_t(line, args))
 			case_weight += 1.5
+			spoke += 1
+	full_case = shown.size() >= MAX_EVIDENCE and spoke >= MAX_WITNESSES
 	# The defence: its servants swear for it
 	if accused.is_vampire():
 		for npc in get_tree().get_nodes_in_group("npcs"):
@@ -407,6 +424,9 @@ func _count_votes() -> void:
 			vote = false  # Bound by blood
 		else:
 			var trust: float = npc.affinity
+			if not full_case and trust < DEEP_TRUST:
+				votes.append({"name": npc.data.npc_name, "guilty": false})
+				continue  # Not on so little
 			var score := case_weight + doctor_word * clampf(trust / 60.0, 0.3, 1.3) + (trust - 50.0) / 20.0
 			for s in npc.sightings:
 				if s["kind"] == "person" and s["who"] == who and _late(s["hour"]):
@@ -433,7 +453,7 @@ func _verdict() -> void:
 		for npc in get_tree().get_nodes_in_group("npcs"):
 			if npc.is_alive():
 				npc.change_affinity(-10.0)
-		body.text = _t("The town has found {name} guilty and locked them in the cellar of the Town Hall. Tonight, Pallbrook will sleep a little easier.", args)
+		body.text = _t("The town has found {name} guilty. They march {name} out through the town gate and bar it behind them. No one goes out there now, not since the wolf. Tonight, Pallbrook will sleep a little easier.", args)
 		Playtest.count("innocent_condemned")
 	elif accused.is_vampire():
 		title.text = tr("Not guilty")
@@ -446,6 +466,8 @@ func _verdict() -> void:
 			if npc != accused and npc.is_alive():
 				npc.change_affinity(-5.0)
 		body.text = _t("The town lets {name} go. {name} won't forgive you soon, and people whisper as you pass.", args)
+	if not guilty and not full_case:
+		body.text += "\n\n" + tr("Three pieces of evidence and two witnesses: without a full case, few here will condemn anyone on your word.")
 	if GameState.hearings_held >= GameState.MAX_HEARINGS and not (guilty and accused.is_vampire()):
 		body.text += "\n\n" + tr("The town will not gather for you again.")
 	_refresh()

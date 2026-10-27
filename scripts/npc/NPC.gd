@@ -328,7 +328,7 @@ func is_alive() -> bool:
 	return state != State.DEAD and not jailed
 
 
-var jailed := false  # Condemned at a hearing: locked in the Town Hall cellar
+var jailed := false  # Condemned at a hearing: shut outside the town gate
 
 func jail() -> void:
 	jailed = true
@@ -1497,7 +1497,8 @@ func _make_headstone() -> Node3D:
 
 # ---------- Clinic visits ----------
 
-func answer_clinic() -> String:
+# Whether they would come at all. "" means yes: the doctor then picks today or tomorrow.
+func clinic_refusal() -> String:
 	asked["clinic"] = GameState.day
 	if GameState.is_night:
 		return tr("At this hour? Ask me tomorrow, doctor.")
@@ -1513,13 +1514,26 @@ func answer_clinic() -> String:
 		return tr("Me? I feel fine, doctor. Save your medicine for the sick.")
 	if not is_vampire() and affinity < 45.0 and randf() < 0.35:
 		return tr("Tonics and bloodletting... no, doctor. I don't trust medicine.")  # Some refuse out of pride or fear
+	return ""
+
+
+# Too late in the day for a visit today: the doctor can only ask for tomorrow
+func clinic_today_possible() -> bool:
+	return floorf(GameState.hour) + 2.0 <= 18.0
+
+
+# Called once clinic_refusal() said yes
+func answer_clinic(tomorrow := false) -> String:
+	if tomorrow and visit_day == GameState.day + 1:
+		return tr("I'm already coming tomorrow, doctor.")
 	# The vampire says yes and never comes (the sun). Weak patients sometimes can't make it either.
 	booked_day = GameState.day
 	skip_appointment = is_vampire() or randf() < 0.25
-	# A visit one or two hours from now, lasting two hours; too late today means tomorrow morning
+	# Today: one or two hours from now, lasting two hours (too late today means tomorrow morning).
+	# Tomorrow: in the morning, once the ordered tonics have arrived.
 	appointment_day = GameState.day
-	appointment_from = floorf(GameState.hour) + float(randi_range(1, 2))
-	if appointment_from + 1.0 > 18.0:
+	appointment_from = minf(floorf(GameState.hour) + float(randi_range(1, 2)), 17.0)
+	if tomorrow or appointment_from + 1.0 > 18.0:
 		appointment_day = GameState.day + 1
 		appointment_from = float(randi_range(8, 10))
 	# One patient per hour: move to the next free hour (today, else tomorrow morning)

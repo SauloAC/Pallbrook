@@ -463,7 +463,7 @@ Night {night}: {witness} saw {name} out near {place} at {time}.,Night {night}: {
 "{name} looks anemic, yet in {count} exams you never found a single bite.","{name} looks anemic, yet in {count} exams you never found a single bite.",{name}は貧血に見えるが、{count}回の診察で噛み跡は一つも見つからなかった。,"{name} parece anêmico, mas em {count} exames você nunca achou uma única mordida.","{name} parece anémico, pero en {count} exámenes nunca encontraste ni una mordedura."
 Traces of {trace} on {victim}'s clothes point to {name}.,Traces of {trace} on {victim}'s clothes point to {name}.,{victim}の服に残った{trace}の痕跡は{name}を指している。,Os vestígios de {trace} nas roupas de {victim} apontam para {name}.,Los rastros de {trace} en la ropa de {victim} apuntan a {name}.
 The hearing of {name},The hearing of {name},{name}の審問,A audiência de {name},La audiencia de {name}
-The town has gathered at the Town Hall. Choose the evidence you will present (up to 3).,The town has gathered at the Town Hall. Choose the evidence you will present (up to 3).,町の人々が役場に集まった。提出する証拠を選べ（3つまで）。,A cidade se reuniu na Prefeitura. Escolha as provas que vai apresentar (até 3).,El pueblo se ha reunido en el Ayuntamiento. Elige las pruebas que presentarás (hasta 3).
+"The town has gathered at the Town Hall. Choose the evidence you will present (up to 3). The town will want all three, and two witnesses.","The town has gathered at the Town Hall. Choose the evidence you will present (up to 3). The town will want all three, and two witnesses.",町の人々が役場に集まった。提出する証拠を選べ（3つまで）。町は3つの証拠すべてと、2人の証人を求めるだろう。,"A cidade se reuniu na Prefeitura. Escolha as provas que vai apresentar (até 3). A cidade vai querer as três, e duas testemunhas.","El pueblo se ha reunido en el Ayuntamiento. Elige las pruebas que presentarás (hasta 3). El pueblo querrá las tres, y dos testigos."
 The town has gathered at the Town Hall. Your casebook holds nothing solid against them: you will have to rely on witnesses and your word.,The town has gathered at the Town Hall. Your casebook holds nothing solid against them: you will have to rely on witnesses and your word.,町の人々が役場に集まった。手帳には確かな証拠が何もない。証人とあなたの言葉に頼るしかない。,A cidade se reuniu na Prefeitura. Seu caderno não tem nada sólido contra essa pessoa: você vai depender de testemunhas e da sua palavra.,El pueblo se ha reunido en el Ayuntamiento. Tu cuaderno no tiene nada sólido contra esa persona: dependerás de testigos y de tu palabra.
 Who will you call to speak (up to 2)? Only those who trust you will stand up.,Who will you call to speak (up to 2)? Only those who trust you will stand up.,誰に証言させるか（2人まで）？あなたを信頼する者だけが立ち上がる。,Quem você vai chamar para falar (até 2)? Só quem confia em você vai se levantar.,¿A quién llamarás a hablar (hasta 2)? Solo se levantarán quienes confían en ti.
 Nobody told you they saw the accused at night. There is no one to call.,Nobody told you they saw the accused at night. There is no one to call.,夜に被告を見たと話した者はいない。呼べる証人はいない。,Ninguém contou ter visto o acusado à noite. Não há quem chamar.,Nadie te dijo haber visto al acusado de noche. No hay a quién llamar.
@@ -487,7 +487,7 @@ You lay out your case:,You lay out your case:,あなたは主張を述べる：,
 Guilty,Guilty,有罪,Culpado,Culpable
 Not guilty,Not guilty,無罪,Inocente,Inocente
 The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun.,The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun.,町は{name}を有罪とした。人々は{name}を役場の地下室へ引きずっていき、日の出を待つ。,A cidade considerou {name} culpado. Arrastam {name} para o porão da Prefeitura e esperam o sol nascer.,El pueblo ha declarado culpable a {name}. Arrastran a {name} al sótano del Ayuntamiento y esperan al sol.
-"The town has found {name} guilty and locked them in the cellar of the Town Hall. Tonight, Pallbrook will sleep a little easier.","The town has found {name} guilty and locked them in the cellar of the Town Hall. Tonight, Pallbrook will sleep a little easier.",町は{name}を有罪とし、役場の地下室に閉じ込めた。今夜、パルブルックは少しだけ安心して眠るだろう。,"A cidade considerou {name} culpado e trancou no porão da Prefeitura. Esta noite, Pallbrook vai dormir um pouco mais tranquila.","El pueblo ha declarado culpable a {name} y lo ha encerrado en el sótano del Ayuntamiento. Esta noche, Pallbrook dormirá un poco más tranquilo."
+"The town has found {name} guilty. They march {name} out through the town gate and bar it behind them. No one goes out there now, not since the wolf. Tonight, Pallbrook will sleep a little easier.","The town has found {name} guilty. They march {name} out through the town gate and bar it behind them. No one goes out there now, not since the wolf. Tonight, Pallbrook will sleep a little easier.",町は{name}を有罪とした。人々は{name}を町の門の外へ連れ出し、背後で門に閂をかけた。あの狼の一件以来、誰も外へは出ない。今夜、パルブルックは少しだけ安心して眠るだろう。,"A cidade considerou {name} culpado. Levam {name} para fora pelo portão da cidade e o trancam por dentro. Desde o lobo, ninguém mais sai para lá. Esta noite, Pallbrook vai dormir um pouco mais tranquila.","El pueblo ha declarado culpable a {name}. Sacan a {name} por la puerta del pueblo y la atrancan tras él. Desde lo del lobo, nadie sale ya ahí fuera. Esta noche, Pallbrook dormirá un poco más tranquilo."
 "The town lets {name} go. As the crowd breaks up, {name} turns and looks straight at you.","The town lets {name} go. As the crowd breaks up, {name} turns and looks straight at you.",町は{name}を釈放した。人々が散っていく中、{name}は振り返り、まっすぐあなたを見た。,"A cidade deixa {name} ir. Enquanto a multidão se dispersa, {name} se vira e olha direto para você.","El pueblo deja ir a {name}. Mientras la multitud se dispersa, {name} se gira y te mira fijamente."
 "The town lets {name} go. {name} won't forgive you soon, and people whisper as you pass.","The town lets {name} go. {name} won't forgive you soon, and people whisper as you pass.",町は{name}を釈放した。{name}はしばらくあなたを許さないだろう。あなたが通ると人々がささやく。,"A cidade deixa {name} ir. {name} não vai perdoar você tão cedo, e as pessoas cochicham quando você passa.","El pueblo deja ir a {name}. {name} no te perdonará pronto, y la gente murmura a tu paso."
 The town will not gather for you again.,The town will not gather for you again.,町が再びあなたのために集まることはない。,A cidade não vai se reunir por você de novo.,El pueblo no volverá a reunirse por ti.
@@ -536,3 +536,47 @@ the bridge,the bridge,橋,a ponte,el puente
 the graves beyond the bridge,the graves beyond the bridge,橋の向こうの墓地,os túmulos além da ponte,las tumbas al otro lado del puente
 [W/S] Pick a piece    [A/D] Choose a gap,[W/S] Pick a piece    [A/D] Choose a gap,[W/S] 切れ端を選ぶ    [A/D] 欠けた部分を選ぶ,[W/S] Escolher pedaço    [A/D] Escolher lacuna,[W/S] Elegir trozo    [A/D] Elegir hueco
 [E] Put it there    [Esc] Back,[E] Put it there    [Esc] Back,[E] そこに置く    [Esc] 戻る,[E] Encaixar    [Esc] Voltar,[E] Colocarlo    [Esc] Volver
+Person,Person,人物,Pessoa,Persona
+Place,Place,場所,Lugar,Lugar
+Topic,Topic,内容,Tópico,Tema
+What people said,What people said,人々の証言,O que disseram,Lo que dijeron
+Your findings,Your findings,あなたの所見,Suas descobertas,Tus hallazgos
+Your notes,Your notes,あなたのメモ,Suas anotações,Tus notas
+Marked important,Marked important,重要の印,Marcadas importantes,Marcadas importantes
+Marked doubtful,Marked doubtful,疑わしいの印,Marcadas duvidosas,Marcadas dudosas
+No clue matches these filters.,No clue matches these filters.,この条件に合う手がかりはない。,Nenhuma pista com esses filtros.,Ninguna pista con estos filtros.
+Pick a clue on the left to mark it.,Pick a clue on the left to mark it.,左の手がかりを選んで印をつける。,Escolha uma pista à esquerda para marcá-la.,Elige una pista a la izquierda para marcarla.
+Important,Important,重要,Importante,Importante
+Doubtful,Doubtful,疑わしい,Duvidosa,Dudosa
+Discard,Discard,捨てる,Descartar,Descartar
+For the hearing,For the hearing,審問のために,Para a audiência,Para la audiencia
+Clues you mark important are offered as evidence when you bring someone before the town. Up to 3 go before them.,Clues you mark important are offered as evidence when you bring someone before the town. Up to 3 go before them.,重要の印をつけた手がかりは、誰かを町の前に引き出すときに証拠として出せる。出せるのは3つまで。,As pistas marcadas como importantes são oferecidas como provas quando você leva alguém diante da cidade. Até 3 vão a julgamento.,Las pistas marcadas como importantes se ofrecen como pruebas cuando llevas a alguien ante el pueblo. Hasta 3 se presentan.
+None marked yet.,None marked yet.,まだ印はない。,Nenhuma marcada ainda.,Ninguna marcada aún.
+…and %d more.,…and %d more.,…ほか%d件。,…e mais %d.,…y %d más.
+The clue,The clue,手がかり,A pista,La pista
+[A/D] Quantity    [E] Order    [Esc] Cancel,[A/D] Quantity    [E] Order    [Esc] Cancel,[A/D] 数量    [E] 注文    [Esc] やめる,[A/D] Quantidade    [E] Encomendar    [Esc] Cancelar,[A/D] Cantidad    [E] Encargar    [Esc] Cancelar
+"Iron tonics to order:  ◀ {amount} ▶
+Cost: {cost} coins (you have {coins})
+Ready tomorrow morning.","Iron tonics to order:  ◀ {amount} ▶
+Cost: {cost} coins (you have {coins})
+Ready tomorrow morning.","注文する鉄の強壮剤：  ◀ {amount} ▶
+費用：硬貨{cost}枚（所持：{coins}枚）
+明朝に出来上がる。","Tônicos de ferro a encomendar:  ◀ {amount} ▶
+Custo: {cost} moedas (você tem {coins})
+Prontos amanhã de manhã.","Tónicos de hierro a encargar:  ◀ {amount} ▶
+Coste: {cost} monedas (tienes {coins})
+Listos mañana por la mañana."
+"You ordered the ingredients for {amount} iron tonics ({price} coins). They will be ready tomorrow morning.
+Coins left: {coins} · Tonics ordered: {ordered}","You ordered the ingredients for {amount} iron tonics ({price} coins). They will be ready tomorrow morning.
+Coins left: {coins} · Tonics ordered: {ordered}","鉄の強壮剤{amount}本分の材料を注文した（硬貨{price}枚）。明朝には出来上がる。
+残りの硬貨：{coins} · 注文中の強壮剤：{ordered}","Você encomendou os ingredientes para {amount} tônicos de ferro ({price} moedas). Estarão prontos amanhã de manhã.
+Moedas restantes: {coins} · Tônicos encomendados: {ordered}","Encargaste los ingredientes para {amount} tónicos de hierro ({price} monedas). Estarán listos mañana por la mañana.
+Monedas restantes: {coins} · Tónicos encargados: {ordered}"
+"Today, as soon as you can.","Today, as soon as you can.",今日、できるだけ早く。,"Hoje, assim que puder.","Hoy, en cuanto puedas."
+Tomorrow morning.,Tomorrow morning.,明日の朝に。,Amanhã de manhã.,Mañana por la mañana.
+Never mind.,Never mind.,やはりいい。,Deixa para lá.,No importa.
+"When should I come, doctor?","When should I come, doctor?",いつ伺えばいいですか、先生？,"Quando devo ir, doutor?","¿Cuándo debo ir, doctor?"
+"A sheet in your predecessor's hand, left where his successor would find it. You put it in your casebook (Tab, Diary).","A sheet in your predecessor's hand, left where his successor would find it. You put it in your casebook (Tab, Diary).",前任者の筆跡の一枚。後継者が見つけるように置かれていた。あなたはそれを事件簿に挟んだ（Tab、日記）。,"Uma folha com a letra do seu antecessor, deixada onde o sucessor a encontraria. Você a guarda no caderno (Tab, Diário).","Una hoja con la letra de tu predecesor, dejada donde su sucesor la encontraría. La guardas en tu cuaderno (Tab, Diario)."
+No sheets yet. Your predecessor must have left something at the clinic.,No sheets yet. Your predecessor must have left something at the clinic.,まだ一枚もない。前任者は診療所に何か残しているはずだ。,Nenhuma folha ainda. Seu antecessor deve ter deixado algo na clínica.,Aún no hay hojas. Tu predecesor debió de dejar algo en la clínica.
+"Three pieces of evidence and two witnesses: without a full case, few here will condemn anyone on your word.","Three pieces of evidence and two witnesses: without a full case, few here will condemn anyone on your word.",3つの証拠と2人の証人。それが揃わなければ、あなたの言葉だけで誰かを罰する者はほとんどいない。,"Três provas e duas testemunhas: sem um caso completo, poucos aqui condenam alguém só pela sua palavra.","Tres pruebas y dos testigos: sin un caso completo, pocos aquí condenarán a nadie solo por tu palabra."
+You have found every piece the old doctor left in town. Only his last page is still missing.,You have found every piece the old doctor left in town. Only his last page is still missing.,前任の医師が町に残した切れ端はすべて見つけた。足りないのは最後のページだけだ。,Você encontrou todos os pedaços que o antigo médico deixou na cidade. Só falta a última página.,Has encontrado todos los pedazos que el antiguo médico dejó en el pueblo. Solo falta su última página.

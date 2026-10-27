@@ -64,7 +64,10 @@ func _input(event: InputEvent) -> void:
 	Audio.play("page", -4.0)
 	Playtest.count("diary_pieces_found")
 	Playtest.log_line("Found diary piece %s" % piece)
-	if piece.ends_with("W"):
+	if piece == "1W":
+		GameState.diary["placed"][piece] = true
+		EventBus.dialogue_started.emit("Doctor", tr("A sheet in your predecessor's hand, left where his successor would find it. You put it in your casebook (Tab, Diary)."))
+	elif piece.ends_with("W"):
 		GameState.diary["placed"][piece] = true  # Whole: straight into the casebook
 		EventBus.dialogue_started.emit("Doctor", tr("A whole sheet in the old doctor's hand, hidden among the graves. You put it in your casebook (Tab, Diary)."))
 	else:

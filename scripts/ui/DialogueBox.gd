@@ -26,6 +26,15 @@ var choices_box: VBoxContainer
 var questions: Array = []  # This conversation's list (the tonic shows up at the clinic)
 
 
+# Asked to come to the clinic: when
+const CLINIC_WHEN := [
+	["clinic_today", "Today, as soon as you can."],
+	["clinic_tomorrow", "Tomorrow morning."],
+	["clinic_back", "Never mind."],
+]
+var picking_when := false
+
+
 const CONSULT_QUESTIONS := [
 	["exam", "Let me examine you."],
 	["tonic", "Give the iron tonic."],
@@ -37,6 +46,13 @@ const CONSULT_QUESTIONS := [
 # The list changes as the talk goes on: a patient waiting at the clinic gets a consultation,
 # and rest is only offered once the doctor has examined them today
 func _questions_for(who: Node) -> Array:
+	if picking_when:
+		var when: Array = []
+		for q in CLINIC_WHEN:
+			if q[0] == "clinic_today" and not who.clinic_today_possible():
+				continue
+			when.append(q)
+		return when
 	var consult: bool = who.has_method("awaiting_treatment") and who.awaiting_treatment()
 	var examined: bool = who.has_method("examined_today") and who.examined_today()
 	var list: Array = []
@@ -70,6 +86,7 @@ func _on_dialogue_started(speaker_name: String, line: String) -> void:
 
 func _on_conversation_started(who: Node) -> void:
 	npc = who
+	picking_when = false
 	questions = _questions_for(who)
 	choice = 0
 	_open(who.data.npc_name, who.greeting())
@@ -100,7 +117,7 @@ func _refresh_choices() -> void:
 		label.add_theme_font_size_override("font_size", 20)
 		if i == choice:
 			label.add_theme_color_override("font_color", SELECTED_COLOR)
-		elif key != "bye" and npc.was_asked(key):
+		elif key != "bye" and not key.begins_with("clinic_") and npc.was_asked(key):
 			label.modulate.a = ASKED_ALPHA  # Already asked today
 		choices_box.add_child(label)
 
@@ -125,7 +142,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("interact"):
 		_ask(questions[choice][0])
 	elif event.is_action_pressed("ui_cancel"):
-		_close()
+		if picking_when:
+			_ask("clinic_back")
+		else:
+			_close()
 	else:
 		return
 	get_viewport().set_input_as_handled()
@@ -140,7 +160,19 @@ func _ask(key: String) -> void:
 		"exam":
 			body.text = npc.answer_exam()
 		"clinic":
-			body.text = npc.answer_clinic()
+			var no: String = npc.clinic_refusal()
+			if no != "":
+				body.text = no
+			else:
+				picking_when = true
+				body.text = tr("When should I come, doctor?")
+		"clinic_today", "clinic_tomorrow":
+			picking_when = false
+			body.text = npc.answer_clinic(key == "clinic_tomorrow")
+			key = "clinic"
+		"clinic_back":
+			picking_when = false
+			key = "clinic"
 		"rest":
 			body.text = npc.answer_rest()
 		"tonic":
@@ -164,6 +196,7 @@ func _close() -> void:
 		return
 	panel.visible = false
 	npc = null
+	picking_when = false
 	GameState.in_dialogue = false
 	EventBus.dialogue_ended.emit()
 
