@@ -19,12 +19,24 @@ var is_collapsing := false
 var last_hour := -1
 
 func _ready() -> void:
+	add_to_group("day_night")  # Reading and brewing ask it to pass time
 	hour = start_hour
 	GameState.hour = hour
 	# Test listener: shows the EventBus working
 	EventBus.phase_changed.connect(func(is_night): print("Night " if is_night else "Day ", GameState.day))
 	_update_lighting()
 	EventBus.player_slept.connect(_on_player_slept)
+	EventBus.dialogue_ended.connect(_on_dialogue_ended)
+
+
+# Time spent in a conversation (an exam is an hour) passes once the talk is over
+func _on_dialogue_ended() -> void:
+	if GameState.pending_hours <= 0.0:
+		return
+	var hours := GameState.pending_hours
+	GameState.pending_hours = 0.0
+	if not GameState.is_night:
+		pass_hours.call_deferred(hours)
 
 func _process(delta: float) -> void:
 	hour += delta / seconds_per_hour
@@ -131,6 +143,51 @@ func _safe_here() -> bool:
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var zones := get_tree().get_first_node_in_group("safe_zones")
 	return player != null and zones != null and zones.is_safe(player.global_position)
+
+
+# Hours spent on something (reading, brewing): the screen fades out, the clock jumps, the town
+# catches up with its schedule, then the result is shown. Only used by day.
+var passing := false
+
+# The clock jumps forward (never past dusk) and the town catches up with its schedule.
+# No fade here: whoever calls it covers the screen (pass_hours, the exam in DialogueBox).
+func advance_clock(hours: float) -> void:
+	hour = minf(hour + hours, night_start_hour - 0.05)
+	GameState.hour = hour
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc.has_method("catch_up"):
+			npc.catch_up()
+	_update_lighting()
+
+
+func pass_hours(hours: float, note := "", on_done := Callable()) -> void:
+	if passing:
+		return
+	passing = true
+	GameState.in_dialogue = true  # The doctor is busy: he stands still and nobody talks to him
+	var fade := CanvasLayer.new()
+	fade.layer = 30
+	var veil := ColorRect.new()
+	veil.color = Color(0, 0, 0, 0)
+	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fade.add_child(veil)
+	add_child(fade)
+	var tween := create_tween()
+	tween.tween_property(veil, "color:a", 1.0, 0.6)
+	await tween.finished
+	advance_clock(hours)
+	if on_done.is_valid():
+		on_done.call()
+	await get_tree().create_timer(0.4).timeout
+	tween = create_tween()
+	tween.tween_property(veil, "color:a", 0.0, 0.6)
+	await tween.finished
+	fade.queue_free()
+	GameState.in_dialogue = false
+	passing = false
+	if note != "":
+		EventBus.dialogue_started.emit("Doctor", note)
 
 
 func _skip_to_morning() -> void:

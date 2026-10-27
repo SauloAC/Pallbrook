@@ -37,6 +37,13 @@ const MARKER_RANGE := 4.0      # Within this distance the nearest spot shows its
 const HIDE_TRANSPARENCY := 0.55
 var hide_markers: Array[Sprite3D] = []
 
+# Pinned against a townsperson (a wall behind, someone standing in a doorway): after a moment of
+# pushing, the doctor slips past them. They go solid again once he is clear.
+const SLIP_AFTER := 0.4
+const SLIP_CLEAR := 1.4
+var push_time := 0.0
+var slipping: Array[Node3D] = []
+
 
 func _ready() -> void:
 	add_to_group("player")  # Lets the vampire know where the doctor is
@@ -157,6 +164,7 @@ func _physics_process(delta: float) -> void:
 		velocity.z = direction.z * current_speed
 
 	move_and_slide()
+	_slip_past_people(delta)
 	if visual:
 		visual.animate(get_real_velocity(), delta)
 	_footsteps(delta)
@@ -165,6 +173,28 @@ func _physics_process(delta: float) -> void:
 	_update_hide_markers(delta)
 	var still := Vector2(velocity.x, velocity.z).length() < 0.3
 	lurk_time = lurk_time + delta if GameState.is_night and still and _near_cover() else 0.0
+
+
+func _slip_past_people(delta: float) -> void:
+	for person in slipping.duplicate():
+		if not is_instance_valid(person) or person.global_position.distance_to(global_position) > SLIP_CLEAR:
+			if is_instance_valid(person):
+				remove_collision_exception_with(person)
+			slipping.erase(person)
+	var wants := Input.get_vector("move_left", "move_right", "move_up", "move_down").length() > 0.1 \
+			and not GameState.in_dialogue and not GameState.reading
+	var blocked_by: Node3D = null
+	for i in get_slide_collision_count():
+		var hit := get_slide_collision(i).get_collider() as Node3D
+		if hit and hit.is_in_group("npcs"):
+			blocked_by = hit
+	if wants and blocked_by and get_real_velocity().length() < 1.0:
+		push_time += delta
+		if push_time > SLIP_AFTER and not slipping.has(blocked_by):
+			add_collision_exception_with(blocked_by)
+			slipping.append(blocked_by)
+	else:
+		push_time = 0.0
 
 
 # The nearest hiding spot within reach fades its icon in; the others fade out.

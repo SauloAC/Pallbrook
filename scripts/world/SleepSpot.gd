@@ -1,6 +1,7 @@
 extends Area3D
 
-# Inside the clinic: by day, order tonic ingredients at the supply cabinet;
+# Inside the clinic: by day, prepare iron tonics at the supply cabinet (recipe from the library,
+# ingredients from the merchant beyond the bridge);
 # at night, sleep in the bed. The spot moves to whichever one is in use.
 
 const ICON_SLEEP := preload("res://assets/ui/icon_sleep.png")
@@ -59,19 +60,22 @@ func _build_picker() -> void:
 	picker_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(picker_body)
 	var hint := Label.new()
-	hint.text = tr("[A/D] Quantity    [E] Order    [Esc] Cancel")
+	hint.text = tr("[A/D] Quantity    [E] Prepare    [Esc] Cancel")
 	hint.add_theme_font_size_override("font_size", 18)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hint)
 
 
+const BREW_HOURS := 1.0
+const LATEST_BREW := 17.0  # The hour of work must end before dusk
+
 func _most() -> int:
-	return floori(float(GameState.coins) / GameState.TONIC_PRICE)
+	return GameState.ingredients
 
 
 func _refresh_picker() -> void:
-	picker_body.text = tr("Iron tonics to order:  ◀ {amount} ▶\nCost: {cost} coins (you have {coins})\nReady tomorrow morning.").format(
-			{"amount": amount, "cost": amount * GameState.TONIC_PRICE, "coins": GameState.coins})
+	picker_body.text = tr("Iron tonics to prepare:  ◀ {amount} ▶\nYou have ingredients for {have}. One hour of work; they steep overnight and are ready tomorrow morning.").format(
+			{"amount": amount, "have": GameState.ingredients})
 
 
 func _open_picker() -> void:
@@ -102,10 +106,11 @@ func _input(event: InputEvent) -> void:
 		_refresh_picker()
 	elif event.is_action_pressed("interact"):
 		_close_picker()
-		GameState.order_tonic(amount)
-		var text := tr("You ordered the ingredients for one iron tonic ({price} coins). It will be ready tomorrow morning.\nCoins left: {coins} · Tonics ordered: {ordered}") if amount == 1 \
-				else tr("You ordered the ingredients for {amount} iron tonics ({price} coins). They will be ready tomorrow morning.\nCoins left: {coins} · Tonics ordered: {ordered}")
-		EventBus.dialogue_started.emit("Supply cabinet", text.format({"amount": amount, "price": GameState.TONIC_PRICE * amount, "coins": GameState.coins, "ordered": GameState.tonics_ordered}))
+		var count := amount
+		var cycle = get_tree().get_first_node_in_group("day_night")
+		if cycle and GameState.brew_tonics(count):
+			var note := tr("An hour of grinding, weighing and steeping. {amount} iron tonics will be ready tomorrow morning.").format({"amount": count})
+			cycle.pass_hours(BREW_HOURS, note)
 	elif event.is_action_pressed("ui_cancel"):
 		_close_picker()
 	else:
@@ -132,9 +137,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		EventBus.player_slept.emit()
 		return
-	# Day: choose how many tonics to order
-	if _most() >= 1:
+	# Day: prepare tonics from the merchant's ingredients, if the doctor knows how
+	if not GameState.knows_tonic:
+		EventBus.dialogue_started.emit("Supply cabinet", tr("Bottles, a mortar, scales. You don't know how your predecessor made his iron tonic. The library may have a book on it."))
+	elif GameState.ingredients <= 0:
+		EventBus.dialogue_started.emit("Supply cabinet", tr("No ingredients left. The merchant beyond the bridge sells them, in the mornings."))
+	elif GameState.hour >= LATEST_BREW:
+		EventBus.dialogue_started.emit("Supply cabinet", tr("Too late to start a batch today. Come back in the morning."))
+	else:
 		_open_picker()
-		return
-	var text := tr("Iron salts, herbs, a little wine... one tonic costs {price} coins, and you have {coins}.").format({"price": GameState.TONIC_PRICE, "coins": GameState.coins})
-	EventBus.dialogue_started.emit("Supply cabinet", text)

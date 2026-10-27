@@ -50,6 +50,7 @@ var places: Array[Dictionary] = []  # {name, label, pos (world), uv}
 
 func _ready() -> void:
 	layer = 6
+	add_to_group("mural")
 	if ResourceLoader.exists(HAND_FONT):
 		hand = load(HAND_FONT)
 	if ResourceLoader.exists(PAPER_TEX):

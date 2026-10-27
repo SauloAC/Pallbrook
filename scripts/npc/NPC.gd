@@ -655,6 +655,17 @@ func hurry_home() -> void:
 	hurrying = true
 
 
+# Hours passed in a moment (the doctor read or brewed): be wherever the day has taken them by now
+func catch_up() -> void:
+	if state != State.ROUTINE or wander or data == null or chasing:
+		return
+	_follow_schedule()
+	var spot := agent.target_position
+	if spot.distance_to(global_position) > 0.5:
+		global_position = spot
+		reset_physics_interpolation()
+
+
 func at_home() -> bool:
 	if current_place != data.home:
 		return false
@@ -1109,6 +1120,11 @@ func answer_seen() -> String:
 	var text := tr("No. I slept through the night.") if lines.is_empty() else Lang.join_sentences(lines)
 	GameState.add_clue(_t("Day {day} · {name} saw: \"{text}\"", {"day": GameState.day, "name": _n(data.npc_name), "text": text}))
 	return text
+
+
+# Whether an exam would actually happen now (the dialogue spends the hour before asking)
+func can_examine() -> bool:
+	return not is_wary() and not (cared_day == GameState.day and not exams.is_empty())
 
 
 func answer_exam() -> String:
@@ -1622,7 +1638,7 @@ func answer_clinic(tomorrow := false) -> String:
 		if a["status"] == "waiting":
 			waiting += 1
 	if waiting > GameState.tonics + GameState.tonics_ordered:
-		reply += "\n" + tr("(You don't have a tonic for every patient. Order ingredients at the clinic cabinet.)")
+		reply += "\n" + tr("(You don't have a tonic for every patient. See the Supplies bookmark for how to make more.)")
 		Playtest.count("booked_without_tonic")
 	return reply
 

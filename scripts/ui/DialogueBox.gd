@@ -24,6 +24,11 @@ var npc: Node = null  # Who we are talking to (null = a plain message, like exam
 var choice := 0
 var choices_box: VBoxContainer
 var questions: Array = []  # This conversation's list (the tonic shows up at the clinic)
+var busy := false          # The exam hour is passing: keys wait
+var veil: ColorRect        # Covers the screen while it does
+
+const EXAM_HOURS := 1.0
+const EXAM_PAUSE := 2.2    # Seconds of dark, with the heartbeat
 
 
 # Asked to come to the clinic: when
@@ -65,6 +70,12 @@ func _questions_for(who: Node) -> Array:
 
 func _ready() -> void:
 	panel.visible = false
+	veil = ColorRect.new()
+	veil.color = Color(0, 0, 0, 0)
+	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	veil.visible = false
+	add_child(veil)  # Last child: drawn over the panel
 	# The list of questions is built in code, right above the hint
 	choices_box = VBoxContainer.new()
 	choices_box.add_theme_constant_override("separation", 2)
@@ -126,6 +137,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Ignore the same key press that opened the box
 	if not panel.visible or Engine.get_process_frames() == opened_frame:
 		return
+	if busy:
+		get_viewport().set_input_as_handled()
+		return
 	if npc == null:
 		if event.is_action_pressed("interact"):
 			_close()
@@ -158,6 +172,10 @@ func _ask(key: String) -> void:
 		"seen":
 			body.text = npc.answer_seen()
 		"exam":
+			if not GameState.is_night and npc.can_examine():
+				await _exam_hour()
+			if npc == null:
+				return  # The talk was closed meanwhile (night fell, the doctor collapsed)
 			body.text = npc.answer_exam()
 		"clinic":
 			var no: String = npc.clinic_refusal()
@@ -189,6 +207,27 @@ func _ask(key: String) -> void:
 		if questions[i][0] == key:
 			choice = i
 	_refresh_choices()
+
+
+# A proper exam takes an hour: the screen goes dark, a heartbeat through the stethoscope,
+# the clock moves on, and the talk comes back with the findings
+func _exam_hour() -> void:
+	busy = true
+	body.text = "..."
+	veil.visible = true
+	var tween := create_tween()
+	tween.tween_property(veil, "color:a", 1.0, 0.5)
+	await tween.finished
+	Audio.play("exam", -4.0)
+	await get_tree().create_timer(EXAM_PAUSE).timeout
+	var cycle = get_tree().get_first_node_in_group("day_night")
+	if cycle:
+		cycle.advance_clock(EXAM_HOURS)
+	tween = create_tween()
+	tween.tween_property(veil, "color:a", 0.0, 0.5)
+	await tween.finished
+	veil.visible = false
+	busy = false
 
 
 func _close() -> void:

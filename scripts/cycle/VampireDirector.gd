@@ -70,6 +70,8 @@ func _choose_vampire() -> void:
 	diary.setup(GameState.vampire_name)
 	add_child(Doormats.new())  # A mat inside each front door, to find the way out
 	add_child(ClinicMural.new())  # The outbreak map on the clinic wall
+	add_child(Merchant.new())  # Gideon's stall in front of the cemetery, beyond the bridge
+	add_child(StudyBook.new())  # The materia medica in the library: how to make the tonic
 	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
 
 

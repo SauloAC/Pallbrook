@@ -96,6 +96,7 @@ var chart_next: Label
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS  # Must work while the game is paused
+	add_to_group("casebook")  # The tutorial watches what the player opens
 	panel.visible = false
 	# Filter buttons, built in code right under the title
 	filter_bar = HBoxContainer.new()
@@ -451,11 +452,15 @@ func _build_supplies() -> void:
 	lines.append(tr("Coins: %d") % GameState.coins)
 	lines.append(tr("Iron tonics ready: %d") % GameState.tonics)
 	if GameState.tonics_ordered > 0:
-		lines.append(tr("Ordered, ready tomorrow morning: %d") % GameState.tonics_ordered)
+		lines.append(tr("Steeping, ready tomorrow morning: %d") % GameState.tonics_ordered)
+	if GameState.ingredients > 0:
+		lines.append(tr("Ingredients for: %d") % GameState.ingredients)
 	lines.append(tr("— How it works —"))
 	lines.append("• " + tr("Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them)."))
 	lines.append("• " + tr("Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing."))
-	lines.append("• " + tr("To make more, order the ingredients at the supply cabinet in your clinic, during the day (E at the cabinet). One tonic costs %d coins and is ready the next morning.") % GameState.TONIC_PRICE)
+	lines.append("• " + tr("To make more: learn the recipe from the materia medica in the library (once, three hours), buy the ingredients from the merchant beyond the bridge (mornings, {price} coins a tonic), then prepare them at your clinic cabinet (one hour). They are ready the next morning.").format({"price": GameState.TONIC_PRICE}))
+	if not GameState.knows_tonic:
+		lines.append("• " + tr("You don't know the recipe yet."))
 	lines.append("• " + tr("Coins: the Town Hall pays you {salary} every morning, and each patient pays {fee} for their first exam of the day.").format({"salary": GameState.SALARY, "fee": GameState.EXAM_FEE}))
 	lines.append("• " + tr("At night, sleep in the bed at your clinic (E) to rest; stay up too long and you collapse in the street."))
 	entries.text = "\n\n".join(PackedStringArray(lines))

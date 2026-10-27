@@ -16,6 +16,7 @@ var entries: Array[Dictionary] = []
 var appointments: Array[Dictionary] = []
 var game_over := false
 var intro_seen := false
+var tutorial_done := false     # The guided first day, once per session (survives restarts, like the intro)
 var weather := "clear"           # Today's sky: clear, cloudy or fog (rolled at dawn)
 var open_building := ""          # The walk-in building the doctor is standing in (roof hidden)
 var open_upstairs := false       # ...and whether he is on its upper floor
@@ -58,7 +59,11 @@ const EXAM_FEE := 1      # Each patient pays for their first exam of the day
 const TONIC_PRICE := 4   # Ingredients for one iron tonic, ordered from the clinic cabinet
 var coins := 4
 var tonics := 1          # Ready to give at the clinic
-var tonics_ordered := 0  # Arrive tomorrow morning
+var tonics_ordered := 0  # Steeping at the clinic: ready tomorrow morning
+var ingredients := 0     # Sets bought from the merchant, one per tonic
+var knows_tonic := false # Learned the recipe at the library
+var merchant := {}       # {day: last visit, told: pieces of his story told}
+var pending_hours := 0.0 # Time a conversation used up (an exam): passes when the talk ends
 
 func reset() -> void:
 	# Autoloads survive a scene reload, so their state must be cleared by hand
@@ -81,6 +86,10 @@ func reset() -> void:
 	coins = 4
 	tonics = 1
 	tonics_ordered = 0
+	ingredients = 0
+	knows_tonic = false
+	merchant = {}
+	pending_hours = 0.0
 	entries.clear()
 	appointments.clear()
 	alibis.clear()
@@ -287,7 +296,7 @@ func start_day() -> void:
 	add_night_event(tr("The Town Hall paid your salary: %d coins.") % SALARY)
 	if tonics_ordered > 0:
 		tonics += tonics_ordered
-		add_night_event(tr("Your order arrived: 1 iron tonic.") if tonics_ordered == 1 else tr("Your order arrived: %d iron tonics.") % tonics_ordered)
+		add_night_event(tr("Your tonic is ready: 1 iron tonic.") if tonics_ordered == 1 else tr("Your tonics are ready: %d iron tonics.") % tonics_ordered)
 		tonics_ordered = 0
 	EventBus.phase_changed.emit(false)
 	
@@ -373,6 +382,26 @@ func place_position(place: String) -> Vector3:
 # So during the day, "last night" is always day - 1.
 func last_night() -> int:
 	return day - 1
+
+
+func buy_ingredients(count: int) -> bool:
+	if count < 1 or coins < TONIC_PRICE * count:
+		return false
+	coins -= TONIC_PRICE * count
+	ingredients += count
+	Playtest.count("ingredients_bought")
+	return true
+
+
+# Preparing tonics at the clinic: they steep overnight
+func brew_tonics(count: int) -> bool:
+	if not knows_tonic or count < 1 or count > ingredients:
+		return false
+	ingredients -= count
+	tonics_ordered += count
+	for i in count:
+		Playtest.count("tonics_brewed")
+	return true
 
 
 func order_tonic(count := 1) -> bool:

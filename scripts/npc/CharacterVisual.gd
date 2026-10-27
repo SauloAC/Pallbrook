@@ -25,6 +25,9 @@ const LOOKS := {
 			"Hair": Color(0.08, 0.06, 0.05)}],
 	"Sarah":  ["Suit_Female", {"Skin": Color(0.88, 0.72, 0.58), "Black": Color(0.15, 0.16, 0.18), "Shirt": Color(0.20, 0.48, 0.46),
 			"Details": Color(0.15, 0.16, 0.18), "Hair": Color(0.06, 0.05, 0.05)}],
+	# The merchant beyond the bridge (not a townsperson: no schedule, never a suspect)
+	"Gideon": ["Worker_Male", {"Skin": Color(0.78, 0.6, 0.48), "Shirt": Color(0.72, 0.68, 0.58), "Vest": Color(0.22, 0.3, 0.2),
+			"Pants": Color(0.28, 0.22, 0.16), "Hat": Color(0.32, 0.3, 0.27)}],
 	"Doctor": ["Doctor_Male_Young", {"Skin": Color(0.85, 0.68, 0.56), "Main": Color(0.88, 0.86, 0.80), "Black": Color(0.35, 0.30, 0.25),
 			"Brown": Color(0.18, 0.15, 0.13), "Hair": Color(0.25, 0.17, 0.10)}],
 }
