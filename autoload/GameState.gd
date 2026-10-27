@@ -49,6 +49,8 @@ var hearings_held := 0
 var attacks: Array[Dictionary] = []
 # The old doctor's diary (see Diary.gd): {spots, found, placed, last_name}
 var diary := {}
+var mural := {}                 # The clinic wall: {notes: [{text, slot, links: [Vector2 world x/z]}]}
+var near_mural := false         # Standing at the wall (the cabinet's prompt gives way)
 
 # ---------- The doctor's purse ----------
 const SALARY := 3        # Paid by the Town Hall every morning
@@ -100,6 +102,8 @@ func reset() -> void:
 	hearings_held = 0
 	attacks.clear()
 	diary = {}
+	mural = {}
+	near_mural = false
 
 # ---------- Cross-checking statements ----------
 

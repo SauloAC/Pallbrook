@@ -15,6 +15,9 @@ extends Node
 @export var blood_gain := 0.4         # Share of what it drinks that refills the vampire
 @export var hungry_level := 50.0     # Below this, bites take twice as much
 @export var frenzy_level := 25.0     # Below this, the vampire turns reckless and violent
+@export var first_hunt_night := 2    # It fed well just before the doctor came (Clara's husband): night 1 is quiet
+const NPC_SCRIPT := preload("res://scripts/npc/NPC.gd")
+const LAST_VICTIM := "Jonas"          # Clara's husband, found at their door the week before
 
 var vampire: Node = null
 var acted_tonight := false
@@ -55,15 +58,28 @@ func _choose_vampire() -> void:
 		return
 	vampire = npcs.pick_random()
 	GameState.vampire_name = vampire.data.npc_name
-	vampire.set_hunger(randf_range(65.0, 80.0))  # Fed recently, before the doctor came
+	vampire.set_hunger(randf_range(95.0, 100.0))  # Fed well just before the doctor came: Jonas
 	_seed_outbreak()
+	GameState.record_attack(0, LAST_VICTIM, "Casa1")  # The last death before the doctor arrived
+	_dig_last_grave.call_deferred()
 	safe_zones = SafeZones.new()
 	add_child(safe_zones)
 	safe_zones.setup(GameState.vampire_name)
 	var diary := Diary.new()  # The old doctor's torn pages, hidden around town
 	add_child(diary)
 	diary.setup(GameState.vampire_name)
+	add_child(Doormats.new())  # A mat inside each front door, to find the way out
+	add_child(ClinicMural.new())  # The outbreak map on the clinic wall
 	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
+
+
+# Jonas's grave, fresh, among the old ones beyond the bridge
+func _dig_last_grave() -> void:
+	await get_tree().process_frame  # town.glb (and its grave slots) may load after us
+	for slot in get_tree().root.find_children("GraveSlot*", "", true, false):
+		if slot is Node3D and slot.get_child_count() == 0:
+			slot.add_child(NPC_SCRIPT.make_headstone(tr(LAST_VICTIM), tr("Clara's husband")))
+			return
 
 
 func _on_phase_changed(is_night: bool) -> void:
@@ -90,7 +106,7 @@ func _on_phase_changed(is_night: bool) -> void:
 		_end_chase(true)
 	if hunting:
 		_finish_hunt_now()
-	elif not acted_tonight:
+	elif not acted_tonight and GameState.day - 1 >= first_hunt_night:
 		# The doctor slept before the hunt: it happened off-screen
 		var victim := _pick_victim()
 		if victim:
@@ -99,8 +115,42 @@ func _on_phase_changed(is_night: bool) -> void:
 		else:
 			_check_town_lost()
 	acted_tonight = false
+	_home_by_sunrise()
 	# Every day without enough blood leaves the vampire hungrier
 	vampire.set_hunger(vampire.blood - hunger_per_day)
+
+
+# The sun is up. Out in the street (still coming back from the hunt, or held up by the doctor),
+# the vampire must get home. Unseen, it already has; in front of the doctor, it hurries, and
+# he sees who it is.
+const DAWN_SIGHT := 16.0
+
+func _home_by_sunrise() -> void:
+	if not vampire.is_alive():
+		return
+	if vampire.walks_by_day():
+		if vampire.state == vampire.State.HUNTING:
+			vampire.stop_hunt()  # Clouds or fog: just a person going about the day
+		return
+	if vampire.at_home() and vampire.state != vampire.State.HUNTING:
+		return
+	if _doctor_sees_vampire():
+		vampire.hurry_home()
+		var args := {"day": GameState.day, "name": tr(vampire.data.npc_name), "place": GameState.place_name(GameState.nearest_place(vampire.global_position))}
+		GameState.add_clue(_t("Dawn of Day {day}: as the sun came up you saw {name} near {place}, hurrying home with their head down.", args), "evidence")
+		Playtest.count("vampire_seen_at_dawn")
+	else:
+		vampire.snap_home()
+
+
+func _doctor_sees_vampire() -> bool:
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player == null or player.global_position.distance_to(vampire.global_position) > DAWN_SIGHT:
+		return false
+	var query := PhysicsRayQueryParameters3D.create(vampire.global_position + Vector3(0.0, 1.0, 0.0), player.global_position + Vector3(0.0, 0.5, 0.0))
+	var skip: Array[RID] = [(player as CollisionObject3D).get_rid(), vampire.get_rid()]
+	query.exclude = skip
+	return player.get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _hungry() -> bool:
@@ -132,7 +182,7 @@ func _process(_delta: float) -> void:
 			vampire.start_hunt(GameState.nearest_place(player.global_position))
 			_start_chase(true)
 		return
-	if h >= hunt_hour and h < 25.0:
+	if h >= hunt_hour and h < 25.0 and GameState.day >= first_hunt_night:
 		var victim := _pick_victim()
 		if victim:
 			_run_hunt(victim)

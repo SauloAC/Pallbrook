@@ -16,7 +16,7 @@ schedule = Dictionary[int, String]({
 22: "Casa1"
 })
 home = "Casa1"
-dialogue_lines = Array[String](["I’m sewing a new dress. For a funeral, sadly.", "I don’t go out after dark. No one should."])
+dialogue_lines = Array[String](["I’m sewing my mourning dress. My Jonas... they found him at our door last week, white as wax.", "Father Elias buried him beyond the bridge. By then the old doctor was already gone.", "I don’t go out after dark. No one should. Not anymore."])
 clue_trait = "loose threads"
 portrait = ExtResource("1_u435y")
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

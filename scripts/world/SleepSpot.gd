@@ -116,7 +116,7 @@ func _process(_delta: float) -> void:
 	var target := bed_position if GameState.is_night else cabinet_position
 	if position != target:
 		position = target  # Overlap signals catch up on the next physics frame
-	prompt.visible = player_inside and not GameState.in_dialogue
+	prompt.visible = player_inside and not GameState.in_dialogue and not GameState.near_mural
 	prompt.texture = ICON_SLEEP if GameState.is_night else ICON_CABINET
 
 func _unhandled_input(event: InputEvent) -> void:

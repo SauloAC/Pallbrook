@@ -1181,11 +1181,11 @@ func _open_chart(npc_name: String) -> void:
 		if row >= NOTE_LINES.size():
 			break
 		var e: Dictionary = exams[i]
-		var note := "Day %d · %s, %s" % [e["day"], e["look"], "pulse " + e["pulse"]]
+		var note := tr("Day {day} · {look}, pulse {pulse}").format({"day": e["day"], "look": _tr_value(e["look"]), "pulse": _tr_value(e["pulse"])})
 		if e["dead"]:
-			note = "Day %d · found dead" % e["day"]
+			note = tr("Day {day} · found dead").format({"day": e["day"]})
 		elif e.get("treated", false):
-			note = "Day %d · Treated at the clinic, now %s" % [e["day"], e["look"].to_lower()]
+			note = tr("Day {day} · Treated at the clinic, now {look}").format({"day": e["day"], "look": _tr_value(e["look"]).to_lower()})
 		_line_text(note, NOTE_X, NOTE_LINES[row], 24)
 		row += 1
 

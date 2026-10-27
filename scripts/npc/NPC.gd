@@ -15,6 +15,7 @@ const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Esco
 @export var witness_range := 5.0  # How close the doctor must be to recognize a hunting vampire
 
 var hunt_returning := false
+var hurrying := false  # Caught outside at sunrise: rushing home
 var witnessed := false        # The doctor got close enough to see its face (as the vampire)
 var noticed_doctor := false   # It saw the doctor watching (as the vampire)
 var chasing := false          # Running after the doctor (as the vampire)
@@ -545,7 +546,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
-	var current_speed := speed * (1.8 if state == State.SCARED or state == State.HUNTING else 1.0)
+	var current_speed := speed * (1.8 if state == State.SCARED or state == State.HUNTING or hurrying else 1.0)
 	if chasing:
 		current_speed = speed * CHASE_SPEED
 
@@ -586,6 +587,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_arrived() -> void:
+	hurrying = false
 	if wander:
 		_pick_random_destination()
 		return
@@ -614,6 +616,51 @@ func end_hunt() -> void:
 	chasing = false
 	hunt_returning = true
 	_go_to_place(data.home)
+
+
+# Sunrise caught it outside and nobody is watching: it made it home in the dark hours the doctor
+# didn't see (or slept through). Put it there at once.
+func snap_home() -> void:
+	chasing = false
+	hunt_returning = false
+	hurrying = false
+	var marker := _find_location(data.home)
+	if marker == null:
+		return
+	var spot := marker.global_position
+	if INTERIOR_SLOTS.has(data.home):
+		spot = _reachable_spot(marker.global_position, marker.global_position + INTERIOR_SLOTS[data.home][0])
+	global_position = spot
+	reset_physics_interpolation()
+	go_to(spot)
+	current_place = data.home
+	if WALK_IN_PLACES.has(data.home):
+		if state == State.ROUTINE:
+			_follow_schedule()
+		else:
+			set_state(State.ROUTINE)
+	else:
+		set_state(State.INSIDE)
+
+
+# Sunrise caught it outside in front of the doctor: it hurries home, head down
+func hurry_home() -> void:
+	chasing = false
+	hunt_returning = false
+	if state == State.ROUTINE:
+		_follow_schedule()
+	else:
+		set_state(State.ROUTINE)
+	_go_to_place(data.home)
+	hurrying = true
+
+
+func at_home() -> bool:
+	if current_place != data.home:
+		return false
+	if state == State.INSIDE or state == State.SLEEPING:
+		return true
+	return global_position.distance_to(GameState.place_position(data.home)) < 6.0
 
 
 func stop_hunt() -> void:
@@ -780,7 +827,8 @@ func _place_for_hour(hour: int) -> String:
 		place = _plan_place(tonight, hour)
 	if not GameState.is_night:
 		# The sick stay in bed. The vampire hides from the sun and blames the same sickness.
-		if is_anemic() or (((is_vampire() and not walks_by_day()) or worried) and hour >= 8 and hour < 17):
+		# (The vampire all day long: the sun is up from dawn to dusk, not only from eight to five)
+		if is_anemic() or (is_vampire() and not walks_by_day()) or (worried and hour >= 8 and hour < 17):
 			return data.home
 	# Servants avoid the open square during the day
 	if is_servant and not GameState.is_night and place == "Praca":
@@ -1100,7 +1148,8 @@ func vitals() -> Dictionary:
 	if is_vampire():
 		# His own blood is his hunger: fed, he looks healthy; starving, he looks as anemic
 		# as his victims. The tells: the pulse stays slow and there are never any marks.
-		var vv := {"marks": false, "old_marks": false, "trace": "", "vitality": blood / 100.0, "dead": false}
+		# The vitality bar reads like anyone else's: full while fed, falling only as hunger shows
+		var vv := {"marks": false, "old_marks": false, "trace": "", "vitality": minf(blood / 80.0, 1.0), "dead": false}
 		if blood >= 80.0:
 			vv.merge({"pulse": ["56, slow", "60, slow", "64, steady"].pick_random(), "temp": ["Cool", "Normal"].pick_random(),
 					"look": ["Good color", "A little pale"].pick_random()})
@@ -1449,7 +1498,12 @@ func _free_grave_slot() -> Node3D:
 
 
 func _make_headstone() -> Node3D:
-	# Dark weathered stone with a rounded top and a fresh mound, like the old graves around it
+	return make_headstone(_n(data.npc_name), tr(data.role))
+
+
+# Dark weathered stone with a rounded top and a fresh mound, like the old graves around it.
+# Static so the town can lay graves that were dug before the game began (Clara's Jonas).
+static func make_headstone(title: String, subtitle: String) -> Node3D:
 	var grave := Node3D.new()
 	var material := StandardMaterial3D.new()
 	material.albedo_color = Color(0.2, 0.21, 0.2)
@@ -1484,7 +1538,7 @@ func _make_headstone() -> Node3D:
 	mound.material_override = soil
 	grave.add_child(mound)
 	var plate := Label3D.new()
-	plate.text = "%s\n%s" % [_n(data.npc_name), tr(data.role)]
+	plate.text = "%s\n%s" % [title, subtitle]
 	plate.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED  # Already in the current language
 	plate.font_size = 48
 	plate.outline_size = 12
