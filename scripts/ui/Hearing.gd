@@ -479,9 +479,17 @@ func _close() -> void:
 	panel.visible = false
 	get_tree().paused = false
 	if won:
+		# As in Dracula, the master's end breaks the blood bond: its servants are free again
 		var alive := 0
+		var freed := 0
 		for npc in get_tree().get_nodes_in_group("npcs"):
-			if npc.is_alive() and not npc.is_servant and npc != accused:
+			if npc.is_alive() and npc != accused:
 				alive += 1
-		EventBus.game_ended.emit(true, _t("You unmasked {name} on Day {day}. {alive} townspeople survived.",
-				{"name": _n(accused.data.npc_name), "day": GameState.day, "alive": alive}))
+				if npc.is_servant:
+					freed += 1
+		var message := _t("You unmasked {name} on Day {day}. {alive} townspeople survived.",
+				{"name": _n(accused.data.npc_name), "day": GameState.day, "alive": alive})
+		if freed > 0:
+			message += " " + (tr("One of them is free of its hold at last.") if freed == 1 \
+					else tr("{freed} of them are free of its hold at last.").format({"freed": freed}))
+		EventBus.game_ended.emit(true, message)

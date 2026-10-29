@@ -218,7 +218,7 @@ func _exam_hour() -> void:
 	var tween := create_tween()
 	tween.tween_property(veil, "color:a", 1.0, 0.5)
 	await tween.finished
-	Audio.play("exam", -4.0)
+	Audio.play("exam", -2.0)
 	await get_tree().create_timer(EXAM_PAUSE).timeout
 	var cycle = get_tree().get_first_node_in_group("day_night")
 	if cycle:

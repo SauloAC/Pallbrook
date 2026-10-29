@@ -8,13 +8,24 @@ extends CanvasLayer
 # It only exists here, at the clinic: a reason to come back.
 
 const MAP_TEX := "res://assets/ui/mural/map.png"
-const PAPER_TEX := "res://assets/ui/diary/sheet.png"  # Clean paper: the scrap art has scribbles of its own
+# Art from the Figma mural (art_source/mural): paper, pins and the framed cork board
+const PAPER_TEX := "res://assets/ui/mural/paper.png"
+const PIN_TEX := "res://assets/ui/mural/pin.png"      # Red push pin: head top right, tip bottom left
+const TACK_TEX := "res://assets/ui/mural/tack.png"    # Brass tack, for the bites found in exams
+const FRAME_TEX := "res://assets/ui/mural/frame.png"  # Wall, wooden frame, cork, candle
+const FRAME_INNER := Rect2(0.185, 0.195, 0.62, 0.59)  # The cork inside the frame art (share of the image)
+const PIN_TIP := Vector2(0.2, 0.97)                   # Where the needle ends, as a share of the pin image
+const TACK_TIP := Vector2(0.25, 0.97)
 const HAND_FONT := "res://assets/fonts/Caveat/Caveat-Regular.ttf"
 const READING_TIME_SCALE := 0.25  # Same as the casebook: thinking is cheap, but not free
 # The part of town the map shows, in world x and z (rendered from town.blend, art_source/mural)
 const MAP_X := Vector2(-26.0, 20.0)
 const MAP_Z := Vector2(-38.0, 26.0)  # North edge, south edge
-const MAP_ASPECT := 702.0 / 977.0
+const MAP_ASPECT := 896.0 / 1200.0
+# The drawn map (Figma, from a Blender top-down) frames the town a little differently from the
+# area above: where that area's corners fall on the drawing (offset, scale), fitted on the
+# bridge, the square, the Town Hall, the school, the tavern and the library
+const MAP_FIT := Rect2(0.118, 0.024, 0.900, 0.953)
 const SLOTS_PER_SIDE := 4
 const SNAP := 3.5               # Metres: a thread snaps to a place this close
 const OLD_AFTER := 3            # Cases older than this many nights fade
@@ -40,6 +51,9 @@ var picker_scroll: ScrollContainer
 var picker_msg: Label
 var hand: Font
 var paper: Texture2D
+var pin_tex: Texture2D
+var tack_tex: Texture2D
+var frame_art: TextureRect
 var cards: Array[Control] = []
 var selected := -1
 var picker_items: Array[Dictionary] = []
@@ -67,6 +81,18 @@ func _ready() -> void:
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(dim)
+	if ResourceLoader.exists(PIN_TEX):
+		pin_tex = load(PIN_TEX)
+	if ResourceLoader.exists(TACK_TEX):
+		tack_tex = load(TACK_TEX)
+	if ResourceLoader.exists(FRAME_TEX):
+		frame_art = TextureRect.new()
+		frame_art.texture = load(FRAME_TEX)
+		frame_art.set_anchors_preset(Control.PRESET_FULL_RECT)
+		frame_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		frame_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		frame_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		root.add_child(frame_art)
 	frame = Panel.new()
 	var wood := StyleBoxFlat.new()
 	wood.bg_color = WOOD
@@ -239,8 +265,18 @@ func _layout() -> void:
 	frame.position = outer.position
 	frame.size = outer.size
 	var inner := outer.grow(-18.0)
+	if frame_art:
+		# The painted board fills the screen; everything goes on its cork
+		var tex_size := frame_art.texture.get_size()
+		var s := maxf(screen.x / tex_size.x, screen.y / tex_size.y)
+		var drawn := tex_size * s
+		var origin := (screen - drawn) * 0.5
+		inner = Rect2(origin + FRAME_INNER.position * drawn, FRAME_INNER.size * drawn)
+		outer = Rect2(Vector2(0, inner.end.y), Vector2.ZERO)
+	frame.visible = frame_art == null
 	cork.position = inner.position
 	cork.size = inner.size
+	cork.visible = frame_art == null
 	var map_h := inner.size.y * 0.94
 	var map_w := map_h * MAP_ASPECT
 	if map_w > inner.size.x * 0.42:
@@ -248,7 +284,7 @@ func _layout() -> void:
 		map_h = map_w / MAP_ASPECT
 	map_rect.size = Vector2(map_w, map_h)
 	map_rect.position = inner.position + (inner.size - map_rect.size) * 0.5
-	hint.position = Vector2(0, outer.end.y + 14)
+	hint.position = Vector2(0, minf(outer.end.y + 14, screen.y - 36))
 	hint.size = Vector2(screen.x, 30)
 	if picker:
 		picker.position = (screen - picker.size) * 0.5
@@ -283,6 +319,7 @@ func _rebuild_cards() -> void:
 		if paper:
 			var tex_style := StyleBoxTexture.new()
 			tex_style.texture = paper
+			tex_style.set_texture_margin_all(40.0)  # Torn edges keep their shape; the middle stretches
 			style = tex_style
 		else:
 			var flat := StyleBoxFlat.new()
@@ -323,7 +360,8 @@ func _rebuild_cards() -> void:
 # ---------- Drawing ----------
 
 func _uv(world: Vector3) -> Vector2:
-	return Vector2((world.x - MAP_X.x) / (MAP_X.y - MAP_X.x), (world.z - MAP_Z.x) / (MAP_Z.y - MAP_Z.x))
+	var area := Vector2((world.x - MAP_X.x) / (MAP_X.y - MAP_X.x), (world.z - MAP_Z.x) / (MAP_Z.y - MAP_Z.x))
+	return MAP_FIT.position + area * MAP_FIT.size
 
 
 func _on_map(uv: Vector2) -> Vector2:
@@ -346,8 +384,8 @@ func _draw_overlay() -> void:
 		var text_size := print_font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 		var tag := Rect2(at + Vector2(-text_size.x * 0.5 - 4, 10), text_size + Vector2(8, 0))
 		# Neighbours close together: slide the tag below, then above, until it is clear
-		for offset in [0.0, tag.size.y + 2.0, -(tag.size.y + 22.0), 2.0 * (tag.size.y + 2.0), -2.0 * (tag.size.y + 12.0)]:
-			var tried := Rect2(tag.position + Vector2(0, offset), tag.size)
+		for shift in [0.0, tag.size.y + 2.0, -(tag.size.y + 22.0), 2.0 * (tag.size.y + 2.0), -2.0 * (tag.size.y + 12.0)]:
+			var tried := Rect2(tag.position + Vector2(0, shift), tag.size)
 			var clear := true
 			for other in placed_tags:
 				if other.grow(1.0).intersects(tried):
@@ -378,21 +416,35 @@ func _draw_overlay() -> void:
 		var at := _on_map(c["uv"])
 		var fade := 0.45 if c["old"] else 1.0
 		var color: Color = PIN_EXAM if c["exam_only"] else PIN
-		overlay.draw_circle(at + Vector2(1.5, 2.5), 9.0, Color(0, 0, 0, 0.35 * fade))
-		overlay.draw_circle(at, 9.0, Color(color, fade))
-		overlay.draw_circle(at + Vector2(-3, -3), 3.0, Color(1, 1, 1, 0.45 * fade))
+		var head := at
+		if c["exam_only"] and tack_tex:
+			head = _draw_pin(tack_tex, at, 30.0, TACK_TIP, fade)
+		elif pin_tex:
+			head = _draw_pin(pin_tex, at, 40.0, PIN_TIP, fade)
+		else:
+			overlay.draw_circle(at, 9.0, Color(color, fade))
 		var label: String = c["label"]
 		var size := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 20)
-		var box := Rect2(at + Vector2(11, -size.y * 0.5 - 2), size + Vector2(10, 4))
+		var box := Rect2(head + Vector2(10, -size.y * 0.5 - 2), size + Vector2(10, 4))
 		overlay.draw_rect(box, Color(0.97, 0.94, 0.86, fade))
 		overlay.draw_rect(box, Color(color, fade), false, 1.5)
 		overlay.draw_string(font, box.position + Vector2(5, size.y - 4), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(INK, fade))
 	# A pin at the top of each clue
 	for i in notes.size():
 		var pin := _card_pin(i)
-		overlay.draw_circle(pin + Vector2(1.5, 2.5), 7.0, Color(0, 0, 0, 0.35))
-		overlay.draw_circle(pin, 7.0, PIN)
-		overlay.draw_circle(pin + Vector2(-2, -2), 2.5, Color(1, 1, 1, 0.5))
+		if pin_tex:
+			_draw_pin(pin_tex, pin, 40.0, PIN_TIP, 1.0)
+		else:
+			overlay.draw_circle(pin, 7.0, PIN)
+
+
+# A pin pushed in at a point (the needle's tip lands there). Returns where its head is.
+func _draw_pin(tex: Texture2D, tip_at: Vector2, height: float, tip: Vector2, alpha: float) -> Vector2:
+	var size := Vector2(height * tex.get_width() / tex.get_height(), height)
+	var rect := Rect2(tip_at - tip * size, size)
+	overlay.draw_texture_rect(tex, Rect2(rect.position + Vector2(3, 3), rect.size), false, Color(0, 0, 0, 0.3 * alpha))  # Shadow on the cork
+	overlay.draw_texture_rect(tex, rect, false, Color(1, 1, 1, alpha))
+	return rect.position + Vector2(size.x * 0.8, size.y * 0.25)
 
 
 # ---------- Input ----------
@@ -450,7 +502,7 @@ func _over_card(at: Vector2) -> bool:
 
 
 func _toggle_thread(index: int, screen_point: Vector2) -> void:
-	var uv := (screen_point - map_rect.position) / map_rect.size
+	var uv := ((screen_point - map_rect.position) / map_rect.size - MAP_FIT.position) / MAP_FIT.size
 	var world := Vector2(MAP_X.x + uv.x * (MAP_X.y - MAP_X.x), MAP_Z.x + uv.y * (MAP_Z.y - MAP_Z.x))
 	# Snap to the nearest place, so threads land on buildings
 	var best := SNAP
