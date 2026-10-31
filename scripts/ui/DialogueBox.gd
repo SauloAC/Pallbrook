@@ -124,7 +124,7 @@ func _refresh_choices() -> void:
 	for i in questions.size():
 		var key: String = questions[i][0]
 		var label := Label.new()
-		label.text = ("» " if i == choice else "   ") + tr(questions[i][1])
+		label.text = ("» " if i == choice else "   ") + Lang.g(questions[i][1], npc.data.female)  # examiná-lo / examiná-la
 		label.add_theme_font_size_override("font_size", 20)
 		if i == choice:
 			label.add_theme_color_override("font_color", SELECTED_COLOR)

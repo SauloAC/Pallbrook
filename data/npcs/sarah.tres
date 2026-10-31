@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("1_npc")
 npc_name = "Sarah"
+female = true
 role = "Teacher"
 color = Color(0.24313726, 0.49019608, 0.47058824, 1)
 schedule = Dictionary[int, String]({

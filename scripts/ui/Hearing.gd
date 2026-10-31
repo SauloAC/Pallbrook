@@ -81,6 +81,11 @@ func _n(person: String) -> String:
 	return tr(person)
 
 
+# Lines about the accused in their grammatical gender (culpado / culpada)
+func _ta(text: String, args := {}) -> String:
+	return Lang.contract(Lang.g(text, accused != null and accused.data.female).format(args))
+
+
 # ---------- Calling a hearing ----------
 
 # The day the hearing would be held if called now: today if it's still before dusk
@@ -151,7 +156,7 @@ func _collect_evidence() -> Array[Dictionary]:
 			var args := {"night": night, "witness": _n(witness), "name": _n(who), "place": GameState.place_name(s["place"]),
 					"time": GameState.format_time(s["hour"]), "victim": _n(victim)}
 			if victim != "":
-				list.append({"text": _t("Night {night}: {witness} saw {name} near {place} at {time}, the night {victim} was attacked.", args), "weight": 2.5})
+				list.append({"text": Lang.contract(Lang.g("Night {night}: {witness} saw {name} near {place} at {time}, the night {victim} was attacked.", Lang.female_of(victim)).format(args)), "weight": 2.5})
 			elif _late(s["hour"]):
 				list.append({"text": _t("Night {night}: {witness} saw {name} out near {place} at {time}.", args), "weight": 1.0})
 	# The exams
@@ -160,7 +165,7 @@ func _collect_evidence() -> Array[Dictionary]:
 		if e.get("look", "") in ["Pale", "Grey", "A little pale"] and not e.get("marks", false) and not e.get("old_marks", false):
 			pale += 1
 	if pale >= 2:
-		list.append({"text": _t("{name} looks anemic, yet in {count} exams you never found a single bite.", {"name": _n(who), "count": pale}), "weight": 2.0})
+		list.append({"text": _ta("{name} looks anemic, yet in {count} exams you never found a single bite.", {"name": _n(who), "count": pale}), "weight": 2.0})
 	var trait_name: String = accused.data.clue_trait
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc == accused or trait_name == "":
@@ -269,11 +274,11 @@ func _refresh() -> void:
 			var lines := PackedStringArray()
 			var yes := 0
 			for v in votes:
-				lines.append(_t("{name}: guilty", {"name": _n(v["name"])}) if v["guilty"] else _t("{name}: not guilty", {"name": _n(v["name"])}))
+				lines.append(_ta("{name}: guilty", {"name": _n(v["name"])}) if v["guilty"] else _ta("{name}: not guilty", {"name": _n(v["name"])}))
 				if v["guilty"]:
 					yes += 1
 			body.text = tr("The town votes.") + "\n\n" + "\n".join(lines) + "\n\n" + \
-					_t("{yes} of {total} say guilty.", {"yes": yes, "total": votes.size()})
+					_ta("{yes} of {total} say guilty.", {"yes": yes, "total": votes.size()})
 			hint.text = tr("[E] Continue")
 		Step.VERDICT:
 			hint.text = tr("[E] Continue")
@@ -445,15 +450,15 @@ func _verdict() -> void:
 	Playtest.note_accused(who)
 	Playtest.log_line("Hearing verdict: %s %s" % [who, "guilty" if guilty else "not guilty"])
 	if guilty and accused.is_vampire():
-		title.text = tr("Guilty")
-		body.text = _t("The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun.", args)
+		title.text = Lang.g("Guilty", accused.data.female)
+		body.text = _ta("The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun.", args)
 	elif guilty:
-		title.text = tr("Guilty")
+		title.text = Lang.g("Guilty", accused.data.female)
 		accused.jail()
 		for npc in get_tree().get_nodes_in_group("npcs"):
 			if npc.is_alive():
 				npc.change_affinity(-10.0)
-		body.text = _t("The town has found {name} guilty. They march {name} out through the town gate and bar it behind them. No one goes out there now, not since the wolf. Tonight, Pallbrook will sleep a little easier.", args)
+		body.text = _ta("The town has found {name} guilty. They march {name} out through the town gate and bar it behind them. No one goes out there now, not since the wolf. Tonight, Pallbrook will sleep a little easier.", args)
 		Playtest.count("innocent_condemned")
 	elif accused.is_vampire():
 		title.text = tr("Not guilty")

@@ -107,6 +107,30 @@ const CONTRACTIONS := {
 	"es": [[" de el ", " del "], [" a el ", " al "]],
 }
 
+# ---------- Grammatical gender (Portuguese, Spanish) ----------
+# English and Japanese say "Let me examine you" the same way to anyone; Portuguese and Spanish
+# don't (examiná-lo / examiná-la). Lines that change with the person they're about, or the
+# person speaking, have a second row in strings.csv whose key ends in " [f]". Code that knows
+# who it is talking about calls g() instead of tr(); without a feminine row it falls back.
+const FEMININE := " [f]"
+
+func g(text: String, female: bool) -> String:
+	if female:
+		var key := text + FEMININE
+		var feminine := TranslationServer.translate(key)
+		if feminine != key:
+			return feminine
+	return TranslationServer.translate(text)
+
+
+# Whether a townsperson (by name) is a woman; names outside the town count as men (Jonas)
+func female_of(person: String) -> bool:
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc.data and npc.data.npc_name == person:
+			return npc.data.female
+	return false
+
+
 func contract(text: String) -> String:
 	for pair in CONTRACTIONS.get(locale, []):
 		text = text.replace(pair[0], pair[1])

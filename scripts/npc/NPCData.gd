@@ -5,6 +5,7 @@ extends Resource
 
 @export var npc_name: String = ""
 @export var role: String = ""        # e.g. "Padre", "Taverneira"
+@export var female := false  # For Portuguese and Spanish: examiná-la, cansada, culpada (see Lang.g)
 @export var color: Color = Color.WHITE
 @export_multiline var description: String = ""
 @export var schedule: Dictionary[int, String] = {}  # hour -> location name

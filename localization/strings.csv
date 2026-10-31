@@ -652,3 +652,48 @@ You don't know the recipe yet.,You don't know the recipe yet.,まだレシピを
 Anyone weak? Ask them to come to the clinic for a treatment. You have one tonic; the Supplies bookmark explains how to make more.,Anyone weak? Ask them to come to the clinic for a treatment. You have one tonic; the Supplies bookmark explains how to make more.,弱っている人はいる？治療のために診療所へ来るよう頼もう。強壮剤は1本ある。作り方は「備品」のしおりに書いてある。,Alguém fraco? Peça para vir à clínica para um tratamento. Você tem um tônico; o marcador Suprimentos explica como fazer mais.,¿Alguien débil? Pídele que venga a la clínica para un tratamiento. Tienes un tónico; el marcador Suministros explica cómo hacer más.
 One of them is free of its hold at last.,One of them is free of its hold at last.,そのうち一人は、ようやくあれの支配から解き放たれた。,Um deles enfim está livre do domínio dele.,Uno de ellos por fin está libre de su dominio.
 {freed} of them are free of its hold at last.,{freed} of them are free of its hold at last.,そのうち{freed}人は、ようやくあれの支配から解き放たれた。,{freed} deles enfim estão livres do domínio dele.,{freed} de ellos por fin están libres de su dominio.
+" I've been tired lately, though. [f]"," I've been tired lately, though.",でも、最近は疲れ気味で。, Mas ando cansada ultimamente., Aunque últimamente ando cansada.
+"Only my own weakness, doctor. I wake up more tired every day, and I don't know why. [f]","Only my own weakness, doctor. I wake up more tired every day, and I don't know why.",自分の体の弱さくらいです、先生。毎朝、前の日より疲れて目が覚めるんです。理由はわかりません。,"Só a minha própria fraqueza, doutor. Acordo mais cansada a cada dia, e não sei por quê.","Solo mi propia debilidad, doctor. Cada día despierto más cansada, y no sé por qué."
+"I'll manage on my own, thank you. [f]","I'll manage on my own, thank you.",自分でなんとかします、どうも。,"Eu me viro sozinha, obrigada.","Me las arreglaré sola, gracias."
+"Thank you, doctor... though my head still burns. [f]","Thank you, doctor... though my head still burns.",ありがとうございます、先生……でも、まだ頭が熱いです。,"Obrigada, doutor... embora minha cabeça ainda arda.","Gracias, doctor... aunque la cabeza todavía me arde."
+"Thank you, doctor. I feel stronger already. [f]","Thank you, doctor. I feel stronger already.",ありがとうございます、先生。もう力が戻ってきた気がします。,"Obrigada, doutor. Já me sinto mais forte.","Gracias, doctor. Ya me siento más fuerte."
+"If you say so, doctor... but I'm so weak, and rest hasn't helped so far. [f]","If you say so, doctor... but I'm so weak, and rest hasn't helped so far.",先生がそうおっしゃるなら……でも、ひどく弱っていて、休んでも今まで良くならなかったんです。,"Se o senhor diz, doutor... mas estou tão fraca, e o repouso não ajudou até agora.","Si usted lo dice, doctor... pero estoy tan débil, y el reposo no ha ayudado hasta ahora."
+I'm so tired. Is it the same thing the others have? [f],I'm so tired. Is it the same thing the others have?,とても疲れているんです。ほかの人たちと同じ病気でしょうか？,Estou tão cansada. É a mesma coisa que os outros têm?,Estoy tan cansada. ¿Es lo mismo que tienen los demás?
+Let me examine you. [f],Let me examine you.,診察させてください。,Deixe-me examiná-la.,Déjeme examinarla.
+A little pale. Mild anemia. [f],A little pale. Mild anemia.,やや蒼白。軽い貧血。,Um pouco pálida. Anemia leve.,Algo pálida. Anemia leve.
+Pale and weak. Clear anemia. [f],Pale and weak. Clear anemia.,蒼白で衰弱している。明らかな貧血。,Pálida e fraca. Anemia evidente.,Pálida y débil. Anemia evidente.
+"Was found at the door at night, with no memory of it. [f]","Was found at the door at night, with no memory of it.",夜、戸口に立っているところを見つかったが、本人に覚えはない。,"Foi encontrada à porta durante a noite, sem lembrar de nada.","La encontraron en la puerta de noche, sin recordar nada."
+{name} was buried in the cemetery beyond the bridge. [f],{name} was buried in the cemetery beyond the bridge.,{name}は橋の向こうの墓地に埋葬された。,{name} foi sepultada no cemitério além da ponte.,"{name} fue enterrada en el cementerio, al otro lado del puente."
+Day {day} · {name} was buried before you examined the body. [f],Day {day} · {name} was buried before you examined the body.,{day}日目 · 遺体を調べる前に、{name}は埋葬された。,Dia {day} · {name} foi sepultada antes que você examinasse o corpo.,Día {day} · {name} fue enterrada antes de que examinaras el cuerpo.
+"{name} looks anemic, yet in {count} exams you never found a single bite. [f]","{name} looks anemic, yet in {count} exams you never found a single bite.",{name}は貧血に見えるが、{count}回の診察で噛み跡は一つも見つからなかった。,"{name} parece anêmica, mas em {count} exames você nunca achou uma única mordida.","{name} parece anémica, pero en {count} exámenes nunca encontraste ni una mordedura."
+"Night {night}: {witness} saw {name} near {place} at {time}, the night {victim} was attacked. [f]","Night {night}: {witness} saw {name} near {place} at {time}, the night {victim} was attacked.",{night}日目の夜：{witness}は{time}に{place}の近くで{name}を見た。{victim}が襲われた夜だ。,"Noite {night}: {witness} viu {name} perto de {place} às {time}, na noite em que {victim} foi atacada.","Noche {night}: {witness} vio a {name} cerca de {place} a las {time}, la noche en que atacaron a {victim}."
+Night {night}: {name} was attacked [f],Night {night}: {name} was attacked,{night}日目の夜：{name}が襲われた,Noite {night}: {name} foi atacada,Noche {night}: {name} fue atacada
+{name}: guilty [f],{name}: guilty,{name}：有罪,{name}: culpada,{name}: culpable
+Guilty [f],Guilty,有罪,Culpada,Culpable
+The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun. [f],The town has found {name} guilty. They drag {name} to the cellar of the Town Hall and wait for the sun.,町は{name}を有罪とした。人々は{name}を役場の地下室へ引きずっていき、日の出を待つ。,A cidade considerou {name} culpada. Arrastam {name} para o porão da Prefeitura e esperam o sol nascer.,El pueblo ha declarado culpable a {name}. Arrastran a {name} al sótano del Ayuntamiento y esperan al sol.
+"The town has found {name} guilty. They march {name} out through the town gate and bar it behind them. No one goes out there now, not since the wolf. Tonight, Pallbrook will sleep a little easier. [f]","The town has found {name} guilty. They march {name} out through the town gate and bar it behind them. No one goes out there now, not since the wolf. Tonight, Pallbrook will sleep a little easier.",町は{name}を有罪とした。人々は{name}を町の門の外へ連れ出し、背後で門に閂をかけた。あの狼の一件以来、誰も外へは出ない。今夜、パルブルックは少しだけ安心して眠るだろう。,"A cidade considerou {name} culpada. Levam {name} para fora pelo portão da cidade e a trancam por dentro. Desde o lobo, ninguém mais sai para lá. Esta noite, Pallbrook vai dormir um pouco mais tranquila.","El pueblo ha declarado culpable a {name}. Sacan a {name} por la puerta del pueblo y la atrancan tras ella. Desde lo del lobo, nadie sale ya ahí fuera. Esta noche, Pallbrook dormirá un poco más tranquilo."
+{yes} of {total} say guilty. [f],{yes} of {total} say guilty.,{total}人中{yes}人が有罪とした。,{yes} de {total} dizem culpada.,{yes} de {total} dicen culpable.
+Day {day} · found dead [f],Day {day} · found dead,{day}日目 · 遺体で発見,Dia {day} · encontrada morta,Día {day} · encontrada muerta
+"Day {day} · Treated at the clinic, now {look} [f]","Day {day} · Treated at the clinic, now {look}",{day}日目 · 診療所で治療、今は{look},"Dia {day} · Tratada na clínica, agora {look}","Día {day} · Tratada en la clínica, ahora {look}"
+treated [f],treated,治療済み,tratada,tratada
+deceased [f],deceased,故人,falecida,fallecida
+Deceased [f],Deceased,死亡,Falecida,Fallecida
+buried [f],buried,埋葬済み,enterrada,enterrada
+Not examined yet [f],Not examined yet,未診察,Ainda não examinada,Aún no examinada
+Visited at night: treat today! [f],Visited at night: treat today!,夜に襲われた：今日中に治療を！,Visitada à noite: trate hoje!,Visitada de noche: ¡trátala hoy!
+"visited at night: treat today, or keep watch at the door tonight [f]","visited at night: treat today, or keep watch at the door tonight",夜に襲われた：今日治療するか、今夜その戸口を見張ること,"visitada à noite: trate hoje, ou vigie a porta esta noite","visitada de noche: trátala hoy, o vigila su puerta esta noche"
+expected at the clinic [f],expected at the clinic,診療所で待ち合わせ,esperada na clínica,esperada en la clínica
+Nothing with my own eyes. But {who} has been pale and weak for days. People whisper about a sickness. [f],Nothing with my own eyes. But {who} has been pale and weak for days. People whisper about a sickness.,自分の目では何も。でも{who}は何日も青ざめて弱っています。病気だと噂されていますよ。,Nada com meus próprios olhos. Mas {who} anda pálida e fraca há dias. O povo cochicha sobre uma doença.,Nada con mis propios ojos. Pero {who} lleva días pálida y débil. La gente murmura sobre una enfermedad.
+Good color [f],Good color,血色良好,Corada,Buen color
+A little pale [f],A little pale,やや蒼白,Um pouco pálida,Algo pálida
+Pale [f],Pale,蒼白,Pálida,Pálida
+Grey [f],Grey,土気色,Acinzentada,Grisácea
+Flushed [f],Flushed,紅潮,Ruborizada,Sonrojada
+Sweaty [f],Sweaty,汗ばむ,Suada,Sudorosa
+Restless [f],Restless,寝苦しい,Agitada,Inquieta
+Wakes tired [f],Wakes tired,疲れて目覚める,Acorda cansada,Despierta cansada
+Dead [f],Dead,死亡,Morta,Muerta
+Sleepwalks [f],Sleepwalks,夢遊,Sonambulismo,Sonámbula
+Guarded [f],Guarded,警戒している,Desconfiada,Recelosa
+Friendly [f],Friendly,友好的,Amigável,Amistosa
+Nothing with my own eyes. But {who} have been pale and weak for days. People whisper about a sickness. [f],Nothing with my own eyes. But {who} have been pale and weak for days. People whisper about a sickness.,自分の目では何も。でも{who}は何日も青ざめて弱っています。病気だと噂されていますよ。,Nada com meus próprios olhos. Mas {who} andam pálidas e fracas há dias. O povo cochicha sobre uma doença.,Nada con mis propios ojos. Pero {who} llevan días pálidas y débiles. La gente murmura sobre una enfermedad.

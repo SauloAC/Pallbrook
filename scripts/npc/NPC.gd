@@ -995,6 +995,15 @@ func _t(text: String, args := {}) -> String:
 	return Lang.contract(tr(text).format(args))
 
 
+# The same, in this person's grammatical gender (cansado/cansada) where the language has one
+func _g(text: String) -> String:
+	return Lang.g(text, data != null and data.female)
+
+
+func _tg(text: String, args := {}) -> String:
+	return Lang.contract(_g(text).format(args))
+
+
 # A townsperson's name as the current language writes it
 func _n(person: String) -> String:
 	return tr(person)
@@ -1065,7 +1074,7 @@ func greeting() -> String:
 		var sick := ["This sickness... I can barely stand, doctor.",
 				"Forgive me, doctor. The light hurts my eyes these days.",
 				"I'm so tired. Is it the same thing the others have?"]
-		return tr(sick[(GameState.day + data.npc_name.length()) % sick.size()])
+		return _g(sick[(GameState.day + data.npc_name.length()) % sick.size()])
 	if is_servant:
 		return tr("Doctor. What is it now?")
 	var hellos := ["Good day, doctor.", "Doctor. Need something?", "Ah, doctor. Any news?"]
@@ -1235,9 +1244,9 @@ func _exam_text(v: Dictionary) -> String:
 	elif blood >= 80.0:
 		parts.append(tr("Good color."))
 	elif blood >= ANEMIA_LEVEL:
-		parts.append(tr("A little pale. Mild anemia."))
+		parts.append(_g("A little pale. Mild anemia."))
 	elif blood >= 25.0:
-		parts.append(tr("Pale and weak. Clear anemia."))
+		parts.append(_g("Pale and weak. Clear anemia."))
 	else:
 		parts.append(tr("Grey lips, can barely stand. Severe anemia: one more night like this could kill."))
 	if has_flu() and blood < 80.0:
@@ -1258,7 +1267,7 @@ func _exam_text(v: Dictionary) -> String:
 		"Hallucinations":
 			parts.append(tr("Swears a figure stands at the foot of the bed each night."))
 		"Sleepwalks":
-			parts.append(tr("Was found at the door at night, with no memory of it."))
+			parts.append(_g("Was found at the door at night, with no memory of it."))
 		"Nightmares":
 			parts.append(tr("Sleeps badly, with nightmares."))
 		"Coughs at night", "Sweats":
@@ -1345,28 +1354,32 @@ func _usual_day_text() -> String:
 	var day_text := tr(", then ").join(PackedStringArray(parts)) if not parts.is_empty() else tr("at home")
 	var openers := ["Yesterday? Like any other day.", "Same as always, doctor.", "An ordinary day, nothing more."]
 	var opener: String = tr(openers[data.npc_name.length() % openers.size()])
-	var weak := tr(" I've been tired lately, though.") if is_anemic() or has_flu() else ""
+	var weak := _g(" I've been tired lately, though.") if is_anemic() or has_flu() else ""
 	return _t("{opener} I was {day}. {evening}{weak}", {"opener": opener, "day": day_text, "evening": _alibi_text(-1), "weak": weak})
 
 
 # Day 1 "did you see anything": what the town already whispers about
 func _first_day_rumor() -> String:
 	if is_anemic():
-		return tr("Only my own weakness, doctor. I wake up more tired every day, and I don't know why.")
+		return _g("Only my own weakness, doctor. I wake up more tired every day, and I don't know why.")
 	var pale: Array[String] = []
+	var pale_women := 0
 	var coughing: Array[String] = []
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc == self or npc.data == null or not npc.is_alive():
 			continue
 		if npc.is_anemic():
 			pale.append(_n(npc.data.npc_name))
+			if npc.data.female:
+				pale_women += 1
 		elif npc.has_flu():
 			coughing.append(_n(npc.data.npc_name))
 	if not pale.is_empty():
 		var who := tr(" and ").join(PackedStringArray(pale))
+		var all_women := pale_women == pale.size()  # Portuguese and Spanish: pálidas only if every one is a woman
 		if pale.size() == 1:
-			return _t("Nothing with my own eyes. But {who} has been pale and weak for days. People whisper about a sickness.", {"who": who})
-		return _t("Nothing with my own eyes. But {who} have been pale and weak for days. People whisper about a sickness.", {"who": who})
+			return Lang.contract(Lang.g("Nothing with my own eyes. But {who} has been pale and weak for days. People whisper about a sickness.", all_women).format({"who": who}))
+		return Lang.contract(Lang.g("Nothing with my own eyes. But {who} have been pale and weak for days. People whisper about a sickness.", all_women).format({"who": who}))
 	if not coughing.is_empty():
 		return _t("Only {name} coughing all day. The cold weather is here.", {"name": coughing[0]})
 	return tr("Nothing strange. The dogs barked a little after midnight, that's all.")
@@ -1499,9 +1512,9 @@ func _bury() -> void:
 	var slot := _free_grave_slot()
 	if slot:
 		slot.add_child(_make_headstone())
-	GameState.add_night_event(_t("{name} was buried in the cemetery beyond the bridge.", {"name": _n(data.npc_name)}))
+	GameState.add_night_event(_tg("{name} was buried in the cemetery beyond the bridge.", {"name": _n(data.npc_name)}))
 	if not examined:
-		GameState.add_clue(_t("Day {day} · {name} was buried before you examined the body.", {"day": GameState.day, "name": _n(data.npc_name)}), "evidence")
+		GameState.add_clue(_tg("Day {day} · {name} was buried before you examined the body.", {"day": GameState.day, "name": _n(data.npc_name)}), "evidence")
 
 
 func _free_grave_slot() -> Node3D:
@@ -1573,7 +1586,7 @@ func clinic_refusal() -> String:
 	if GameState.is_night:
 		return tr("At this hour? Ask me tomorrow, doctor.")
 	if is_wary():
-		return tr("I'll manage on my own, thank you.")
+		return _g("I'll manage on my own, thank you.")
 	if appointment_until >= 0.0:
 		return _t("I'll be at the clinic at {time}, doctor, as we agreed.", {"time": GameState.format_time(appointment_from)})
 	if treated_day == GameState.day:
@@ -1719,8 +1732,8 @@ func answer_tonic() -> String:
 	_treat()
 	if feverish:
 		GameState.add_clue(_t("Day {day} · The tonic did nothing for {name}'s fever.", {"day": GameState.day, "name": _n(data.npc_name)}), "evidence")
-		return tr("Thank you, doctor... though my head still burns.")
-	return tr("Thank you, doctor. I feel stronger already.")
+		return _g("Thank you, doctor... though my head still burns.")
+	return _g("Thank you, doctor. I feel stronger already.")
 
 
 # Rest and good food: cures a chill in half the time, does nothing for lost blood
@@ -1748,7 +1761,7 @@ func answer_rest() -> String:
 		change_affinity(6.0)
 		return tr("Bed and broth... yes, doctor. This fever needs it.")
 	if blood < 80.0:
-		return tr("If you say so, doctor... but I'm so weak, and rest hasn't helped so far.")
+		return _g("If you say so, doctor... but I'm so weak, and rest hasn't helped so far.")
 	return tr("Rest? I feel fine, doctor, but I'll take it easy.")
 
 

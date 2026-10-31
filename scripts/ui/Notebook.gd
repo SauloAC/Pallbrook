@@ -474,7 +474,7 @@ func _build_appointments() -> void:
 	var urgent: Array[String] = []
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc.is_alive() and npc.marked and npc.talked_day >= npc.marked_day:
-			urgent.append("• %s · " % tr(npc.data.npc_name) + tr("visited at night: treat today, or keep watch at the door tonight"))
+			urgent.append("• %s · " % tr(npc.data.npc_name) + Lang.g("visited at night: treat today, or keep watch at the door tonight", npc.data.female))
 	if not urgent.is_empty():
 		lines.append(tr("— Urgent —"))
 		lines.append_array(urgent)
@@ -496,7 +496,7 @@ func _build_appointments() -> void:
 				status = "no tonic"
 			"rest":
 				status = "rest prescribed"
-		lines.append("• %s · %s – %s · %s" % [tr(a["name"]), GameState.format_time(a["from"]), GameState.format_time(a["until"]), tr(status)])
+		lines.append("• %s · %s – %s · %s" % [tr(a["name"]), GameState.format_time(a["from"]), GameState.format_time(a["until"]), Lang.g(status, Lang.female_of(a["name"]))])
 	if lines.is_empty():
 		entries.text = tr("No appointments yet.") + "\n\n" + tr("Ask a sick patient to come to the clinic for a treatment.")
 	else:
@@ -569,7 +569,7 @@ func _build_suspects() -> void:
 		card.add_child(label)
 
 		var role := Label.new()
-		role.text = tr(npc.data.role) + ("" if npc.is_alive() else " · " + tr("deceased"))
+		role.text = tr(npc.data.role) + ("" if npc.is_alive() else " · " + Lang.g("deceased", npc.data.female))
 		role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		role.add_theme_color_override("font_color", Color(0.17, 0.15, 0.13, 0.7))
 		role.add_theme_font_size_override("font_size", 13)
@@ -1116,15 +1116,16 @@ func _open_chart(npc_name: String) -> void:
 
 	var exams: Array = npc.exams
 	var last: Dictionary = exams[-1] if not exams.is_empty() else {}
+	var fem: bool = npc.data.female  # Pálido / pálida in Portuguese and Spanish
 	var title_font := title.get_theme_font("font")
 
 	# Header lines
 	_line_text(tr(npc.data.npc_name), LINE_X, TOP_LINES[0], 44, title_font)
 	_line_text(tr(npc.data.role), LINE_X, TOP_LINES[1], 30)
 	if not npc.is_alive():
-		_line_text(tr("Deceased") + (" · " + tr("buried") if npc.buried else ""), LINE_X, TOP_LINES[2], 30, null, BLOOD_RED)
+		_line_text(Lang.g("Deceased", fem) + (" · " + Lang.g("buried", fem) if npc.buried else ""), LINE_X, TOP_LINES[2], 30, null, BLOOD_RED)
 	elif last.is_empty():
-		_line_text(tr("Not examined yet"), LINE_X, TOP_LINES[2], 30)
+		_line_text(Lang.g("Not examined yet", fem), LINE_X, TOP_LINES[2], 30)
 	else:
 		var age: int = GameState.day - int(last["day"])
 		var when := tr("today") if age == 0 else (tr("yesterday") if age == 1 else tr("%d days ago") % age)
@@ -1134,14 +1135,14 @@ func _open_chart(npc_name: String) -> void:
 	if not last.is_empty() and last["old_marks"]:
 		_line_text(tr("Old, healed punctures"), LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
 	elif npc.is_alive() and npc.marked and npc.talked_day >= npc.marked_day:
-		_line_text(tr("Visited at night: treat today!"), LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
+		_line_text(Lang.g("Visited at night: treat today!", fem), LINE_X, TOP_LINES[4], 28, null, BLOOD_RED)
 	if npc.is_alive():
-		_line_text(tr(npc.trust_word()), LINE_X, TOP_LINES[5], 28)
+		_line_text(Lang.g(npc.trust_word(), fem), LINE_X, TOP_LINES[5], 28)
 
 	# Vital signs boxes: pulse, temperature, appearance, sleep
 	var values := ["—", "—", "—", "—"]
 	if not last.is_empty():
-		values = [_tr_value(last["pulse"]), _tr_value(last["temp"]), _tr_value(last["look"]), _tr_value(last.get("sleep", "—"))]
+		values = [_tr_value(last["pulse"], fem), _tr_value(last["temp"], fem), _tr_value(last["look"], fem), _tr_value(last.get("sleep", "—"), fem)]
 	for i in 4:
 		var box: Rect2 = BOX_RECTS[i]
 		var label := _label(values[i], 28 if str(values[i]).length() <= 11 else 23)  # Long words shrink to fit
@@ -1186,11 +1187,11 @@ func _open_chart(npc_name: String) -> void:
 		if row >= NOTE_LINES.size():
 			break
 		var e: Dictionary = exams[i]
-		var note := tr("Day {day} · {look}, pulse {pulse}").format({"day": e["day"], "look": _tr_value(e["look"]), "pulse": _tr_value(e["pulse"])})
+		var note := tr("Day {day} · {look}, pulse {pulse}").format({"day": e["day"], "look": _tr_value(e["look"], fem), "pulse": _tr_value(e["pulse"], fem)})
 		if e["dead"]:
-			note = tr("Day {day} · found dead").format({"day": e["day"]})
+			note = Lang.g("Day {day} · found dead", fem).format({"day": e["day"]})
 		elif e.get("treated", false):
-			note = tr("Day {day} · Treated at the clinic, now {look}").format({"day": e["day"], "look": _tr_value(e["look"]).to_lower()})
+			note = Lang.g("Day {day} · Treated at the clinic, now {look}", fem).format({"day": e["day"], "look": _tr_value(e["look"], fem).to_lower()})
 		_line_text(note, NOTE_X, NOTE_LINES[row], 24)
 		row += 1
 
@@ -1273,14 +1274,14 @@ func _label(text: String, font_size: int, color := INK) -> Label:
 
 # Exam readings are stored in English ("88, quick", "chalk dust (wrist)"); show them in the
 # current language: the number stays, the words are translated.
-func _tr_value(value) -> String:
+func _tr_value(value, female := false) -> String:
 	var text := str(value)
 	if text.ends_with(" (wrist)"):
-		return _tr_value(text.trim_suffix(" (wrist)")) + " " + tr("(wrist)")
+		return _tr_value(text.trim_suffix(" (wrist)"), female) + " " + tr("(wrist)")
 	var comma := text.find(", ")
 	if comma > 0 and text.left(comma).is_valid_int():
 		return text.left(comma) + ", " + tr(text.substr(comma + 2))
-	return tr(text)
+	return Lang.g(text, female)
 
 
 # ---------- The old doctor's diary ----------

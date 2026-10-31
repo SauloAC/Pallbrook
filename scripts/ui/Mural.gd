@@ -232,7 +232,7 @@ func _collect_cases() -> void:
 		if int(attack["night"]) <= 0:
 			c["lines"].append(tr("Before you came: {name} died").format({"name": tr(attack["victim"])}))
 		else:
-			c["lines"].append(tr("Night {night}: {name} was attacked").format({"night": attack["night"], "name": tr(attack["victim"])}))
+			c["lines"].append(Lang.g("Night {night}: {name} was attacked", Lang.female_of(attack["victim"])).format({"night": attack["night"], "name": tr(attack["victim"])}))
 		by_home[home] = c
 	# Bites the doctor found himself, the first time for each patient
 	for npc in get_tree().get_nodes_in_group("npcs"):
