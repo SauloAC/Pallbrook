@@ -212,7 +212,7 @@ func finish_restore() -> void:
 
 # ---------- Copying fields ----------
 
-static func pack(obj: Object, props: Array) -> Dictionary:
+func pack(obj: Object, props: Array) -> Dictionary:
 	var out := {}
 	for prop: String in props:
 		var value = obj.get(prop)
@@ -221,7 +221,7 @@ static func pack(obj: Object, props: Array) -> Dictionary:
 
 
 # Typed arrays (Array[Dictionary], Array[String]) are refilled in place so they keep their type
-static func unpack(obj: Object, saved: Dictionary) -> void:
+func unpack(obj: Object, saved: Dictionary) -> void:
 	for prop: String in saved:
 		if not prop in obj:
 			continue  # A field from an older build
