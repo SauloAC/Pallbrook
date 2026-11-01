@@ -15,7 +15,7 @@ const ALL := ""
 const EVIDENCE := "#evidence"
 const APPOINTMENTS := "#appointments"
 const CHART_PICK := "#chart"  # Waiting for the player to pick whose chart to open
-const READING_TIME_SCALE := 0.25  # How fast the world runs while the casebook is open
+const READING_TIME_SCALE := 0.0  # The world stops while the casebook is open (so many things cost hours now)
 const SUPPLIES := "#supplies"  # Coins, tonics, and how to get more
 const NIGHTS := "#nights"      # Who was where each night, and the cross-check
 const DIARY := "#diary"        # The old doctor's sheets (filled in a later step)
@@ -170,6 +170,8 @@ func _input(event: InputEvent) -> void:
 		chart_layer.visible = false  # Back to the casebook first
 	elif panel.visible:
 		_close()
+	elif GameState.chased:
+		Settings.show_toast(tr("No time to read: it is right behind you."))  # A stopped clock would end every chase
 	elif not GameState.in_dialogue and not get_tree().paused:
 		_open()
 	get_viewport().set_input_as_handled()
@@ -180,8 +182,7 @@ func _open() -> void:
 	panel.visible = true
 	ribbon_box.visible = true
 	Audio.play("book_open", -4.0)
-	# Time doesn't stop while reading, it slows down: thinking is cheap, but not free.
-	# 0 = full pause, 1 = normal speed.
+	# Time stops while reading (1 Nov: the day is full of things that cost hours; thinking is free).
 	GameState.reading = true
 	Engine.time_scale = READING_TIME_SCALE
 	Playtest.reading_started()

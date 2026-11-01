@@ -17,7 +17,7 @@ const FRAME_INNER := Rect2(0.185, 0.195, 0.62, 0.59)  # The cork inside the fram
 const PIN_TIP := Vector2(0.2, 0.97)                   # Where the needle ends, as a share of the pin image
 const TACK_TIP := Vector2(0.25, 0.97)
 const HAND_FONT := "res://assets/fonts/Caveat/Caveat-Regular.ttf"
-const READING_TIME_SCALE := 0.25  # Same as the casebook: thinking is cheap, but not free
+const READING_TIME_SCALE := 0.0  # Same as the casebook: the world stops while he thinks
 # The part of town the map shows, in world x and z (rendered from town.blend, art_source/mural)
 const MAP_X := Vector2(-26.0, 20.0)
 const MAP_Z := Vector2(-38.0, 26.0)  # North edge, south edge

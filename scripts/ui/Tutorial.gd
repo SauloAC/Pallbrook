@@ -17,7 +17,7 @@ const STEPS := [
 	["mural", "At the clinic, study the map on the back wall (E). Every case in town gets pinned there."],
 	["night", "Night falls at 6 PM. Watch the streets if you dare, but be back at the clinic before 1 AM and sleep in your bed (E)."],
 	["alibi", "A new day. Ask people where they were last night: their answers fill the Nights bookmark, where you can compare them."],
-	["done", "From here on you are on your own. When you are sure who it is, call a hearing (Q)."],
+	["done", "From here on you are on your own. Look after your patients and keep your eyes open: this anemia is not like any you have seen."],
 ]
 const NIGHT_STEP := 7
 const DONE_SHOWN := 12.0   # Seconds the last note stays up

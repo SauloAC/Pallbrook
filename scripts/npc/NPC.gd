@@ -804,6 +804,7 @@ func _check_seen_by_doctor() -> void:
 		GameState.saw_hunting[data.npc_name] = nights
 		SaveGame.remember(["saw_hunting"])  # He can't unsee it, even by closing the game
 		SaveGame.remember_entry(clue)
+		GameState.notice_sign("seen")
 
 # ---------- Schedule ----------
 
@@ -1207,6 +1208,18 @@ func answer_seen() -> String:
 	return text
 
 
+# The doctor saw the small wounds on an earlier day, and now there is a new one: a sign (act 1).
+# Only following one patient over days shows it, so it can't come from the first exams.
+func _fresh_marks(record: Dictionary) -> bool:
+	if not record.get("marks", false):
+		return false
+	for earlier: Dictionary in exams:
+		if earlier.get("marks", false) and earlier.has("bites") and int(earlier["day"]) < GameState.day \
+				and int(earlier["bites"]) < int(record["bites"]):
+			return true
+	return false
+
+
 # Whether an exam would actually happen now (the dialogue spends the hour before asking)
 func can_examine() -> bool:
 	return not is_wary() and not (cared_day == GameState.day and not exams.is_empty())
@@ -1237,6 +1250,9 @@ func answer_exam() -> String:
 		GameState.coins += GameState.EXAM_FEE  # The patient pays for the visit
 	record["day"] = GameState.day
 	record["marked"] = marked
+	record["bites"] = bite_spots.size()
+	if _fresh_marks(record):
+		GameState.notice_sign("marks")  # New wounds in the same place: no insect does that
 	exams.append(record)
 	if not GameState.casebook_hint_shown:
 		GameState.casebook_hint_shown = true

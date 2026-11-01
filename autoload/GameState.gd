@@ -10,6 +10,11 @@ var reading := false               # The casebook is open: the world slows down 
 var casebook_hint_shown := false   # The first exam points the player to the casebook
 var vampire_name := ""
 var case_id := ""                # Tells this case's save from another's (see SaveGame)
+# The story's act (see the design doc, "Os três atos"). 1: a new doctor and a strange anemia;
+# 2: it is no sickness; 3: the hunt. Act 2 starts the morning after the doctor's first sign
+# (see notice_sign), or after the first death, on night 6 at the latest (VampireDirector).
+var act := 1
+var sign_day := -1               # Act 1: the day he first found a sign it is no sickness
 var clues: Array[String] = []
 # The casebook: {text, kind ("testimony" or "evidence"), day, people (names mentioned)}
 var entries: Array[Dictionary] = []
@@ -90,6 +95,8 @@ func reset() -> void:
 	game_over = false
 	vampire_name = ""
 	case_id = ""
+	act = 1
+	sign_day = -1
 	weather = "clear"
 	open_building = ""
 	open_upstairs = false
@@ -172,7 +179,18 @@ func attack_at(night: int, place: String) -> String:
 	return ""
 
 
+# Something no fever explains: the figure seen up close at night, a whole diary sheet, the same
+# marks in two exams. The first one opens act 2 the next morning.
+func notice_sign(kind: String) -> void:
+	if act != 1 or sign_day >= 0:
+		return
+	sign_day = day
+	Playtest.log_line("First sign it is no sickness: " + kind)
+	SaveGame.remember(["sign_day"])  # Closing the game won't make him forget it
+
+
 func learn(topic: String) -> void:
+	notice_sign("diary")
 	if not lore.has(topic):
 		lore[topic] = day
 		Playtest.count("learned_" + topic)

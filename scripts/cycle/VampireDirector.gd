@@ -35,6 +35,11 @@ var hunt_victim: Node = null
 # 3. It reaches him: the game ends.
 const CHASE_TRIGGER := 7.0     # Mutual sighting closer than this starts the chase
 const CATCH_RANGE := 1.1       # Contact, or as good as
+# Act 1 (see GameState.act): it feeds lightly, kills nobody, turns nobody, and runs from the
+# doctor instead of chasing him. If he has found no sign by then, night 6 brings the first death.
+const ACT1_LAST_NIGHT := 6
+const ACT1_FLOOR := 20.0       # Act 1 bites never take anyone below this
+var killed_tonight := ""       # Who died tonight (the first death opens act 2)
 const COME_AFTER_CHASE := 3   # The night it comes for a doctor who got away: two nights to bring it to a hearing
 const LOSE_SECONDS := 4.0      # Out of its sight this long and it gives up
 const SAFE_GIVE_UP := 8.0      # Waiting at the edge of a safe place this long, then it leaves
@@ -149,6 +154,7 @@ func _on_phase_changed(is_night: bool) -> void:
 	if is_night:
 		acted_tonight = false
 		chased_tonight = false
+		killed_tonight = ""
 		fed_tonight = false
 		frenzy_tonight = _frenzied()
 		# Two nights after it learned his face (and he didn't bring it to justice), it comes for him
@@ -179,6 +185,27 @@ func _on_phase_changed(is_night: bool) -> void:
 	_home_by_sunrise()
 	# Every day without enough blood leaves the vampire hungrier
 	vampire.set_hunger(vampire.blood - hunger_per_day)
+	_check_act_two()
+
+
+# Act 2 begins the morning after the doctor's first sign, or after the first death
+func _check_act_two() -> void:
+	if GameState.act != 1:
+		return
+	var night := GameState.day - 1
+	var found_sign := GameState.sign_day >= 0 and GameState.sign_day < GameState.day
+	if not found_sign and killed_tonight == "" and night < ACT1_LAST_NIGHT:
+		return
+	GameState.act = 2
+	if killed_tonight != "":
+		GameState.add_night_event(_t("{name}'s body has two small wounds on the neck, close together. No fever leaves marks like that. Whatever is happening in Pallbrook, it is not a sickness.", {"name": tr(killed_tonight)}))
+	elif found_sign:
+		GameState.add_night_event(tr("You lay awake going over what you found. Whatever is taking Pallbrook's blood, it is not a fever."))
+	else:
+		GameState.add_night_event(tr("Another night of shadows in the streets, another patient weaker by morning. Whatever is taking Pallbrook's blood, it is not a fever."))
+	GameState.add_night_event(tr("If you come to suspect someone, you can now call the town to a hearing against them (Q)."))
+	Playtest.count("act2_by_" + ("death" if killed_tonight != "" else ("sign" if found_sign else "time")))
+	Playtest.log_line("Act 2 begins")
 
 
 # The sun is up. Out in the street (still coming back from the hunt, or held up by the doctor),
@@ -219,7 +246,7 @@ func _hungry() -> bool:
 
 
 func _frenzied() -> bool:
-	return vampire.blood < frenzy_level
+	return GameState.act >= 2 and vampire.blood < frenzy_level  # Act 1: it keeps itself in check
 
 
 func _process(_delta: float) -> void:
@@ -229,7 +256,10 @@ func _process(_delta: float) -> void:
 	if not chasing and not chased_tonight and vampire.state == vampire.State.HUNTING and vampire.witnessed and vampire.noticed_doctor:
 		var player := get_tree().get_first_node_in_group("player") as Node3D
 		if player and vampire.global_position.distance_to(player.global_position) < CHASE_TRIGGER:
-			_start_chase()
+			if GameState.act == 1:
+				_flee_from_doctor()  # Act 1: it won't show what it is yet
+			else:
+				_start_chase()
 			return
 	if acted_tonight or hunting:
 		return
@@ -291,6 +321,16 @@ func _run_hunt(victim: Node) -> void:
 	_resolve_attack(victim)
 	vampire.end_hunt()
 	hunting = false
+
+
+# Act 1, face to face with the doctor: it turns and runs home. He saw it (a sign).
+func _flee_from_doctor() -> void:
+	chased_tonight = true  # Once a night is enough
+	acted_tonight = true
+	Playtest.count("vampire_fled_act1")
+	Playtest.log_line("Act 1: the vampire fled from the doctor")
+	GameState.notice_sign("seen")
+	_abort_hunt(tr("A figure in the dark street turned and fled when it saw the doctor."))
 
 
 func _abort_hunt(event := "") -> void:
@@ -381,6 +421,9 @@ func _resolve_attack(victim: Node) -> void:
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc != victim and npc.is_alive() and not npc.is_servant:
 			others += 1
+	var act1 := GameState.act == 1
+	if act1:
+		victim.marked = false  # Act 1: it turns nobody
 	# A marked person who was not saved during the day is turned now (if there is room:
 	# otherwise the mark fades and it simply feeds)
 	if victim.marked and _servant_slots(victim) <= 0:
@@ -404,12 +447,17 @@ func _resolve_attack(victim: Node) -> void:
 		amount *= 2.0  # Hungry: takes twice the blood
 	fed_tonight = true
 	var had: float = victim.blood
+	if act1 and night >= ACT1_LAST_NIGHT:
+		amount = had + 1.0  # The doctor found nothing in time: the first death
+	elif act1:
+		amount = minf(amount, maxf(had - ACT1_FLOOR, 0.0))  # Weaker, never dead
 	# In a frenzy it is careless: the trace always points to the real vampire
 	var died: bool = victim.feed(amount, vampire.data.clue_trait if frenzy else _pick_trace(victim))
 	vampire.set_hunger(vampire.blood + minf(amount, had) * blood_gain)
 	if died or frenzy:
 		GameState.record_attack(night, victim_name, victim.data.home)  # Everyone heard of it
 	if died:
+		killed_tonight = victim_name
 		GameState.add_night_event(_t("{name} was found dead at their doorstep.", shown))
 		GameState.add_clue(_t("Morning of Day {day}: {name} died during the night.", shown), "evidence", morning)
 		EventBus.npc_died.emit(victim_name)
@@ -417,12 +465,12 @@ func _resolve_attack(victim: Node) -> void:
 		# No patience to turn anyone: it just feeds, and not quietly
 		GameState.add_night_event(tr("Screams were heard in the night. Someone woke up torn and gravely weak."))
 		GameState.add_clue(_t("Morning of Day {day}: screams were heard near {name}'s house.", shown), "evidence", morning)
-	elif others > 0 and _servant_slots() > 0 and randf() < servant_chance and victim.affinity >= 60.0:
+	elif not act1 and others > 0 and _servant_slots() > 0 and randf() < servant_chance and victim.affinity >= 60.0:
 		# They trust the doctor: marked, with one day to warn him
 		victim.marked = true
 		victim.marked_day = morning
 		GameState.add_night_event(tr("Somewhere in Pallbrook, someone woke up weaker than they went to bed."))
-	elif others > 0 and _servant_slots() > 0 and randf() < servant_chance:
+	elif not act1 and others > 0 and _servant_slots() > 0 and randf() < servant_chance:
 		# Sometimes the bite turns them (only if someone else is left to hunt)
 		victim.make_servant()
 		Playtest.count("servants_made")

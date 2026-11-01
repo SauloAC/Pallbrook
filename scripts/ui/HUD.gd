@@ -9,7 +9,7 @@ const ICON_SLEEP := preload("res://assets/ui/icon_sleep.png")
 const ICON_ACCUSE := preload("res://assets/ui/icon_accuse.png")
 const ICON_BOOK := preload("res://assets/ui/casebook.png")
 
-var accuse_hint: Control  # Hidden on Day 1: no accusations yet
+var accuse_hint: Control  # Hidden in act 1: no accusations yet
 var hidden_note: Label    # Shown while the doctor is hidden in a bush or tall grass
 var chase_note: Label     # Shown while the vampire is chasing him
 var doom_note: Label      # It knows his face: nights left before it comes for him
@@ -97,7 +97,7 @@ func _process(_delta: float) -> void:
 	else:
 		doom_note.add_theme_color_override("font_color", Color(0.9, 0.35, 0.3))
 	controls.visible = not GameState.in_dialogue
-	accuse_hint.visible = GameState.day >= 2
+	accuse_hint.visible = GameState.act >= 2  # Act 1: nobody to accuse yet
 
 
 # One control hint: [icon] KEY Action
