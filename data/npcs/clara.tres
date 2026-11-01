@@ -10,13 +10,13 @@ female = true
 role = "Seamstress"
 color = Color(3.272891e-06, 0.499933, 0.763627, 1)
 schedule = Dictionary[int, String]({
-7: "Casa1",
+7: "CasaClara",
 10: "Praca",
-13: "Casa1",
+13: "CasaClara",
 19: "Taverna",
-22: "Casa1"
+22: "CasaClara"
 })
-home = "Casa1"
+home = "CasaClara"
 dialogue_lines = Array[String](["I’m sewing my mourning dress. My Jonas... they found him at our door last week, white as wax.", "Father Elias buried him beyond the bridge. By then the old doctor was already gone.", "I don’t go out after dark. No one should. Not anymore."])
 clue_trait = "loose threads"
 portrait = ExtResource("1_u435y")

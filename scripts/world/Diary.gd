@@ -17,7 +17,7 @@ extends Node
 const TEXT := preload("res://scripts/data/DiaryText.gd")
 const NPC_SCRIPT := preload("res://scripts/npc/NPC.gd")
 const PIECE := preload("res://scripts/world/DiaryPiece.gd")
-const HOUSES := ["Casa1", "CasaSophia", "CasaSarah", "CasaHugo"]
+const HOUSES := ["Casa1", "CasaSophia", "CasaSarah", "CasaHugo", "CasaClara"]
 # Places with no location marker
 const SPOTS := {"#bridge": Vector3(-7.6, 0.0, -13.6), "#cemetery": Vector3(-19.5, 0.0, -4.0)}
 const LAST_PAGE_NAMES_THE_VAMPIRE := 0.6  # How often the old doctor guessed right

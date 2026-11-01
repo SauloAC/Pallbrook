@@ -6,7 +6,7 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
 const OPEN_AIR_PLACES := ["Praca"]
 # Walk-in buildings: people stay visible inside (the roof opens when the doctor enters)
 const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Escola", "Igreja", "Casa2",
-		"Casa1", "CasaSophia", "CasaSarah", "CasaHugo"]
+		"Casa1", "CasaSophia", "CasaSarah", "CasaHugo", "CasaJohn", "CasaSebastian", "CasaClara", "Padaria", "Fazenda"]
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -143,6 +143,12 @@ const INTERIOR_SLOTS := {
 	"CasaSophia": [Vector3(-1.2, 0.0, -2.0), Vector3(-1.8, 0.0, -2.4), Vector3(-0.6, 0.0, -1.7)],
 	"CasaSarah": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],
 	"CasaHugo": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],
+	# The north row, the bakery and the farm (1 Nov) copy older houses: the same rooms and spots
+	"CasaJohn": [Vector3(-1.2, 0.0, -2.0), Vector3(-1.8, 0.0, -2.4), Vector3(-0.6, 0.0, -1.7)],  # as CasaSophia
+	"CasaSebastian": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],  # as CasaSarah
+	"CasaClara": [Vector3(0.6, 0.0, -2.2), Vector3(-0.4, 0.0, -1.9), Vector3(0.2, 0.0, -2.9)],  # as Casa1
+	"Padaria": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],  # as CasaSarah
+	"Fazenda": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],  # as CasaHugo
 	# Tomas's forge (marker at the house door): beside the anvil, at the hearth, in front of the anvil
 	"Casa2": [
 		Vector3(4.1, 0.0, -1.9), Vector3(4.25, 0.0, -2.3), Vector3(2.6, 0.0, -0.6), Vector3(3.4, 0.0, -0.6),
@@ -189,6 +195,11 @@ const BED_SPOTS := {
 	"CasaSophia": [Vector3(-1.0, 0.0, -3.7), 90.0],
 	"CasaSarah": [Vector3(2.55, 0.0, -3.8), 90.0],
 	"CasaHugo": [Vector3(2.7, 0.0, -3.8), 90.0],
+	"CasaJohn": [Vector3(-1.0, 0.0, -3.7), 90.0],
+	"CasaSebastian": [Vector3(2.55, 0.0, -3.8), 90.0],
+	"CasaClara": [Vector3(2.15, 0.0, -2.75), 0.0],
+	"Padaria": [Vector3(2.55, 0.0, -3.8), 90.0],
+	"Fazenda": [Vector3(2.7, 0.0, -3.8), 90.0],
 	"Taverna": [Vector3(1.45, 3.12, -6.85), -90.0],  # Marta sleeps upstairs, by the window (feet at the foot of the bed, head to the wall)
 }
 const BED_HEIGHT := 0.6

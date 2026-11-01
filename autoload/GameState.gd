@@ -410,11 +410,16 @@ const PLACE_NAMES := {
 	"Prefeitura": "the Town Hall",
 	"Biblioteca": "the Library",
 	"Praca": "the square",
-	"Casa1": "Clara's house",
+	"Casa1": "the parish house",      # Father Elias's since 1 Nov (Clara moved after Jonas died at its door)
 	"Casa2": "Tomas's forge",
 	"CasaSophia": "Sophia's house",
 	"CasaSarah": "Sarah's house",
 	"CasaHugo": "the Mayor's house",
+	"CasaJohn": "John's house",
+	"CasaSebastian": "Sebastian's house",
+	"CasaClara": "Clara's house",
+	"Padaria": "the bakery",
+	"Fazenda": "Ada's farm",
 }
 
 
