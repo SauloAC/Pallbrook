@@ -60,6 +60,8 @@ func _choose_vampire() -> void:
 	GameState.vampire_name = vampire.data.npc_name
 	vampire.set_hunger(randf_range(95.0, 100.0))  # Fed well just before the doctor came: Jonas
 	_seed_outbreak()
+	var residents: Array = npcs.map(func(n): return n.data.npc_name)
+	GameState.history = TownHistory.generate(GameState.vampire_name, residents)  # The past, to fit the vampire
 	GameState.record_attack(0, LAST_VICTIM, "Casa1")  # The last death before the doctor arrived
 	_dig_last_grave.call_deferred()
 	safe_zones = SafeZones.new()
@@ -72,6 +74,12 @@ func _choose_vampire() -> void:
 	add_child(ClinicMural.new())  # The outbreak map on the clinic wall
 	add_child(Merchant.new())  # Gideon's stall in front of the cemetery, beyond the bridge
 	add_child(StudyBook.new())  # The materia medica in the library: how to make the tonic
+	for book in ["hall", "church"]:  # The Town Hall register and the church burial book
+		var records := RecordBook.new()
+		records.kind = book
+		add_child(records)
+	add_child(Lunch.new())  # Noon at the tavern: the town talks, the doctor listens
+	add_child(Nap.new())  # An afternoon nap in the clinic bed: an hour more on his feet tonight
 	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
 
 

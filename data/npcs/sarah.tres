@@ -11,7 +11,7 @@ role = "Teacher"
 color = Color(0.24313726, 0.49019608, 0.47058824, 1)
 schedule = Dictionary[int, String]({
 7: "Escola",
-12: "Praca",
+12: "Taverna",
 13: "Escola",
 16: "Biblioteca",
 19: "CasaSarah"

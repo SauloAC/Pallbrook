@@ -425,7 +425,22 @@ func _draw_overlay() -> void:
 			overlay.draw_circle(at, 9.0, Color(color, fade))
 		var label: String = c["label"]
 		var size := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 20)
-		var box := Rect2(head + Vector2(10, -size.y * 0.5 - 2), size + Vector2(10, 4))
+		# Beside the pin's head, on whichever side is clear of the place tags and other cases
+		var box_size := size + Vector2(10, 4)
+		var box := Rect2(head + Vector2(10, -box_size.y * 0.5), box_size)
+		for spot: Vector2 in [Vector2(10, -box_size.y * 0.5), Vector2(-10 - box_size.x, -box_size.y * 0.5),
+				Vector2(-box_size.x * 0.5, -box_size.y - 12), Vector2(10, -box_size.y - 10), Vector2(-10 - box_size.x, -box_size.y - 10),
+				Vector2(10, 8), Vector2(-10 - box_size.x, 8)]:
+			var tried := Rect2(head + spot, box_size)
+			var clear := true
+			for other in placed_tags:
+				if other.grow(2.0).intersects(tried):
+					clear = false
+					break
+			if clear:
+				box = tried
+				break
+		placed_tags.append(box)
 		overlay.draw_rect(box, Color(0.97, 0.94, 0.86, fade))
 		overlay.draw_rect(box, Color(color, fade), false, 1.5)
 		overlay.draw_string(font, box.position + Vector2(5, size.y - 4), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(INK, fade))

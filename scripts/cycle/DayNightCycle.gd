@@ -99,9 +99,13 @@ func _update_lighting() -> void:
 			env.fog_height_density = fog_height_density
 
 func _update_exhaustion() -> void:
-	# Only between midnight and sunrise
-	if GameState.is_night and hour >= exhaustion_start_hour and hour < day_start_hour:
-		var progress := (hour - exhaustion_start_hour) / (collapse_hour - exhaustion_start_hour)
+	# Only from midnight (earlier after a collapse: the fatigue debt) until sunrise.
+	# Hours after midnight count past 24 so the window can start the evening before.
+	var night_hour := hour if hour >= 12.0 else hour + 24.0
+	var start := 24.0 + exhaustion_start_hour - GameState.fatigue_debt
+	var fall := 24.0 + collapse_hour - GameState.fatigue_debt
+	if GameState.is_night and night_hour >= start and night_hour < 24.0 + day_start_hour:
+		var progress := (night_hour - start) / (fall - start)
 		GameState.exhaustion = clampf(progress, 0.0, 1.0)
 		if GameState.exhaustion >= 1.0 and not is_collapsing:
 			_collapse()
@@ -127,6 +131,10 @@ func _collapse() -> void:
 	else:
 		GameState.add_night_event(Lang.contract(tr("You collapsed in the street. {who} found you there at dawn.").format(args)))
 	GameState.collapsed_in_street = true
+	# A night on the floor: tomorrow night he tires an hour earlier (two at most), until he sleeps in a bed
+	GameState.fatigue_debt = minf(maxf(GameState.fatigue_debt, 0.0) + 1.0, 2.0)  # A nap's banked hour is lost too
+	GameState.add_night_event(tr("You woke up aching all over. Tonight you will tire an hour earlier; a night in your bed will set it right.") if GameState.fatigue_debt < 2.0
+			else tr("You woke up aching all over. Two nights on the floor: tonight you will tire two hours earlier. Sleep in your bed."))
 	EventBus.player_collapsed.emit()
 	_skip_to_morning()
 
@@ -137,6 +145,7 @@ func _on_player_slept() -> void:
 		EventBus.game_ended.emit(false, tr("It came for you at the clinic while you slept. Pallbrook will need another doctor."))
 		return
 	GameState.add_night_event(tr("You slept at the clinic."))
+	GameState.fatigue_debt = 0.0  # A real night's sleep
 	_skip_to_morning()  # Slept safely: no consequence
 
 func _safe_here() -> bool:

@@ -53,7 +53,10 @@ func _ready() -> void:
 	visual.position.y = -1.0  # The doctor's body origin sits at the capsule's center
 	if visual.setup("Doctor"):
 		$MeshInstance3D.visible = false
-		_add_silhouette(visual.meshes)
+		if visual.sprite:
+			visual.make_xray(SILHOUETTE_COLOR)  # Pixel-art test body: its own outline
+		else:
+			_add_silhouette(visual.meshes)
 	else:
 		visual.queue_free()
 		visual = null
@@ -103,6 +106,7 @@ func _set_cover(inside: bool) -> void:
 		Audio.play("rustle", -12.0, 0.3, 0.1)
 	# See-through while hidden, so the player knows (the HUD also says "Hidden")
 	if visual:
+		visual.set_see_through(HIDE_TRANSPARENCY if is_hidden() else 0.0)
 		for mi in visual.meshes:
 			mi.transparency = HIDE_TRANSPARENCY if is_hidden() else 0.0
 

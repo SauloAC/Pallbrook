@@ -12,7 +12,7 @@ color = Color(0.72156864, 0.58431375, 0.18039216, 1)
 schedule = Dictionary[int, String]({
 7: "CasaSophia",
 8: "Biblioteca",
-12: "Praca",
+12: "Taverna",
 13: "Biblioteca",
 18: "Taverna",
 21: "CasaSophia"

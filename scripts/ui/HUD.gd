@@ -18,6 +18,7 @@ var doom_note: Label      # It knows his face: nights left before it comes for h
 func _ready() -> void:
 	_build_hints()
 	add_child(Tutorial.new())  # The guided first day (top-right corner)
+	add_child(Hints.new())  # One-time tips for the optional daytime activities (below it)
 	hidden_note = Label.new()
 	hidden_note.position = Vector2(20.0, 38.0)  # Just under the clock
 	hidden_note.add_theme_font_size_override("font_size", 18)

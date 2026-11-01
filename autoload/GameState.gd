@@ -63,6 +63,11 @@ var tonics_ordered := 0  # Steeping at the clinic: ready tomorrow morning
 var ingredients := 0     # Sets bought from the merchant, one per tonic
 var knows_tonic := false # Learned the recipe at the library
 var merchant := {}       # {day: last visit, told: pieces of his story told}
+var history := {}        # The town's past for this run (TownHistory): deaths and who came when
+var records_read := {}   # "hall" / "church" -> day the doctor first went through that book
+var lunch := {}          # Tavern lunch: {day: last lunch, seen: exchanges already heard, garlic_hater}
+var fatigue_debt := 0.0  # Hours the doctor tires earlier tonight: collapsing outside a bed costs one (max two); the bed clears it
+var hints_seen := {}     # One-time tips already shown (like the tutorial, survives restarts)
 var pending_hours := 0.0 # Time a conversation used up (an exam): passes when the talk ends
 
 func reset() -> void:
@@ -89,6 +94,10 @@ func reset() -> void:
 	ingredients = 0
 	knows_tonic = false
 	merchant = {}
+	history = {}
+	records_read = {}
+	lunch = {}
+	fatigue_debt = 0.0
 	pending_hours = 0.0
 	entries.clear()
 	appointments.clear()
