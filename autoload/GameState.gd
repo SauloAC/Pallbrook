@@ -56,11 +56,16 @@ var near_mural := false         # Standing at the wall (the cabinet's prompt giv
 # ---------- The doctor's purse ----------
 const SALARY := 3        # Paid by the Town Hall every morning
 const EXAM_FEE := 1      # Each patient pays for their first exam of the day
-const TONIC_PRICE := 4   # Ingredients for one iron tonic, ordered from the clinic cabinet
 var coins := 4
-var tonics := 1          # Ready to give at the clinic
+const START_ITEMS := {"tonic": 1, "bandage": 2, "syrup": 1, "willow_tea": 1}  # What the old doctor left in the cabinet
+var items := START_ITEMS.duplicate()  # The clinic cabinet: ingredient and remedy id -> count (see Items)
+var tonics: int:         # Ready to give at the clinic (kept as a name: many places count them)
+	get:
+		return int(items.get("tonic", 0))
+	set(value):
+		items["tonic"] = maxi(value, 0)
 var tonics_ordered := 0  # Steeping at the clinic: ready tomorrow morning
-var ingredients := 0     # Sets bought from the merchant, one per tonic
+var gathered := {}       # Gathering spot -> last day the doctor gathered there (see Gathering)
 var knows_tonic := false # Learned the recipe at the library
 var merchant := {}       # {day: last visit, told: pieces of his story told}
 var history := {}        # The town's past for this run (TownHistory): deaths and who came when
@@ -89,9 +94,9 @@ func reset() -> void:
 	night_events.clear()
 	clues.clear()
 	coins = 4
-	tonics = 1
+	items = START_ITEMS.duplicate()
 	tonics_ordered = 0
-	ingredients = 0
+	gathered = {}
 	knows_tonic = false
 	merchant = {}
 	history = {}
@@ -393,31 +398,55 @@ func last_night() -> int:
 	return day - 1
 
 
-func buy_ingredients(count: int) -> bool:
-	if count < 1 or coins < TONIC_PRICE * count:
+# ---------- The cabinet: ingredients and remedies (see Items) ----------
+
+func item_count(id: String) -> int:
+	return int(items.get(id, 0))
+
+
+func add_item(id: String, count := 1) -> void:
+	items[id] = item_count(id) + count
+
+
+func take_item(id: String, count := 1) -> bool:
+	if item_count(id) < count:
 		return false
-	coins -= TONIC_PRICE * count
-	ingredients += count
-	Playtest.count("ingredients_bought")
+	items[id] = item_count(id) - count
 	return true
 
 
-# Preparing tonics at the clinic: they steep overnight
-func brew_tonics(count: int) -> bool:
-	if not knows_tonic or count < 1 or count > ingredients:
+# Buying from Gideon
+func buy(id: String, count: int) -> bool:
+	var price: int = Items.INGREDIENTS[id]["price"] * count
+	if count < 1 or price <= 0 or coins < price:
 		return false
-	ingredients -= count
-	tonics_ordered += count
-	for i in count:
-		Playtest.count("tonics_brewed")
+	coins -= price
+	add_item(id, count)
+	Playtest.count("bought_" + id, count)
 	return true
 
 
-func order_tonic(count := 1) -> bool:
-	if count < 1 or coins < TONIC_PRICE * count:
+# How many batches of a remedy the cabinet has ingredients for
+func batches_possible(remedy: String) -> int:
+	var most := 999
+	var needs: Dictionary = Items.REMEDIES[remedy]["needs"]
+	for ing: String in needs:
+		most = mini(most, floori(item_count(ing) / float(needs[ing])))
+	return most
+
+
+# Preparing at the clinic cabinet. The tonic steeps overnight; the rest are ready at once.
+func make(remedy: String, batches: int) -> bool:
+	var recipe: Dictionary = Items.REMEDIES[remedy]
+	if batches < 1 or batches > batches_possible(remedy) or (recipe.get("learned", false) and not knows_tonic):
 		return false
-	coins -= TONIC_PRICE * count
-	tonics_ordered += count
-	for i in count:
-		Playtest.count("tonics_ordered")
+	var needs: Dictionary = recipe["needs"]
+	for ing: String in needs:
+		take_item(ing, needs[ing] * batches)
+	var made: int = recipe["makes"] * batches
+	if recipe.get("overnight", false):
+		tonics_ordered += made
+	else:
+		add_item(remedy, made)
+	Playtest.count("made_" + remedy, made)
 	return true

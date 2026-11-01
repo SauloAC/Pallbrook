@@ -21,9 +21,21 @@ English, Português (Brasil), Español, 日本語 · built in Godot 4.7 with GDS
   night — but being seen out late changes how the town treats you.
 - **Clues:** a bite mark marks a victim, not the vampire. Contradictions only count once
   *you* compare two statements and find them.
-- **The hearing:** accuse someone in front of the town, present your evidence and let
-  them vote. You get two hearings per run. Convict an innocent and you pay for it;
-  fail against the real vampire and it comes for you.
+- **Daytime is time you spend:** read the Town Hall register and the church burial book,
+  sit at the tavern at noon and overhear the town, learn the iron tonic at the library,
+  buy its ingredients from the merchant beyond the bridge and brew it at the clinic,
+  treat patients who come by appointment, or take an afternoon nap to last longer tonight.
+- **The old doctor's diary:** your predecessor's torn pages are hidden around town, a few
+  each day. The clinic wall holds an outbreak map where every case gets pinned.
+- **Exhaustion:** sleep in your clinic bed at night. Collapse in the street instead and
+  you tire earlier the next night. You can hide in bushes and tall grass when chased.
+- **The hearing:** accuse someone in front of the town and let them vote. The town wants
+  a full case (three pieces of evidence and two witnesses who speak up) unless they
+  trust you deeply. You get two hearings per run. Convict an innocent and you pay for
+  it; fail against the real vampire and it comes for you. Convict the vampire and its
+  servants go free.
+- **The first day is guided:** a short tutorial walks you through the clinic, the casebook,
+  an exam and your first night.
 
 ## What's interesting under the hood
 
@@ -34,6 +46,14 @@ foggy days as an ordinary person; starving, it bites twice as hard and turns rec
 Every number that shapes a run — hunt hours, bite size, hunger, how often a clue points
 to the real culprit — is an exported variable, so balance changes happen in the
 inspector, not in code.
+
+### A past written to fit the culprit
+`TownHistory` writes the town's last forty years at the start of each run, after the
+vampire is chosen: the pale deaths begin the year it settled in Pallbrook, and two
+innocents arrived around the same time. The Town Hall register narrows the list without
+naming anyone; the church book, which the priest only shows once he trusts you, pins
+down when it began. If the priest is the vampire, he shows it all the same, with
+harmless notes where the pale deaths should be.
 
 ### Systems that don't know about each other
 Global signals live in one `EventBus` autoload (`phase_changed`, `npc_died`,
@@ -47,9 +67,11 @@ an hour-by-hour schedule, dialogue, a clue trait and a portrait. Adding a charac
 `NPC.gd`.
 
 ### Four languages from one table
-Every line on screen is a key in `localization/strings.csv` (~650 keys × EN, JA, PT-BR,
+Every line on screen is a key in `localization/strings.csv` (~700 keys × EN, JA, PT-BR,
 ES), served through Godot's translation server and a small `Lang` autoload. The game
-starts in the system language and can switch from the title screen. The Japanese build
+starts in the system language and can switch from the title screen. Portuguese and
+Spanish need grammatical gender (*cansado / cansada*), so lines about a woman have their
+own feminine row, picked by `Lang.g()`. The Japanese build
 exists because Japanese-speaking friends asked to playtest it.
 
 ### Playtesting built into the game
@@ -70,6 +92,14 @@ Design changes come from those reports, not guesses.
   resource.
 - **A bite mark looks like a confession.** It actually marks a victim. Kept the
   misdirection, but added a hint that a bite trace on clothes can be misleading.
+- **The town was convinced too easily.** One clue could win a hearing. Now the town
+  wants three pieces of evidence and two witnesses who actually speak, unless trust in
+  the doctor is very high.
+- **Exams cost nothing.** A player could examine everyone in a minute. Each exam now
+  takes an hour of the day.
+- **Collapsing in the street had no real cost.** Being seen was the only penalty. Now the
+  doctor tires an hour earlier the next night, and an afternoon nap or a night in bed
+  makes up for it.
 
 ## Project structure
 
@@ -79,8 +109,10 @@ scenes/        Godot scenes (town, buildings, UI)
 scripts/
   cycle/       DayNightCycle, VampireDirector
   npc/         NPC behaviour, schedules and visuals
-  ui/          Casebook (Notebook), Hearing, Mural, Dialogue, HUD, Tutorial
-  world/       Clinic mural, diary pages, merchant, safe zones
+  data/        Diary text, TownHistory (the town's past, generated per run)
+  ui/          Casebook (Notebook), Hearing, Mural, Dialogue, HUD, Tutorial, Hints
+  world/       Clinic mural, diary pages, merchant, library book, town records,
+               tavern lunch, afternoon nap, safe zones
 data/npcs/     One resource per character
 localization/  strings.csv — every on-screen line, four languages
 assets/        Models, portraits, audio, fonts, UI theme
@@ -101,8 +133,9 @@ built.
 
 ## Credits
 
-3D characters and town kits by [Quaternius](https://quaternius.com) (CC0). Music and
-sound effects are listed with their licences in [CREDITS.md](CREDITS.md).
+3D characters and town kits by [Quaternius](https://quaternius.com) (CC0). Music, sound
+effects, fonts and AI-generated art are listed with their licences in
+[CREDITS.md](CREDITS.md).
 
 ## Author
 

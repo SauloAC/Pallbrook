@@ -80,6 +80,8 @@ func _choose_vampire() -> void:
 		add_child(records)
 	add_child(Lunch.new())  # Noon at the tavern: the town talks, the doctor listens
 	add_child(Nap.new())  # An afternoon nap in the clinic bed: an hour more on his feet tonight
+	add_child(ClinicPatients.new())  # Everyday complaints that walk into the clinic each morning
+	add_child(Gathering.new())  # Willow bark and wild herbs beyond the bridge
 	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
 
 

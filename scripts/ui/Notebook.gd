@@ -453,12 +453,22 @@ func _build_supplies() -> void:
 	lines.append(tr("Iron tonics ready: %d") % GameState.tonics)
 	if GameState.tonics_ordered > 0:
 		lines.append(tr("Steeping, ready tomorrow morning: %d") % GameState.tonics_ordered)
-	if GameState.ingredients > 0:
-		lines.append(tr("Ingredients for: %d") % GameState.ingredients)
+	# The bag: everything else in the cabinet (remedies, then ingredients)
+	var bag := PackedStringArray()
+	for id: String in Items.REMEDY_ORDER:
+		if id != "tonic" and GameState.item_count(id) > 0:
+			bag.append("%s: %d" % [tr(Items.item_name(id)), GameState.item_count(id)])
+	for id: String in Items.INGREDIENTS:
+		if GameState.item_count(id) > 0:
+			bag.append("%s: %d" % [tr(Items.item_name(id)), GameState.item_count(id)])
+	if not bag.is_empty():
+		lines.append(tr("In your bag and cabinet: {list}").format({"list": ", ".join(bag)}))
 	lines.append(tr("— How it works —"))
 	lines.append("• " + tr("Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them)."))
 	lines.append("• " + tr("Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing."))
-	lines.append("• " + tr("To make more: learn the recipe from the materia medica in the library (once, three hours), buy the ingredients from the merchant beyond the bridge (mornings, {price} coins a tonic), then prepare them at your clinic cabinet (one hour). They are ready the next morning.").format({"price": GameState.TONIC_PRICE}))
+	lines.append("• " + tr("To make more: learn the recipe from the materia medica in the library (once, three hours), get iron salts, red wine and wormwood, then prepare them at your clinic cabinet (one hour). They are ready the next morning."))
+	lines.append("• " + tr("Everyday complaints (burns, cuts, toothaches, sore throats, headaches) need their own remedies, prepared at the cabinet: bandages, burn salve, clove oil, honey and thyme syrup, willow bark tea."))
+	lines.append("• " + tr("Ingredients: the merchant beyond the bridge sells nearly all of them (mornings, 7 to 1). Willow bark grows on the riverbank and herbs in the woods beyond the bridge: free, but gathering takes half an hour."))
 	if not GameState.knows_tonic:
 		lines.append("• " + tr("You don't know the recipe yet."))
 	lines.append("• " + tr("Coins: the Town Hall pays you {salary} every morning, and each patient pays {fee} for their first exam of the day.").format({"salary": GameState.SALARY, "fee": GameState.EXAM_FEE}))
@@ -496,7 +506,12 @@ func _build_appointments() -> void:
 				status = "no tonic"
 			"rest":
 				status = "rest prescribed"
-		lines.append("• %s · %s – %s · %s" % [tr(a["name"]), GameState.format_time(a["from"]), GameState.format_time(a["until"]), Lang.g(status, Lang.female_of(a["name"]))])
+			"wrong":
+				status = "wrong remedy"
+		var what := ""
+		if a.has("complaint"):
+			what = tr(a["complaint"]) + " · "  # An everyday complaint, not the anemia
+		lines.append("• %s · %s – %s · %s%s" % [tr(a["name"]), GameState.format_time(a["from"]), GameState.format_time(a["until"]), what, Lang.g(status, Lang.female_of(a["name"]))])
 	if lines.is_empty():
 		entries.text = tr("No appointments yet.") + "\n\n" + tr("Ask a sick patient to come to the clinic for a treatment.")
 	else:

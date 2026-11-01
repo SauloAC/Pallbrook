@@ -4,12 +4,12 @@ extends Node3D
 # Gideon's stall, on the road in front of the cemetery gate, beyond the bridge (see the design
 # doc, "O comerciante além da ponte"). He came from the town across the hills that the wolf
 # attacked, and by these graves he feels strangely safe (the vampire can't cross running water;
-# he doesn't know that). He sells the ingredients for the iron tonic, mornings only, and every
+# he doesn't know that). He sells ingredients for the doctor's remedies, mornings only, and every
 # day he tells a little more of what happened over there.
 
 const NAME := "Gideon"
 const OPEN_FROM := 7.0
-const OPEN_UNTIL := 12.0
+const OPEN_UNTIL := 13.0   # Long enough for a quick visit on a morning with patients
 const STALL_AT := Vector3(-24.5, 0.0, -12.9)   # On the road, west of the cemetery gate
 const USE_AT := Vector3(-24.5, 0.0, -11.9)     # Where the doctor stands to buy
 const USE_RANGE := 1.4
@@ -34,7 +34,8 @@ var panel: CanvasLayer
 var body_label: Label
 var hint_label: Label
 var is_open_ui := false
-var amount := 1
+var selected := 0
+var note := ""           # What just happened (bought, not enough coins)
 var story_text := ""
 var opened_frame := -1
 
@@ -118,7 +119,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	get_viewport().set_input_as_handled()
 	if not is_open():
-		EventBus.dialogue_started.emit("Doctor", tr("The stall is covered with a cloth. A note pinned to it: \"Mornings, from 7 to noon.\""))
+		EventBus.dialogue_started.emit("Doctor", tr("The stall is covered with a cloth. A note pinned to it: \"Mornings, from 7 to 1.\""))
 		return
 	_open_ui()
 
@@ -171,7 +172,7 @@ func _open_ui() -> void:
 	else:
 		index = maxi(index - 1, 0)
 	story_text = tr(STORY[mini(index, STORY.size() - 1)])
-	amount = 1
+	note = ""
 	is_open_ui = true
 	opened_frame = Engine.get_process_frames()
 	GameState.in_dialogue = true
@@ -179,21 +180,24 @@ func _open_ui() -> void:
 	_refresh()
 
 
-func _most() -> int:
-	return floori(float(GameState.coins) / GameState.TONIC_PRICE)
+# What he sells: every ingredient with a price
+func _wares() -> Array:
+	return Items.INGREDIENTS.keys().filter(func(id): return Items.INGREDIENTS[id]["price"] > 0)
 
 
 func _refresh() -> void:
-	var offer := ""
-	if _most() < 1:
-		offer = tr("Ingredients for one iron tonic: {price} coins. You have {coins}.").format({"price": GameState.TONIC_PRICE, "coins": GameState.coins})
-		hint_label.text = tr("[Esc] Leave")
-	else:
-		amount = clampi(amount, 1, _most())
-		offer = tr("Ingredients for iron tonics:  ◀ {amount} ▶\nCost: {cost} coins (you have {coins}). Prepare them at the clinic cabinet.").format(
-				{"amount": amount, "cost": amount * GameState.TONIC_PRICE, "coins": GameState.coins})
-		hint_label.text = tr("[A/D] Quantity    [E] Buy    [Esc] Leave")
-	body_label.text = "\"" + story_text + "\"\n\n" + offer
+	var wares := _wares()
+	selected = clampi(selected, 0, wares.size() - 1)
+	var lines := PackedStringArray()
+	for i in wares.size():
+		var id: String = wares[i]
+		lines.append(("» " if i == selected else "   ") + tr("{item} · {price} coins (in your cabinet: {have})").format(
+				{"item": tr(Items.item_name(id)), "price": Items.INGREDIENTS[id]["price"], "have": GameState.item_count(id)}))
+	var offer := tr("You have {coins} coins. Prepare remedies at the clinic cabinet.").format({"coins": GameState.coins})
+	if note != "":
+		offer += "\n" + note
+	body_label.text = "\"" + story_text + "\"\n\n" + "\n".join(lines) + "\n\n" + offer
+	hint_label.text = tr("[W/S] Choose    [E] Buy one    [Esc] Leave")
 
 
 func _close_ui() -> void:
@@ -205,20 +209,22 @@ func _close_ui() -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open_ui or Engine.get_process_frames() == opened_frame:
 		return
-	if event.is_action_pressed("move_left") or event.is_action_pressed("ui_left"):
-		amount = maxi(amount - 1, 1)
+	if event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
+		selected = wrapi(selected - 1, 0, _wares().size())
 		Audio.play("click", -10.0)
 		_refresh()
-	elif event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
-		amount = mini(amount + 1, maxi(_most(), 1))
+	elif event.is_action_pressed("move_down") or event.is_action_pressed("ui_down"):
+		selected = wrapi(selected + 1, 0, _wares().size())
 		Audio.play("click", -10.0)
 		_refresh()
 	elif event.is_action_pressed("interact"):
-		if _most() >= 1 and GameState.buy_ingredients(amount):
-			_close_ui()
-			EventBus.dialogue_started.emit(NAME, tr("There you are: enough for {amount}. Steep them overnight, doctor, or they're worth nothing.").format({"amount": amount}))
+		var id: String = _wares()[selected]
+		if GameState.buy(id, 1):
+			Audio.play("click", -6.0)
+			note = tr("Bought: 1 {item}.").format({"item": tr(Items.item_name(id))})
 		else:
-			_close_ui()
+			note = tr("Not enough coins for that.")
+		_refresh()
 	elif event.is_action_pressed("ui_cancel"):
 		_close_ui()
 	else:

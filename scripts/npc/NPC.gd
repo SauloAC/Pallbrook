@@ -74,6 +74,29 @@ var flu_rest := false          # The doctor prescribed rest
 var rest_day := 0              # Last day rest was prescribed
 var exams: Array[Dictionary] = []     # The doctor's records, shown on the patient chart
 
+# ---------- Everyday complaints ----------
+# A burn, a cut, a toothache: ordinary patients who come to the clinic on their own in the
+# morning (see ClinicPatients). The doctor listens, picks the remedy, and they pay a coin.
+# They talk while he works. Nothing to do with the vampire; it hides the anemia among the rest.
+const COMPLAINTS := {
+	"burn": {"remedy": "salve", "label": "burned hand", "line": "I burned my hand this morning, doctor. The skin is red and blistering."},
+	"cut": {"remedy": "bandage", "label": "cut", "line": "I cut myself, doctor. It won't stop bleeding properly."},
+	"sprain": {"remedy": "bandage", "label": "sprained ankle", "line": "I twisted my ankle on the steps. It's swollen and I can barely put weight on it."},
+	"toothache": {"remedy": "clove_oil", "label": "toothache", "line": "A tooth, doctor. It throbs all night and I can't chew on that side."},
+	"throat": {"remedy": "syrup", "label": "sore throat", "line": "My throat is raw, doctor. Every word scrapes."},
+	"headache": {"remedy": "willow_tea", "label": "headache", "line": "My head pounds behind the eyes, doctor. Since yesterday."},
+}
+# Who tends to get what (their trade); the vampire is never the one who bleeds
+const COMPLAINT_POOL := {
+	"Tomas": ["burn", "cut", "sprain"], "Marta": ["burn", "cut", "headache"], "Clara": ["cut", "headache", "toothache"],
+	"Hugo": ["throat", "headache", "toothache"], "Elias": ["throat", "toothache", "headache"],
+	"Sarah": ["throat", "headache", "sprain"], "Sophia": ["headache", "toothache", "throat"],
+}
+const COMPLAINT_DAYS := 2      # It passes on its own after this many days
+var complaint := ""            # Key in COMPLAINTS ("" = nothing)
+var complaint_day := 0
+
+
 # ---------- Trust in the doctor ----------
 # Trust of 60 or more: a night visit marks them instead of turning them (see VampireDirector)
 var affinity := 40.0
@@ -1656,6 +1679,102 @@ func answer_clinic(tomorrow := false) -> String:
 	return reply
 
 
+# ---------- Everyday complaints ----------
+
+func complaints_possible() -> Array:
+	var pool: Array = COMPLAINT_POOL.get(data.npc_name, ["headache", "throat"])
+	if is_vampire():
+		pool = pool.filter(func(c): return c != "cut")  # Its blood would give it away
+	return pool
+
+
+func has_complaint() -> bool:
+	return complaint != ""
+
+
+# Woke up with something ordinary: walks to the clinic this morning, on its own
+func come_with_complaint(key: String) -> void:
+	complaint = key
+	complaint_day = GameState.day
+	appointment_day = GameState.day
+	appointment_from = float(randi_range(9, 15))  # Any time of the day: not every morning is the market's
+	while _slot_taken(appointment_day, appointment_from) and appointment_from < 15.0:
+		appointment_from += 1.0
+	visit_day = appointment_day
+	booked_day = GameState.day
+	skip_appointment = false
+	waiting_announced = false
+	doctor_was_there = false
+	appointment_until = minf(appointment_from + 3.0, 18.0)  # Three hours' patience
+	appointment_arrival = appointment_from
+	appointment = {"day": appointment_day, "name": data.npc_name, "from": appointment_from,
+			"until": appointment_until, "status": "waiting", "complaint": COMPLAINTS[key]["label"]}
+	GameState.appointments.append(appointment)
+	Playtest.count("complaints")
+
+
+# It passes on its own after a couple of days
+func heal_complaint() -> void:
+	if complaint != "" and GameState.day - complaint_day >= COMPLAINT_DAYS:
+		complaint = ""
+
+
+# The doctor picks a remedy for today's complaint (one from the cabinet: see Items)
+func answer_remedy(remedy: String) -> String:
+	asked["remedy"] = GameState.day
+	if complaint == "" or not awaiting_treatment():
+		return tr("I'm fine now, doctor. Nothing that needs treating.")
+	if not GameState.take_item(remedy):
+		return tr("There's no {item} left in the cabinet. Prepare some, or try something else.").format({"item": tr(Items.item_name(remedy))})
+	var label: String = tr(COMPLAINTS[complaint]["label"])
+	treated_day = GameState.day
+	appointment_until = -1.0
+	if state == State.INSIDE:
+		set_state(State.ROUTINE)
+	if remedy != COMPLAINTS[complaint]["remedy"]:
+		appointment["status"] = "wrong"
+		change_affinity(-3.0)
+		Playtest.count("complaint_wrong_remedy")
+		GameState.add_clue(_t("Day {day} · Wrong remedy for {name}'s {what}.", {"day": GameState.day, "name": _n(data.npc_name), "what": label}), "evidence")
+		return tr("That's not helping, doctor... I'll just wait for it to pass.")
+	complaint = ""
+	appointment["status"] = "treated"
+	change_affinity(6.0)
+	GameState.coins += 1  # They pay for the visit
+	GameState.pending_hours = 0.5  # Half an hour of work, once the talk is over
+	Playtest.count("complaint_treated")
+	GameState.add_clue(_t("Day {day} · You treated {name}'s {what} at the clinic. A coin for the visit.", {"day": GameState.day, "name": _n(data.npc_name), "what": label}), "evidence")
+	return tr("That's much better, doctor. Here, for your trouble.") + "\n\n" + _clinic_talk()
+
+
+# What they talk about while the doctor works: something seen last night, if anything, else themselves
+func _clinic_talk() -> String:
+	var night := GameState.last_night()
+	for s: Dictionary in sightings:
+		if s["night"] == night and s["kind"] == "person" and s["who"] != data.npc_name:
+			var text := _t("While you work: \"I couldn't sleep last night. Around {hour} I saw {who} out by {place}.\"",
+					{"hour": GameState.format_time(float(s["hour"])), "who": _n(String(s["who"])), "place": GameState.place_name(String(s["place"]))})
+			GameState.add_clue(_t("Day {day} · At the clinic, {name} said they saw {who} out by {place} last night, around {hour}.",
+					{"day": GameState.day, "name": _n(data.npc_name), "who": _n(String(s["who"])), "place": GameState.place_name(String(s["place"])), "hour": GameState.format_time(float(s["hour"]))}))
+			return text
+	var lines: Array = CLINIC_TALK.get(data.npc_name, [])
+	if lines.is_empty():
+		return ""
+	return tr("While you work: ") + "\"" + tr(lines.pick_random()) + "\""
+
+
+# Small talk on the clinic stool: who they are, a hint of what they keep to themselves
+const CLINIC_TALK := {
+	"Tomas": ["Jonas used to sit right here when he cut himself at my forge. Every week, the clumsy fool.", "I don't sleep much lately. The anvil is louder at night."],
+	"Marta": ["Half the town owes me for drinks. The other half pays me in secrets.", "Someone's been leaving the back gate open at night. I close it, and it's open again by morning."],
+	"Clara": ["Jonas kept a little box under the floorboards. I haven't had the courage to open it.", "Sewing keeps my hands busy. It's the nights that are long."],
+	"Hugo": ["Pallbrook is a good town, doctor. Write that in your book.", "Some pages are best left closed. For everyone's sake."],
+	"Elias": ["Your predecessor and I played chess on Thursdays. I still set up the board.", "I pray every morning, doctor. Lately the words feel heavier."],
+	"Sarah": ["One of my pupils told me something I couldn't bring myself to repeat. Not yet.", "Tomás fixed the school gate for free. Don't tell him I told you."],
+	"Sophia": ["I copied some of the old register before the pages went missing. I'm not sure whom to trust with them.", "The mayor visits the archive more than any mayor should."],
+}
+
+
 # Another patient is already expected at the clinic in that hour
 func _slot_taken(day: int, from: float) -> bool:
 	for a in GameState.appointments:
@@ -1705,7 +1824,10 @@ func _check_appointment() -> void:
 		# Here and waiting: the doctor decides, in conversation, between the tonic and rest
 		if not waiting_announced and not GameState.in_dialogue:
 			waiting_announced = true
-			EventBus.dialogue_started.emit(data.npc_name, tr("I'm here for the treatment, doctor. Examine me if you like, then give me the tonic or tell me what else to do."))
+			if complaint != "":
+				EventBus.dialogue_started.emit(data.npc_name, tr(COMPLAINTS[complaint]["line"]))
+			else:
+				EventBus.dialogue_started.emit(data.npc_name, tr("I'm here for the treatment, doctor. Examine me if you like, then give me the tonic or tell me what else to do."))
 
 
 # Waiting at the clinic during their appointment, for the doctor's decision

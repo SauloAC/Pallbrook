@@ -39,8 +39,21 @@ const CLINIC_WHEN := [
 ]
 var picking_when := false
 
+# An everyday complaint at the clinic: which remedy from the cabinet
+const REMEDIES := [
+	["r_bandage", "Clean it and bandage it."],
+	["r_salve", "A burn salve."],
+	["r_clove", "Clove oil."],
+	["r_syrup", "Honey and thyme syrup."],
+	["r_willow", "Willow bark tea."],
+	["r_back", "Not yet."],
+]
+var picking_remedy := false
+const REMEDY_ITEMS := {"r_bandage": "bandage", "r_salve": "salve", "r_clove": "clove_oil", "r_syrup": "syrup", "r_willow": "willow_tea"}
+
 
 const CONSULT_QUESTIONS := [
+	["remedy", "Let me treat that."],
 	["exam", "Let me examine you."],
 	["tonic", "Give the iron tonic."],
 	["rest", "You need rest and good food."],
@@ -58,11 +71,15 @@ func _questions_for(who: Node) -> Array:
 				continue
 			when.append(q)
 		return when
+	if picking_remedy:
+		return REMEDIES
 	var consult: bool = who.has_method("awaiting_treatment") and who.awaiting_treatment()
 	var examined: bool = who.has_method("examined_today") and who.examined_today()
 	var list: Array = []
 	for q in (CONSULT_QUESTIONS if consult else QUESTIONS):
 		if q[0] == "rest" and not examined:
+			continue
+		if q[0] == "remedy" and not (who.has_method("has_complaint") and who.has_complaint()):
 			continue
 		list.append(q)
 	return list
@@ -98,6 +115,7 @@ func _on_dialogue_started(speaker_name: String, line: String) -> void:
 func _on_conversation_started(who: Node) -> void:
 	npc = who
 	picking_when = false
+	picking_remedy = false
 	questions = _questions_for(who)
 	choice = 0
 	_open(who.data.npc_name, who.greeting())
@@ -125,10 +143,12 @@ func _refresh_choices() -> void:
 		var key: String = questions[i][0]
 		var label := Label.new()
 		label.text = ("» " if i == choice else "   ") + Lang.g(questions[i][1], npc.data.female)  # examiná-lo / examiná-la
+		if REMEDY_ITEMS.has(key):
+			label.text += "  (%d)" % GameState.item_count(REMEDY_ITEMS[key])  # How many in the cabinet
 		label.add_theme_font_size_override("font_size", 20)
 		if i == choice:
 			label.add_theme_color_override("font_color", SELECTED_COLOR)
-		elif key != "bye" and not key.begins_with("clinic_") and npc.was_asked(key):
+		elif key != "bye" and not key.begins_with("clinic_") and not key.begins_with("r_") and npc.was_asked(key):
 			label.modulate.a = ASKED_ALPHA  # Already asked today
 		choices_box.add_child(label)
 
@@ -158,6 +178,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_cancel"):
 		if picking_when:
 			_ask("clinic_back")
+		elif picking_remedy:
+			_ask("r_back")
 		else:
 			_close()
 	else:
@@ -191,6 +213,16 @@ func _ask(key: String) -> void:
 		"clinic_back":
 			picking_when = false
 			key = "clinic"
+		"remedy":
+			picking_remedy = true
+			body.text = tr("What will you use, doctor?")
+		"r_back":
+			picking_remedy = false
+			key = "remedy"
+		"r_bandage", "r_salve", "r_clove", "r_syrup", "r_willow":
+			picking_remedy = false
+			body.text = npc.answer_remedy(REMEDY_ITEMS[key])
+			key = "remedy"
 		"rest":
 			body.text = npc.answer_rest()
 		"tonic":
@@ -236,6 +268,7 @@ func _close() -> void:
 	panel.visible = false
 	npc = null
 	picking_when = false
+	picking_remedy = false
 	GameState.in_dialogue = false
 	EventBus.dialogue_ended.emit()
 
