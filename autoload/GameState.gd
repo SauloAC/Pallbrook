@@ -15,6 +15,7 @@ var case_id := ""                # Tells this case's save from another's (see Sa
 # (see notice_sign), or after the first death, on night 6 at the latest (VampireDirector).
 var act := 1
 var sign_day := -1               # Act 1: the day he first found a sign it is no sickness
+var act2_day := -1               # The morning act 2 began (the diary's act 2 pieces count from it)
 var clues: Array[String] = []
 # The casebook: {text, kind ("testimony" or "evidence"), day, people (names mentioned)}
 var entries: Array[Dictionary] = []
@@ -97,6 +98,7 @@ func reset() -> void:
 	case_id = ""
 	act = 1
 	sign_day = -1
+	act2_day = -1
 	weather = "clear"
 	open_building = ""
 	open_upstairs = false

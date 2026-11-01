@@ -3,10 +3,13 @@ extends Node
 
 # The old doctor's diary (see the design doc and the "Diário" draft).
 # Slow on purpose: the diary should not solve the town for the player.
-# Day 1: only sheet 1, whole, in the clinic (the guided tutorial will point at it).
-# Day 2: two pieces of the sheet about the servants (2): its start in the clinic, another in town.
-# Day 3 on: two pieces a day, drawn at random from all the rest, so they rarely complete a
-#        sheet at once. The player works out which sheet each one belongs to.
+# The pieces follow the acts (see the design doc, "Os três atos"):
+# Day 1: only sheet 1, whole, in the clinic (the guided tutorial points at it).
+# Act 1, from Day 2: two pieces a day of the sheets a doctor could notice before he knows what he
+#        faces (the stain, the fog). Completing one is a sign: act 2 starts the next morning.
+# Act 2, its first morning: two pieces of the sheet about the servants (2), its start in the
+#        clinic. Then two a day, drawn at random from the rest, so they rarely complete a sheet at
+#        once. The player works out which sheet each one belongs to.
 # The last page names a suspect, so it only turns up (whole, among the graves) the morning
 # after every other piece has been found.
 # A whole sheet teaches the doctor a rule.
@@ -18,15 +21,17 @@ const HOUSES := ["Casa1", "CasaSophia", "CasaSarah", "CasaHugo"]
 # Places with no location marker
 const SPOTS := {"#bridge": Vector3(-7.6, 0.0, -13.6), "#cemetery": Vector3(-19.5, 0.0, -4.0)}
 const LAST_PAGE_NAMES_THE_VAMPIRE := 0.6  # How often the old doctor guessed right
-const SERVANT_SHEET := 2       # Two of its pieces turn up on Day 2
+const SERVANT_SHEET := 2       # Two of its pieces turn up the morning act 2 starts
 const SERVANT_PIECES := ["A", "B"]
-const FIRST_RANDOM_DAY := 3
+const ACT1_SHEETS := [3, 4]    # The stain and the fog
+const ACT1_FIRST_DAY := 2
 const PER_DAY := 2
 
 
 func setup(vampire_name: String) -> void:
+	# day_of: for act 1 pieces, the day they turn up; for act 2 pieces (act_of), days after act 2 starts
 	var state := {"spots": {}, "found": {}, "placed": {}, "spawned": {}, "last_name": vampire_name,
-			"day_of": {}}
+			"day_of": {}, "act_of": {}}
 	# Whom the old doctor named on his last page: usually right, not always
 	if randf() > LAST_PAGE_NAMES_THE_VAMPIRE:
 		var others := []
@@ -35,7 +40,8 @@ func setup(vampire_name: String) -> void:
 				others.append(npc.data.npc_name)
 		if not others.is_empty():
 			state["last_name"] = others.pick_random()
-	var shuffled: Array[String] = []  # Everything after Day 2
+	var act1_pieces: Array[String] = []
+	var act2_pieces: Array[String] = []
 	var last_page := ""
 	for sheet: Dictionary in TEXT.PAGES:
 		var id := int(sheet["id"])
@@ -61,14 +67,21 @@ func setup(vampire_name: String) -> void:
 			if sheet.get("hidden", false):
 				last_page = piece
 			elif id == SERVANT_SHEET and letter in SERVANT_PIECES:
-				state["day_of"][piece] = 2
+				state["act_of"][piece] = 2
+				state["day_of"][piece] = 0  # The first morning of act 2
+			elif id in ACT1_SHEETS:
+				act1_pieces.append(piece)
 			else:
-				shuffled.append(piece)
+				act2_pieces.append(piece)
 	# Two a day in a random order
-	shuffled.shuffle()
+	act1_pieces.shuffle()
+	act2_pieces.shuffle()
 	state["last_page"] = last_page
-	for i in shuffled.size():
-		state["day_of"][shuffled[i]] = FIRST_RANDOM_DAY + floori(i / float(PER_DAY))
+	for i in act1_pieces.size():
+		state["day_of"][act1_pieces[i]] = ACT1_FIRST_DAY + floori(i / float(PER_DAY))
+	for i in act2_pieces.size():
+		state["act_of"][act2_pieces[i]] = 2
+		state["day_of"][act2_pieces[i]] = 1 + floori(i / float(PER_DAY))
 	GameState.diary = state
 	EventBus.phase_changed.connect(_on_phase_changed)  # Each morning a few more turn up
 	_spawn_pieces.call_deferred()
@@ -104,13 +117,21 @@ func _spawn_pieces(quiet := false) -> void:  # quiet: putting back a saved game,
 				continue
 			if not quiet:
 				GameState.add_night_event(tr("You have found every piece the old doctor left in town. Only his last page is still missing."))
-		elif GameState.day < int(GameState.diary["day_of"].get(piece, 1)):
+		elif not _due(piece):
 			continue
 		GameState.diary["spawned"][piece] = true
 		var node := PIECE.new()
 		node.piece = piece
 		add_child(node)
 		node.global_position = _ground(_spot(place, index))
+
+
+# Act 1 pieces turn up on their day; act 2 pieces that many days after act 2 began
+func _due(piece: String) -> bool:
+	var when := int(GameState.diary["day_of"].get(piece, 1))
+	if int(GameState.diary.get("act_of", {}).get(piece, 1)) == 1:
+		return GameState.day >= when
+	return GameState.act >= 2 and GameState.act2_day >= 0 and GameState.day >= GameState.act2_day + when
 
 
 func _all_but_last_found() -> bool:

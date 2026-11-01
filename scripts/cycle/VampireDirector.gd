@@ -197,6 +197,7 @@ func _check_act_two() -> void:
 	if not found_sign and killed_tonight == "" and night < ACT1_LAST_NIGHT:
 		return
 	GameState.act = 2
+	GameState.act2_day = GameState.day
 	if killed_tonight != "":
 		GameState.add_night_event(_t("{name}'s body has two small wounds on the neck, close together. No fever leaves marks like that. Whatever is happening in Pallbrook, it is not a sickness.", {"name": tr(killed_tonight)}))
 	elif found_sign:
