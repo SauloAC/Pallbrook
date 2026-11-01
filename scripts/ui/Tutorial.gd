@@ -74,11 +74,11 @@ func _build() -> void:
 	footer = Label.new()
 	footer.add_theme_font_size_override("font_size", 13)
 	footer.modulate = Color(1, 1, 1, 0.55)
-	footer.text = tr("[F1] Skip the tutorial")
 	box.add_child(footer)
 
 
 func _show_step() -> void:
+	footer.text = tr("[F1] Skip the tutorial")  # Here, not at build: the language may change on the title screen
 	heading.text = tr("First day · {n} of {total}").format({"n": step + 1, "total": STEPS.size()})
 	body.text = tr(STEPS[step][1])
 	panel.modulate = Color(1, 1, 1, 0)

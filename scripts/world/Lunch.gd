@@ -99,11 +99,15 @@ func _run() -> void:
 		npc.change_affinity(WARMTH)
 	var names: Array = table.map(func(n): return n.data.npc_name)
 	var lines := _scene(table, names)
+	# The clock stops while they talk (nobody gets up mid-sentence); the hour passes after
+	var cycle = get_tree().get_first_node_in_group("day_night")
+	if cycle:
+		cycle.set_process(false)
 	for line: Array in lines:
 		EventBus.dialogue_started.emit(line[0], line[1])
 		await EventBus.dialogue_ended
-	var cycle = get_tree().get_first_node_in_group("day_night")
 	if cycle:
+		cycle.set_process(true)
 		await cycle.pass_hours(1.0)
 	running = false
 
@@ -274,8 +278,8 @@ func _absence(names: Array) -> Array:
 func _small_talk(names: Array) -> Array:
 	var options := []
 	for i in PAIRS.size():
-		var pair: Array = PAIRS[i]
-		if pair[0] in names and pair[2] in names and not ("pair%d" % i) in GameState.lunch["seen"]:
+		var entry: Array = PAIRS[i]
+		if entry[0] in names and entry[2] in names and not ("pair%d" % i) in GameState.lunch["seen"]:
 			options.append(i)
 	if options.is_empty():
 		return []

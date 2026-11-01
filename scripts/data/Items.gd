@@ -47,5 +47,5 @@ static func needs_text(remedy: String) -> String:
 	var parts := PackedStringArray()
 	var needs: Dictionary = REMEDIES[remedy]["needs"]
 	for ing: String in needs:
-		parts.append("%d %s" % [needs[ing], TranslationServer.translate(item_name(ing))])
-	return ", ".join(parts)
+		parts.append(TranslationServer.translate("{n} {item}").format({"n": needs[ing], "item": TranslationServer.translate(item_name(ing))}))
+	return ("、" if TranslationServer.get_locale().begins_with("ja") else ", ").join(parts)

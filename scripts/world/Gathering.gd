@@ -1,15 +1,17 @@
 class_name Gathering
 extends Node3D
 
-# Free ingredients in the world, beyond the bridge (see Items): willow bark on the riverbank,
-# thyme and wormwood in the woods. Once a day each, by daylight, half an hour of the doctor's
+# Free ingredients in the world (see Items): willow bark on the riverbank by the bridge,
+# thyme and wormwood among the cemetery's graves. Once a day each, by daylight, half an hour of the doctor's
 # time. Gideon sells most of the same things, dearer; gathering trades coins for hours.
 
 const SPOTS := [
-	{"key": "willow", "at": Vector3(-16.4, 0.0, -15.5), "gives": {"willow": 2},
+	# Town side of the bridge, on the bank by the bush (the far bank is fenced off)
+	{"key": "willow", "at": Vector3(-9.0, 0.0, -14.4), "gives": {"willow": 2},
 			"text": "Half an hour on the riverbank with a knife: two strips of willow bark."},
-	{"key": "herbs", "at": Vector3(-21.0, 0.0, -17.5), "gives": {"thyme": 1, "wormwood": 1},
-			"text": "Half an hour among the trees: a bunch of wild thyme and a handful of wormwood."},
+	# Inside the cemetery, where wormwood has always grown among the graves
+	{"key": "herbs", "at": Vector3(-19.2, 0.0, -8.0), "gives": {"thyme": 1, "wormwood": 1},
+			"text": "Half an hour among the old graves: a bunch of wild thyme and a handful of wormwood."},
 ]
 const USE_RANGE := 1.2
 const SEEN_RANGE := 9.0   # The icon shows faintly from here, so the spots can be found
@@ -72,7 +74,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	var cycle = get_tree().get_first_node_in_group("day_night")
 	if cycle == null:
 		return
+	var at: Vector3 = ground[near_index]
 	GameState.gathered[spot["key"]] = GameState.day
+	# He kneels and picks it, then the half hour passes
+	var player = get_tree().get_first_node_in_group("player")  # Untyped: Jogador fields
+	if player and player.visual:
+		GameState.in_dialogue = true  # Stands still while he picks
+		player.visual.face(at)
+		var length: float = player.visual.act("PickUp")
+		await get_tree().create_timer(maxf(length * 0.85, 0.3)).timeout
+		GameState.in_dialogue = false
 	var gives: Dictionary = spot["gives"]
 	for id: String in gives:
 		GameState.add_item(id, gives[id])

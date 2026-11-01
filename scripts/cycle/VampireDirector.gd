@@ -549,6 +549,30 @@ func _end_chase(dawn: bool) -> void:
 		GameState.add_night_event(tr("You have two nights to bring it before the town. Then it will come for you."))
 
 
+# The moment it reaches him: the camera closes in, it lunges and strikes, he falls
+func _attack_scene() -> void:
+	var player = get_tree().get_first_node_in_group("player")  # Untyped: Jogador fields
+	if player == null or vampire == null or vampire.visual == null or player.visual == null:
+		return
+	vampire.set_physics_process(false)  # Its own chase logic must not pull it away now
+	var cam = get_viewport().get_camera_3d()  # Untyped: CameraFollow's offset
+	if cam and "offset" in cam:
+		create_tween().tween_property(cam, "offset", cam.offset * 0.55, 1.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	var him: Vector3 = player.global_position
+	var it: Vector3 = vampire.global_position
+	vampire.visual.face(him)
+	player.visual.face(it)
+	var close := him + (it - him).normalized() * 0.7
+	close.y = it.y
+	create_tween().tween_property(vampire, "global_position", close, 0.25)
+	vampire.visual.act("Punch")
+	await get_tree().create_timer(0.3).timeout
+	player.visual.act("RecieveHit")
+	await get_tree().create_timer(0.5).timeout
+	player.visual.act("Defeat", true)  # Down, and he stays down
+	await get_tree().create_timer(0.7).timeout
+
+
 func _caught() -> void:
 	chasing = false
 	GameState.chased = false
@@ -556,6 +580,7 @@ func _caught() -> void:
 	Playtest.log_line("The vampire caught the doctor")
 	GameState.in_dialogue = true  # Stops the doctor where he stands
 	Audio.play("death")
+	await _attack_scene()
 	# The night closes in red, then the end
 	var layer := CanvasLayer.new()
 	layer.layer = 40

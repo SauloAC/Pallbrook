@@ -150,7 +150,7 @@ func _build_panel() -> void:
 	title.add_theme_font_size_override("font_size", 30)
 	box.add_child(title)
 	body_label = Label.new()
-	body_label.add_theme_font_size_override("font_size", 21)
+	body_label.add_theme_font_size_override("font_size", 18)  # Story and a long list of wares must fit the screen
 	body_label.custom_minimum_size = Vector2(640, 0)
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(body_label)
@@ -191,7 +191,8 @@ func _refresh() -> void:
 	var lines := PackedStringArray()
 	for i in wares.size():
 		var id: String = wares[i]
-		lines.append(("» " if i == selected else "   ") + tr("{item} · {price} coins (in your cabinet: {have})").format(
+		var each := "{item} · 1 coin (in your cabinet: {have})" if Items.INGREDIENTS[id]["price"] == 1 else "{item} · {price} coins (in your cabinet: {have})"
+		lines.append(("» " if i == selected else "   ") + tr(each).format(
 				{"item": tr(Items.item_name(id)), "price": Items.INGREDIENTS[id]["price"], "have": GameState.item_count(id)}))
 	var offer := tr("You have {coins} coins. Prepare remedies at the clinic cabinet.").format({"coins": GameState.coins})
 	if note != "":

@@ -14,6 +14,18 @@ extends Node
 @export var fog_height := 2.5          # Above this the fog thins out
 @export var fog_height_density := 0.2  # How fast it thickens below fog_height
 
+# Colour grade (test of 31 Oct): a little less saturation, a touch more contrast, cool shadows and
+# warm, faded highlights, so the town reads older and less toy-like. F10 toggles it while
+# running from the editor, to compare.
+@export var grade_enabled := true
+@export var grade_saturation_day := 0.72
+@export var grade_saturation_night := 0.85
+@export var grade_contrast := 1.08
+@export var grade_brightness := 0.97
+@export var grade_contrast_night := 0.95    # Softer at night: the dark must stay readable
+@export var grade_brightness_night := 1.1
+var grade_lut: GradientTexture1D
+
 var hour: float
 var is_collapsing := false
 var last_hour := -1
@@ -90,6 +102,7 @@ func _update_lighting() -> void:
 		var env := world_environment.environment
 		env.background_energy_multiplier = lerpf(0.15, 1.0, daylight) * lerpf(1.0, 0.8, grey)
 		env.ambient_light_energy = lerpf(0.7, 1.0, daylight)  # Night: dark blue, never pitch black
+		_apply_grade(env, daylight)
 		env.fog_enabled = GameState.weather == "fog"
 		if env.fog_enabled:
 			env.fog_light_color = Color(0.72, 0.75, 0.8)
@@ -97,6 +110,32 @@ func _update_lighting() -> void:
 			env.fog_density = fog_density
 			env.fog_height = fog_height
 			env.fog_height_density = fog_height_density
+
+func _apply_grade(env: Environment, daylight: float) -> void:
+	env.adjustment_enabled = grade_enabled
+	if not grade_enabled:
+		return
+	if grade_lut == null:
+		# Shadows lifted toward a cold blue-grey, highlights pulled toward old paper
+		var gradient := Gradient.new()
+		gradient.set_color(0, Color(0.05, 0.06, 0.09))
+		gradient.set_color(1, Color(0.96, 0.93, 0.86))
+		gradient.add_point(0.5, Color(0.49, 0.48, 0.47))
+		grade_lut = GradientTexture1D.new()
+		grade_lut.gradient = gradient
+	env.adjustment_saturation = lerpf(grade_saturation_night, grade_saturation_day, daylight)
+	env.adjustment_contrast = lerpf(grade_contrast_night, grade_contrast, daylight)
+	env.adjustment_brightness = lerpf(grade_brightness_night, grade_brightness, daylight)
+	env.adjustment_color_correction = grade_lut
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if OS.has_feature("editor") and event is InputEventKey and event.pressed and not event.echo \
+			and event.physical_keycode == KEY_F10:
+		grade_enabled = not grade_enabled
+		print("[DEBUG] Colour grade ", "on" if grade_enabled else "off")
+		_update_lighting()
+
 
 func _update_exhaustion() -> void:
 	# Only from midnight (earlier after a collapse: the fatigue debt) until sunrise.

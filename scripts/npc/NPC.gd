@@ -151,10 +151,12 @@ const INTERIOR_SLOTS := {
 		Vector3(0.0, 0.0, 0.0), Vector3(-0.6, 0.0, 0.2), Vector3(0.3, 0.0, -1.0), Vector3(-1.0, 0.0, 0.4),
 		Vector3(0.4, 0.0, -1.7), Vector3(0.5, 0.0, 0.5), Vector3(-0.6, 0.0, 2.4), Vector3(0.6, 0.0, 2.6),
 	],
-	# Tavern (marker at the south door): four inside by the bar and the table, four out on the patio
+	# Tavern (marker at the south door): four inside by the bar and the table, eight out on the
+	# patio (the second row of tables, added for lunch on 31 Oct, sits south of the first)
 	"Taverna": [
 		Vector3(0.5, 0.0, -5.0), Vector3(-0.5, 0.0, -5.0), Vector3(0.0, 0.0, -2.0), Vector3(1.2, 0.0, -7.2),
 		Vector3(0.0, 0.0, 1.4), Vector3(-0.6, 0.0, 3.1), Vector3(0.6, 0.0, 3.1), Vector3(2.4, 0.0, 0.9),
+		Vector3(-1.8, 0.0, 4.6), Vector3(1.8, 0.0, 4.6), Vector3(0.0, 0.0, 6.4), Vector3(1.8, 0.0, 7.0),
 	],
 	# Town hall (marker at the tower door): around the round rug, clear of the council desks
 	"Prefeitura": [
@@ -847,7 +849,10 @@ func _free_slot(place: String) -> int:
 			continue
 		taken.append(npc.place_slot)
 	var count: int = INTERIOR_SLOTS[place].size() if INTERIOR_SLOTS.has(place) else PLACE_SLOTS.size()
-	for i in count:
+	var order: Array = range(count)
+	if place == "Taverna" and not GameState.is_night and GameState.hour >= 11.5 and GameState.hour < 13.5:
+		order = range(4, count) + range(0, 4)  # Lunch is out on the patio, where the doctor sits
+	for i in order:
 		if not taken.has(i):
 			return i
 	return randi() % count  # Very crowded: share a spot

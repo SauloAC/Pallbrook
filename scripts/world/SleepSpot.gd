@@ -19,6 +19,8 @@ var player_inside := false
 var picker: CanvasLayer
 var picker_body: Label
 var stock_label: Label
+var title_label: Label
+var hint_label: Label
 var picking := false
 var amount := 1
 var selected := 0
@@ -51,7 +53,7 @@ func _build_picker() -> void:
 	box.add_theme_constant_override("separation", 14)
 	panel.add_child(box)
 	var title := Label.new()
-	title.text = tr("Supply cabinet")
+	title_label = title  # Texts are set when it opens: the language may change on the title screen
 	title.add_theme_font_size_override("font_size", 30)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
@@ -68,7 +70,7 @@ func _build_picker() -> void:
 	picker_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	columns.add_child(picker_body)
 	var hint := Label.new()
-	hint.text = tr("[W/S] Remedy    [A/D] Batches    [E] Prepare    [Esc] Close")
+	hint_label = hint
 	hint.add_theme_font_size_override("font_size", 18)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hint)
@@ -124,6 +126,8 @@ func _refresh_picker() -> void:
 
 
 func _open_picker() -> void:
+	title_label.text = tr("Supply cabinet")
+	hint_label.text = tr("[W/S] Remedy    [A/D] Batches    [E] Prepare    [Esc] Close")
 	picking = true
 	amount = 1
 	selected = clampi(selected, 0, Items.REMEDY_ORDER.size() - 1)

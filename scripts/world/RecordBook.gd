@@ -71,16 +71,19 @@ func _try_open(event: InputEvent) -> void:
 		_open_ui()
 		return
 	var book: Dictionary = BOOKS[kind]
-	if kind == "church":
-		var refusal := _church_refusal()
-		if refusal != "":
-			EventBus.dialogue_started.emit(PRIEST, refusal)
-			return
 	if GameState.is_night or GameState.hour < book["opens"] or GameState.hour + book["hours"] > book["closes"]:
 		var text := tr("The Town Hall register: births, deaths, who came to live here and when. Going through it properly would take about two hours. Come back while the hall is open, before 3 PM.") if kind == "hall" \
 				else tr("The church's burial book. Reading it with care would take about an hour. Come back during the day.")
 		EventBus.dialogue_started.emit("Doctor", text)
 		return
+	if kind == "church":
+		var refusal := _church_refusal()
+		if refusal != "":
+			if _priest_nearby():
+				EventBus.dialogue_started.emit(PRIEST, refusal)
+			else:  # He isn't here to say so: the book is simply locked away
+				EventBus.dialogue_started.emit("Doctor", tr("The burial book is locked in the vestry. Only Father Elias has the key."))
+			return
 	var cycle = get_tree().get_first_node_in_group("day_night")
 	if cycle == null:
 		return
@@ -106,6 +109,13 @@ func _note_for(d: Dictionary, index: int) -> String:
 	if GameState.vampire_name == PRIEST and d["pale"] and d["name"] != "Jonas":
 		return TownHistory.PLAIN_NOTES[index % TownHistory.PLAIN_NOTES.size()]
 	return d["note"]
+
+
+func _priest_nearby() -> bool:
+	var priest = _priest()
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	return priest != null and player != null and not priest.in_bed \
+			and priest.global_position.distance_to(player.global_position) < 6.0
 
 
 func _priest() -> Node:

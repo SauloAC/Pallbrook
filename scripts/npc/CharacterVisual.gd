@@ -81,6 +81,8 @@ var clothes: Array[StandardMaterial3D] = []   # Everything but skin and eyes, fo
 var clothes_colors: Array[Color] = []
 var current := ""
 var dead := false
+var acting := false   # A one-off clip is playing (see act): walking and idling wait
+var act_id := 0
 var target_yaw := 0.0
 var dark_overlay: StandardMaterial3D
 
@@ -256,7 +258,7 @@ func animate(velocity: Vector3, delta: float) -> void:
 			sprite.speed_scale = 1.0
 			_sprite_play("idle", facing)
 		return
-	if dead or anim == null:
+	if dead or anim == null or acting:
 		return
 	var flat := Vector2(velocity.x, velocity.z)
 	if flat.length() > 0.3:
@@ -351,6 +353,27 @@ func _make_shade() -> void:
 		for loop_name in ["Idle", "Walk", "Run"]:
 			if shade_anim.has_animation(loop_name):
 				shade_anim.get_animation(loop_name).loop_mode = Animation.LOOP_LINEAR
+
+
+# A one-off clip from the shared rig: PickUp, Punch, RecieveHit, Defeat, Death...
+# Walking and idling wait until it ends; hold keeps the last pose (a fall). Returns its length.
+func act(anim_name: String, hold := false, speed := 1.0) -> float:
+	if anim == null or not anim.has_animation(anim_name):
+		return 0.0
+	acting = true
+	act_id += 1
+	current = anim_name
+	anim.play(anim_name, 0.15, speed)
+	var length := anim.get_animation(anim_name).length / speed
+	if not hold:
+		get_tree().create_timer(length).timeout.connect(_end_act.bind(act_id))
+	return length
+
+
+func _end_act(id: int) -> void:
+	if id == act_id:  # A later clip (or a held fall) took over meanwhile
+		acting = false
+		current = ""
 
 
 func _play(anim_name: String) -> void:

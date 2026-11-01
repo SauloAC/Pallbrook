@@ -231,6 +231,12 @@ func _refresh() -> void:
 	var hint := get_node_or_null("Panel/Pages/VBox/Hint") as Label
 	if hint:
 		hint.text = tr("[Tab] Close") + "     " + tr("[Q/E] Turn bookmark")
+		if not hint.get_parent().has_node("HintSpacer"):
+			var spacer := Control.new()  # Lifts the key hints off the book's burnt bottom edge
+			spacer.name = "HintSpacer"
+			spacer.custom_minimum_size.y = 34.0
+			spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			hint.get_parent().add_child(spacer)
 
 
 # ---------- Book layout ----------
@@ -468,7 +474,7 @@ func _build_supplies() -> void:
 	lines.append("• " + tr("Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing."))
 	lines.append("• " + tr("To make more: learn the recipe from the materia medica in the library (once, three hours), get iron salts, red wine and wormwood, then prepare them at your clinic cabinet (one hour). They are ready the next morning."))
 	lines.append("• " + tr("Everyday complaints (burns, cuts, toothaches, sore throats, headaches) need their own remedies, prepared at the cabinet: bandages, burn salve, clove oil, honey and thyme syrup, willow bark tea."))
-	lines.append("• " + tr("Ingredients: the merchant beyond the bridge sells nearly all of them (mornings, 7 to 1). Willow bark grows on the riverbank and herbs in the woods beyond the bridge: free, but gathering takes half an hour."))
+	lines.append("• " + tr("Ingredients: the merchant beyond the bridge sells nearly all of them (mornings, 7 to 1). Willow bark grows on the riverbank by the bridge and herbs among the graves of the cemetery: free, but gathering takes half an hour."))
 	if not GameState.knows_tonic:
 		lines.append("• " + tr("You don't know the recipe yet."))
 	lines.append("• " + tr("Coins: the Town Hall pays you {salary} every morning, and each patient pays {fee} for their first exam of the day.").format({"salary": GameState.SALARY, "fee": GameState.EXAM_FEE}))

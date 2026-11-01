@@ -52,6 +52,8 @@ func _process(_delta: float) -> void:
 		var gap := player.global_position - global_position
 		near = Vector2(gap.x, gap.z).length() < PICK_RANGE and absf(gap.y) < 2.2
 	prompt.visible = near and not GameState.in_dialogue and not GameState.reading
+	if prompt.visible:
+		prompt.text = tr("[E] Pick up")  # Here, not at build: the language may change on the title screen
 
 
 # _input, not _unhandled_input: with someone standing next to the paper, picking it up wins
