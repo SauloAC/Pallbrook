@@ -23,6 +23,7 @@ Audio="*res://autoload/Audio.gd"
 Playtest="*res://autoload/Playtest.gd"
 Lang="*res://autoload/Lang.gd"
 Settings="*res://autoload/Settings.gd"
+SaveGame="*res://autoload/SaveGame.gd"
 
 [display]
 

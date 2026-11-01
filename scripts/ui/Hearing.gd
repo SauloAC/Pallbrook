@@ -117,6 +117,7 @@ func _open(accused_name: String) -> void:
 		EventBus.dialogue_started.emit("Doctor", _t("The hearing against {name} will not take place.", {"name": _n(accused_name)}))
 		return
 	GameState.hearings_held += 1
+	SaveGame.remember(["hearings_held", "hearing"])  # Walking out of it (closing the game) still spends it
 	Playtest.count("hearings")
 	Playtest.log_line("Hearing against %s" % accused_name)
 	evidence = _collect_evidence()
@@ -475,6 +476,10 @@ func _verdict() -> void:
 		body.text += "\n\n" + tr("Three pieces of evidence and two witnesses: without a full case, few here will condemn anyone on your word.")
 	if GameState.hearings_held >= GameState.MAX_HEARINGS and not (guilty and accused.is_vampire()):
 		body.text += "\n\n" + tr("The town will not gather for you again.")
+	if guilty and accused.is_vampire():
+		SaveGame.delete_save()  # The case is as good as closed
+	else:
+		SaveGame.remember_townsfolk(["affinity"])  # The verdict stands even if the game is closed now
 	_refresh()
 
 

@@ -35,6 +35,7 @@ var hunt_victim: Node = null
 # 3. It reaches him: the game ends.
 const CHASE_TRIGGER := 7.0     # Mutual sighting closer than this starts the chase
 const CATCH_RANGE := 1.1       # Contact, or as good as
+const COME_AFTER_CHASE := 3   # The night it comes for a doctor who got away: two nights to bring it to a hearing
 const LOSE_SECONDS := 4.0      # Out of its sight this long and it gives up
 const SAFE_GIVE_UP := 8.0      # Waiting at the edge of a safe place this long, then it leaves
 var chasing := false
@@ -46,10 +47,14 @@ var relentless := false        # Tonight's chase is for the doctor: no giving up
 
 
 func _ready() -> void:
+	add_to_group("vampire_director")  # SaveGame reads its plans
 	EventBus.phase_changed.connect(_on_phase_changed)
 	# NPCs join the "npcs" group in their own _ready, which runs after ours
 	await get_tree().process_frame
-	_choose_vampire()
+	if SaveGame.restoring:
+		_restore()
+	else:
+		_choose_vampire()
 
 
 func _choose_vampire() -> void:
@@ -58,18 +63,28 @@ func _choose_vampire() -> void:
 		return
 	vampire = npcs.pick_random()
 	GameState.vampire_name = vampire.data.npc_name
+	GameState.case_id = "%d-%d" % [Time.get_unix_time_from_system(), randi()]
 	vampire.set_hunger(randf_range(95.0, 100.0))  # Fed well just before the doctor came: Jonas
 	_seed_outbreak()
 	var residents: Array = npcs.map(func(n): return n.data.npc_name)
 	GameState.history = TownHistory.generate(GameState.vampire_name, residents)  # The past, to fit the vampire
 	GameState.record_attack(0, LAST_VICTIM, "Casa1")  # The last death before the doctor arrived
 	_dig_last_grave.call_deferred()
+	_build_town()
+	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
+
+
+# Everything in town that hangs on who the vampire is, or keeps its own state
+func _build_town(garlic_owner := "") -> void:
 	safe_zones = SafeZones.new()
 	add_child(safe_zones)
-	safe_zones.setup(GameState.vampire_name)
+	safe_zones.setup(GameState.vampire_name, garlic_owner)
 	var diary := Diary.new()  # The old doctor's torn pages, hidden around town
 	add_child(diary)
-	diary.setup(GameState.vampire_name)
+	if SaveGame.restoring:
+		diary.restore()  # Same pieces in the same places; the found ones stay found
+	else:
+		diary.setup(GameState.vampire_name)
 	add_child(Doormats.new())  # A mat inside each front door, to find the way out
 	add_child(ClinicMural.new())  # The outbreak map on the clinic wall
 	add_child(Merchant.new())  # Gideon's stall in front of the cemetery, beyond the bridge
@@ -82,7 +97,41 @@ func _choose_vampire() -> void:
 	add_child(Nap.new())  # An afternoon nap in the clinic bed: an hour more on his feet tonight
 	add_child(ClinicPatients.new())  # Everyday complaints that walk into the clinic each morning
 	add_child(Gathering.new())  # Willow bark and wild herbs beyond the bridge
-	#print("[DEBUG] The vampire is: ", GameState.vampire_name)
+
+
+# Continuing a saved game: the same vampire in the same town, as it was that morning.
+# GameState and each townsperson already took their saved state (SaveGame, NPC.load_state).
+func _restore() -> void:
+	var saved: Dictionary = SaveGame.data.get("director", {})
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		if npc.data and npc.data.npc_name == GameState.vampire_name:
+			vampire = npc
+	if vampire == null:
+		push_warning("The saved vampire (%s) is not in town: starting a new case" % GameState.vampire_name)
+		SaveGame.finish_restore()
+		_choose_vampire()
+		return
+	plant_false_trace = bool(saved.get("plant_false_trace", false))
+	_build_town(String(saved.get("no_garlic", "")))
+	_restore_graves.call_deferred()
+	SaveGame.finish_restore()
+
+
+# Jonas first, then everyone buried since, in the order they died
+func _restore_graves() -> void:
+	await get_tree().process_frame  # town.glb (and its grave slots) may load after us
+	var dead := get_tree().get_nodes_in_group("npcs").filter(func(n): return n.data and n.buried)
+	dead.sort_custom(func(x, y): return x.found_day < y.found_day)
+	var slots := get_tree().root.find_children("GraveSlot*", "", true, false).filter(
+			func(slot): return slot is Node3D and slot.get_child_count() == 0)
+	var stones: Array = [NPC_SCRIPT.make_headstone(tr(LAST_VICTIM), tr("Clara's husband"))]
+	for npc in dead:
+		stones.append(NPC_SCRIPT.make_headstone(tr(npc.data.npc_name), tr(npc.data.role)))
+	for i in stones.size():
+		if i < slots.size():
+			slots[i].add_child(stones[i])
+		else:
+			stones[i].free()
 
 
 # Jonas's grave, fresh, among the old ones beyond the bridge
@@ -462,6 +511,7 @@ func _start_chase(for_the_doctor := false) -> void:
 	GameState.chased = true
 	GameState.faced_night = GameState.day  # The day only turns at dawn
 	GameState.faced_by = vampire.data.npc_name
+	SaveGame.remember_chase(GameState.faced_night + COME_AFTER_CHASE)  # Closing the game won't undo this
 	Playtest.count("chases")
 	Playtest.log_line("The vampire saw the doctor face to face and chased him")
 	Audio.play("clue", -2.0)
@@ -537,7 +587,7 @@ func _end_chase(dawn: bool) -> void:
 		_hid_all_night()
 		return
 	var first := not GameState.hunted_by_vampire
-	GameState.recognize(GameState.faced_night + 3)  # Two nights to bring it before the town
+	GameState.recognize(GameState.faced_night + COME_AFTER_CHASE)  # Two nights to bring it before the town
 	if dawn:
 		vampire.stop_hunt()
 	else:
@@ -576,6 +626,7 @@ func _attack_scene() -> void:
 func _caught() -> void:
 	chasing = false
 	GameState.chased = false
+	SaveGame.delete_save()  # No way back from here, not even by closing the game
 	Playtest.count("caught_by_vampire")
 	Playtest.log_line("The vampire caught the doctor")
 	GameState.in_dialogue = true  # Stops the doctor where he stands

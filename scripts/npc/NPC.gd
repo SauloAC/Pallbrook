@@ -225,6 +225,8 @@ func _ready() -> void:
 			visual.queue_free()
 			visual = null
 	_update_label()
+	if SaveGame.restoring and data:
+		load_state(SaveGame.npc_data(data.npc_name))  # Continuing a saved game
 	# Wait until the navigation map actually has walkable area
 	var map := agent.get_navigation_map()
 	while NavigationServer3D.map_get_random_point(map, 1, true) == Vector3.ZERO:
@@ -234,8 +236,52 @@ func _ready() -> void:
 	EventBus.phase_changed.connect(_on_phase_changed)
 	if wander:
 		_pick_random_destination()
+	elif restored:
+		if is_alive():
+			catch_up()  # A saved morning: straight to where the schedule has them
 	else:
 		_follow_schedule()
+
+
+# ---------- Saving (see SaveGame) ----------
+# What outlasts the night. Where they stand and what they are doing is left out: a saved game
+# starts in the morning, and everyone simply follows their schedule from there.
+const SAVED_PROPS := ["is_servant", "examined", "body_trace", "sightings", "wary_day", "asked", "hid_night",
+		"found_day", "blood", "bite_traces", "bite_spots", "wrist_found", "exam_count", "worried",
+		"flu_days", "flu_rest", "rest_day", "exams", "complaint", "complaint_day", "affinity",
+		"talked_day", "cared_day", "marked", "marked_day", "appointment_until", "appointment_from",
+		"appointment_day", "treated_day", "appointment", "skip_appointment", "booked_day", "visit_day",
+		"waiting_announced", "appointment_arrival", "doctor_was_there", "plans", "buried",
+		"servant_lie", "line_index"]
+var restored := false
+
+
+func save_state() -> Dictionary:
+	var status := "jailed" if jailed else ("dead" if state == State.DEAD else "alive")
+	return {"status": status, "vars": SaveGame.pack(self, SAVED_PROPS)}
+
+
+func load_state(saved: Dictionary) -> void:
+	if saved.is_empty():
+		return
+	SaveGame.unpack(self, saved.get("vars", {}))
+	# The appointment is the very entry in GameState's list (the casebook marks it there)
+	if not appointment.is_empty():
+		for entry: Dictionary in GameState.appointments:
+			if entry == appointment:
+				appointment = entry
+				break
+	restored = true
+	match String(saved.get("status", "alive")):
+		"dead":
+			set_state(State.DEAD)  # Found this morning: at their door. Buried: out of sight
+			if buried:
+				visible = false
+				collision.disabled = true
+		"jailed":
+			jail()
+	_update_color()
+	_update_label()
 
 
 # ---------- State machine ----------
@@ -756,6 +802,8 @@ func _check_seen_by_doctor() -> void:
 		if not nights.has(GameState.day):
 			nights.append(GameState.day)
 		GameState.saw_hunting[data.npc_name] = nights
+		SaveGame.remember(["saw_hunting"])  # He can't unsee it, even by closing the game
+		SaveGame.remember_entry(clue)
 
 # ---------- Schedule ----------
 

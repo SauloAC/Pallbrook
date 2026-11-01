@@ -32,7 +32,7 @@ var last_hour := -1
 
 func _ready() -> void:
 	add_to_group("day_night")  # Reading and brewing ask it to pass time
-	hour = start_hour
+	hour = GameState.hour if SaveGame.restoring else start_hour  # A saved game starts at its morning
 	GameState.hour = hour
 	# Test listener: shows the EventBus working
 	EventBus.phase_changed.connect(func(is_night): print("Night " if is_night else "Day ", GameState.day))

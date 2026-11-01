@@ -48,6 +48,7 @@ func _on_accusation_requested(npc: Node) -> void:
 func _on_game_ended(won: bool, message: String) -> void:
 	GameState.game_over = true
 	var heading := tr("Pallbrook is saved") if won else tr("Pallbrook is lost")
+	SaveGame.delete_save()  # Won or lost, the case is over: a save pauses a case, it never undoes one
 	_show(Mode.RESULT, heading, message, tr("[E] Play again"))
 
 

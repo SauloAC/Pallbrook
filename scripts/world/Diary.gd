@@ -74,12 +74,23 @@ func setup(vampire_name: String) -> void:
 	_spawn_pieces.call_deferred()
 
 
+# A saved game: GameState.diary already says where every piece lies and which were found.
+# The ones still on the ground are put back; the found ones stay in the casebook.
+func restore() -> void:
+	var spawned: Dictionary = GameState.diary.get("spawned", {})
+	for piece: String in spawned.keys():
+		if not is_found(piece):
+			spawned.erase(piece)
+	EventBus.phase_changed.connect(_on_phase_changed)
+	_spawn_pieces.call_deferred(true)
+
+
 func _on_phase_changed(is_night: bool) -> void:
 	if not is_night:
 		_spawn_pieces()
 
 
-func _spawn_pieces() -> void:
+func _spawn_pieces(quiet := false) -> void:  # quiet: putting back a saved game, no news
 	await get_tree().physics_frame  # The town's colliders must be in place for the ground check
 	var used := {}  # Pieces already put in each place, so they don't pile up
 	for piece: String in GameState.diary["spots"]:
@@ -91,7 +102,8 @@ func _spawn_pieces() -> void:
 		if piece == GameState.diary.get("last_page", ""):
 			if not _all_but_last_found():
 				continue
-			GameState.add_night_event(tr("You have found every piece the old doctor left in town. Only his last page is still missing."))
+			if not quiet:
+				GameState.add_night_event(tr("You have found every piece the old doctor left in town. Only his last page is still missing."))
 		elif GameState.day < int(GameState.diary["day_of"].get(piece, 1)):
 			continue
 		GameState.diary["spawned"][piece] = true

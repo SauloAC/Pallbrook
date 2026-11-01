@@ -9,6 +9,7 @@ var in_dialogue := false
 var reading := false               # The casebook is open: the world slows down (see Notebook)
 var casebook_hint_shown := false   # The first exam points the player to the casebook
 var vampire_name := ""
+var case_id := ""                # Tells this case's save from another's (see SaveGame)
 var clues: Array[String] = []
 # The casebook: {text, kind ("testimony" or "evidence"), day, people (names mentioned)}
 var entries: Array[Dictionary] = []
@@ -88,6 +89,7 @@ func reset() -> void:
 	Engine.time_scale = 1.0
 	game_over = false
 	vampire_name = ""
+	case_id = ""
 	weather = "clear"
 	open_building = ""
 	open_upstairs = false
@@ -144,6 +146,7 @@ func recognize(night: int) -> void:
 	if come_night < 0 or night < come_night:
 		come_night = night
 		known_since = day
+	SaveGame.remember(["hunted_by_vampire", "come_night", "known_since"])  # Quitting won't make it forget
 
 
 # Free nights left before it comes (0 = tonight it comes; -1 = it doesn't know him).

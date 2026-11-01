@@ -22,7 +22,7 @@ var gardens: Array[Rect2] = []   # Gardens that have garlic
 var no_garlic_owner := ""        # Whose garden has none this run
 
 
-func setup(vampire_name: String) -> void:
+func setup(vampire_name: String, keep_owner := "") -> void:
 	add_to_group("safe_zones")
 	var soils := get_tree().current_scene.find_children("GSoil_*", "MeshInstance3D", true, false)
 	var owners: Array[String] = []
@@ -30,7 +30,10 @@ func setup(vampire_name: String) -> void:
 		owners.append(String(soil.name).trim_prefix("GSoil_").get_slice(".", 0))
 	if owners.is_empty():
 		return
-	no_garlic_owner = vampire_name if vampire_name in owners else owners.pick_random()
+	if keep_owner in owners:
+		no_garlic_owner = keep_owner  # A saved game: the same garden as before
+	else:
+		no_garlic_owner = vampire_name if vampire_name in owners else owners.pick_random()
 	for soil: MeshInstance3D in soils:
 		var owner_name := String(soil.name).trim_prefix("GSoil_").get_slice(".", 0)
 		if owner_name == no_garlic_owner:

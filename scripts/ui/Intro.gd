@@ -35,6 +35,12 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_switch_language()
 		return
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_C \
+			and SaveGame.has_save():
+		get_viewport().set_input_as_handled()
+		Audio.play("click", -10.0)
+		SaveGame.continue_game()  # The town reloads at the saved morning (this screen stays hidden)
+		return
 	if event.is_action_pressed("interact"):
 		get_viewport().set_input_as_handled()  # This E must not also trigger the player
 		GameState.intro_seen = true
@@ -135,6 +141,8 @@ func _show_text() -> void:
 	title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	body.text = tr(INTRO)
 	hint.text = tr("[E] Begin")
+	if SaveGame.has_save():  # A case left halfway: carry on with it, or start a new one
+		hint.text = tr("[E] New case") + "      " + tr("[C] Continue: morning of Day {day}").format({"day": SaveGame.saved_day()})
 	language_note.text = "[L] %s  ·  %s" % [tr("Change language"), Lang.locale_label()]
 	language_flag.texture = Lang.flag()
 	brightness_note.text = "[B] " + Settings.brightness_label()

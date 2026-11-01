@@ -69,6 +69,13 @@ func next_brightness() -> void:
 	changed.emit()
 
 
+# A short notice in the middle of the screen (brightness, the morning save)
+func show_toast(text: String, seconds := 2.0) -> void:
+	toast.text = text
+	toast.visible = true
+	toast_timer = seconds
+
+
 func _apply_gamma() -> void:
 	(gamma_rect.material as ShaderMaterial).set_shader_parameter("gamma", brightness)
 	gamma_rect.visible = not is_equal_approx(brightness, 1.0)  # No extra pass at 100%

@@ -34,3 +34,4 @@ func _unhandled_input(event: InputEvent) -> void:
 	if panel.visible and event.is_action_pressed("interact"):
 		panel.visible = false
 		get_tree().paused = false
+		SaveGame.save_game()  # The night is settled: this morning is where "Continue" starts
