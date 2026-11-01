@@ -242,7 +242,8 @@ func _collect_cases() -> void:
 			if record.get("marks", false) or String(record.get("trace", "")) != "":
 				var home: String = npc.data.home
 				var c: Dictionary = by_home.get(home, {"home": home, "nights": [], "lines": [], "latest": 0})
-				c["lines"].append(tr("Day {day}: you found bite marks on {name}").format({"day": record["day"], "name": tr(npc.data.npc_name)}))
+				var found := "Day {day}: small red marks on {name}" if GameState.act == 1 else "Day {day}: you found bite marks on {name}"  # Act 1: insect bites, as far as he knows
+				c["lines"].append(tr(found).format({"day": record["day"], "name": tr(npc.data.npc_name)}))
 				c["latest"] = maxi(int(c["latest"]), int(record["day"]) - 1)
 				by_home[home] = c
 				break

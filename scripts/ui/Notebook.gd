@@ -471,8 +471,8 @@ func _build_supplies() -> void:
 	if not bag.is_empty():
 		lines.append(tr("In your bag and cabinet: {list}").format({"list": ", ".join(bag)}))
 	lines.append(tr("— How it works —"))
-	lines.append("• " + tr("Iron tonic: treats one weak or bitten patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them)."))
-	lines.append("• " + tr("Not every sick person was bitten: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing."))
+	lines.append("• " + tr("Iron tonic: treats one weak, anemic patient. Ask them to come to the clinic, be there at the agreed time, and give it to them (talk to them)."))
+	lines.append("• " + tr("Not every pale patient has this anemia: autumn chills bring fever, a strong pulse and a cough. The tonic does nothing for them; prescribe rest and good food instead (after an exam, or at the clinic). It costs nothing."))
 	lines.append("• " + tr("To make more: learn the recipe from the materia medica in the library (once, three hours), get iron salts, red wine and wormwood, then prepare them at your clinic cabinet (one hour). They are ready the next morning."))
 	lines.append("• " + tr("Everyday complaints (burns, cuts, toothaches, sore throats, headaches) need their own remedies, prepared at the cabinet: bandages, burn salve, clove oil, honey and thyme syrup, willow bark tea."))
 	lines.append("• " + tr("Ingredients: the merchant beyond the bridge sells nearly all of them (mornings, 7 to 1). Willow bark grows on the riverbank by the bridge and herbs among the graves of the cemetery: free, but gathering takes half an hour."))

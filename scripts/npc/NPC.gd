@@ -1345,10 +1345,14 @@ func _exam_text(v: Dictionary) -> String:
 		parts.append(tr("Also feverish, with a cough."))
 	if v["temp"] == "Cool" and blood >= ANEMIA_LEVEL:
 		parts.append(tr("Hands a little cool, but it is autumn."))
+	# Act 1: as far as the doctor knows, insect bites. From act 2 he calls them what they are.
+	var act1 := GameState.act == 1
 	if neck_bitten():
-		parts.append(_t("Two small punctures on the neck. On the collar, traces of {trace}.", {"trace": tr(bite_traces[-1])}))
+		parts.append(_t("Two small red marks on the neck, like insect bites. On the collar, traces of {trace}." if act1
+				else "Two small punctures on the neck. On the collar, traces of {trace}.", {"trace": tr(bite_traces[-1])}))
 	elif bite_spots.has("wrist") and wrist_found:
-		parts.append(_t("No marks on the neck, but two small punctures inside the wrist. On the cuff, traces of {trace}.", {"trace": tr(bite_traces[-1])}))
+		parts.append(_t("No marks on the neck, but two small red marks inside the wrist, like insect bites. On the cuff, traces of {trace}." if act1
+				else "No marks on the neck, but two small punctures inside the wrist. On the cuff, traces of {trace}.", {"trace": tr(bite_traces[-1])}))
 	elif not is_servant:
 		parts.append(tr("No marks on the neck."))
 	if is_servant:
