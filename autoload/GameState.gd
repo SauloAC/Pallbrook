@@ -16,6 +16,16 @@ var case_id := ""                # Tells this case's save from another's (see Sa
 var act := 1
 var sign_day := -1               # Act 1: the day he first found a sign it is no sickness
 var act2_day := -1               # The morning act 2 began (the diary's act 2 pieces count from it)
+
+# ---------- Pressure on the vampire (act 2 on; see the design doc) ----------
+# How close the vampire feels the doctor is. Only what it notices counts (being examined, asked
+# again and again, seeing him watch at night, a chase, a hearing); never what he learns in hiding.
+# The player never sees the number: he sees the vampire react.
+const PRESSURE_WARY := 30.0      # Leaves someone else's trace every time, keeps away from the clinic
+const PRESSURE_CORNERED := 60.0  # Goes for whoever the doctor cares about most
+const PRESSURE_EASE := 10.0      # Lost each morning after a day and night it felt nothing
+var pressure := 0.0
+var pressure_day := -1           # The last day something pressed it
 var clues: Array[String] = []
 # The casebook: {text, kind ("testimony" or "evidence"), day, people (names mentioned)}
 var entries: Array[Dictionary] = []
@@ -99,6 +109,8 @@ func reset() -> void:
 	act = 1
 	sign_day = -1
 	act2_day = -1
+	pressure = 0.0
+	pressure_day = -1
 	weather = "clear"
 	open_building = ""
 	open_upstairs = false
@@ -179,6 +191,21 @@ func attack_at(night: int, place: String) -> String:
 		if a["night"] == night and a["home"] == place:
 			return a["victim"]
 	return ""
+
+
+func press(amount: float, why: String) -> void:
+	if act < 2 or game_over:
+		return
+	pressure = minf(pressure + amount, 100.0)
+	pressure_day = day
+	Playtest.log_line("Pressure on the vampire +%d (%s): %d" % [amount, why, pressure])
+	SaveGame.remember(["pressure", "pressure_day"])  # Quitting doesn't calm it down
+
+
+# At dawn: a quiet day and night let it breathe (the doctor can lie low for a while)
+func ease_pressure() -> void:
+	if pressure_day < day - 1:
+		pressure = maxf(pressure - PRESSURE_EASE, 0.0)
 
 
 # Something no fever explains: the figure seen up close at night, a whole diary sheet, the same

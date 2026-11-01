@@ -24,7 +24,7 @@ const FORMAT := 2   # Raise when the layout changes in a way older saves can't f
 
 # GameState fields that make up a case. Left out on purpose: what only lasts a moment (in_dialogue,
 # reading, open_building, chased, pending_hours...) and what belongs to the session (intro_seen).
-const GAME_PROPS := ["case_id", "act", "sign_day", "act2_day", "day", "hour", "is_night", "casebook_hint_shown", "vampire_name", "clues", "entries",
+const GAME_PROPS := ["case_id", "act", "sign_day", "act2_day", "pressure", "pressure_day", "day", "hour", "is_night", "casebook_hint_shown", "vampire_name", "clues", "entries",
 		"appointments", "weather", "alibis", "reports", "crosschecks", "refusals", "beliefs", "remarks",
 		"lore", "hunted_by_vampire", "faced_night", "faced_by", "saw_hunting", "come_night", "known_since",
 		"hearing", "hearings_held", "attacks", "diary", "mural", "coins", "items", "tonics_ordered",

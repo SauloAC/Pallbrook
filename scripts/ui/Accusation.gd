@@ -89,6 +89,8 @@ func _resolve() -> void:
 	var accused: String = suspect.data.npc_name
 	var day := hearing.day_if_called_now()
 	GameState.hearing = {"accused": accused, "day": day}
+	if suspect.is_vampire():
+		GameState.press(40, "a hearing called against it")
 	Playtest.count("hearings_called")
 	var args := {"name": tr(accused), "day": day}
 	GameState.add_clue(Lang.contract(tr("Day {day} · You called a hearing against {name}, at 7 PM at the Town Hall.").format(args)), "evidence")

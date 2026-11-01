@@ -1160,6 +1160,8 @@ func greeting() -> String:
 
 func answer_alibi() -> String:
 	Playtest.count("asked_alibi")
+	if is_vampire() and int(asked.get("alibi", -1)) == GameState.day - 1:
+		GameState.press(5, "asked again where it was")  # Two days running: it notices
 	asked["alibi"] = GameState.day
 	if is_wary():
 		if GameState.day > 1:
@@ -1244,6 +1246,8 @@ func answer_exam() -> String:
 		Playtest.count("exams_of_bitten")
 	if has_flu():
 		Playtest.count("exams_of_flu")
+	if is_vampire():
+		GameState.press(10, "examined")  # Once a day at most: can_examine
 	if cared_day != GameState.day:
 		cared_day = GameState.day
 		change_affinity(8.0)
@@ -1371,12 +1375,18 @@ func _exam_text(v: Dictionary) -> String:
 	return Lang.join_sentences(parts)
 
 
+# The vampire when the pressure is up (see GameState.press): curt, a little too curt
+const COLD_LINES := ["You ask a lot of questions, doctor.", "Don't you have patients to see, doctor?",
+		"I've told you all I know. I'd rather be left alone."]
+
 func answer_chat() -> String:
 	asked["chat"] = GameState.day
 	if is_wary():
 		return tr("I'd rather not chat today, doctor.")
 	var line := "..."
-	if is_servant:
+	if is_vampire() and GameState.pressure >= GameState.PRESSURE_WARY and randf() < 0.5:
+		line = tr(COLD_LINES.pick_random())  # It feels him closing in, and it shows
+	elif is_servant:
 		line = _servant_line()
 	elif not data.dialogue_lines.is_empty():
 		# Go through the lines in order, looping back to the start

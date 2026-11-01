@@ -185,6 +185,7 @@ func _on_phase_changed(is_night: bool) -> void:
 	_home_by_sunrise()
 	# Every day without enough blood leaves the vampire hungrier
 	vampire.set_hunger(vampire.blood - hunger_per_day)
+	GameState.ease_pressure()
 	_check_act_two()
 
 
@@ -300,6 +301,7 @@ func _run_hunt(victim: Node) -> void:
 			Playtest.count("vampire_noticed_doctor")
 			Playtest.log_line("The vampire noticed the doctor from afar and gave up")
 			plant_false_trace = true
+			GameState.press(15, "noticed the doctor watching")
 			_abort_hunt()
 			return
 		await get_tree().physics_frame
@@ -307,6 +309,7 @@ func _run_hunt(victim: Node) -> void:
 		return
 	if _doctor_watching(victim) and not _frenzied():  # Starving, it no longer cares who is watching
 		victim.marked = false  # The doctor kept watch: the hold is broken
+		GameState.press(15, "the doctor at the victim's door")
 		Playtest.count("vampire_scared_off_by_watch")
 		Playtest.log_line("The vampire saw the doctor watching %s's door and fled" % victim.data.npc_name)
 		_abort_hunt(_t("A figure fled from {name}'s door when it saw the doctor.", {"name": tr(victim.data.npc_name)}))
@@ -389,20 +392,31 @@ func _seed_outbreak() -> void:
 		rest.pick_random().catch_flu()
 
 
+const CLINIC_NEAR := 12.0  # A wary vampire leaves the houses this close to the clinic alone
+
 func _pick_victim() -> Node:
 	# A marked person is the first to be visited again
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc.is_alive() and npc.marked:
 			return npc
 	var victims := []
-	var weak := []
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc != vampire and npc.is_alive() and not npc.is_servant and not npc.has_flu():
 			victims.append(npc)  # Fever in the blood: the vampire leaves the sick alone
-			if npc.is_anemic():
-				weak.append(npc)
 	if victims.is_empty():
 		return null
+	if GameState.pressure >= GameState.PRESSURE_CORNERED:
+		# Cornered: it goes for whoever the doctor cares about most (the romance partner, once
+		# there is one), as in Dracula
+		victims.sort_custom(func(a, b): return a.affinity > b.affinity)
+		return victims[0]
+	if GameState.pressure >= GameState.PRESSURE_WARY:
+		# Wary: it keeps away from the clinic's street, where the doctor is most often
+		var clinic := GameState.place_position("Clinica")
+		var far := victims.filter(func(n): return GameState.place_position(n.data.home).distance_to(clinic) > CLINIC_NEAR)
+		if not far.is_empty():
+			victims = far
+	var weak := victims.filter(func(n): return n.is_anemic())
 	# Half the time it returns to someone already weakened
 	if not weak.is_empty() and randf() < 0.5:
 		return weak.pick_random()
@@ -440,6 +454,7 @@ func _resolve_attack(victim: Node) -> void:
 		GameState.add_clue(_t("Morning of Day {day}: a figure was seen near {name}'s house.", shown), "evidence", morning)
 		_check_town_lost()
 		return
+	var chance := servant_chance * (2.0 if GameState.pressure >= GameState.PRESSURE_CORNERED else 1.0)  # Cornered: it needs more who lie for it
 	# Feed. Death only comes when the blood runs out.
 	var amount := randf_range(bite_min, bite_max)
 	var starving := _hungry()
@@ -466,12 +481,12 @@ func _resolve_attack(victim: Node) -> void:
 		# No patience to turn anyone: it just feeds, and not quietly
 		GameState.add_night_event(tr("Screams were heard in the night. Someone woke up torn and gravely weak."))
 		GameState.add_clue(_t("Morning of Day {day}: screams were heard near {name}'s house.", shown), "evidence", morning)
-	elif not act1 and others > 0 and _servant_slots() > 0 and randf() < servant_chance and victim.affinity >= 60.0:
+	elif not act1 and others > 0 and _servant_slots() > 0 and randf() < chance and victim.affinity >= 60.0:
 		# They trust the doctor: marked, with one day to warn him
 		victim.marked = true
 		victim.marked_day = morning
 		GameState.add_night_event(tr("Somewhere in Pallbrook, someone woke up weaker than they went to bed."))
-	elif not act1 and others > 0 and _servant_slots() > 0 and randf() < servant_chance:
+	elif not act1 and others > 0 and _servant_slots() > 0 and randf() < chance:
 		# Sometimes the bite turns them (only if someone else is left to hunt)
 		victim.make_servant()
 		Playtest.count("servants_made")
@@ -501,8 +516,8 @@ func _servant_slots(turning: Node = null) -> int:
 
 
 func _pick_trace(victim: Node) -> String:
-	if plant_false_trace:
-		plant_false_trace = false  # Seen recently: this time it leaves someone else's trace
+	if plant_false_trace or GameState.pressure >= GameState.PRESSURE_WARY:
+		plant_false_trace = false  # Seen recently, or it feels him closing in: someone else's trace
 	elif randf() < clue_reliability:
 		return vampire.data.clue_trait  # The real trace
 	# Misleading trace: someone innocent (never the victim)
@@ -560,6 +575,7 @@ func _start_chase(for_the_doctor := false) -> void:
 	GameState.chased = true
 	GameState.faced_night = GameState.day  # The day only turns at dawn
 	GameState.faced_by = vampire.data.npc_name
+	GameState.press(30, "face to face")
 	SaveGame.remember_chase(GameState.faced_night + COME_AFTER_CHASE)  # Closing the game won't undo this
 	Playtest.count("chases")
 	Playtest.log_line("The vampire saw the doctor face to face and chased him")
