@@ -98,6 +98,8 @@ func _update_lighting() -> void:
 		var day_color := Color(1.0, 0.95, 0.85).lerp(Color(0.82, 0.85, 0.9), grey)
 		sun.light_color = Color(0.5, 0.6, 1.0).lerp(day_color, daylight)
 
+	# Painted 2D surfaces (assets/test2d): their own painted light fades with the day
+	RenderingServer.global_shader_parameter_set("sprite_daylight", lerpf(0.12, 1.0, daylight))
 	if world_environment and world_environment.environment:
 		var env := world_environment.environment
 		env.background_energy_multiplier = lerpf(0.15, 1.0, daylight) * lerpf(1.0, 0.8, grey)

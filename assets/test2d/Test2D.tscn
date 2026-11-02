@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://assets/test2d/sprite_surface.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/test2d/house09_noshadow.png" id="4_vol"]
+[ext_resource type="ArrayMesh" path="res://assets/test2d/house09.obj" id="5_mesh"]
+
+[sub_resource type="ShaderMaterial" id="Mat_vol"]
+shader = ExtResource("1_shader")
+shader_parameter/tex = ExtResource("4_vol")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="BoxShape3D" id="Box_vol"]
+size = Vector3(7.9, 3, 3.76)
+
+[node name="Test2D" type="Node3D"]
+
+[node name="Volume" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, -10)
+mesh = ExtResource("5_mesh")
+material_override = SubResource("Mat_vol")
+
+[node name="VolumeBody" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.94, 1.5, -11.88)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VolumeBody"]
+shape = SubResource("Box_vol")

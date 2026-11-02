@@ -1,0 +1,216 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://assets/buildings2d/sprite_surface.gdshader" id="sh_sprite"]
+[ext_resource type="Shader" path="res://assets/buildings2d/tile_surface.gdshader" id="sh_tile"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/padaria/padaria_facade.png" id="tx_facade"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_floor.png" id="tx_floor"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_brick_wall.png" id="tx_wall"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_front.obj" id="m_front"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_roof.obj" id="m_roof"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_body.obj" id="m_body"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_floor.obj" id="m_floor"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_innerwall.obj" id="m_innerwall"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_table.png" id="tx_table"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bed.png" id="tx_bed"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_stack.png" id="tx_barrel_stack"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_a.png" id="tx_barrel_a"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_a.png" id="tx_sack_a"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_b.png" id="tx_sack_b"]
+
+[sub_resource type="ShaderMaterial" id="mt_facade"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_facade")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_floor"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_floor")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_wall"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_wall")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_table"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_table")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_Counter"]
+size = Vector2(2.562, 1.836)
+
+[sub_resource type="ShaderMaterial" id="mt_bed"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_bed")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_Bed"]
+size = Vector2(1.062, 1.917)
+
+[sub_resource type="ShaderMaterial" id="mt_barrel_stack"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_barrel_stack")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_BarrelStack"]
+size = Vector2(1.875, 2.625)
+
+[sub_resource type="ShaderMaterial" id="mt_barrel_a"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_barrel_a")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_Barrel"]
+size = Vector2(0.938, 1.847)
+
+[sub_resource type="ShaderMaterial" id="mt_sack_a"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_sack_a")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_SackA"]
+size = Vector2(0.719, 1.410)
+
+[sub_resource type="ShaderMaterial" id="mt_sack_b"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_sack_b")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_SackB"]
+size = Vector2(0.750, 1.458)
+
+[sub_resource type="BoxShape3D" id="b_Back"]
+size = Vector3(8.2, 3, 0.3)
+
+[sub_resource type="BoxShape3D" id="b_West"]
+size = Vector3(0.3, 3, 3.9)
+
+[sub_resource type="BoxShape3D" id="b_East"]
+size = Vector3(0.3, 3, 3.9)
+
+[sub_resource type="BoxShape3D" id="b_FrontLeft"]
+size = Vector3(0.5, 3, 0.3)
+
+[sub_resource type="BoxShape3D" id="b_FrontRight"]
+size = Vector3(6.15, 3, 0.3)
+
+[sub_resource type="BoxShape3D" id="b_Counter"]
+size = Vector3(2.5, 1, 1.8)
+
+[sub_resource type="BoxShape3D" id="b_Bed"]
+size = Vector3(1.0, 0.6, 1.9)
+
+[sub_resource type="BoxShape3D" id="b_Stack"]
+size = Vector3(1.8, 1, 0.5)
+
+[sub_resource type="BoxShape3D" id="b_Barrel"]
+size = Vector3(0.85, 1, 0.5)
+
+[sub_resource type="BoxShape3D" id="b_Sacks"]
+size = Vector3(1.5, 1, 0.5)
+
+[node name="Padaria2D" type="Node3D"]
+
+[node name="Padaria_Front" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_front")
+material_override = SubResource("mt_facade")
+
+[node name="Padaria_Roof" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_roof")
+material_override = SubResource("mt_facade")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_body")
+material_override = SubResource("mt_facade")
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_floor")
+material_override = SubResource("mt_floor")
+
+[node name="InnerWall" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_innerwall")
+material_override = SubResource("mt_wall")
+
+[node name="Furniture" type="Node3D" parent="."]
+
+[node name="Counter" type="MeshInstance3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.9, 0.8, -1.718)
+mesh = SubResource("q_Counter")
+surface_material_override/0 = SubResource("mt_table")
+
+[node name="Bed" type="MeshInstance3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 3.3, 0.45, -2.759)
+mesh = SubResource("q_Bed")
+surface_material_override/0 = SubResource("mt_bed")
+
+[node name="BarrelStack" type="MeshInstance3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 1.313, -3.5)
+mesh = SubResource("q_BarrelStack")
+surface_material_override/0 = SubResource("mt_barrel_stack")
+
+[node name="Barrel" type="MeshInstance3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.924, -3.5)
+mesh = SubResource("q_Barrel")
+surface_material_override/0 = SubResource("mt_barrel_a")
+
+[node name="SackA" type="MeshInstance3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.55, 0.705, -3.5)
+mesh = SubResource("q_SackA")
+surface_material_override/0 = SubResource("mt_sack_a")
+
+[node name="SackB" type="MeshInstance3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.85, 0.729, -3.45)
+mesh = SubResource("q_SackB")
+surface_material_override/0 = SubResource("mt_sack_b")
+
+[node name="Walls" type="StaticBody3D" parent="."]
+
+[node name="Back" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 1.5, -3.76)
+shape = SubResource("b_Back")
+
+[node name="West" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0, 1.5, -1.88)
+shape = SubResource("b_West")
+
+[node name="East" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.89, 1.5, -1.88)
+shape = SubResource("b_East")
+
+[node name="FrontLeft" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.78, 1.5, 0)
+shape = SubResource("b_FrontLeft")
+
+[node name="FrontRight" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.83, 1.5, 0)
+shape = SubResource("b_FrontRight")
+
+[node name="Counter" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.5, -1.72)
+shape = SubResource("b_Counter")
+
+[node name="Bed" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 0.3, -2.76)
+shape = SubResource("b_Bed")
+
+[node name="Stack" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 0.5, -3.45)
+shape = SubResource("b_Stack")
+
+[node name="Barrel" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.5, -3.45)
+shape = SubResource("b_Barrel")
+
+[node name="Sacks" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0.5, -3.45)
+shape = SubResource("b_Sacks")
