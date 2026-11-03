@@ -11,6 +11,7 @@ const INTERIOR_SLOTS := {
 	"CasaSarah": [Vector3(2.686, 0.0, -2.52), Vector3(1.706, 0.0, -0.7), Vector3(3.106, 0.0, -1.54)],
 	"CasaSebastian": [Vector3(0.041, 0.0, -2.52), Vector3(1.931, 0.0, -2.1), Vector3(1.651, 0.0, -3.92)],
 	"CasaSophia": [Vector3(-0.289, 0.0, -2.94), Vector3(-0.009, 0.0, -1.26), Vector3(1.391, 0.0, -0.98)],
+	"Deposito": [Vector3(-0.192, 0.0, -2.24), Vector3(-2.572, 0.0, -2.8), Vector3(0.787, 0.0, -2.66)],
 	"Fazenda": [Vector3(-7.048, 0.0, -2.94), Vector3(-3.828, 0.0, -3.5), Vector3(-5.508, 0.0, -1.4)],
 	"Padaria": [Vector3(6.754, 0.0, -2.8), Vector3(3.534, 0.0, -0.14), Vector3(6.334, 0.0, -0.14), Vector3(1.854, 0.0, -0.7)],
 }

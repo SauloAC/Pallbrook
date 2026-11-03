@@ -420,6 +420,7 @@ const PLACE_NAMES := {
 	"CasaClara": "Clara's house",
 	"Padaria": "the bakery",
 	"Fazenda": "Ada's farm",
+	"Deposito": "the farm store",
 }
 
 

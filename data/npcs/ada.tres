@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="NPCData" format=3]
+
+[ext_resource type="Script" uid="uid://dl651qayo3ngb" path="res://scripts/npc/NPCData.gd" id="1_npc"]
+
+[resource]
+script = ExtResource("1_npc")
+npc_name = "Ada"
+female = true
+role = "Farmer"
+color = Color(0.52, 0.62, 0.25, 1)
+schedule = Dictionary[int, String]({
+6: "Deposito",
+8: "Praca",
+12: "Taverna",
+13: "Praca",
+15: "Fazenda",
+20: "Fazenda"
+})
+home = "Fazenda"
+dialogue_lines = Array[String](["Fresh eggs and herbs at the square, doctor. Half the town still owes me for last week's.", "The goats won't go near the old road after dark. Animals know things."])
+clue_trait = "hay"
+bedtime = 21
+metadata/_custom_type_script = "uid://dl651qayo3ngb"

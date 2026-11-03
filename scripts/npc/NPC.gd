@@ -6,7 +6,7 @@ enum State { ROUTINE, TALKING, SCARED, SLEEPING, DEAD, HUNTING, INSIDE }
 const OPEN_AIR_PLACES := ["Praca"]
 # Walk-in buildings: people stay visible inside (the roof opens when the doctor enters)
 const WALK_IN_PLACES := ["Clinica", "Taverna", "Biblioteca", "Prefeitura", "Escola", "Igreja", "Casa2",
-		"Casa1", "CasaSophia", "CasaSarah", "CasaHugo", "CasaJohn", "CasaSebastian", "CasaClara", "Padaria", "Fazenda"]
+		"Casa1", "CasaSophia", "CasaSarah", "CasaHugo", "CasaJohn", "CasaSebastian", "CasaClara", "Padaria", "Fazenda", "Deposito"]
 
 @export var data: NPCData
 @export var speed := 2.5
@@ -91,6 +91,7 @@ const COMPLAINT_POOL := {
 	"Tomas": ["burn", "cut", "sprain"], "Marta": ["burn", "cut", "headache"], "Clara": ["cut", "headache", "toothache"],
 	"Hugo": ["throat", "headache", "toothache"], "Elias": ["throat", "toothache", "headache"],
 	"Sarah": ["throat", "headache", "sprain"], "Sophia": ["headache", "toothache", "throat"],
+	"Ada": ["cut", "sprain", "headache"],
 }
 const COMPLAINT_DAYS := 2      # It passes on its own after this many days
 var complaint := ""            # Key in COMPLAINTS ("" = nothing)
@@ -1855,6 +1856,7 @@ const CLINIC_TALK := {
 	"Elias": ["Your predecessor and I played chess on Thursdays. I still set up the board.", "I pray every morning, doctor. Lately the words feel heavier."],
 	"Sarah": ["One of my pupils told me something I couldn't bring myself to repeat. Not yet.", "Tomás fixed the school gate for free. Don't tell him I told you."],
 	"Sophia": ["I copied some of the old register before the pages went missing. I'm not sure whom to trust with them.", "The mayor visits the archive more than any mayor should."],
+	"Ada": ["I start before the sun, in the store by the pen. Lately I keep the lantern lit until I'm back inside.", "Jonas bought eggs from me every Sunday. The last time, he paid for two weeks at once. As if he knew."],
 }
 
 

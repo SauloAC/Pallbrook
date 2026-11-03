@@ -105,7 +105,9 @@ def build(h):
     INS = NAME + "_Inside"
     N('[node name="%s" type="Node3D" parent="."]\n' % INS)
     for nm, m, mt in (("Floor", "floor", GROUND_MT), ("InnerWall", "innerwall", "mt_wall"), ("Timber", "timber", "mt_beam")):
-        N('[node name="%s" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_%s")\nmaterial_override = SubResource("%s")\n' % (nm, INS, m, mt))
+        # an open-fronted building (a shed) shows its floor from outside too, through the opening
+        par = "." if (nm == "Floor" and SPEC.get("floor_outside")) else INS
+        N('[node name="%s" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_%s")\nmaterial_override = SubResource("%s")\n' % (nm, par, m, mt))
     N('[node name="Furniture" type="Node3D" parent="%s"]\n' % INS)
     if timber_low_fn:
         # <Name>_Lower: shown only while the doctor is inside downstairs (InteriorCutaway)
