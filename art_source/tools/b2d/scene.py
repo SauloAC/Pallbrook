@@ -18,6 +18,8 @@ def build(h):
     BLOCKS, up_meshes, up_shapes, conv = h.blocks, h.up_meshes, h.up_shapes, h.conv
     d0, d1 = h.d0, h.d1
     NOTCH = h.NOTCH
+    FY = h.FY
+    PORCH = getattr(h, "PORCH", None)
     XN, ZN, WT = (h.xn, h.zn, h.wt) if NOTCH else (None, None, None)
     # ---------- props ----------
     ext, sub, nodes, shapes = [], [], [], []
@@ -55,6 +57,10 @@ def build(h):
         E("ArrayMesh", RH + timber_low_fn, "m_timberlow"); E("ArrayMesh", RH + timber_up_fn, "m_timberupw")
     if DECK:
         E("ArrayMesh", RH + deck_fn, "m_deck"); E("Texture2D", RH + roof_tex, "tx_roof"); mat("mt_roof", "sh_sprite", "tx_roof")
+    if h.porch_fn:
+        E("ArrayMesh", RH + h.porch_fn, "m_porch")
+    if h.steps_fn:
+        E("ArrayMesh", RH + h.steps_fn, "m_steps")
     for nm, fn in (("roof", roof_fn), ("body", body_fn), ("floor", floor_fn), ("innerwall", wall_fn), ("timber", timber_fn)):
         E("ArrayMesh", RH + fn, "m_" + nm)
     FX = R + "fx/"
@@ -84,6 +90,10 @@ def build(h):
     if DECK:
         # outside the balcony goes with the roof it was cut from; upstairs a copy shows (below, in _Upper)
         N('[node name="Deck" type="MeshInstance3D" parent="%s_Roof"]' % NAME + '\nmesh = ExtResource("m_deck")\nmaterial_override = SubResource("%s")\n' % facade_mat)
+    if h.porch_fn:     # outside, always on show: you walk on it to the door
+        N('[node name="Porch" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_porch")\nmaterial_override = SubResource("%s")\n' % facade_mat)
+    if h.steps_fn:
+        N('[node name="Steps" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_steps")\nmaterial_override = SubResource("%s")\n' % facade_mat)
     N('[node name="%s" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_body")\nmaterial_override = SubResource("%s")\n' % ("Body", facade_mat))
     # Everything inside is shown only while the doctor is in (InteriorCutaway): from outside it would show
     # through the transparent parts of the art, above the lower roofs
@@ -115,21 +125,21 @@ def build(h):
     for bi, b, front, top in BLOCKS:
         N('[node name="%sFront" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_block%df")\nmaterial_override = SubResource("mt_block%d")\n' % (b["name"], INS, bi, bi))
         N('[node name="%sTop" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_block%dt")\nmaterial_override = SubResource("%s")\n' % (b["name"], INS, bi, ("mt_block%dtop" % bi) if b.get("top_tile") else "mt_wall"))
-        shapes.append((b["name"], b["x0"], b["x1"], 0, b["height"], b["z_back"], b["z_front"]))
+        shapes.append((b["name"], b["x0"], b["x1"], h.FY, h.FY + b["height"], b["z_back"], b["z_front"]))
         if b.get("flame"):
             fx_, fy_, fz_, fw_, fh_ = b["flame"]
             S('[sub_resource type="QuadMesh" id="q_flame%d"]\nsize = Vector2(%.4f, %.4f)\n' % (bi, fw_, fh_))
             N('[node name="%sFire" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_flame%d")\nsurface_material_override/0 = SubResource("mt_flame")\n'
-              % (b["name"], INS, tf(fx_, fy_, fz_), bi))
+              % (b["name"], INS, tf(fx_, fy_ + h.FY, fz_), bi))
         if b.get("light"):
             lx, ly, lz = b["light"]
             N('[node name="%sGlow" type="OmniLight3D" parent="%s"]\ntransform = %s\nlight_color = Color(1, 0.62, 0.3, 1)\nlight_energy = 0.9\nomni_range = 3.0\nshadow_enabled = false\n'
-              % (b["name"], INS, tf(lx, ly, lz)))
+              % (b["name"], INS, tf(lx, ly + h.FY, lz)))
     furniture = list(SPEC["furniture"])
     if SPEC.get("door_rug", True):
         furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": -0.42})
     for f in furniture:
-        lift = UP["height"] if (UP and f.get("upper")) else 0.0
+        lift = UP["height"] if (UP and f.get("upper")) else FY
         fpar = (INS + "/" + NAME + "_Upper") if (UP and f.get("upper")) else (INS + "/Furniture")
         w, h = props[f["prop"]]
         qw = w / 32.0 * FURN
@@ -153,6 +163,15 @@ def build(h):
     FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
     shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, max(0.15, FZ_ + 0.15), -D),
                ("FrontLeft", xw0, d0, 0, FH, 0.15, -0.15), ("FrontRight", d1, XN if NOTCH else xw1, 0, FH, 0.15, -0.15)]
+    if FY > 0:    # the raised floor is a solid slab; the porch in front of the door and the steps up to it
+        shapes.append(("RaisedFloor", xw0, xw1, 0, FY, 0.15, -D))
+        if PORCH:
+            pa, pb, pz0, pz1 = PORCH
+            shapes.append(("PorchFloor", pa, pb, 0, FY, pz1, min(pz0, 0.15)))
+        if SPEC.get("steps"):
+            sx0, sx1 = (px(v) for v in SPEC["steps"]["x_px"])
+            st, sb = SPEC["steps"]["z"]          # where they meet the porch, where they reach the ground
+            conv.append(("Steps", [(x, y, z) for x in (sx0, sx1) for y, z in ((FY, st - 0.05), (0.0, st - 0.05), (0.0, sb), (0.02, sb))]))
     if NOTCH:     # the lean-to: the main room's east wall up to it, and its own front wall
         shapes += [("NotchSide", XN - WT, XN, 0, WALL, 0.15, ZN), ("NotchFront", XN - WT, xw1, 0, WALL, ZN + 0.15, ZN - 0.15)]
     if FZ_ > 0:

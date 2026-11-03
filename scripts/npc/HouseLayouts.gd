@@ -6,6 +6,7 @@ extends RefCounted
 const INTERIOR_SLOTS := {
 	"Casa1": [Vector3(-2.209, 0.0, -1.26), Vector3(-5.149, 0.0, -0.98), Vector3(-0.949, 0.0, -1.82)],
 	"CasaClara": [Vector3(-2.23, 0.0, -1.89), Vector3(-1.81, 0.0, -0.42), Vector3(-0.41, 0.0, -0.98)],
+	"CasaHugo": [Vector3(0.022, 0.0, -3.71), Vector3(-1.028, 0.0, -1.54), Vector3(1.282, 0.0, -1.4)],
 	"CasaJohn": [Vector3(0.041, 0.0, -0.98), Vector3(-1.791, 0.0, -2.1), Vector3(0.601, 0.0, -2.38)],
 	"CasaSarah": [Vector3(2.686, 0.0, -2.52), Vector3(1.706, 0.0, -0.7), Vector3(3.106, 0.0, -1.54)],
 	"CasaSebastian": [Vector3(0.041, 0.0, -2.52), Vector3(1.931, 0.0, -2.1), Vector3(1.651, 0.0, -3.92)],
@@ -17,6 +18,7 @@ const INTERIOR_SLOTS := {
 const BED_SPOTS := {
 	"Casa1": [Vector3(-6.409, 0.0, -2.24), 0.0],
 	"CasaClara": [Vector3(-0.2, 2.94, -1.75), 0.0],
+	"CasaHugo": [Vector3(-1.756, 0.42, -3.15), 0.0],
 	"CasaJohn": [Vector3(0.251, 3.879, -4.76), 0.0],
 	"CasaSarah": [Vector3(2.966, 3.402, -4.62), 0.0],
 	"CasaSebastian": [Vector3(2.701, 0.0, -4.83), 0.0],

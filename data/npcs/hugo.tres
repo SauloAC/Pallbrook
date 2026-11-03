@@ -13,9 +13,9 @@ schedule = Dictionary[int, String]({
 12: "Taverna",
 14: "Prefeitura",
 17: "Praca",
-20: "CasaHugo"
+20: "CasaSarah"
 })
-home = "CasaHugo"
+home = "CasaSarah"
 dialogue_lines = Array[String](["Welcome to Pallbrook! A quiet town, I assure you.", "If you hear rumors, ignore them. People here love a good story."])
 clue_trait = "stamp ink"
 bedtime = 21

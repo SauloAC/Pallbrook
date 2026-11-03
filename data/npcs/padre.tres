@@ -13,9 +13,9 @@ schedule = Dictionary[int, String]({
 12: "Taverna",
 14: "Igreja",
 19: "Taverna",
-21: "Casa1"
+21: "CasaHugo"
 })
-home = "Casa1"
+home = "CasaHugo"
 dialogue_lines = Array[String](["May God protect you, doctor. The nights here have grown too long.", "I pray for this town every morning. Lately, I pray more."])
 clue_trait = "candle wax"
 bedtime = 21

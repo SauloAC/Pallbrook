@@ -38,6 +38,7 @@ class House:
         self.HIN = spec["room_height"]
         self.UP = spec.get("upper")
         self.DECK = spec.get("deck")
+        self.FY = spec.get("floor_y", 0.0)           # a raised floor (a house on posts), in local units
         # a set-back part on the right (a lean-to): its front wall stands behind the main front
         self.NOTCH = spec.get("notch")
         if self.NOTCH:

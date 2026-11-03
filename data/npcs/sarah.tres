@@ -14,9 +14,9 @@ schedule = Dictionary[int, String]({
 12: "Taverna",
 13: "Escola",
 16: "Biblioteca",
-19: "CasaSarah"
+19: "Casa1"
 })
-home = "CasaSarah"
+home = "Casa1"
 dialogue_lines = Array[String](["Half my pupils stayed home this week. Their parents say they are just tired.", "Children notice things, doctor. They say someone walks the streets at night."])
 clue_trait = "chalk dust"
 portrait = ExtResource("2_portrait")

@@ -6,13 +6,14 @@ def build(h):
     sp, D, HIN = h.spec, h.D, h.HIN
     XI0, XI1, ZB, xw0, xw1 = h.XI0, h.XI1, h.ZB, h.xw0, h.xw1
     if h.NOTCH:     # the floor stops at the lean-to's front wall
-        h.floor_fn = h.obj("Floor", [rect_floor(xw0, h.xn, -D, 0.0, 0.02), rect_floor(h.xn, xw1, -D, h.zn, 0.02)], ["0 1 0"])
+        h.floor_fn = h.obj("Floor", [rect_floor(xw0, h.xn, -D, 0.0, h.FY + 0.02), rect_floor(h.xn, xw1, -D, h.zn, h.FY + 0.02)], ["0 1 0"])
     else:
-        h.floor_fn = h.obj("Floor", [rect_floor(xw0, xw1, -D, 0.0, 0.02)], ["0 1 0"])
+        h.floor_fn = h.obj("Floor", [rect_floor(xw0, xw1, -D, 0.0, h.FY + 0.02)], ["0 1 0"])
     # inner back wall, tiled so its pixels stay square on screen
     su, sv = h.su, h.sv
-    h.wall_fn = h.obj("InnerWall", [([(XI0, 0, ZB), (XI1, 0, ZB), (XI1, HIN, ZB), (XI0, HIN, ZB)],
-                                     [(XI0 * su, 0), (XI1 * su, 0), (XI1 * su, HIN * COS * sv), (XI0 * su, HIN * COS * sv)], 1)], ["0 0 1"])
+    FY = h.FY
+    h.wall_fn = h.obj("InnerWall", [([(XI0, FY, ZB), (XI1, FY, ZB), (XI1, HIN, ZB), (XI0, HIN, ZB)],
+                                     [(XI0 * su, 0), (XI1 * su, 0), (XI1 * su, (HIN - FY) * COS * sv), (XI0 * su, (HIN - FY) * COS * sv)], 1)], ["0 0 1"])
 
     # cut walls: timber on the side and back wall tops and on the side wall front ends
     tb, tb_low, tb_up = [], [], []           # always / downstairs only / upstairs only (beside a balcony)
@@ -47,7 +48,9 @@ def build(h):
     h.blocks = []
     for bi, b in enumerate(sp.get("blocks", [])):
         x0, x1, zb, zf, hh = b["x0"], b["x1"], b["z_back"], b["z_front"], b["height"]
-        front = h.obj("Block%dFront" % bi, [([(x0, 0, zf), (x1, 0, zf), (x1, hh, zf), (x0, hh, zf)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1)], ["0 0 1"])
+        y0 = h.FY                     # blocks stand on the floor
+        hh = y0 + hh
+        front = h.obj("Block%dFront" % bi, [([(x0, y0, zf), (x1, y0, zf), (x1, hh, zf), (x0, hh, zf)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1)], ["0 0 1"])
         btw, bth = b.get("top_tile_px", h.wall_tile)
         bu, bv = 32.0 / btw, 32.0 / bth
         top = h.obj("Block%dTop" % bi, [([(x0, hh, zf), (x1, hh, zf), (x1, hh, zb), (x0, hh, zb)],

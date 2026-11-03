@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://db3dnatyrv5hh"
+path="res://.godot/imported/casahugo_front0.obj-98017388aef7488d277a837af8065810.mesh"
+
+[deps]
+
+files=["res://.godot/imported/casahugo_front0.obj-98017388aef7488d277a837af8065810.mesh"]
+
+source_file="res://assets/buildings2d/casahugo/casahugo_front0.obj"
+dest_files=["res://.godot/imported/casahugo_front0.obj-98017388aef7488d277a837af8065810.mesh", "res://.godot/imported/casahugo_front0.obj-98017388aef7488d277a837af8065810.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
