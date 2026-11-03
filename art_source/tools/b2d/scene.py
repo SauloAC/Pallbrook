@@ -17,6 +17,8 @@ def build(h):
     floor_fn, wall_fn, timber_fn, timber_low_fn, timber_up_fn = h.floor_fn, h.wall_fn, h.timber_fn, h.timber_low_fn, h.timber_up_fn
     BLOCKS, up_meshes, up_shapes, conv = h.blocks, h.up_meshes, h.up_shapes, h.conv
     d0, d1 = h.d0, h.d1
+    NOTCH = h.NOTCH
+    XN, ZN, WT = (h.xn, h.zn, h.wt) if NOTCH else (None, None, None)
     # ---------- props ----------
     ext, sub, nodes, shapes = [], [], [], []
     def E(kind, path, rid): ext.append('[ext_resource type="%s" path="%s" id="%s"]' % (kind, path, rid))
@@ -150,7 +152,9 @@ def build(h):
     FZ_ = UP.get("front_z", 0.0) if UP else 0.0
     FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
     shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, max(0.15, FZ_ + 0.15), -D),
-               ("FrontLeft", xw0, d0, 0, FH, 0.15, -0.15), ("FrontRight", d1, xw1, 0, FH, 0.15, -0.15)]
+               ("FrontLeft", xw0, d0, 0, FH, 0.15, -0.15), ("FrontRight", d1, XN if NOTCH else xw1, 0, FH, 0.15, -0.15)]
+    if NOTCH:     # the lean-to: the main room's east wall up to it, and its own front wall
+        shapes += [("NotchSide", XN - WT, XN, 0, WALL, 0.15, ZN), ("NotchFront", XN - WT, xw1, 0, WALL, ZN + 0.15, ZN - 0.15)]
     if FZ_ > 0:
         shapes.append(("UpperFront", xw0, xw1, UP["height"], WALL, FZ_ + 0.15, FZ_ - 0.15))
     if DECK:
@@ -164,7 +168,7 @@ def build(h):
                    ("DeckRailFront", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[1] - 0.1, DECK_Z[1]),
                    ("DeckRailBack", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[0], DECK_Z[0] + 0.1)]
     else:
-        shapes.append(("East", XI1, xw1, 0, WALL, max(0.15, FZ_ + 0.15), -D))
+        shapes.append(("East", XI1, xw1, 0, WALL, ZN + 0.15 if NOTCH else max(0.15, FZ_ + 0.15), -D))
     if UP:
         if FZ_ <= 0:
             shapes.append(("UpperDoor", d0, d1, UP["height"] + 0.5, WALL, 0.15, -0.15))
@@ -178,6 +182,27 @@ def build(h):
         S('[sub_resource type="QuadMesh" id="q_smoke"]\nsize = Vector2(0.9, 3.2)\n')
         N('[node name="ChimneySmoke" type="MeshInstance3D" parent="."]\ntransform = %s\nmesh = SubResource("q_smoke")\nsurface_material_override/0 = SubResource("mt_smoke")\n'
           % tf(px(sx), sy + 1.6, sz + 0.05))
+    # lanterns in the art: a small flame behind the glass and a light that comes on at night
+    if SPEC.get("lamps"):
+        if not any('id="sh_flame"' in e for e in ext):
+            E("Shader", FX + "fx_flame.gdshader", "sh_flame"); E("Texture2D", FX + "fx_flame.png", "tx_flame")
+            S('[sub_resource type="ShaderMaterial" id="mt_flame"]\nshader = ExtResource("sh_flame")\nshader_parameter/frames = ExtResource("tx_flame")\n')
+        E("Script", "res://scripts/world/NightLight.gd", "sc_nightlight")
+        for li, lp_ in enumerate(SPEC["lamps"]):
+            lx_px, lrow = lp_["px"]
+            lpl = SPEC["planes"][lp_.get("plane", 0)]
+            lx, ly, lz = px(lx_px), (lpl["base"] - lrow) / 32.0 / COS, lpl["z"] + 0.03
+            fw_, fh_ = lp_.get("flame", (0.12, 0.16))
+            S('[sub_resource type="QuadMesh" id="q_lamp%d"]\nsize = Vector2(%.4f, %.4f)\n' % (li, fw_, fh_))
+            # the flame goes with the art it sits in: the front (hidden indoors), and upstairs too when
+            # the lantern is one of the pieces of the outside kept on show there
+            N('[node name="Lamp%dFlame" type="MeshInstance3D" parent="%s_Front"]\ntransform = %s\nmesh = SubResource("q_lamp%d")\nsurface_material_override/0 = SubResource("mt_flame")\n'
+              % (li, NAME, tf(lx, ly, lz), li))
+            if UP and any(k["rect"][0] <= lx_px < k["rect"][2] and k["rect"][1] <= lrow < k["rect"][3] for k in SPEC.get("keep_inside", [])):
+                N('[node name="Lamp%dFlameUp" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_lamp%d")\nsurface_material_override/0 = SubResource("mt_flame")\n'
+                  % (li, NAME + "_Inside/" + NAME + "_Upper", tf(lx, ly, lz), li))
+            N('[node name="Lamp%dLight" type="OmniLight3D" parent="."]\ntransform = %s\nlight_color = Color(1, 0.72, 0.4, 1)\nlight_energy = 1.2\nomni_range = 4.0\nshadow_enabled = false\nscript = ExtResource("sc_nightlight")\n'
+              % (li, tf(lx, ly, lz + 0.4)))
     N('[node name="Walls" type="StaticBody3D" parent="."]\n')
     for nm, xa, xb, ya, yb, za, zb in shapes:
         S('[sub_resource type="BoxShape3D" id="b_%s"]\nsize = Vector3(%.4f, %.4f, %.4f)\n' % (nm, abs(xb - xa), abs(yb - ya), abs(zb - za)))

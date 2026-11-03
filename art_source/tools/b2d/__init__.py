@@ -20,6 +20,8 @@ def build_house(spec, out_dir, prop_sizes):
               "ridge": round(h.yt, 3), "door_x": round(h.door_x, 3), "room": [round(h.XI0, 3), round(h.XI1, 3), round(h.ZB, 3)]}
     if h.UP:
         h.info["upper"] = h.info_up
+    if h.NOTCH:
+        h.info["notch"] = [round(h.xn, 3), h.zn, round(h.wt, 3)]
     if h.DECK:
         h.info["deck_z"] = [round(h.DECK_Z[0], 3), round(h.DECK_Z[1], 3)]
     return h

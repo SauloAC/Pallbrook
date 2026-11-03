@@ -42,13 +42,17 @@ def build(h):
         h.deck_fn = h.obj("Deck", [([(h.px(dx0), dk["y"], zrow(dr1)), (h.px(dx1), dk["y"], zrow(dr1)), (h.px(dx1), dk["y"], zrow(dr0)), (h.px(dx0), dk["y"], zrow(dr0))],
                                      [h.uv(dx0, dr1), h.uv(dx1, dr1), h.uv(dx1, dr0), h.uv(dx0, dr0)], 1)], ["0 1 0"])
         h.DECK_Z = (zrow(dr0), zrow(dr1))                 # back, front
+        # how far the floor beside the east wall reaches: the painted balcony's back railing and front edge
+        h.DECK_ZR = (zrow(dk["fill_rows"][0]), zrow(dk["fill_rows"][1])) if dk.get("fill_rows") else h.DECK_Z
         h.DECK_X1 = h.px(dx1)
         if dk.get("walk"):                                # only the floor inside the painted railings can be walked on
             wx1, wr0, wr1 = dk["walk"]
             h.DECK_Z, h.DECK_X1 = (zrow(wr0), zrow(wr1)), h.px(wx1)
         im = h.art.copy(); pxl = im.load()
+        # cut a little less than the balcony out of the roof: the two overlap by a couple of pixels,
+        # so no seam of ground shows between them where the textures are filtered
         for y in range(dr0, dr1):
-            for x in range(dx0, dx1):
+            for x in range(dx0 + 2, dx1):
                 pxl[x, y] = (0, 0, 0, 0)
         h.roof_tex = h.key + "_facade_roof.png"
         im.save(os.path.join(h.out, h.roof_tex))
@@ -71,5 +75,5 @@ def build(h):
     xw0, xw1 = h.xw0, h.xw1
     h.body_fn = h.obj("Body", [([(xw1, 0, -D), (xw0, 0, -D), (xw0, yt, -D), (xw1, yt, -D)], [solid] * 4, 1),
                                ([(xw0, 0, -D), (xw0, 0, ze), (xw0, ye, ze), (xw0, yt, -D)], [solid] * 4, 2),
-                               ([(xw1, 0, ze), (xw1, 0, -D), (xw1, yt, -D), (xw1, ye, ze)], [solid] * 4, 3)],
+                               ([(xw1, 0, h.zn if h.NOTCH else ze), (xw1, 0, -D), (xw1, yt, -D), (xw1, ye, h.zn if h.NOTCH else ze)], [solid] * 4, 3)],
                       ["0 0 -1", "-1 0 0", "1 0 0"])

@@ -38,6 +38,11 @@ class House:
         self.HIN = spec["room_height"]
         self.UP = spec.get("upper")
         self.DECK = spec.get("deck")
+        # a set-back part on the right (a lean-to): its front wall stands behind the main front
+        self.NOTCH = spec.get("notch")
+        if self.NOTCH:
+            assert not self.DECK, "a notch and a balcony on the same house are not supported"
+            self.xn, self.zn, self.wt = self.px(self.NOTCH["x_px"]), self.NOTCH["z"], t
         self.d0, self.d1 = self.px(spec["door_px"][0]), self.px(spec["door_px"][1])
         self.door_x = (self.d0 + self.d1) / 2
         tw, th = spec.get("inner_wall_tile_px", (32, 32))

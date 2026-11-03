@@ -143,9 +143,6 @@ const HouseLayouts = preload("res://scripts/npc/HouseLayouts.gd")
 # Clinic: the last two are outside the door, for a queue.
 const INTERIOR_SLOTS_3D := {
 	# Homes (marker at the front door): spots off to the side, so the doctor can step in
-	"Casa1": [Vector3(0.6, 0.0, -2.2), Vector3(-0.4, 0.0, -1.9), Vector3(0.2, 0.0, -2.9)],
-	"CasaSophia": [Vector3(-1.2, 0.0, -2.0), Vector3(-1.8, 0.0, -2.4), Vector3(-0.6, 0.0, -1.7)],
-	"CasaSarah": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],
 	"CasaHugo": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],
 	# The farm (1 Nov) copies an older house: the same room and spots
 	"Fazenda": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],  # as CasaHugo
@@ -190,10 +187,7 @@ const INTERIOR_SLOTS_3D := {
 # way the head points (degrees around Y; 0 = head toward -z). Homes without a bed here
 # (the tavern rooms upstairs, the priest's quarters) still send their owner out of sight.
 const BED_SPOTS_3D := {
-	"Casa1": [Vector3(2.15, 0.0, -2.75), 0.0],
 	"Casa2": [Vector3(-1.9, 0.0, -2.7), 0.0],
-	"CasaSophia": [Vector3(-1.0, 0.0, -3.7), 90.0],
-	"CasaSarah": [Vector3(2.55, 0.0, -3.8), 90.0],
 	"CasaHugo": [Vector3(2.7, 0.0, -3.8), 90.0],
 	"Fazenda": [Vector3(2.7, 0.0, -3.8), 90.0],
 	"Taverna": [Vector3(1.45, 3.12, -6.85), -90.0],  # Marta sleeps upstairs, by the window (feet at the foot of the bed, head to the wall)

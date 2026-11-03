@@ -4,17 +4,23 @@ extends RefCounted
 
 # Indoor spots: the first is the owner's own (or the worker's post)
 const INTERIOR_SLOTS := {
+	"Casa1": [Vector3(-2.209, 0.0, -1.26), Vector3(-5.149, 0.0, -0.98), Vector3(-0.949, 0.0, -1.82)],
 	"CasaClara": [Vector3(-2.23, 0.0, -1.89), Vector3(-1.81, 0.0, -0.42), Vector3(-0.41, 0.0, -0.98)],
 	"CasaJohn": [Vector3(0.041, 0.0, -0.98), Vector3(-1.791, 0.0, -2.1), Vector3(0.601, 0.0, -2.38)],
+	"CasaSarah": [Vector3(2.686, 0.0, -2.52), Vector3(1.706, 0.0, -0.7), Vector3(3.106, 0.0, -1.54)],
 	"CasaSebastian": [Vector3(0.041, 0.0, -2.52), Vector3(1.931, 0.0, -2.1), Vector3(1.651, 0.0, -3.92)],
+	"CasaSophia": [Vector3(-0.289, 0.0, -2.94), Vector3(-0.009, 0.0, -1.26), Vector3(1.391, 0.0, -0.98)],
 	"Padaria": [Vector3(6.754, 0.0, -2.8), Vector3(3.534, 0.0, -0.14), Vector3(6.334, 0.0, -0.14), Vector3(1.854, 0.0, -0.7)],
 }
 
 # The foot of the bed and which way the head points (degrees around Y)
 const BED_SPOTS := {
+	"Casa1": [Vector3(-6.409, 0.0, -2.24), 0.0],
 	"CasaClara": [Vector3(-0.2, 2.94, -1.75), 0.0],
 	"CasaJohn": [Vector3(0.251, 3.879, -4.76), 0.0],
+	"CasaSarah": [Vector3(2.966, 3.402, -4.62), 0.0],
 	"CasaSebastian": [Vector3(2.701, 0.0, -4.83), 0.0],
+	"CasaSophia": [Vector3(-1.549, 0.0, -2.8), 0.0],
 	"Padaria": [Vector3(9.694, 2.94, -2.52), 0.0],
 }
 
@@ -22,5 +28,6 @@ const BED_SPOTS := {
 const BED_APPROACH := {
 	"CasaClara": Vector3(-1.25, 2.94, -0.98),
 	"CasaJohn": Vector3(-1.231, 3.879, -4.34),
+	"CasaSarah": Vector3(1.846, 3.402, -4.34),
 	"Padaria": Vector3(8.574, 2.94, -1.4),
 }

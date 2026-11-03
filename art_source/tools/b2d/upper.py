@@ -102,6 +102,12 @@ def build(h):
     if DECK:
         # the upper floor runs out over the cut east wall to the balcony, edged with timber
         floors.append(rect_floor(XI1 - 0.02, px(DECK["rect"][0]) + 0.02, DECK_Z[0], DECK_Z[1], H + 0.012))
+        # beside the solid parts of the east wall, the floor still reaches the painted balcony at its back and front
+        zr0, zr1 = h.DECK_ZR
+        if zr0 < DECK_Z[0] - 0.01:
+            floors.append(rect_floor(xw1 - 0.02, px(DECK["rect"][0]) + 0.02, zr0, DECK_Z[0], H + 0.012))
+        if zr1 > DECK_Z[1] + 0.01:
+            floors.append(rect_floor(xw1 - 0.02, px(DECK["rect"][0]) + 0.02, DECK_Z[1], zr1, H + 0.012))
         ut_extra = [([(XI1, H + 0.02, DECK_Z[1]), (px(DECK["rect"][0]) + 0.02, H + 0.02, DECK_Z[1]),
                       (px(DECK["rect"][0]) + 0.02, H + 0.02, DECK_Z[1] - 0.1), (XI1, H + 0.02, DECK_Z[1] - 0.1)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1),
                     ([(XI1, H + 0.02, DECK_Z[0] + 0.1), (px(DECK["rect"][0]) + 0.02, H + 0.02, DECK_Z[0] + 0.1),
