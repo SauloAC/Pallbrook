@@ -18,6 +18,7 @@ const UPSTAIRS_HEIGHT := 1.6  # Doctor's feet above this = on the upper floor
 var parts: Dictionary = {}     # suffix -> Node3D
 var sign_label: Node3D = null
 var inside: Node3D = null      # <Building>_Inside, for 2D buildings
+var lower: Node3D = null       # <Building>_Lower: shown only while the doctor is inside downstairs
 var building := ""
 var player: Node3D = null      # The doctor, while inside
 var upstairs := false
@@ -38,6 +39,7 @@ func _ready() -> void:
 	inside = scene.find_child(building + "_Inside", true, false) as Node3D
 	if inside:
 		inside.visible = false
+	lower = scene.find_child(building + "_Lower", true, false) as Node3D
 	if parts.is_empty():
 		push_warning("InteriorCutaway: no %s_Roof/_Upper/_Front nodes found" % building)
 	if hide_sign:
@@ -76,6 +78,8 @@ func _apply(open: bool) -> void:
 		parts[suffix].visible = not cut
 	if inside:
 		inside.visible = open
+	if lower:
+		lower.visible = open and not upstairs
 	if sign_label:
 		sign_label.visible = not open
 	if open:

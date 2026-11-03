@@ -144,7 +144,7 @@ const INTERIOR_SLOTS := {
 	"CasaSarah": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],
 	"CasaHugo": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],
 	# The north row, the bakery and the farm (1 Nov) copy older houses: the same rooms and spots
-	"CasaJohn": [Vector3(-0.08, 0.0, -1.4), Vector3(-0.92, 0.0, -1.96), Vector3(0.06, 0.0, -3.5)],  # 2D house: by the door, at the table, by the bed
+	"CasaJohn": [Vector3(0.04, 0.0, -0.98), Vector3(-1.79, 0.0, -2.1), Vector3(0.6, 0.0, -2.38)],  # 2D house: by the door, by the stairs, at the table
 	"CasaSebastian": [Vector3(0.04, 0.0, -2.52), Vector3(1.93, 0.0, -2.1), Vector3(1.65, 0.0, -3.92)],  # 2D house: at the table, mid-room, by the bed
 	"CasaClara": [Vector3(-2.23, 0.0, -1.89), Vector3(-1.81, 0.0, -0.42), Vector3(-0.41, 0.0, -0.98)],  # 2D house: at her sewing table, mid-workshop, by the door
 	"Padaria": [Vector3(6.748, 0.0, -2.8), Vector3(3.528, 0.0, -0.14), Vector3(6.328, 0.0, -0.14), Vector3(1.848, 0.0, -0.7)],  # 2D bakery: behind the counter, then the shop floor
@@ -195,7 +195,7 @@ const BED_SPOTS := {
 	"CasaSophia": [Vector3(-1.0, 0.0, -3.7), 90.0],
 	"CasaSarah": [Vector3(2.55, 0.0, -3.8), 90.0],
 	"CasaHugo": [Vector3(2.7, 0.0, -3.8), 90.0],
-	"CasaJohn": [Vector3(0.27, 0.0, -5.11), 0.0],
+	"CasaJohn": [Vector3(0.25, 3.88, -4.76), 0.0],  # upstairs, over the stone room
 	"CasaSebastian": [Vector3(2.7, 0.0, -4.83), 0.0],
 	"CasaClara": [Vector3(-0.2, 2.94, -1.75), 0.0],  # upstairs, over her workshop
 	"Fazenda": [Vector3(2.7, 0.0, -3.8), 90.0],
@@ -210,6 +210,7 @@ const BED_APPROACH := {
 	"Taverna": Vector3(0.6, 3.12, -6.6),
 	"Padaria": Vector3(8.568, 2.94, -1.4),  # Up the stone stairs, beside the bed
 	"CasaClara": Vector3(-1.25, 2.94, -0.98),  # Up her stairs, beside the bed
+	"CasaJohn": Vector3(-1.23, 3.88, -4.34),  # Up the stairs by the left wall, beside the bed
 }
 var in_bed := false
 

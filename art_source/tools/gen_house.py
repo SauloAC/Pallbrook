@@ -67,6 +67,34 @@ ye, ze = y_on(rp, re), rp["z"]
 yt = (rp["base"] / 32.0 - (ze + D) * SIN) / COS
 assert yt >= ye - 0.01, "roof would lean forward: make the house shallower (yt %.2f < eave %.2f)" % (yt, ye)
 XR = -XL
+DECK = SPEC.get("deck")
+roof_tex = KEY + "_facade.png"
+if DECK:
+    dx0, dr0, dx1, dr1 = DECK["rect"]
+    dpl = SPEC["planes"][DECK["plane"]]
+    zrow = lambda r: dpl["z"] - ((dpl["base"] - r) / 32.0 - DECK["y"] * COS) / SIN
+    deck_fn = obj("Deck", [([(px(dx0), DECK["y"], zrow(dr1)), (px(dx1), DECK["y"], zrow(dr1)), (px(dx1), DECK["y"], zrow(dr0)), (px(dx0), DECK["y"], zrow(dr0))],
+                            [uv(dx0, dr1), uv(dx1, dr1), uv(dx1, dr0), uv(dx0, dr0)], 1)], ["0 1 0"])
+    DECK_Z = (zrow(dr0), zrow(dr1))                 # back, front
+    DECK_X1 = px(dx1)
+    if DECK.get("walk"):                            # only the floor inside the painted railings can be walked on
+        wx1, wr0, wr1 = DECK["walk"]
+        DECK_Z, DECK_X1 = (zrow(wr0), zrow(wr1)), px(wx1)
+    im = art.copy(); pxl = im.load()
+    for y in range(dr0, dr1):
+        for x in range(dx0, dx1):
+            pxl[x, y] = (0, 0, 0, 0)
+    roof_tex = KEY + "_facade_roof.png"
+    im.save(os.path.join(OUT, roof_tex))
+# bits of the outside art that stay drawn while the doctor is inside (what holds up a balcony, say),
+# laid on a front plane just ahead of it: same place on screen, not cut away with the roof and front
+KEEP = []
+for ki, k in enumerate(SPEC.get("keep_inside", [])):
+    kx0, kr0, kx1, kr1 = k["rect"]
+    kp = SPEC["planes"][k.get("plane", 0)]
+    kz = kp["z"] + 0.02
+    KEEP.append(obj("Keep%d" % ki, [([(px(kx0), y_on(kp, kr1), kz), (px(kx1), y_on(kp, kr1), kz), (px(kx1), y_on(kp, kr0), kz), (px(kx0), y_on(kp, kr0), kz)],
+                                      [uv(kx0, kr1), uv(kx1, kr1), uv(kx1, kr0), uv(kx0, kr0)], 1)], ["0 0 1"]))
 roof_fn = obj("Roof", [([(XL, ye, ze), (XR, ye, ze), (XR, yt, -D), (XL, yt, -D)],
                         [uv(0, re), uv(IW, re), uv(IW, 0), uv(0, 0)], 1)],
               ["0 %.4f %.4f" % (D / math.hypot(D, yt - ye), (yt - ye) / math.hypot(D, yt - ye))])
@@ -90,14 +118,24 @@ wall_fn = obj("InnerWall", [([(XI0, 0, ZB), (XI1, 0, ZB), (XI1, HIN, ZB), (XI0, 
 # cut walls: timber on the side and back wall tops and on the side wall front ends
 BW = 0.5
 tb = []
+tb_low, tb_up = [], []                              # downstairs-only and upstairs-only timber (beside a balcony)
+def wall_top(lst, a, b, z0_, z1_, yy):
+    lst.append(([(a, yy, z0_), (b, yy, z0_), (b, yy, z1_), (a, yy, z1_)], [(0, 0), (0, 1), (-z1_ / BW, 1), (-z0_ / BW, 0)], 1))
+def wall_end(lst, a, b, hh):
+    lst.append(([(a, 0, -0.015), (b, 0, -0.015), (b, hh, -0.015), (a, hh, -0.015)], [(0, 0), (0, 1), (hh / BW, 1), (hh / BW, 0)], 2))
 for a, b in ((xw0, XI0), (XI1, xw1)):
-    tb.append(([(a, HIN, -0.015), (b, HIN, -0.015), (b, HIN, -D), (a, HIN, -D)],
-               [(0, 0), (0, 1), (D / BW, 1), (D / BW, 0)], 1))
-    tb.append(([(a, 0, -0.015), (b, 0, -0.015), (b, HIN, -0.015), (a, HIN, -0.015)],
-               [(0, 0), (0, 1), (HIN / BW, 1), (HIN / BW, 0)], 2))
+    if DECK and a == XI1:
+        # downstairs the east wall stands whole; upstairs it is cut down to the balcony floor in front of it and opens on it
+        wall_top(tb, a, b, DECK_Z[0], -D, HIN)
+        wall_top(tb_low, a, b, -0.015, DECK_Z[0], HIN); wall_end(tb_low, a, b, HIN)
+        wall_top(tb_up, a, b, -0.015, DECK_Z[1], DECK["y"] + 0.02); wall_end(tb_up, a, b, DECK["y"])
+    else:
+        wall_top(tb, a, b, -0.015, -D, HIN); wall_end(tb, a, b, HIN)
 tb.append(([(XI0, HIN, ZB), (XI1, HIN, ZB), (XI1, HIN, -D), (XI0, HIN, -D)],
            [(XI0 / BW, 0), (XI1 / BW, 0), (XI1 / BW, 1), (XI0 / BW, 1)], 1))
 timber_fn = obj("Timber", tb, ["0 1 0", "0 0 1"])
+timber_low_fn = obj("TimberLower", tb_low, ["0 1 0", "0 0 1"]) if tb_low else None
+timber_up_fn = obj("TimberUpperWall", tb_up, ["0 1 0", "0 0 1"]) if tb_up else None
 
 BLOCKS = []
 for bi, b in enumerate(SPEC.get("blocks", [])):
@@ -113,27 +151,11 @@ UP = SPEC.get("upper")
 up_meshes, up_shapes, conv = {}, [], []
 if UP:
     H = UP["height"]
-    LAND_X = XI0 + UP.get("landing", 0.8)
-    SF = ZB + UP.get("stair_depth", 1.0)           # front of the stairs = front of the stairwell
-    RAMP_LOW = LAND_X + UP.get("run", 2.7)
+    FZ = UP.get("front_z", 0.0)                    # the upper floor may overhang the ground floor (stilts)
     STEPS = UP.get("steps", 14)
-    dx, dy = (RAMP_LOW - LAND_X) / STEPS, H / STEPS
-    treads, side = [], []
     stw, sth = UP.get("stair_wall_tile_px", (tw, th))
     su2, sv2 = 32.0 / stw, 32.0 / sth
     STAIR_MT = "mt_stairwall" if UP.get("stair_wall_tile") else "mt_wall"
-    for i in range(STEPS):
-        xr, xl, y = RAMP_LOW - i * dx, RAMP_LOW - (i + 1) * dx, (i + 1) * dy
-        treads.append(([(xl, y, SF), (xr, y, SF), (xr, y, ZB), (xl, y, ZB)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1))
-        side.append(([(xl, 0, SF), (xr, 0, SF), (xr, y, SF), (xl, y, SF)],
-                     [(xl * su2, 0), (xr * su2, 0), (xr * su2, y * COS * sv2), (xl * su2, y * COS * sv2)], 1))
-    up_meshes["stairtreads"] = (obj("StairTreads", treads, ["0 1 0"]), "mt_tread", "")
-    up_meshes["stairside"] = (obj("StairSide", side, ["0 0 1"]), STAIR_MT, "")
-    up_meshes["landingtop"] = (obj("LandingTop", [rect_floor(XI0, LAND_X, ZB, SF, H + 0.012)], ["0 1 0"]), "mt_floor", "")
-    up_meshes["landingfront"] = (obj("LandingFront", [([(XI0, 0, SF), (LAND_X, 0, SF), (LAND_X, H, SF), (XI0, H, SF)],
-        [(XI0 * su2, 0), (LAND_X * su2, 0), (LAND_X * su2, H * COS * sv2), (XI0 * su2, H * COS * sv2)], 1)], ["0 0 1"]), STAIR_MT, "")
-    up_meshes["upperfloor"] = (obj("UpperFloor", [rect_floor(XI0, XI1, SF, 0.0, H + 0.01), rect_floor(RAMP_LOW, XI1, ZB, SF, H + 0.01)],
-                                   ["0 1 0"]), "mt_floor", "Upper")
     RAIL_H = 0.9 / 1.4
     def beam(faces, xa, ya, xb, yb, zf, t=0.07, d=0.07):
         if xa > xb: xa, ya, xb, yb = xb, yb, xa, ya
@@ -141,39 +163,103 @@ if UP:
         faces.append(([(xa, ya, zf), (xb, yb, zf), (xb, yb, zf - d), (xa, ya, zf - d)], [(0.75, 0.5)] * 4, 1))
     def post(faces, x, y0, y1, zf, w=0.07):
         beam(faces, x - w / 2, y1, x + w / 2, y1, zf, t=y1 - y0, d=w)
-    line = lambda x: dy / 2 + H * (RAMP_LOW - x) / (RAMP_LOW - LAND_X)
-    RZ = SF + 0.05
-    rail = []
-    beam(rail, RAMP_LOW - dx / 2, line(RAMP_LOW - dx / 2) + RAIL_H, LAND_X + dx / 2, line(LAND_X + dx / 2) + RAIL_H, RZ)
-    for i in (0, STEPS // 2, STEPS - 1):
-        x = RAMP_LOW - (i + 0.5) * dx
-        post(rail, x, (i + 1) * dy, line(x) + RAIL_H, RZ)
+    def zrail(faces, x, z0, y0, z1, y1, w=0.07):      # a rail running back along z: only its top shows
+        faces.append(([(x - w / 2, y0, z0), (x + w / 2, y0, z0), (x + w / 2, y1, z1), (x - w / 2, y1, z1)], [(0.75, 0.5)] * 4, 1))
+    treads, side, rail, upr = [], [], [], []
+    if UP.get("dir", "left") == "left":
+        # along the back wall, rising to the left to a landing in the back left corner
+        LAND_X = XI0 + UP.get("landing", 0.8)
+        SF = ZB + UP.get("stair_depth", 1.0)           # front of the stairs = front of the stairwell
+        RAMP_LOW = LAND_X + UP.get("run", 2.7)
+        dx, dy = (RAMP_LOW - LAND_X) / STEPS, H / STEPS
+        for i in range(STEPS):
+            xr, xl, y = RAMP_LOW - i * dx, RAMP_LOW - (i + 1) * dx, (i + 1) * dy
+            treads.append(([(xl, y, SF), (xr, y, SF), (xr, y, ZB), (xl, y, ZB)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1))
+            side.append(([(xl, 0, SF), (xr, 0, SF), (xr, y, SF), (xl, y, SF)],
+                         [(xl * su2, 0), (xr * su2, 0), (xr * su2, y * COS * sv2), (xl * su2, y * COS * sv2)], 1))
+        land = (XI0, LAND_X, ZB, SF)
+        up_meshes["landingfront"] = (obj("LandingFront", [([(XI0, 0, SF), (LAND_X, 0, SF), (LAND_X, H, SF), (XI0, H, SF)],
+            [(XI0 * su2, 0), (LAND_X * su2, 0), (LAND_X * su2, H * COS * sv2), (XI0 * su2, H * COS * sv2)], 1)], ["0 0 1"]), STAIR_MT, "")
+        floors = [rect_floor(XI0, XI1, SF, FZ, H + 0.01), rect_floor(RAMP_LOW, XI1, ZB, SF, H + 0.01)]
+        line = lambda x: dy / 2 + H * (RAMP_LOW - x) / (RAMP_LOW - LAND_X)
+        RZ = SF + 0.05
+        beam(rail, RAMP_LOW - dx / 2, line(RAMP_LOW - dx / 2) + RAIL_H, LAND_X + dx / 2, line(LAND_X + dx / 2) + RAIL_H, RZ)
+        for i in (0, STEPS // 2, STEPS - 1):
+            x = RAMP_LOW - (i + 0.5) * dx
+            post(rail, x, (i + 1) * dy, line(x) + RAIL_H, RZ)
+        beam(upr, LAND_X + 0.3, H + RAIL_H, RAMP_LOW, H + RAIL_H, RZ)
+        for x in (LAND_X + 0.3, (LAND_X + RAMP_LOW) / 2, RAMP_LOW):
+            post(upr, x, H, H + RAIL_H, RZ)
+        zrail(upr, RAMP_LOW, SF, H + RAIL_H, ZB, H + RAIL_H)
+        prof = [(RAMP_LOW + dx / 2, 0), (LAND_X, 0), (LAND_X, H), (LAND_X + dx / 2, H)]
+        conv.append(("Stairs", [(x, y, z) for z in (SF, ZB) for x, y in prof]))
+        rp_ = [(RAMP_LOW, 0), (LAND_X, H), (LAND_X, H + 1.0), (RAMP_LOW, 1.0)]
+        conv.append(("StairRail", [(x, y, z) for z in (SF - 0.02, SF + 0.08) for x, y in rp_]))
+        up_shapes += [("SlabA", XI0, XI1, H - 0.2, H, SF, FZ), ("SlabB", RAMP_LOW, XI1, H - 0.2, H, ZB, SF),
+                      ("Railing", LAND_X + 0.3, RAMP_LOW, H - 0.2, H + 1.0, SF, SF + 0.1),
+                      ("RailingSide", RAMP_LOW, RAMP_LOW + 0.1, H - 0.2, H + 1.0, ZB, SF + 0.1)]
+        info_up = {"H": H, "stairs_x": [round(LAND_X, 3), round(RAMP_LOW, 3)], "stairs_front": round(SF, 3)}
+    else:
+        # along the left wall, rising toward the back to a landing in the back left corner; risers face the room
+        SW = UP.get("width", 1.0)
+        XS = XI0 + SW                                   # open side of the stairs
+        ZLOW = UP["start_z"]
+        ZTOP = ZLOW - UP["run"]
+        dz, dy = (ZLOW - ZTOP) / STEPS, H / STEPS
+        for i in range(STEPS):
+            zf, zb, y = ZLOW - i * dz, ZLOW - (i + 1) * dz, (i + 1) * dy
+            treads.append(([(XI0, y, zf), (XS, y, zf), (XS, y, zb), (XI0, y, zb)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1))
+            side.append(([(XI0, i * dy, zf), (XS, i * dy, zf), (XS, y, zf), (XI0, y, zf)],
+                         [(XI0 * su2, i * dy * COS * sv2), (XS * su2, i * dy * COS * sv2), (XS * su2, y * COS * sv2), (XI0 * su2, y * COS * sv2)], 1))
+        land = (XI0, XS, ZB, ZTOP)
+        floors = [rect_floor(XS, XI1, ZB, FZ, H + 0.01), rect_floor(XI0, XS, ZLOW, FZ, H + 0.01)]
+        line = lambda z: dy / 2 + H * (ZLOW - z) / (ZLOW - ZTOP)
+        RX = XS + 0.04
+        zrail(rail, RX, ZLOW - dz / 2, line(ZLOW - dz / 2) + RAIL_H, ZTOP + dz / 2, line(ZTOP + dz / 2) + RAIL_H)
+        for i in (0, STEPS // 2, STEPS - 1):
+            z = ZLOW - (i + 0.5) * dz
+            post(rail, RX, (i + 1) * dy, line(z) + RAIL_H, z)
+        zrail(upr, RX, ZLOW, H + RAIL_H, ZTOP, H + RAIL_H)
+        beam(upr, XI0, H + RAIL_H, XS, H + RAIL_H, ZLOW - 0.04)
+        for z in (ZLOW, (ZLOW + ZTOP) / 2, ZTOP):
+            post(upr, RX, H, H + RAIL_H, z)
+        prof = [(ZLOW + dz / 2, 0), (ZTOP, 0), (ZTOP, H), (ZTOP + dz / 2, H)]
+        conv.append(("Stairs", [(x, y, z) for x in (XI0, XS) for z, y in prof]))
+        rp_ = [(ZLOW, 0), (ZTOP, H), (ZTOP, H + 1.0), (ZLOW, 1.0)]
+        conv.append(("StairRail", [(x, y, z) for x in (XS, XS + 0.08) for z, y in rp_]))
+        up_shapes += [("SlabA", XS, XI1, H - 0.2, H, ZB, FZ), ("SlabFront", XI0, XS, H - 0.2, H, ZLOW, FZ),
+                      ("Railing", XS, XS + 0.1, H - 0.2, H + 1.0, ZLOW, ZTOP),
+                      ("RailingFront", XI0, XS + 0.1, H - 0.2, H + 1.0, ZLOW - 0.1, ZLOW)]
+        info_up = {"H": H, "stairs_x": [round(XI0, 3), round(XS, 3)], "stairs_z": [round(ZLOW, 3), round(ZTOP, 3)]}
+    up_meshes["stairtreads"] = (obj("StairTreads", treads, ["0 1 0"]), "mt_tread", "")
+    up_meshes["stairside"] = (obj("StairSide", side, ["0 0 1"]), STAIR_MT, "")
+    up_meshes["landingtop"] = (obj("LandingTop", [rect_floor(land[0], land[1], land[2], land[3], H + 0.012)], ["0 1 0"]), "mt_floor", "")
+    if DECK:
+        # the upper floor runs out over the cut east wall to the balcony, edged with timber
+        floors.append(rect_floor(XI1 - 0.02, px(DECK["rect"][0]) + 0.02, DECK_Z[0], DECK_Z[1], H + 0.012))
+        ut_extra = [([(XI1, H + 0.02, DECK_Z[1]), (px(DECK["rect"][0]) + 0.02, H + 0.02, DECK_Z[1]),
+                      (px(DECK["rect"][0]) + 0.02, H + 0.02, DECK_Z[1] - 0.1), (XI1, H + 0.02, DECK_Z[1] - 0.1)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1),
+                    ([(XI1, H + 0.02, DECK_Z[0] + 0.1), (px(DECK["rect"][0]) + 0.02, H + 0.02, DECK_Z[0] + 0.1),
+                      (px(DECK["rect"][0]) + 0.02, H + 0.02, DECK_Z[0]), (XI1, H + 0.02, DECK_Z[0])], [(0, 0), (1, 0), (1, 1), (0, 1)], 1),
+                    ([(XI1, H, DECK_Z[0]), (xw1, H, DECK_Z[0]), (xw1, HIN, DECK_Z[0]), (XI1, HIN, DECK_Z[0])],
+                     [(0, 0), (0, 1), ((HIN - H) / BW, 1), ((HIN - H) / BW, 0)], 2)]
+    else:
+        ut_extra = []
+    up_meshes["upperfloor"] = (obj("UpperFloor", floors, ["0 1 0"]), "mt_floor", "Upper")
     up_meshes["railing"] = (obj("Railing", rail, ["0 1 0", "0 0 1"]), "mt_rail", "")
-    upr = []
-    beam(upr, LAND_X + 0.3, H + RAIL_H, RAMP_LOW, H + RAIL_H, RZ)
-    for x in (LAND_X + 0.3, (LAND_X + RAMP_LOW) / 2, RAMP_LOW):
-        post(upr, x, H, H + RAIL_H, RZ)
-    upr.append(([(RAMP_LOW - 0.035, H + RAIL_H, SF), (RAMP_LOW + 0.035, H + RAIL_H, SF), (RAMP_LOW + 0.035, H + RAIL_H, ZB),
-                 (RAMP_LOW - 0.035, H + RAIL_H, ZB)], [(0.75, 0.5)] * 4, 1))
     up_meshes["upperrailing"] = (obj("UpperRailing", upr, ["0 1 0", "0 0 1"]), "mt_rail", "Upper")
-    # upstairs the lower storey of the facade comes back over the shop below; a sill beam on top of it
-    lp = SPEC["planes"][UP.get("lower_front_plane", 0)]
+    up_shapes.append(("Landing", land[0] - 0.05, land[1], 0, H, land[2], land[3]))
+    # upstairs the lower storey of the facade comes back over the room below; a sill beam on top of it
+    LFP = UP.get("lower_front_plane", 0)
+    lp = SPEC["planes"][LFP]
     rtop = lp["base"] - H * COS * 32
     up_meshes["lowerfront"] = (obj("LowerFront", [([(XL, 0, lp["z"] + 0.01), (-XL, 0, lp["z"] + 0.01), (-XL, H, lp["z"] + 0.01), (XL, H, lp["z"] + 0.01)],
-        [uv(0, lp["base"]), uv(IW, lp["base"]), uv(IW, rtop), uv(0, rtop)], 1)], ["0 0 1"]), "FACADE", "Upper")
-    ut = [([(xw0, H + 0.02, -0.005), (xw1, H + 0.02, -0.005), (xw1, H + 0.02, -0.33), (xw0, H + 0.02, -0.33)],
+        [uv(0, lp["base"]), uv(IW, lp["base"]), uv(IW, rtop), uv(0, rtop)], 1)], ["0 0 1"]), "PLANE%d" % LFP, "Upper")
+    ut = [([(xw0, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.33), (xw0, H + 0.02, FZ - 0.33)],
            [(xw0 / BW, 0), (xw1 / BW, 0), (xw1 / BW, 1), (xw0 / BW, 1)], 1)]
-    up_meshes["uppertimber"] = (obj("UpperTimber", ut, ["0 1 0"]), "mt_beam", "Upper")
-    # collision: the stairs as a solid wedge, rails, the upper floor round the stairwell
-    prof = [(RAMP_LOW + dx / 2, 0), (LAND_X, 0), (LAND_X, H), (LAND_X + dx / 2, H)]
-    conv.append(("Stairs", [(x, y, z) for z in (SF, ZB) for x, y in prof]))
-    rp_ = [(RAMP_LOW, 0), (LAND_X, H), (LAND_X, H + 1.0), (RAMP_LOW, 1.0)]
-    conv.append(("StairRail", [(x, y, z) for z in (SF - 0.02, SF + 0.08) for x, y in rp_]))
-    up_shapes += [("Landing", XI0 - 0.05, LAND_X, 0, H, ZB, SF),
-                  ("SlabA", XI0, XI1, H - 0.2, H, SF, 0), ("SlabB", RAMP_LOW, XI1, H - 0.2, H, ZB, SF),
-                  ("Railing", LAND_X + 0.3, RAMP_LOW, H - 0.2, H + 1.0, SF, SF + 0.1),
-                  ("RailingSide", RAMP_LOW, RAMP_LOW + 0.1, H - 0.2, H + 1.0, ZB, SF + 0.1)]
-    info_up = {"H": H, "stairs_x": [round(LAND_X, 3), round(RAMP_LOW, 3)], "stairs_front": round(SF, 3)}
+    up_meshes["uppertimber"] = (obj("UpperTimber", ut + ut_extra, ["0 1 0", "0 0 1"]), "mt_beam", "Upper")
+
+d0, d1 = px(SPEC["door_px"][0]), px(SPEC["door_px"][1])
 
 # ---------- props ----------
 props = json.load(open(os.path.join(PROPS_SRC, "prop_sizes_all.json")))
@@ -206,6 +292,12 @@ for i, (fn, tex) in enumerate(fronts):
     if not any(('id="tx_%s"' % tex.replace(".png", "")) in e for e in ext):
         E("Texture2D", RH + tex, "tx_" + tex.replace(".png", ""))
         mat("mt_" + tex.replace(".png", ""), "sh_sprite", "tx_" + tex.replace(".png", ""))
+for ki, kfn in enumerate(KEEP):
+    E("ArrayMesh", RH + kfn, "m_keep%d" % ki)
+if timber_low_fn:
+    E("ArrayMesh", RH + timber_low_fn, "m_timberlow"); E("ArrayMesh", RH + timber_up_fn, "m_timberupw")
+if DECK:
+    E("ArrayMesh", RH + deck_fn, "m_deck"); E("Texture2D", RH + roof_tex, "tx_roof"); mat("mt_roof", "sh_sprite", "tx_roof")
 for nm, fn in (("roof", roof_fn), ("body", body_fn), ("floor", floor_fn), ("innerwall", wall_fn), ("timber", timber_fn)):
     E("ArrayMesh", RH + fn, "m_" + nm)
 FX = R + "fx/"
@@ -219,7 +311,7 @@ for bi, b, front, top in BLOCKS:
     E("Texture2D", R + "props/prop_%s.png" % b["front_tex"], "tx_block%d" % bi); mat("mt_block%d" % bi, "sh_sprite", "tx_block%d" % bi)
     if b.get("top_tile"):
         E("Texture2D", R + b["top_tile"], "tx_block%dtop" % bi); mat("mt_block%dtop" % bi, "sh_tile", "tx_block%dtop" % bi)
-used = sorted(set(f["prop"] for f in SPEC["furniture"]))
+used = sorted(set(f["prop"] for f in SPEC["furniture"]) | ({"rug"} if SPEC.get("door_rug", True) else set()))
 for p in used:
     E("Texture2D", R + "props/prop_%s.png" % p, "tx_p_" + p)
     mat("mt_p_" + p, "sh_sprite", "tx_p_" + p)
@@ -230,7 +322,10 @@ facade_mat = "mt_" + KEY + "_facade"
 for i, (fn, tex) in enumerate(fronts):
     N('[node name="Plane%d" type="MeshInstance3D" parent="%s_Front"]\nmesh = ExtResource("m_front%d")\nmaterial_override = SubResource("mt_%s")\n'
       % (i, NAME, i, tex.replace(".png", "")))
-N('[node name="%s_Roof" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_roof")\nmaterial_override = SubResource("%s")\n' % (NAME, facade_mat))
+N('[node name="%s_Roof" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_roof")\nmaterial_override = SubResource("%s")\n' % (NAME, "mt_roof" if DECK else facade_mat))
+if DECK:
+    # outside the balcony goes with the roof it was cut from; upstairs a copy shows (below, in _Upper)
+    N('[node name="Deck" type="MeshInstance3D" parent="%s_Roof"]' % NAME + '\nmesh = ExtResource("m_deck")\nmaterial_override = SubResource("%s")\n' % facade_mat)
 N('[node name="%s" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_body")\nmaterial_override = SubResource("%s")\n' % ("Body", facade_mat))
 # Everything inside is shown only while the doctor is in (InteriorCutaway): from outside it would show
 # through the transparent parts of the art, above the lower roofs
@@ -239,13 +334,23 @@ N('[node name="%s" type="Node3D" parent="."]\n' % INS)
 for nm, m, mt in (("Floor", "floor", "mt_floor"), ("InnerWall", "innerwall", "mt_wall"), ("Timber", "timber", "mt_beam")):
     N('[node name="%s" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_%s")\nmaterial_override = SubResource("%s")\n' % (nm, INS, m, mt))
 N('[node name="Furniture" type="Node3D" parent="%s"]\n' % INS)
+if timber_low_fn:
+    # <Name>_Lower: shown only while the doctor is inside downstairs (InteriorCutaway)
+    N('[node name="%s_Lower" type="Node3D" parent="%s"]\n' % (NAME, INS))
+    N('[node name="TimberLower" type="MeshInstance3D" parent="%s/%s_Lower"]\nmesh = ExtResource("m_timberlow")\nmaterial_override = SubResource("mt_beam")\n' % (INS, NAME))
 if UP:
     N('[node name="%s_Upper" type="Node3D" parent="%s"]\n' % (NAME, INS))
     for nm, (fn, mt, parent) in up_meshes.items():
-        mtn = facade_mat if mt == "FACADE" else mt
+        mtn = ("mt_" + fronts[int(mt[5:])][1].replace(".png", "")) if mt.startswith("PLANE") else mt
         par = (INS + "/" + NAME + "_Upper") if parent == "Upper" else INS
         N('[node name="%s" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_%s")\nmaterial_override = SubResource("%s")\n' % (nm.title().replace("_", ""), par, nm, mtn))
     # front pieces standing out from the wall (a porch) come back upstairs with the lower facade
+    if timber_up_fn:
+        N('[node name="TimberUpperWall" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_timberupw")\nmaterial_override = SubResource("mt_beam")\n' % (INS + "/" + NAME + "_Upper"))
+    if DECK:
+        N('[node name="DeckUp" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_deck")\nmaterial_override = SubResource("%s")\n' % (INS + "/" + NAME + "_Upper", facade_mat))
+    for ki in range(len(KEEP)):
+        N('[node name="Keep%d" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_keep%d")\nmaterial_override = SubResource("%s")\n' % (ki, INS + "/" + NAME + "_Upper", ki, facade_mat))
     for i in UP.get("show_upstairs", []):
         N('[node name="UpstairsPlane%d" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_front%d")\nmaterial_override = SubResource("mt_%s")\n'
           % (i, INS + "/" + NAME + "_Upper", i, fronts[i][1].replace(".png", "")))
@@ -262,7 +367,10 @@ for bi, b, front, top in BLOCKS:
         lx, ly, lz = b["light"]
         N('[node name="%sGlow" type="OmniLight3D" parent="%s"]\ntransform = %s\nlight_color = Color(1, 0.62, 0.3, 1)\nlight_energy = 0.9\nomni_range = 3.0\nshadow_enabled = false\n'
           % (b["name"], INS, tf(lx, ly, lz)))
-for f in SPEC["furniture"]:
+furniture = list(SPEC["furniture"])
+if SPEC.get("door_rug", True):
+    furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": -0.42})
+for f in furniture:
     lift = UP["height"] if (UP and f.get("upper")) else 0.0
     fpar = (INS + "/" + NAME + "_Upper") if (UP and f.get("upper")) else (INS + "/Furniture")
     w, h = props[f["prop"]]
@@ -283,11 +391,27 @@ for f in SPEC["furniture"]:
 
 # ---------- collision ----------
 WALL = 5.4 if UP else 3.2
-d0, d1 = px(SPEC["door_px"][0]), px(SPEC["door_px"][1])
-shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, 0.15, -D), ("East", XI1, xw1, 0, WALL, 0.15, -D),
-           ("FrontLeft", xw0, d0, 0, WALL, 0.15, -0.15), ("FrontRight", d1, xw1, 0, WALL, 0.15, -0.15)]
+FZ_ = UP.get("front_z", 0.0) if UP else 0.0
+FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
+shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, max(0.15, FZ_ + 0.15), -D),
+           ("FrontLeft", xw0, d0, 0, FH, 0.15, -0.15), ("FrontRight", d1, xw1, 0, FH, 0.15, -0.15)]
+if FZ_ > 0:
+    shapes.append(("UpperFront", xw0, xw1, UP["height"], WALL, FZ_ + 0.15, FZ_ - 0.15))
+if DECK:
+    # a door from the upper room out to the balcony through the east wall; the balcony's floor and rails
+    ga, gb = DECK_Z[1], DECK_Z[0]                 # open all along the balcony
+    H_ = DECK["y"]
+    shapes += [("East", XI1, xw1, 0, H_, max(0.15, FZ_ + 0.15), -D),
+               ("EastUpFront", XI1, xw1, H_, WALL, max(0.15, FZ_ + 0.15), ga), ("EastUpBack", XI1, xw1, H_, WALL, gb, -D),
+               ("DeckFloor", xw1, DECK_X1, H_ - 0.2, H_, DECK_Z[0], DECK_Z[1]),
+               ("DeckRailOut", DECK_X1 - 0.1, DECK_X1, H_, H_ + 1.0, DECK_Z[0], DECK_Z[1]),
+               ("DeckRailFront", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[1] - 0.1, DECK_Z[1]),
+               ("DeckRailBack", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[0], DECK_Z[0] + 0.1)]
+else:
+    shapes.append(("East", XI1, xw1, 0, WALL, max(0.15, FZ_ + 0.15), -D))
 if UP:
-    shapes.append(("UpperDoor", d0, d1, UP["height"] + 0.5, WALL, 0.15, -0.15))
+    if FZ_ <= 0:
+        shapes.append(("UpperDoor", d0, d1, UP["height"] + 0.5, WALL, 0.15, -0.15))
     shapes += up_shapes
 for i, (a, b, za, zb) in enumerate(SPEC.get("posts", [])):
     shapes.append(("Post%d" % i, px(a), px(b), 0, 2.5, za, zb))
@@ -313,4 +437,5 @@ door_x = (d0 + d1) / 2
 info = {"W": round(W, 3), "xw0": round(xw0, 3), "xw1": round(xw1, 3), "D": D, "eave": round(ye, 3), "ridge": round(yt, 3),
         "door_x": round(door_x, 3), "room": [round(XI0, 3), round(XI1, 3), round(ZB, 3)]}
 if UP: info["upper"] = info_up
+if DECK: info["deck_z"] = [round(DECK_Z[0], 3), round(DECK_Z[1], 3)]
 print(json.dumps(info))

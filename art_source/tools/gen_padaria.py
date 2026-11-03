@@ -164,7 +164,7 @@ PROPS = {  # name: (file, px w, px h)
     "table": ("prop_table.png", 82, 45), "bed": ("prop_bed_real.png", 32, 48),
     "stack": ("prop_barrel_stack.png", 60, 54), "barrel_a": ("prop_barrel_a.png", 30, 38),
     "barrel_b": ("prop_barrel_b.png", 30, 38), "sack_a": ("prop_sack_a.png", 23, 29),
-    "sack_b": ("prop_sack_b.png", 24, 30),
+    "sack_b": ("prop_sack_b.png", 24, 30), "rug": ("prop_rug.png", 38, 16),
 }
 for k, (f, w, h) in PROPS.items():
     E("Texture2D", R + "props/" + f, "tx_" + k)
@@ -216,6 +216,7 @@ sprite("Furniture", "Counter", "table", 1.6, None, flat=True, flat_y=0.57, cente
 sprite("Furniture", "BarrelStack", "stack", 3.3, ZB + 0.71)
 sprite("Furniture", "Barrel", "barrel_a", 3.7, -0.3)
 sprite("Furniture", "SackB", "sack_b", 3.0, -0.3)
+sprite("Furniture", "DoorRug", "rug", -3.32, None, flat=True, flat_y=0.025, center_z=-0.42)   # marks the way out
 # Upper floor, shown only while the doctor is up there
 N('[node name="Padaria_Upper" type="Node3D" parent="."]\n')
 N('[node name="UpperFloor" type="MeshInstance3D" parent="Padaria_Upper"]\nmesh = ExtResource("m_upperfloor")\nmaterial_override = SubResource("mt_floor")\n')

@@ -25,6 +25,7 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_crate.png" id="tx_p_crate"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_jar.png" id="tx_p_jar"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_pot.png" id="tx_p_pot"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_stool.png" id="tx_p_stool"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_table_round.png" id="tx_p_table_round"]
 
@@ -97,6 +98,12 @@ shader_parameter/tex = ExtResource("tx_p_pot")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
+[sub_resource type="ShaderMaterial" id="mt_p_rug"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_rug")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
 [sub_resource type="ShaderMaterial" id="mt_p_stool"]
 shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_stool")
@@ -132,6 +139,9 @@ size = Vector2(0.6027, 1.2154)
 
 [sub_resource type="QuadMesh" id="q_Crate"]
 size = Vector2(0.7143, 1.5974)
+
+[sub_resource type="QuadMesh" id="q_DoorRug"]
+size = Vector2(0.8482, 0.4662)
 
 [sub_resource type="QuadMesh" id="q_smoke"]
 size = Vector2(0.9, 3.2)
@@ -261,6 +271,11 @@ surface_material_override/0 = SubResource("mt_p_jar")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1000, 0.7987, -4.7500)
 mesh = SubResource("q_Crate")
 surface_material_override/0 = SubResource("mt_p_crate")
+
+[node name="DoorRug" type="MeshInstance3D" parent="CasaSebastian_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.7812, 0.0250, -0.4200)
+mesh = SubResource("q_DoorRug")
+surface_material_override/0 = SubResource("mt_p_rug")
 
 [node name="ChimneySmoke" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3438, 8.0812, -5.0365)
