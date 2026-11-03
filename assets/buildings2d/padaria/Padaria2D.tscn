@@ -2,41 +2,35 @@
 
 [ext_resource type="Shader" path="res://assets/buildings2d/sprite_surface.gdshader" id="sh_sprite"]
 [ext_resource type="Shader" path="res://assets/buildings2d/tile_surface.gdshader" id="sh_tile"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/padaria/padaria_facade.png" id="tx_facade"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_wood_floor.png" id="tx_floor"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/padaria/padaria_innerwall.png" id="tx_wall"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_wall.png" id="tx_wall"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_beam.png" id="tx_beam"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stair_tread.png" id="tx_tread"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_rail_wood.png" id="tx_rail"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_beam.png" id="tx_beam"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_front.obj" id="m_front"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_landingfront.obj" id="m_landingfront"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_stairtreads.obj" id="m_stairtreads"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_stairside.obj" id="m_stairside"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_landingtop.obj" id="m_landingtop"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_upperfloor.obj" id="m_upperfloor"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_railing.obj" id="m_railing"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_upperrailing.obj" id="m_upperrailing"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_lowerfront.obj" id="m_lowerfront"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_uppertimber.obj" id="m_uppertimber"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_front0.obj" id="m_front0"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/padaria/padaria_facade.png" id="tx_padaria_facade"]
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_roof.obj" id="m_roof"]
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_body.obj" id="m_body"]
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_floor.obj" id="m_floor"]
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_innerwall.obj" id="m_innerwall"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_sidewalls.obj" id="m_sidewalls"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_upperfloor.obj" id="m_upperfloor"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_landingtop.obj" id="m_landingtop"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_landingfront.obj" id="m_landingfront"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_stairtreads.obj" id="m_stairtreads"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_stairside.obj" id="m_stairside"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_railing.obj" id="m_railing"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_upperrailing.obj" id="m_upperrailing"]
-[ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_lowerfront.obj" id="m_lowerfront"]
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/padaria/padaria_timber.obj" id="m_timber"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_table.png" id="tx_table"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bed_real.png" id="tx_bed"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_stack.png" id="tx_stack"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_a.png" id="tx_barrel_a"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_b.png" id="tx_barrel_b"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_a.png" id="tx_sack_a"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_b.png" id="tx_sack_b"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_rug"]
-
-[sub_resource type="ShaderMaterial" id="mt_facade"]
-shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_facade")
-shader_parameter/lit_share = 0.5
-shader_parameter/own_light = 0.85
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_a.png" id="tx_p_barrel_a"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_b.png" id="tx_p_barrel_b"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_stack.png" id="tx_p_barrel_stack"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bed.png" id="tx_p_bed"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_a.png" id="tx_p_sack_a"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_b.png" id="tx_p_sack_b"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_table.png" id="tx_p_table"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -45,8 +39,14 @@ shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
 [sub_resource type="ShaderMaterial" id="mt_wall"]
-shader = ExtResource("sh_sprite")
+shader = ExtResource("sh_tile")
 shader_parameter/tex = ExtResource("tx_wall")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_beam"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_beam")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -62,57 +62,57 @@ shader_parameter/tex = ExtResource("tx_rail")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_beam"]
-shader = ExtResource("sh_tile")
-shader_parameter/tex = ExtResource("tx_beam")
+[sub_resource type="ShaderMaterial" id="mt_padaria_facade"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_padaria_facade")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_table"]
+[sub_resource type="ShaderMaterial" id="mt_p_barrel_a"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_table")
+shader_parameter/tex = ExtResource("tx_p_barrel_a")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_bed"]
+[sub_resource type="ShaderMaterial" id="mt_p_barrel_b"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_bed")
+shader_parameter/tex = ExtResource("tx_p_barrel_b")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_stack"]
+[sub_resource type="ShaderMaterial" id="mt_p_barrel_stack"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_stack")
+shader_parameter/tex = ExtResource("tx_p_barrel_stack")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_barrel_a"]
+[sub_resource type="ShaderMaterial" id="mt_p_bed"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_barrel_a")
+shader_parameter/tex = ExtResource("tx_p_bed")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_barrel_b"]
+[sub_resource type="ShaderMaterial" id="mt_p_rug"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_barrel_b")
+shader_parameter/tex = ExtResource("tx_p_rug")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_sack_a"]
+[sub_resource type="ShaderMaterial" id="mt_p_sack_a"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_sack_a")
+shader_parameter/tex = ExtResource("tx_p_sack_a")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_sack_b"]
+[sub_resource type="ShaderMaterial" id="mt_p_sack_b"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_sack_b")
+shader_parameter/tex = ExtResource("tx_p_sack_b")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_rug"]
+[sub_resource type="ShaderMaterial" id="mt_p_table"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_rug")
+shader_parameter/tex = ExtResource("tx_p_table")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -128,9 +128,6 @@ size = Vector2(0.6696, 1.3196)
 [sub_resource type="QuadMesh" id="q_SackB"]
 size = Vector2(0.5357, 1.0418)
 
-[sub_resource type="QuadMesh" id="q_DoorRug"]
-size = Vector2(0.8482, 0.4662)
-
 [sub_resource type="QuadMesh" id="q_Bed"]
 size = Vector2(0.7143, 1.3987)
 
@@ -140,28 +137,13 @@ size = Vector2(0.6696, 1.3196)
 [sub_resource type="QuadMesh" id="q_UpSack"]
 size = Vector2(0.5134, 1.0071)
 
-[sub_resource type="BoxShape3D" id="b_Back"]
-size = Vector3(9.0922, 5.4000, 0.3000)
-
-[sub_resource type="BoxShape3D" id="b_West"]
-size = Vector3(0.3000, 5.4000, 4.1710)
-
-[sub_resource type="BoxShape3D" id="b_East"]
-size = Vector3(0.3000, 5.4000, 4.1710)
-
-[sub_resource type="BoxShape3D" id="b_FrontLeft"]
-size = Vector3(0.5780, 5.4000, 0.3000)
-
-[sub_resource type="BoxShape3D" id="b_FrontRight"]
-size = Vector3(7.0742, 5.4000, 0.3000)
-
-[sub_resource type="BoxShape3D" id="b_UpperDoor"]
-size = Vector3(1.4800, 2.8000, 0.3000)
+[sub_resource type="QuadMesh" id="q_DoorRug"]
+size = Vector2(0.8482, 0.4662)
 
 [sub_resource type="BoxShape3D" id="b_Counter"]
 size = Vector3(1.8000, 0.7000, 0.7000)
 
-[sub_resource type="BoxShape3D" id="b_Stack"]
+[sub_resource type="BoxShape3D" id="b_BarrelStack"]
 size = Vector3(1.3000, 1.0000, 0.7100)
 
 [sub_resource type="BoxShape3D" id="b_Barrel"]
@@ -170,28 +152,7 @@ size = Vector3(0.6400, 0.8000, 0.6500)
 [sub_resource type="BoxShape3D" id="b_SackB"]
 size = Vector3(0.5000, 0.7000, 0.4500)
 
-[sub_resource type="BoxShape3D" id="b_Landing"]
-size = Vector3(0.8500, 2.1000, 1.0000)
-
-[sub_resource type="ConvexPolygonShape3D" id="c_Stairs"]
-points = PackedVector3Array(-0.6766, 0.0000, -2.7210, -3.4730, 0.0000, -2.7210, -3.4730, 2.1000, -2.7210, -3.3766, 2.1000, -2.7210, -0.6766, 0.0000, -3.7210, -3.4730, 0.0000, -3.7210, -3.4730, 2.1000, -3.7210, -3.3766, 2.1000, -3.7210)
-
-[sub_resource type="BoxShape3D" id="b_Railing"]
-size = Vector3(2.4000, 1.2000, 0.1000)
-
-[sub_resource type="BoxShape3D" id="b_RailingSide"]
-size = Vector3(0.1000, 1.2000, 1.1000)
-
-[sub_resource type="ConvexPolygonShape3D" id="c_StairRail"]
-points = PackedVector3Array(-0.7730, 0.0000, -2.7410, -3.4730, 2.1000, -2.7410, -3.4730, 3.1000, -2.7410, -0.7730, 1.0000, -2.7410, -0.7730, 0.0000, -2.6410, -3.4730, 2.1000, -2.6410, -3.4730, 3.1000, -2.6410, -0.7730, 1.0000, -2.6410)
-
-[sub_resource type="BoxShape3D" id="b_SlabA"]
-size = Vector3(8.4022, 0.2000, 2.7210)
-
-[sub_resource type="BoxShape3D" id="b_SlabB"]
-size = Vector3(4.9022, 0.2000, 1.0000)
-
-[sub_resource type="BoxShape3D" id="b_UpBed"]
+[sub_resource type="BoxShape3D" id="b_Bed"]
 size = Vector3(0.6800, 0.4000, 1.3600)
 
 [sub_resource type="BoxShape3D" id="b_UpBarrel"]
@@ -200,145 +161,164 @@ size = Vector3(0.6000, 0.8000, 0.6700)
 [sub_resource type="BoxShape3D" id="b_UpSack"]
 size = Vector3(0.5000, 0.7000, 0.5000)
 
+[sub_resource type="BoxShape3D" id="b_Back"]
+size = Vector3(9.0922, 5.4000, 0.3450)
+
+[sub_resource type="BoxShape3D" id="b_West"]
+size = Vector3(0.3450, 5.4000, 4.2160)
+
+[sub_resource type="BoxShape3D" id="b_FrontLeft"]
+size = Vector3(0.5391, 5.4000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_FrontRight"]
+size = Vector3(7.0437, 5.4000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_East"]
+size = Vector3(0.3450, 5.4000, 4.2160)
+
+[sub_resource type="BoxShape3D" id="b_UpperDoor"]
+size = Vector3(1.5094, 2.8000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_SlabA"]
+size = Vector3(8.4022, 0.2000, 2.7210)
+
+[sub_resource type="BoxShape3D" id="b_SlabB"]
+size = Vector3(4.7022, 0.2000, 1.0000)
+
+[sub_resource type="BoxShape3D" id="b_Railing"]
+size = Vector3(2.1000, 1.2000, 0.1000)
+
+[sub_resource type="BoxShape3D" id="b_RailingSide"]
+size = Vector3(0.1000, 1.2000, 1.1000)
+
+[sub_resource type="BoxShape3D" id="b_Landing"]
+size = Vector3(1.3500, 2.1000, 1.0000)
+
+[sub_resource type="ConvexPolygonShape3D" id="c_Stairs"]
+points = PackedVector3Array(-0.4873, 0.0000, -2.7210, -2.9730, 0.0000, -2.7210, -2.9730, 2.1000, -2.7210, -2.8873, 2.1000, -2.7210, -0.4873, 0.0000, -3.7210, -2.9730, 0.0000, -3.7210, -2.9730, 2.1000, -3.7210, -2.8873, 2.1000, -3.7210)
+
+[sub_resource type="ConvexPolygonShape3D" id="c_StairRail"]
+points = PackedVector3Array(-0.5730, 0.0000, -2.7410, -2.9730, 2.1000, -2.7410, -2.9730, 3.1000, -2.7410, -0.5730, 1.0000, -2.7410, -0.5730, 0.0000, -2.6410, -2.9730, 2.1000, -2.6410, -2.9730, 3.1000, -2.6410, -0.5730, 1.0000, -2.6410)
+
 [node name="Padaria2D" type="Node3D"]
 
-[node name="Padaria_Front" type="MeshInstance3D" parent="."]
-mesh = ExtResource("m_front")
-material_override = SubResource("mt_facade")
+[node name="Padaria_Front" type="Node3D" parent="."]
+
+[node name="Plane0" type="MeshInstance3D" parent="Padaria_Front"]
+mesh = ExtResource("m_front0")
+material_override = SubResource("mt_padaria_facade")
 
 [node name="Padaria_Roof" type="MeshInstance3D" parent="."]
 mesh = ExtResource("m_roof")
-material_override = SubResource("mt_facade")
+material_override = SubResource("mt_padaria_facade")
 
 [node name="Body" type="MeshInstance3D" parent="."]
 mesh = ExtResource("m_body")
-material_override = SubResource("mt_facade")
+material_override = SubResource("mt_padaria_facade")
 
-[node name="Floor" type="MeshInstance3D" parent="."]
+[node name="Padaria_Inside" type="Node3D" parent="."]
+
+[node name="Floor" type="MeshInstance3D" parent="Padaria_Inside"]
 mesh = ExtResource("m_floor")
 material_override = SubResource("mt_floor")
 
-[node name="InnerWall" type="MeshInstance3D" parent="."]
+[node name="InnerWall" type="MeshInstance3D" parent="Padaria_Inside"]
 mesh = ExtResource("m_innerwall")
 material_override = SubResource("mt_wall")
 
-[node name="SideWalls" type="MeshInstance3D" parent="."]
-mesh = ExtResource("m_sidewalls")
-material_override = SubResource("mt_wall")
-
-[node name="LandingTop" type="MeshInstance3D" parent="."]
-mesh = ExtResource("m_landingtop")
-material_override = SubResource("mt_floor")
-
-[node name="LandingFront" type="MeshInstance3D" parent="."]
-mesh = ExtResource("m_landingfront")
-material_override = SubResource("mt_wall")
-
-[node name="StairTreads" type="MeshInstance3D" parent="."]
-mesh = ExtResource("m_stairtreads")
-material_override = SubResource("mt_tread")
-
-[node name="StairSide" type="MeshInstance3D" parent="."]
-mesh = ExtResource("m_stairside")
-material_override = SubResource("mt_wall")
-
-[node name="Railing" type="MeshInstance3D" parent="."]
-mesh = ExtResource("m_railing")
-material_override = SubResource("mt_rail")
-
-[node name="Furniture" type="Node3D" parent="."]
-
-[node name="Counter" type="MeshInstance3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.6000, 0.5700, -1.4000)
-mesh = SubResource("q_Counter")
-surface_material_override/0 = SubResource("mt_table")
-
-[node name="BarrelStack" type="MeshInstance3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3000, 0.9376, -3.0110)
-mesh = SubResource("q_BarrelStack")
-surface_material_override/0 = SubResource("mt_stack")
-
-[node name="Barrel" type="MeshInstance3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7000, 0.6598, -0.3000)
-mesh = SubResource("q_Barrel")
-surface_material_override/0 = SubResource("mt_barrel_a")
-
-[node name="SackB" type="MeshInstance3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0000, 0.5209, -0.3000)
-mesh = SubResource("q_SackB")
-surface_material_override/0 = SubResource("mt_sack_b")
-
-[node name="DoorRug" type="MeshInstance3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -3.3200, 0.0250, -0.4200)
-mesh = SubResource("q_DoorRug")
-surface_material_override/0 = SubResource("mt_rug")
-
-[node name="Padaria_Upper" type="Node3D" parent="."]
-
-[node name="UpperFloor" type="MeshInstance3D" parent="Padaria_Upper"]
-mesh = ExtResource("m_upperfloor")
-material_override = SubResource("mt_floor")
-
-[node name="UpperRailing" type="MeshInstance3D" parent="Padaria_Upper"]
-mesh = ExtResource("m_upperrailing")
-material_override = SubResource("mt_rail")
-
-[node name="Timber" type="MeshInstance3D" parent="Padaria_Upper"]
+[node name="Timber" type="MeshInstance3D" parent="Padaria_Inside"]
 mesh = ExtResource("m_timber")
 material_override = SubResource("mt_beam")
 
-[node name="LowerFront" type="MeshInstance3D" parent="Padaria_Upper"]
-mesh = ExtResource("m_lowerfront")
-material_override = SubResource("mt_facade")
+[node name="Furniture" type="Node3D" parent="Padaria_Inside"]
 
-[node name="Bed" type="MeshInstance3D" parent="Padaria_Upper"]
+[node name="Padaria_Upper" type="Node3D" parent="Padaria_Inside"]
+
+[node name="Landingfront" type="MeshInstance3D" parent="Padaria_Inside"]
+mesh = ExtResource("m_landingfront")
+material_override = SubResource("mt_wall")
+
+[node name="Stairtreads" type="MeshInstance3D" parent="Padaria_Inside"]
+mesh = ExtResource("m_stairtreads")
+material_override = SubResource("mt_tread")
+
+[node name="Stairside" type="MeshInstance3D" parent="Padaria_Inside"]
+mesh = ExtResource("m_stairside")
+material_override = SubResource("mt_wall")
+
+[node name="Landingtop" type="MeshInstance3D" parent="Padaria_Inside"]
+mesh = ExtResource("m_landingtop")
+material_override = SubResource("mt_floor")
+
+[node name="Upperfloor" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
+mesh = ExtResource("m_upperfloor")
+material_override = SubResource("mt_floor")
+
+[node name="Railing" type="MeshInstance3D" parent="Padaria_Inside"]
+mesh = ExtResource("m_railing")
+material_override = SubResource("mt_rail")
+
+[node name="Upperrailing" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
+mesh = ExtResource("m_upperrailing")
+material_override = SubResource("mt_rail")
+
+[node name="Lowerfront" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
+mesh = ExtResource("m_lowerfront")
+material_override = SubResource("mt_padaria_facade")
+
+[node name="Uppertimber" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
+mesh = ExtResource("m_uppertimber")
+material_override = SubResource("mt_beam")
+
+[node name="Counter" type="MeshInstance3D" parent="Padaria_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.6000, 0.5700, -1.4000)
+mesh = SubResource("q_Counter")
+surface_material_override/0 = SubResource("mt_p_table")
+
+[node name="BarrelStack" type="MeshInstance3D" parent="Padaria_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3000, 0.9376, -3.0110)
+mesh = SubResource("q_BarrelStack")
+surface_material_override/0 = SubResource("mt_p_barrel_stack")
+
+[node name="Barrel" type="MeshInstance3D" parent="Padaria_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7000, 0.6598, -0.3000)
+mesh = SubResource("q_Barrel")
+surface_material_override/0 = SubResource("mt_p_barrel_a")
+
+[node name="SackB" type="MeshInstance3D" parent="Padaria_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0000, 0.5209, -0.3000)
+mesh = SubResource("q_SackB")
+surface_material_override/0 = SubResource("mt_p_sack_b")
+
+[node name="Bed" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 3.6000, 2.4600, -2.9000)
 mesh = SubResource("q_Bed")
-surface_material_override/0 = SubResource("mt_bed")
+surface_material_override/0 = SubResource("mt_p_bed")
 
-[node name="UpBarrel" type="MeshInstance3D" parent="Padaria_Upper"]
+[node name="UpBarrel" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4000, 2.7598, -3.0510)
 mesh = SubResource("q_UpBarrel")
-surface_material_override/0 = SubResource("mt_barrel_b")
+surface_material_override/0 = SubResource("mt_p_barrel_b")
 
-[node name="UpSack" type="MeshInstance3D" parent="Padaria_Upper"]
+[node name="UpSack" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3000, 2.6035, -3.2210)
 mesh = SubResource("q_UpSack")
-surface_material_override/0 = SubResource("mt_sack_a")
+surface_material_override/0 = SubResource("mt_p_sack_a")
+
+[node name="DoorRug" type="MeshInstance3D" parent="Padaria_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -3.3242, 0.0250, -0.4200)
+mesh = SubResource("q_DoorRug")
+surface_material_override/0 = SubResource("mt_p_rug")
 
 [node name="Walls" type="StaticBody3D" parent="."]
-
-[node name="Back" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0719, 2.7000, -3.8710)
-shape = SubResource("b_Back")
-
-[node name="West" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4680, 2.7000, -1.9355)
-shape = SubResource("b_West")
-
-[node name="East" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3242, 2.7000, -1.9355)
-shape = SubResource("b_East")
-
-[node name="FrontLeft" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3490, 2.7000, 0.0000)
-shape = SubResource("b_FrontLeft")
-
-[node name="FrontRight" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9571, 2.7000, 0.0000)
-shape = SubResource("b_FrontRight")
-
-[node name="UpperDoor" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3200, 4.0000, 0.0000)
-shape = SubResource("b_UpperDoor")
 
 [node name="Counter" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6000, 0.3500, -1.4000)
 shape = SubResource("b_Counter")
 
-[node name="Stack" type="CollisionShape3D" parent="Walls"]
+[node name="BarrelStack" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3000, 0.5000, -3.3660)
-shape = SubResource("b_Stack")
+shape = SubResource("b_BarrelStack")
 
 [node name="Barrel" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7000, 0.4000, -0.6250)
@@ -348,35 +328,9 @@ shape = SubResource("b_Barrel")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0000, 0.3500, -0.5250)
 shape = SubResource("b_SackB")
 
-[node name="Landing" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8980, 1.0500, -3.2210)
-shape = SubResource("b_Landing")
-
-[node name="Stairs" type="CollisionShape3D" parent="Walls"]
-shape = SubResource("c_Stairs")
-
-[node name="Railing" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9730, 2.5000, -2.6710)
-shape = SubResource("b_Railing")
-
-[node name="RailingSide" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7230, 2.5000, -3.1710)
-shape = SubResource("b_RailingSide")
-
-[node name="StairRail" type="CollisionShape3D" parent="Walls"]
-shape = SubResource("c_StairRail")
-
-[node name="SlabA" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0719, 2.0000, -1.3605)
-shape = SubResource("b_SlabA")
-
-[node name="SlabB" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6781, 2.0000, -3.2210)
-shape = SubResource("b_SlabB")
-
-[node name="UpBed" type="CollisionShape3D" parent="Walls"]
+[node name="Bed" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6000, 2.3000, -2.9000)
-shape = SubResource("b_UpBed")
+shape = SubResource("b_Bed")
 
 [node name="UpBarrel" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4000, 2.5000, -3.3860)
@@ -385,3 +339,53 @@ shape = SubResource("b_UpBarrel")
 [node name="UpSack" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3000, 2.4500, -3.4710)
 shape = SubResource("b_UpSack")
+
+[node name="Back" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0719, 2.7000, -3.8935)
+shape = SubResource("b_Back")
+
+[node name="West" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4455, 2.7000, -1.9580)
+shape = SubResource("b_West")
+
+[node name="FrontLeft" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3484, 2.7000, 0.0000)
+shape = SubResource("b_FrontLeft")
+
+[node name="FrontRight" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9523, 2.7000, 0.0000)
+shape = SubResource("b_FrontRight")
+
+[node name="East" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3017, 2.7000, -1.9580)
+shape = SubResource("b_East")
+
+[node name="UpperDoor" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3242, 4.0000, 0.0000)
+shape = SubResource("b_UpperDoor")
+
+[node name="SlabA" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0719, 2.0000, -1.3605)
+shape = SubResource("b_SlabA")
+
+[node name="SlabB" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7781, 2.0000, -3.2210)
+shape = SubResource("b_SlabB")
+
+[node name="Railing" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6230, 2.5000, -2.6710)
+shape = SubResource("b_Railing")
+
+[node name="RailingSide" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5230, 2.5000, -3.1710)
+shape = SubResource("b_RailingSide")
+
+[node name="Landing" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6480, 1.0500, -3.2210)
+shape = SubResource("b_Landing")
+
+[node name="Stairs" type="CollisionShape3D" parent="Walls"]
+shape = SubResource("c_Stairs")
+
+[node name="StairRail" type="CollisionShape3D" parent="Walls"]
+shape = SubResource("c_StairRail")

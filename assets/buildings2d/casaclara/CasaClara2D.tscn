@@ -168,14 +168,14 @@ size = Vector3(5.6250, 5.4000, 0.3000)
 [sub_resource type="BoxShape3D" id="b_West"]
 size = Vector3(0.3000, 5.4000, 3.5500)
 
-[sub_resource type="BoxShape3D" id="b_East"]
-size = Vector3(0.3000, 5.4000, 3.5500)
-
 [sub_resource type="BoxShape3D" id="b_FrontLeft"]
 size = Vector3(4.1250, 5.4000, 0.3000)
 
 [sub_resource type="BoxShape3D" id="b_FrontRight"]
 size = Vector3(0.2500, 5.4000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_East"]
+size = Vector3(0.3000, 5.4000, 3.5500)
 
 [sub_resource type="BoxShape3D" id="b_UpperDoor"]
 size = Vector3(1.2500, 2.8000, 0.3000)
@@ -184,16 +184,16 @@ size = Vector3(1.2500, 2.8000, 0.3000)
 size = Vector3(5.0250, 0.2000, 2.1000)
 
 [sub_resource type="BoxShape3D" id="b_SlabB"]
-size = Vector3(1.5250, 0.2000, 1.0000)
+size = Vector3(1.3250, 0.2000, 1.0000)
 
 [sub_resource type="BoxShape3D" id="b_Railing"]
-size = Vector3(2.4000, 1.2000, 0.1000)
+size = Vector3(2.1000, 1.2000, 0.1000)
 
 [sub_resource type="BoxShape3D" id="b_RailingSide"]
 size = Vector3(0.1000, 1.2000, 1.1000)
 
 [sub_resource type="BoxShape3D" id="b_Landing"]
-size = Vector3(0.8500, 2.1000, 1.0000)
+size = Vector3(1.3500, 2.1000, 1.0000)
 
 [sub_resource type="BoxShape3D" id="b_Post0"]
 size = Vector3(0.2812, 2.5000, 0.3000)
@@ -202,10 +202,10 @@ size = Vector3(0.2812, 2.5000, 0.3000)
 size = Vector3(0.2188, 2.5000, 0.3000)
 
 [sub_resource type="ConvexPolygonShape3D" id="c_Stairs"]
-points = PackedVector3Array(1.0371, 0.0000, -2.1000, -1.7594, 0.0000, -2.1000, -1.7594, 2.1000, -2.1000, -1.6629, 2.1000, -2.1000, 1.0371, 0.0000, -3.1000, -1.7594, 0.0000, -3.1000, -1.7594, 2.1000, -3.1000, -1.6629, 2.1000, -3.1000)
+points = PackedVector3Array(1.2263, 0.0000, -2.1000, -1.2594, 0.0000, -2.1000, -1.2594, 2.1000, -2.1000, -1.1737, 2.1000, -2.1000, 1.2263, 0.0000, -3.1000, -1.2594, 0.0000, -3.1000, -1.2594, 2.1000, -3.1000, -1.1737, 2.1000, -3.1000)
 
 [sub_resource type="ConvexPolygonShape3D" id="c_StairRail"]
-points = PackedVector3Array(0.9406, 0.0000, -2.1200, -1.7594, 2.1000, -2.1200, -1.7594, 3.1000, -2.1200, 0.9406, 1.0000, -2.1200, 0.9406, 0.0000, -2.0200, -1.7594, 2.1000, -2.0200, -1.7594, 3.1000, -2.0200, 0.9406, 1.0000, -2.0200)
+points = PackedVector3Array(1.1406, 0.0000, -2.1200, -1.2594, 2.1000, -2.1200, -1.2594, 3.1000, -2.1200, 1.1406, 1.0000, -2.1200, 1.1406, 0.0000, -2.0200, -1.2594, 2.1000, -2.0200, -1.2594, 3.1000, -2.0200, 1.1406, 1.0000, -2.0200)
 
 [node name="CasaClara2D" type="Node3D"]
 
@@ -316,7 +316,7 @@ mesh = SubResource("q_Bed")
 surface_material_override/0 = SubResource("mt_p_bed")
 
 [node name="UpBasket" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 2.6730, -1.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.6730, -1.6000)
 mesh = SubResource("q_UpBasket")
 surface_material_override/0 = SubResource("mt_p_basket")
 
@@ -352,7 +352,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7500, 2.3000, -2.3500)
 shape = SubResource("b_Bed")
 
 [node name="UpBasket" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 2.4000, -1.7750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.4000, -1.7750)
 shape = SubResource("b_UpBasket")
 
 [node name="Back" type="CollisionShape3D" parent="Walls"]
@@ -363,10 +363,6 @@ shape = SubResource("b_Back")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7094, 2.7000, -1.6250)
 shape = SubResource("b_West")
 
-[node name="East" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6156, 2.7000, -1.6250)
-shape = SubResource("b_East")
-
 [node name="FrontLeft" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7969, 2.7000, 0.0000)
 shape = SubResource("b_FrontLeft")
@@ -374,6 +370,10 @@ shape = SubResource("b_FrontLeft")
 [node name="FrontRight" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6406, 2.7000, 0.0000)
 shape = SubResource("b_FrontRight")
+
+[node name="East" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6156, 2.7000, -1.6250)
+shape = SubResource("b_East")
 
 [node name="UpperDoor" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8906, 4.0000, 0.0000)
@@ -384,19 +384,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0469, 2.0000, -1.0500)
 shape = SubResource("b_SlabA")
 
 [node name="SlabB" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7031, 2.0000, -2.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8031, 2.0000, -2.6000)
 shape = SubResource("b_SlabB")
 
 [node name="Railing" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2594, 2.5000, -2.0500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0906, 2.5000, -2.0500)
 shape = SubResource("b_Railing")
 
 [node name="RailingSide" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9906, 2.5000, -2.5500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1906, 2.5000, -2.5500)
 shape = SubResource("b_RailingSide")
 
 [node name="Landing" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1844, 1.0500, -2.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9344, 1.0500, -2.6000)
 shape = SubResource("b_Landing")
 
 [node name="Post0" type="CollisionShape3D" parent="Walls"]

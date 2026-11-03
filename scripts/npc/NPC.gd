@@ -135,19 +135,19 @@ const PLACE_SLOTS: Array[Vector3] = [
 	Vector3(0.0, 0.0, 4.2),
 ]
 
+# The 2D buildings' spots, beds and stair approaches live in HouseLayouts.gd, generated with the
+# buildings themselves (art_source/tools/gen_buildings.py); they are merged into the tables below.
+const HouseLayouts = preload("res://scripts/npc/HouseLayouts.gd")
+
 # Spots inside walk-in buildings, around their marker: open floor, clear of the furniture.
 # Clinic: the last two are outside the door, for a queue.
-const INTERIOR_SLOTS := {
+const INTERIOR_SLOTS_3D := {
 	# Homes (marker at the front door): spots off to the side, so the doctor can step in
 	"Casa1": [Vector3(0.6, 0.0, -2.2), Vector3(-0.4, 0.0, -1.9), Vector3(0.2, 0.0, -2.9)],
 	"CasaSophia": [Vector3(-1.2, 0.0, -2.0), Vector3(-1.8, 0.0, -2.4), Vector3(-0.6, 0.0, -1.7)],
 	"CasaSarah": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],
 	"CasaHugo": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],
-	# The north row, the bakery and the farm (1 Nov) copy older houses: the same rooms and spots
-	"CasaJohn": [Vector3(0.04, 0.0, -0.98), Vector3(-1.79, 0.0, -2.1), Vector3(0.6, 0.0, -2.38)],  # 2D house: by the door, by the stairs, at the table
-	"CasaSebastian": [Vector3(0.04, 0.0, -2.52), Vector3(1.93, 0.0, -2.1), Vector3(1.65, 0.0, -3.92)],  # 2D house: at the table, mid-room, by the bed
-	"CasaClara": [Vector3(-2.23, 0.0, -1.89), Vector3(-1.81, 0.0, -0.42), Vector3(-0.41, 0.0, -0.98)],  # 2D house: at her sewing table, mid-workshop, by the door
-	"Padaria": [Vector3(6.748, 0.0, -2.8), Vector3(3.528, 0.0, -0.14), Vector3(6.328, 0.0, -0.14), Vector3(1.848, 0.0, -0.7)],  # 2D bakery: behind the counter, then the shop floor
+	# The farm (1 Nov) copies an older house: the same room and spots
 	"Fazenda": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],  # as CasaHugo
 	# Tomas's forge (marker at the house door): beside the anvil, at the hearth, in front of the anvil
 	"Casa2": [
@@ -189,29 +189,25 @@ const INTERIOR_SLOTS := {
 # Where each person sleeps: the foot of their bed (from the home's door marker) and which
 # way the head points (degrees around Y; 0 = head toward -z). Homes without a bed here
 # (the tavern rooms upstairs, the priest's quarters) still send their owner out of sight.
-const BED_SPOTS := {
+const BED_SPOTS_3D := {
 	"Casa1": [Vector3(2.15, 0.0, -2.75), 0.0],
 	"Casa2": [Vector3(-1.9, 0.0, -2.7), 0.0],
 	"CasaSophia": [Vector3(-1.0, 0.0, -3.7), 90.0],
 	"CasaSarah": [Vector3(2.55, 0.0, -3.8), 90.0],
 	"CasaHugo": [Vector3(2.7, 0.0, -3.8), 90.0],
-	"CasaJohn": [Vector3(0.25, 3.88, -4.76), 0.0],  # upstairs, over the stone room
-	"CasaSebastian": [Vector3(2.7, 0.0, -4.83), 0.0],
-	"CasaClara": [Vector3(-0.2, 2.94, -1.75), 0.0],  # upstairs, over her workshop
 	"Fazenda": [Vector3(2.7, 0.0, -3.8), 90.0],
-	"Padaria": [Vector3(9.688, 2.94, -2.52), 0.0],  # Bruno sleeps upstairs, over the shop
 	"Taverna": [Vector3(1.45, 3.12, -6.85), -90.0],  # Marta sleeps upstairs, by the window (feet at the foot of the bed, head to the wall)
 }
 const BED_HEIGHT := 0.6
 
 # Upstairs beds: where to walk to first (on the upper floor, beside the bed), relative to the door.
 # The bed itself has no navigation mesh, and its nearest mesh point can be outside the house.
-const BED_APPROACH := {
+const BED_APPROACH_3D := {
 	"Taverna": Vector3(0.6, 3.12, -6.6),
-	"Padaria": Vector3(8.568, 2.94, -1.4),  # Up the stone stairs, beside the bed
-	"CasaClara": Vector3(-1.25, 2.94, -0.98),  # Up her stairs, beside the bed
-	"CasaJohn": Vector3(-1.23, 3.88, -4.34),  # Up the stairs by the left wall, beside the bed
 }
+static var INTERIOR_SLOTS: Dictionary = INTERIOR_SLOTS_3D.merged(HouseLayouts.INTERIOR_SLOTS)
+static var BED_SPOTS: Dictionary = BED_SPOTS_3D.merged(HouseLayouts.BED_SPOTS)
+static var BED_APPROACH: Dictionary = BED_APPROACH_3D.merged(HouseLayouts.BED_APPROACH)
 var in_bed := false
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D

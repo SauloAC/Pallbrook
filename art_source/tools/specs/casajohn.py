@@ -10,13 +10,17 @@ SPEC = {
     "posts": [(9, 17, 0.95, 1.25), (69, 77, 0.95, 1.25), (128, 136, 0.95, 1.25)],
     # two floors: the stone room below, John's room above at the level of the beam over the stilts.
     # The stairs run along the left wall toward the back; upstairs the stilts and the stone wall come back.
-    "upper": {"height": 2.77, "dir": "back", "width": 1.0, "start_z": -1.2, "run": 3.55, "steps": 16,
+    "upper": {"height": 2.77, "dir": "back", "width": 1.0, "start_z": -1.0, "run": 3.2, "steps": 16,
               "lower_front_plane": 0, "show_upstairs": [1], "front_z": 1.1},
     # the balcony on the right, at the level of the upper floor, reached through the east wall
     "deck": {"rect": (141, 138, 184, 238), "plane": 0, "y": 2.77, "walk": (170, 152, 226)},
     # seen from inside, the balcony keeps its brace and a roof tile above and below where it meets the house
     "keep_inside": [{"rect": (136, 238, 172, 263)}, {"rect": (130, 224, 144, 250)}, {"rect": (130, 136, 144, 152)}],
-    # room x -2.29..1.07, back wall at z -5.5; stairs x -2.29..-1.29 from z -1.2 to -4.75
+    # room x -2.29..1.07, back wall at z -5.5; stairs x -2.29..-1.29 from z -1.0 to -4.2
+    # where people stand indoors (x, z; the first is the owner's own spot) and sleep (x, y, z, head angle)
+    "npc": {"slots": [(0.404, -1.2), (-0.904, -2.0), (0.804, -2.2)],  # by the door, by the stairs, at the table
+            "bed": (0.554, 2.771, -3.9, 0.0),
+            "bed_approach": (-0.504, 2.771, -3.6)},
     "furniture": [
         {"name": "Table", "prop": "table", "flat": True, "y": 0.57, "x": 0.0, "z": -3.4, "box": (-0.9, 0.9, -3.75, -3.05, 0.7)},
         {"name": "StoolA", "prop": "stool", "x": -0.5, "z": -2.5, "box": (-0.68, -0.32, -2.8, -2.5, 0.5)},
