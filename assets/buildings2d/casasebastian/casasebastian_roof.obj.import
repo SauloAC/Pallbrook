@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bx2rehl2ct2mr"
+path="res://.godot/imported/casasebastian_roof.obj-84b503881de297fd9c54bbe8003ea02e.mesh"
+
+[deps]
+
+files=["res://.godot/imported/casasebastian_roof.obj-84b503881de297fd9c54bbe8003ea02e.mesh"]
+
+source_file="res://assets/buildings2d/casasebastian/casasebastian_roof.obj"
+dest_files=["res://.godot/imported/casasebastian_roof.obj-84b503881de297fd9c54bbe8003ea02e.mesh", "res://.godot/imported/casasebastian_roof.obj-84b503881de297fd9c54bbe8003ea02e.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

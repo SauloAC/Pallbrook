@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ba6arq35icvrt"
+path="res://.godot/imported/casaclara_landingtop.obj-a14581336477d54e2ce836de6057e04f.mesh"
+
+[deps]
+
+files=["res://.godot/imported/casaclara_landingtop.obj-a14581336477d54e2ce836de6057e04f.mesh"]
+
+source_file="res://assets/buildings2d/casaclara/casaclara_landingtop.obj"
+dest_files=["res://.godot/imported/casaclara_landingtop.obj-a14581336477d54e2ce836de6057e04f.mesh", "res://.godot/imported/casaclara_landingtop.obj-a14581336477d54e2ce836de6057e04f.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

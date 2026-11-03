@@ -7,6 +7,8 @@ extends Area3D
 # area's parent node (Clinica, Taverna...). Groups a building doesn't have are simply skipped.
 # Two levels: downstairs everything above the room is cut away; upstairs (via the stairs)
 # only the roof and the front walls go, so the upper room and its beds show.
+# 2D buildings also have <Building>_Inside: the room itself, shown only while the doctor is in
+# (from outside it would show through the transparent parts of the painted facade).
 
 const PART_SUFFIXES := ["_Roof", "_Upper", "_UpperFront", "_Front"]
 const UPSTAIRS_HEIGHT := 1.6  # Doctor's feet above this = on the upper floor
@@ -15,6 +17,7 @@ const UPSTAIRS_HEIGHT := 1.6  # Doctor's feet above this = on the upper floor
 
 var parts: Dictionary = {}     # suffix -> Node3D
 var sign_label: Node3D = null
+var inside: Node3D = null      # <Building>_Inside, for 2D buildings
 var building := ""
 var player: Node3D = null      # The doctor, while inside
 var upstairs := false
@@ -32,6 +35,9 @@ func _ready() -> void:
 		var node := scene.find_child(building + suffix, true, false) as Node3D
 		if node:
 			parts[suffix] = node
+	inside = scene.find_child(building + "_Inside", true, false) as Node3D
+	if inside:
+		inside.visible = false
 	if parts.is_empty():
 		push_warning("InteriorCutaway: no %s_Roof/_Upper/_Front nodes found" % building)
 	if hide_sign:
@@ -68,6 +74,8 @@ func _apply(open: bool) -> void:
 	for suffix in parts:
 		var cut: bool = open and not (upstairs and suffix == "_Upper")
 		parts[suffix].visible = not cut
+	if inside:
+		inside.visible = open
 	if sign_label:
 		sign_label.visible = not open
 	if open:
