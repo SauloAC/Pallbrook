@@ -38,6 +38,10 @@ def build(h):
             wall_top(tb, h.xn - h.wt, h.xn, -0.015, h.zn, 0.03)
         else:
             wall_top(tb, a, b, -0.015, -D, HIN); wall_end(tb, a, b, HIN)
+    # inner walls between ground-floor rooms (a stable and a stair hall): only downstairs, under the upper floor
+    for pt in sp.get("partitions", []):
+        pa, pb = pt["x"]
+        wall_top(tb_low, pa, pb, -0.015, ZB, pt["height"]); wall_end(tb_low, pa, pb, pt["height"])
     tb.append(([(XI0, HIN, ZB), (XI1, HIN, ZB), (XI1, HIN, -D), (XI0, HIN, -D)],
                [(XI0 / BW, 0), (XI1 / BW, 0), (XI1 / BW, 1), (XI0 / BW, 1)], 1))
     h.timber_fn = h.obj("Timber", tb, ["0 1 0", "0 0 1"])

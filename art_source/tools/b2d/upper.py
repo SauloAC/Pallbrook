@@ -64,6 +64,38 @@ def build(h):
                       ("Railing", LAND_X + 0.3, RAMP_LOW, H - 0.2, H + 1.0, SF, SF + 0.1),
                       ("RailingSide", RAMP_LOW, RAMP_LOW + 0.1, H - 0.2, H + 1.0, ZB, SF + 0.1)]
         info_up = {"H": H, "stairs_x": [round(LAND_X, 3), round(RAMP_LOW, 3)], "stairs_front": round(SF, 3)}
+    elif UP.get("side") == "right":
+        # along the right wall, rising toward the back to a landing in the back right corner (a stair hall)
+        SW = UP.get("width", 1.0)
+        XS = XI1 - SW                                   # open side of the stairs
+        ZLOW = UP["start_z"]
+        ZTOP = ZLOW - UP["run"]
+        dz, dy = (ZLOW - ZTOP) / STEPS, H / STEPS
+        for i in range(STEPS):
+            zf, zb, y = ZLOW - i * dz, ZLOW - (i + 1) * dz, (i + 1) * dy
+            treads.append(([(XS, y, zf), (XI1, y, zf), (XI1, y, zb), (XS, y, zb)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1))
+            side.append(([(XS, i * dy, zf), (XI1, i * dy, zf), (XI1, y, zf), (XS, y, zf)],
+                         [(XS * su2, i * dy * COS * sv2), (XI1 * su2, i * dy * COS * sv2), (XI1 * su2, y * COS * sv2), (XS * su2, y * COS * sv2)], 1))
+        land = (XS, XI1, ZB, ZTOP)
+        floors = [rect_floor(XI0, XS, ZB, FZ, H + 0.01), rect_floor(XS, XI1, ZLOW, FZ, H + 0.01)]
+        line = lambda z: dy / 2 + H * (ZLOW - z) / (ZLOW - ZTOP)
+        RX = XS - 0.04
+        zrail(rail, RX, ZLOW - dz / 2, line(ZLOW - dz / 2) + RAIL_H, ZTOP + dz / 2, line(ZTOP + dz / 2) + RAIL_H)
+        for i in (0, STEPS // 2, STEPS - 1):
+            z = ZLOW - (i + 0.5) * dz
+            post(rail, RX, (i + 1) * dy, line(z) + RAIL_H, z)
+        zrail(upr, RX, ZLOW, H + RAIL_H, ZTOP, H + RAIL_H)
+        beam(upr, XS, H + RAIL_H, XI1, H + RAIL_H, ZLOW - 0.04)
+        for z in (ZLOW, (ZLOW + ZTOP) / 2, ZTOP):
+            post(upr, RX, H, H + RAIL_H, z)
+        prof = [(ZLOW + dz / 2, 0), (ZTOP, 0), (ZTOP, H), (ZTOP + dz / 2, H)]
+        conv.append(("Stairs", [(x, y, z) for x in (XS, XI1) for z, y in prof]))
+        rp_ = [(ZLOW, 0), (ZTOP, H), (ZTOP, H + 1.0), (ZLOW, 1.0)]
+        conv.append(("StairRail", [(x, y, z) for x in (XS - 0.08, XS) for z, y in rp_]))
+        up_shapes += [("SlabA", XI0, XS, H - 0.2, H, ZB, FZ), ("SlabFront", XS, XI1, H - 0.2, H, ZLOW, FZ),
+                      ("Railing", XS - 0.1, XS, H - 0.2, H + 1.0, ZLOW, ZTOP),
+                      ("RailingFront", XS - 0.1, XI1, H - 0.2, H + 1.0, ZLOW - 0.1, ZLOW)]
+        info_up = {"H": H, "stairs_x": [round(XS, 3), round(XI1, 3)], "stairs_z": [round(ZLOW, 3), round(ZTOP, 3)]}
     else:
         # along the left wall, rising toward the back to a landing in the back left corner; risers face the room
         SW = UP.get("width", 1.0)
@@ -119,7 +151,7 @@ def build(h):
     up_meshes["upperfloor"] = (obj("UpperFloor", floors, ["0 1 0"]), "mt_floor", "Upper")
     up_meshes["railing"] = (obj("Railing", rail, ["0 1 0", "0 0 1"]), "mt_rail", "")
     up_meshes["upperrailing"] = (obj("UpperRailing", upr, ["0 1 0", "0 0 1"]), "mt_rail", "Upper")
-    up_shapes.append(("Landing", land[0] - 0.05, land[1], 0, H, land[2], land[3]))
+    up_shapes.append(("Landing", land[0] - (0.0 if UP.get("side") == "right" else 0.05), land[1] + (0.05 if UP.get("side") == "right" else 0.0), 0, H, land[2], land[3]))
     # upstairs the lower storey of the facade comes back over the room below; a sill beam on top of it
     LFP = UP.get("lower_front_plane", 0)
     lp = sp["planes"][LFP]

@@ -39,6 +39,9 @@ def build(h):
     E("Texture2D", R + SPEC["inner_wall_tile"], "tx_wall")
     E("Texture2D", R + "tile_beam.png", "tx_beam")
     mat("mt_floor", "sh_tile", "tx_floor"); mat("mt_wall", "sh_tile", "tx_wall"); mat("mt_beam", "sh_tile", "tx_beam")
+    GROUND_MT = "mt_floor"
+    if SPEC.get("floor_tile"):          # the ground floor in its own material (packed earth in a stable)
+        E("Texture2D", R + SPEC["floor_tile"], "tx_ground"); mat("mt_ground", "sh_tile", "tx_ground"); GROUND_MT = "mt_ground"
     if UP:
         E("Texture2D", R + "tile_stair_tread.png", "tx_tread"); E("Texture2D", R + "tile_rail_wood.png", "tx_rail")
         mat("mt_tread", "sh_sprite", "tx_tread"); mat("mt_rail", "sh_sprite", "tx_rail")
@@ -54,7 +57,9 @@ def build(h):
     for ki, kfn in enumerate(KEEP):
         E("ArrayMesh", RH + kfn, "m_keep%d" % ki)
     if timber_low_fn:
-        E("ArrayMesh", RH + timber_low_fn, "m_timberlow"); E("ArrayMesh", RH + timber_up_fn, "m_timberupw")
+        E("ArrayMesh", RH + timber_low_fn, "m_timberlow")
+    if timber_up_fn:
+        E("ArrayMesh", RH + timber_up_fn, "m_timberupw")
     if DECK:
         E("ArrayMesh", RH + deck_fn, "m_deck"); E("Texture2D", RH + roof_tex, "tx_roof"); mat("mt_roof", "sh_sprite", "tx_roof")
     if h.porch_fn:
@@ -99,7 +104,7 @@ def build(h):
     # through the transparent parts of the art, above the lower roofs
     INS = NAME + "_Inside"
     N('[node name="%s" type="Node3D" parent="."]\n' % INS)
-    for nm, m, mt in (("Floor", "floor", "mt_floor"), ("InnerWall", "innerwall", "mt_wall"), ("Timber", "timber", "mt_beam")):
+    for nm, m, mt in (("Floor", "floor", GROUND_MT), ("InnerWall", "innerwall", "mt_wall"), ("Timber", "timber", "mt_beam")):
         N('[node name="%s" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_%s")\nmaterial_override = SubResource("%s")\n' % (nm, INS, m, mt))
     N('[node name="Furniture" type="Node3D" parent="%s"]\n' % INS)
     if timber_low_fn:
@@ -161,8 +166,23 @@ def build(h):
     WALL = 5.4 if UP else 3.2
     FZ_ = UP.get("front_z", 0.0) if UP else 0.0
     FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
-    shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, max(0.15, FZ_ + 0.15), -D),
-               ("FrontLeft", xw0, d0, 0, FH, 0.15, -0.15), ("FrontRight", d1, XN if NOTCH else xw1, 0, FH, 0.15, -0.15)]
+    shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, max(0.15, FZ_ + 0.15), -D)]
+    # the front wall, open at the door and at any other openings in the art (arches); a lintel over each opening
+    gaps = [(d0, d1, None)]
+    for gi, g in enumerate(SPEC.get("front_gaps", [])):
+        gp = SPEC["planes"][g.get("plane", 0)]
+        gaps.append((px(g["px"][0]), px(g["px"][1]), (gp["base"] - g["top_row"]) / 32.0 / COS))
+    gaps.sort()
+    fx = xw0
+    for gi, (ga_, gb_, gtop) in enumerate(gaps):
+        nm_ = "FrontLeft" if gi == 0 else "Front%d" % gi
+        shapes.append((nm_, fx, ga_, 0, FH, 0.15, -0.15))
+        if gtop is not None:
+            shapes.append(("Lintel%d" % gi, ga_, gb_, gtop, FH, 0.15, -0.15))
+        fx = gb_
+    shapes.append(("FrontRight", fx, XN if NOTCH else xw1, 0, FH, 0.15, -0.15))
+    for pi, pt in enumerate(SPEC.get("partitions", [])):
+        shapes.append(("Partition%d" % pi, pt["x"][0], pt["x"][1], 0, pt["height"], -0.15, ZB))
     if FY > 0:    # the raised floor is a solid slab; the porch in front of the door and the steps up to it
         shapes.append(("RaisedFloor", xw0, xw1, 0, FY, 0.15, -D))
         if PORCH:

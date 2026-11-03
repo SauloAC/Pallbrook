@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://rysfrnak6pp7"
+path="res://.godot/imported/fazenda_front0.obj-24570010c84adefb860ae7e3bd811464.mesh"
+
+[deps]
+
+files=["res://.godot/imported/fazenda_front0.obj-24570010c84adefb860ae7e3bd811464.mesh"]
+
+source_file="res://assets/buildings2d/fazenda/fazenda_front0.obj"
+dest_files=["res://.godot/imported/fazenda_front0.obj-24570010c84adefb860ae7e3bd811464.mesh", "res://.godot/imported/fazenda_front0.obj-24570010c84adefb860ae7e3bd811464.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
