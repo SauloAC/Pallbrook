@@ -99,6 +99,16 @@ tb.append(([(XI0, HIN, ZB), (XI1, HIN, ZB), (XI1, HIN, -D), (XI0, HIN, -D)],
            [(XI0 / BW, 0), (XI1 / BW, 0), (XI1 / BW, 1), (XI0 / BW, 1)], 1))
 timber_fn = obj("Timber", tb, ["0 1 0", "0 0 1"])
 
+BLOCKS = []
+for bi, b in enumerate(SPEC.get("blocks", [])):
+    x0, x1, zb, zf, h = b["x0"], b["x1"], b["z_back"], b["z_front"], b["height"]
+    front = obj("Block%dFront" % bi, [([(x0, 0, zf), (x1, 0, zf), (x1, h, zf), (x0, h, zf)], [(0, 0), (1, 0), (1, 1), (0, 1)], 1)], ["0 0 1"])
+    btw, bth = b.get("top_tile_px", (tw, th))
+    bu, bv = 32.0 / btw, 32.0 / bth
+    top = obj("Block%dTop" % bi, [([(x0, h, zf), (x1, h, zf), (x1, h, zb), (x0, h, zb)],
+                                   [(x0 * bu, -zf * bv), (x1 * bu, -zf * bv), (x1 * bu, -zb * bv), (x0 * bu, -zb * bv)], 1)], ["0 1 0"])
+    BLOCKS.append((bi, b, front, top))
+
 UP = SPEC.get("upper")
 up_meshes, up_shapes, conv = {}, [], []
 if UP:
@@ -198,6 +208,17 @@ for i, (fn, tex) in enumerate(fronts):
         mat("mt_" + tex.replace(".png", ""), "sh_sprite", "tx_" + tex.replace(".png", ""))
 for nm, fn in (("roof", roof_fn), ("body", body_fn), ("floor", floor_fn), ("innerwall", wall_fn), ("timber", timber_fn)):
     E("ArrayMesh", RH + fn, "m_" + nm)
+FX = R + "fx/"
+if SPEC.get("smoke_px") or any(b.get("flame") for b in SPEC.get("blocks", [])):
+    E("Shader", FX + "fx_smoke.gdshader", "sh_smoke"); E("Shader", FX + "fx_flame.gdshader", "sh_flame")
+    E("Texture2D", FX + "fx_smoke.png", "tx_smoke"); E("Texture2D", FX + "fx_smoke_ramp.png", "tx_smoke_ramp"); E("Texture2D", FX + "fx_flame.png", "tx_flame")
+    S('[sub_resource type="ShaderMaterial" id="mt_smoke"]\nshader = ExtResource("sh_smoke")\nshader_parameter/smoke = ExtResource("tx_smoke")\nshader_parameter/ramp = ExtResource("tx_smoke_ramp")\n')
+    S('[sub_resource type="ShaderMaterial" id="mt_flame"]\nshader = ExtResource("sh_flame")\nshader_parameter/frames = ExtResource("tx_flame")\n')
+for bi, b, front, top in BLOCKS:
+    E("ArrayMesh", RH + front, "m_block%df" % bi); E("ArrayMesh", RH + top, "m_block%dt" % bi)
+    E("Texture2D", R + "props/prop_%s.png" % b["front_tex"], "tx_block%d" % bi); mat("mt_block%d" % bi, "sh_sprite", "tx_block%d" % bi)
+    if b.get("top_tile"):
+        E("Texture2D", R + b["top_tile"], "tx_block%dtop" % bi); mat("mt_block%dtop" % bi, "sh_tile", "tx_block%dtop" % bi)
 used = sorted(set(f["prop"] for f in SPEC["furniture"]))
 for p in used:
     E("Texture2D", R + "props/prop_%s.png" % p, "tx_p_" + p)
@@ -228,6 +249,19 @@ if UP:
     for i in UP.get("show_upstairs", []):
         N('[node name="UpstairsPlane%d" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_front%d")\nmaterial_override = SubResource("mt_%s")\n'
           % (i, INS + "/" + NAME + "_Upper", i, fronts[i][1].replace(".png", "")))
+for bi, b, front, top in BLOCKS:
+    N('[node name="%sFront" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_block%df")\nmaterial_override = SubResource("mt_block%d")\n' % (b["name"], INS, bi, bi))
+    N('[node name="%sTop" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_block%dt")\nmaterial_override = SubResource("%s")\n' % (b["name"], INS, bi, ("mt_block%dtop" % bi) if b.get("top_tile") else "mt_wall"))
+    shapes.append((b["name"], b["x0"], b["x1"], 0, b["height"], b["z_back"], b["z_front"]))
+    if b.get("flame"):
+        fx_, fy_, fz_, fw_, fh_ = b["flame"]
+        S('[sub_resource type="QuadMesh" id="q_flame%d"]\nsize = Vector2(%.4f, %.4f)\n' % (bi, fw_, fh_))
+        N('[node name="%sFire" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_flame%d")\nsurface_material_override/0 = SubResource("mt_flame")\n'
+          % (b["name"], INS, tf(fx_, fy_, fz_), bi))
+    if b.get("light"):
+        lx, ly, lz = b["light"]
+        N('[node name="%sGlow" type="OmniLight3D" parent="%s"]\ntransform = %s\nlight_color = Color(1, 0.62, 0.3, 1)\nlight_energy = 0.9\nomni_range = 3.0\nshadow_enabled = false\n'
+          % (b["name"], INS, tf(lx, ly, lz)))
 for f in SPEC["furniture"]:
     lift = UP["height"] if (UP and f.get("upper")) else 0.0
     fpar = (INS + "/" + NAME + "_Upper") if (UP and f.get("upper")) else (INS + "/Furniture")
@@ -257,6 +291,13 @@ if UP:
     shapes += up_shapes
 for i, (a, b, za, zb) in enumerate(SPEC.get("posts", [])):
     shapes.append(("Post%d" % i, px(a), px(b), 0, 2.5, za, zb))
+if SPEC.get("smoke_px"):
+    sx, srow = SPEC["smoke_px"]
+    t = (re - srow) / re
+    sy, sz = ye + t * (yt - ye), ze + t * (-D - ze)
+    S('[sub_resource type="QuadMesh" id="q_smoke"]\nsize = Vector2(0.9, 3.2)\n')
+    N('[node name="ChimneySmoke" type="MeshInstance3D" parent="."]\ntransform = %s\nmesh = SubResource("q_smoke")\nsurface_material_override/0 = SubResource("mt_smoke")\n'
+      % tf(px(sx), sy + 1.6, sz + 0.05))
 N('[node name="Walls" type="StaticBody3D" parent="."]\n')
 for nm, xa, xb, ya, yb, za, zb in shapes:
     S('[sub_resource type="BoxShape3D" id="b_%s"]\nsize = Vector3(%.4f, %.4f, %.4f)\n' % (nm, abs(xb - xa), abs(yb - ya), abs(zb - za)))
