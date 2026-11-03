@@ -38,6 +38,9 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_stool.png" id="tx_p_stool"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_table.png" id="tx_p_table"]
+[ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/casajohn/casajohn_door.png" id="tx_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -128,6 +131,24 @@ shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_table")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_door"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_door")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_opening"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_opening")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_door"]
+size = Vector2(0.8750, 1.2640)
+
+[sub_resource type="BoxShape3D" id="b_doorway"]
+size = Vector3(1.1750, 1.6, 0.8)
 
 [sub_resource type="QuadMesh" id="q_Table"]
 size = Vector2(1.8304, 1.3112)
@@ -251,6 +272,29 @@ material_override = SubResource("mt_casajohn_facade_0")
 [node name="Plane1" type="MeshInstance3D" parent="CasaJohn_Front"]
 mesh = ExtResource("m_front1")
 material_override = SubResource("mt_casajohn_facade")
+
+[node name="Door" type="Node3D" parent="CasaJohn_Front"]
+script = ExtResource("sc_door")
+
+[node name="Opening" type="MeshInstance3D" parent="CasaJohn_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3125, 0.6320, 0.0120)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_opening")
+
+[node name="Leaf" type="Node3D" parent="CasaJohn_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1250, 0.0000, 0.0240)
+
+[node name="Panel" type="MeshInstance3D" parent="CasaJohn_Front/Door/Leaf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4375, 0.6320, 0.0000)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_door")
+
+[node name="Doorway" type="Area3D" parent="CasaJohn_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3125, 0.8000, 0.1000)
+collision_layer = 0
+
+[node name="Shape" type="CollisionShape3D" parent="CasaJohn_Front/Door/Doorway"]
+shape = SubResource("b_doorway")
 
 [node name="CasaJohn_Roof" type="MeshInstance3D" parent="."]
 mesh = ExtResource("m_roof")

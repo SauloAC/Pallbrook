@@ -4,6 +4,7 @@ Node tree: <Name>2D / <Name>_Front (planes), <Name>_Roof, Body, <Name>_Inside (t
 doctor is in: Floor, InnerWall, Timber, Furniture, <Name>_Lower, <Name>_Upper), ChimneySmoke, Walls."""
 import os
 from .core import COS, SIN, FURN, RES as R, tf
+from . import door as door_mod
 
 
 def build(h):
@@ -76,6 +77,7 @@ def build(h):
     for i, (fn, tex) in enumerate(fronts):
         N('[node name="Plane%d" type="MeshInstance3D" parent="%s_Front"]\nmesh = ExtResource("m_front%d")\nmaterial_override = SubResource("mt_%s")\n'
           % (i, NAME, i, tex.replace(".png", "")))
+    door_mod.scene_nodes(h, h.door, E, S, N, mat, NAME + "_Front")
     N('[node name="%s_Roof" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_roof")\nmaterial_override = SubResource("%s")\n' % (NAME, "mt_roof" if DECK else facade_mat))
     if DECK:
         # outside the balcony goes with the roof it was cut from; upstairs a copy shows (below, in _Upper)

@@ -4,7 +4,7 @@
 """
 import os
 from .core import House
-from . import outside, inside, upper, scene, layout
+from . import outside, inside, upper, door, scene, layout
 
 
 def build_house(spec, out_dir, prop_sizes):
@@ -12,6 +12,7 @@ def build_house(spec, out_dir, prop_sizes):
     outside.build(h)
     inside.build(h)
     upper.build(h)
+    h.door = door.build(h)
     text = scene.build(h)
     open(os.path.join(out_dir, h.name + "2D.tscn"), "w").write(text)
     h.layout = layout.npc_layout(h)

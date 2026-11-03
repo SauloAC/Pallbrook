@@ -12,6 +12,7 @@ SPEC = {
     "npc": {"slots": [(1.5, -2.5), (-0.8, -0.6), (1.2, -0.6), (-2.0, -1.0)],  # behind the counter, then the shop floor
             "bed": (3.6, 2.1, -2.3, 0.0),
             "bed_approach": (2.8, 2.1, -1.5)},
+    "door_art": {"rect": (29, 160, 57, 203), "hinge": "left"},   # the painted door, which swings open
     "furniture": [
         {"name": "Counter", "prop": "table", "flat": True, "y": 0.57, "x": 1.6, "z": -1.4, "box": (0.7, 2.5, -1.75, -1.05, 0.7)},
         {"name": "BarrelStack", "prop": "barrel_stack", "x": 3.3, "z": -3.011, "box": (2.65, 3.95, -3.721, -3.011, 1.0)},

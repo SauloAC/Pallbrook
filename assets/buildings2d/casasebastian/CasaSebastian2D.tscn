@@ -28,6 +28,9 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_stool.png" id="tx_p_stool"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_table_round.png" id="tx_p_table_round"]
+[ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/casasebastian/casasebastian_door.png" id="tx_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -116,6 +119,24 @@ shader_parameter/tex = ExtResource("tx_p_table_round")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
+[sub_resource type="ShaderMaterial" id="mt_door"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_door")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_opening"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_opening")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_door"]
+size = Vector2(0.9375, 1.9447)
+
+[sub_resource type="BoxShape3D" id="b_doorway"]
+size = Vector3(1.2375, 1.6, 0.8)
+
 [sub_resource type="QuadMesh" id="q_flame0"]
 size = Vector2(0.3600, 0.4800)
 
@@ -176,14 +197,14 @@ size = Vector3(4.0000, 3.2000, 0.3000)
 [sub_resource type="BoxShape3D" id="b_West"]
 size = Vector3(0.3000, 3.2000, 5.7500)
 
-[sub_resource type="BoxShape3D" id="b_East"]
-size = Vector3(0.3000, 3.2000, 5.7500)
-
 [sub_resource type="BoxShape3D" id="b_FrontLeft"]
 size = Vector3(0.5938, 3.2000, 0.3000)
 
 [sub_resource type="BoxShape3D" id="b_FrontRight"]
 size = Vector3(2.1562, 3.2000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_East"]
+size = Vector3(0.3000, 3.2000, 5.7500)
 
 [node name="CasaSebastian2D" type="Node3D"]
 
@@ -192,6 +213,29 @@ size = Vector3(2.1562, 3.2000, 0.3000)
 [node name="Plane0" type="MeshInstance3D" parent="CasaSebastian_Front"]
 mesh = ExtResource("m_front0")
 material_override = SubResource("mt_casasebastian_facade")
+
+[node name="Door" type="Node3D" parent="CasaSebastian_Front"]
+script = ExtResource("sc_door")
+
+[node name="Opening" type="MeshInstance3D" parent="CasaSebastian_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7500, 1.0696, 0.0120)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_opening")
+
+[node name="Leaf" type="Node3D" parent="CasaSebastian_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2188, 0.0972, 0.0240)
+
+[node name="Panel" type="MeshInstance3D" parent="CasaSebastian_Front/Door/Leaf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4688, 0.9723, 0.0000)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_door")
+
+[node name="Doorway" type="Area3D" parent="CasaSebastian_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7500, 0.8000, 0.1000)
+collision_layer = 0
+
+[node name="Shape" type="CollisionShape3D" parent="CasaSebastian_Front/Door/Doorway"]
+shape = SubResource("b_doorway")
 
 [node name="CasaSebastian_Roof" type="MeshInstance3D" parent="."]
 mesh = ExtResource("m_roof")
@@ -324,10 +368,6 @@ shape = SubResource("b_Back")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8500, 1.6000, -2.7250)
 shape = SubResource("b_West")
 
-[node name="East" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8500, 1.6000, -2.7250)
-shape = SubResource("b_East")
-
 [node name="FrontLeft" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7031, 1.6000, 0.0000)
 shape = SubResource("b_FrontLeft")
@@ -335,3 +375,7 @@ shape = SubResource("b_FrontLeft")
 [node name="FrontRight" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9219, 1.6000, 0.0000)
 shape = SubResource("b_FrontRight")
+
+[node name="East" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8500, 1.6000, -2.7250)
+shape = SubResource("b_East")

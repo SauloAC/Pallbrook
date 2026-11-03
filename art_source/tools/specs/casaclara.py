@@ -16,6 +16,7 @@ SPEC = {
     "npc": {"slots": [(0.298, -1.85), (0.598, -0.8), (1.598, -1.2)],  # at her sewing table, mid-workshop, by the door
             "bed": (1.748, 2.1, -1.75, 0.0),
             "bed_approach": (0.998, 2.1, -1.2)},
+    "door_art": {"rect": (141, 145, 169, 182), "hinge": "left"},   # the painted door, which swings open
     "furniture": [
         {"name": "SewingTable", "prop": "table_cloth", "flat": True, "y": 0.57, "x": -0.9, "z": -1.05, "box": (-1.8, 0.0, -1.4, -0.7, 0.7)},
         {"name": "Stool", "prop": "stool", "x": -0.9, "z": -1.75, "box": (-1.08, -0.72, -2.05, -1.75, 0.5)},

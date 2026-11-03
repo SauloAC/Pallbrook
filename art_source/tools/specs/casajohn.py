@@ -21,6 +21,7 @@ SPEC = {
     "npc": {"slots": [(0.404, -1.2), (-0.904, -2.0), (0.804, -2.2)],  # by the door, by the stairs, at the table
             "bed": (0.554, 2.771, -3.9, 0.0),
             "bed_approach": (-0.504, 2.771, -3.6)},
+    "door_art": {"rect": (88, 291, 116, 317), "plane": 1, "hinge": "left"},   # the painted door, which swings open
     "furniture": [
         {"name": "Table", "prop": "table", "flat": True, "y": 0.57, "x": 0.0, "z": -3.4, "box": (-0.9, 0.9, -3.75, -3.05, 0.7)},
         {"name": "StoolA", "prop": "stool", "x": -0.5, "z": -2.5, "box": (-0.68, -0.32, -2.8, -2.5, 0.5)},
