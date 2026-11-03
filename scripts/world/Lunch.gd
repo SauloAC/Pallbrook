@@ -99,6 +99,10 @@ func _run() -> void:
 		npc.change_affinity(WARMTH)
 	var names: Array = table.map(func(n): return n.data.npc_name)
 	var lines := _scene(table, names)
+	# He takes a chair at the table if one is marked there (a Seat); he gets up when he walks off
+	var seat := Seat.nearest(get_tree(), USE_AT, 2.5)
+	if seat:
+		seat.sit_player(get_tree().get_first_node_in_group("player"))
 	# The clock stops while they talk (nobody gets up mid-sentence); the hour passes after
 	var cycle = get_tree().get_first_node_in_group("day_night")
 	if cycle:

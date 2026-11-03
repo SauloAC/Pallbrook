@@ -41,12 +41,25 @@ const SHADE_MODEL := "BaseCharacter"
 # folder here (rotations/<dir>.png, animations/walk/<dir>/frame_NNN.png, animations/idle/<dir>/...).
 # The sprite always faces the camera; directions without their own walk are borrowed (west
 # mirrors east). Everything else (bed, death, pallor, the night shade) works as for the bodies.
-# Test over (31 Oct): the 3D bodies animate better, so nobody uses a sprite now. To try one again:
-# "Tomas": "res://assets/characters/sprites/tomas/", "Doctor": "res://assets/characters/sprites/doctor/"
-const SPRITES := {}
+# Test over (31 Oct): the 3D bodies animate better, so nobody used a sprite then.
+# Again from 3 Nov, now that the town is painted 2D: the doctor first. Tomas also has a folder:
+# "Tomas": "res://assets/characters/sprites/tomas/"
+# doctor_half: the PixelLab frames halved (40 px), so his pixels are the size of the painted buildings
+# (art_source: 2x2 blocks to one pixel, keeping the dark contour). The full-size frames stay in doctor/.
+const SPRITES := {"Doctor": "res://assets/characters/sprites/doctor_half/"}
 const DIRS := ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"]
-const SPRITE_PIXEL := 0.0215   # 80 px canvas, ~79 px of body -> about 1.7 m
-const SPRITE_FPS := {"walk": 10.0, "idle": 5.0}
+const SPRITE_PIXEL := 0.0215   # 80 px canvas, ~79 px of body -> about 1.7 m (scaled for other canvas sizes)
+const UPRIGHT := 1.5557238      # 1 / cos(50 deg): an upright sprite seen by the 50-degree camera
+var px_size := SPRITE_PIXEL     # This sprite's pixel, for its canvas
+var half_h := 40.0              # Half its canvas height, in pixels
+const SPRITE_FPS := {"walk": 10.0, "idle": 5.0, "sit": 8.0, "death": 7.0}
+const SPRITE_LOOPS := ["walk", "idle"]   # sit and death play once and hold their last frame
+# Sitting (3 Nov): only the south pose was drawn on a seat; east and north sit on the floor, so on a
+# chair they are lifted to a bench seat (~0.5 m). In pixels of the 80 px canvas (west mirrors east).
+const SIT_LIFT_PX := {"south": 0.0, "east": 15.0, "west": 15.0, "north": 14.0}
+var seated := false
+var sit_lift := 0.0             # Metres the sprite is raised while seated (see SIT_LIFT_PX)
+var sit_tween: Tween
 var sprite: AnimatedSprite3D
 var facing := "south"
 var sprite_tint := Color.WHITE
@@ -58,10 +71,6 @@ render_mode unshaded, cull_disabled, depth_draw_never, depth_test_inverted, blen
 uniform sampler2D frame_tex : filter_nearest, source_color;
 uniform vec4 tint : source_color = vec4(1.0);
 uniform bool flip = false;
-void vertex() {
-	// Face the camera like the sprite does
-	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
-}
 void fragment() {
 	vec2 uv = UV;
 	if (flip) { uv.x = 1.0 - uv.x; }
@@ -145,22 +154,28 @@ func _setup_sprite(dir: String) -> bool:
 			frames.add_animation("stand_" + d)
 			frames.add_frame("stand_" + d, load(path))
 			found = true
-		for kind: String in ["walk", "idle"]:
+		for kind: String in SPRITE_FPS:
 			var i := 0
 			while ResourceLoader.exists(dir + "animations/%s/%s/frame_%03d.png" % [kind, d, i]):
 				if i == 0:
 					frames.add_animation(kind + "_" + d)
 					frames.set_animation_speed(kind + "_" + d, SPRITE_FPS[kind])
-					frames.set_animation_loop(kind + "_" + d, true)
+					frames.set_animation_loop(kind + "_" + d, kind in SPRITE_LOOPS)
 				frames.add_frame(kind + "_" + d, load(dir + "animations/%s/%s/frame_%03d.png" % [kind, d, i]))
 				i += 1
 	if not found:
 		return false
+	var canvas := frames.get_frame_texture(frames.get_animation_names()[0], 0).get_height()
+	px_size = SPRITE_PIXEL * 80.0 / canvas
+	half_h = canvas / 2.0
 	sprite = AnimatedSprite3D.new()
 	sprite.sprite_frames = frames
-	sprite.pixel_size = SPRITE_PIXEL
-	sprite.position.y = 40.0 * SPRITE_PIXEL  # Feet on the ground
-	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	sprite.pixel_size = px_size
+	# Stand upright like the painted buildings (a full billboard leans back into the wall behind and
+	# gets cut by it), stretched by 1/cos(50 deg) so the 50-degree camera shows it at its full height
+	sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+	sprite.scale.y = UPRIGHT
+	sprite.position.y = half_h * px_size * UPRIGHT  # Feet on the ground
 	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	sprite.shaded = true  # Night and lamps light it like everything else
@@ -216,12 +231,14 @@ func make_xray(color: Color) -> void:
 	xray_mat.shader = shader
 	xray_mat.set_shader_parameter("tint", color)
 	var quad := QuadMesh.new()
-	quad.size = Vector2(80.0, 80.0) * SPRITE_PIXEL
+	quad.size = Vector2(2.0 * half_h, 2.0 * half_h) * px_size
 	xray = MeshInstance3D.new()
 	xray.mesh = quad
 	xray.material_override = xray_mat
 	xray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	xray.position = sprite.position + Vector3(0.0, 0.03, 0.03)  # A hair toward the camera, so it never shows over the body itself
+	# Upright like the sprite and a hair toward the camera, so it only shows where a wall hides the body
+	xray.scale.y = UPRIGHT
+	xray.position = sprite.position + Vector3(0.0, 0.0, 0.03)
 	add_child(xray)
 
 
@@ -238,19 +255,64 @@ func _process(_delta: float) -> void:
 		if xray.visible:
 			xray_mat.set_shader_parameter("frame_tex", sprite.sprite_frames.get_frame_texture(sprite.animation, sprite.frame))
 			xray_mat.set_shader_parameter("flip", sprite.flip_h)
-	# Lying in bed or dead: the body is turned flat, so the sprite stops facing the camera
-	var lying := dead or absf(rotation.x) > 0.5
-	sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED if lying else BaseMaterial3D.BILLBOARD_ENABLED
+			xray.position = sprite.position + Vector3(0.0, 0.0, 0.03)
+	# Lying in bed, or dead without a drawn death: the body is turned flat, so the sprite stops
+	# facing the camera (the drawn death already ends lying down, seen from above, and stays upright)
+	var lying := (dead and not _has_clip("death")) or absf(rotation.x) > 0.5
+	sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED if lying else BaseMaterial3D.BILLBOARD_FIXED_Y
 	if lying:
 		sprite.rotation = Vector3.ZERO
-		sprite.position = Vector3(0.0, 40.0 * SPRITE_PIXEL, 0.05)
+		sprite.scale.y = 1.0
+		sprite.position = Vector3(0.0, half_h * px_size, 0.05)
+	else:
+		sprite.scale.y = UPRIGHT
+		sprite.position = Vector3(0.0, half_h * px_size * UPRIGHT + sit_lift, 0.0)
+
+
+func _has_clip(kind: String) -> bool:
+	return sprite != null and sprite.sprite_frames.has_animation(kind + "_south")
+
+
+# Sits down where it stands, facing d ("south", "east", "north", "west"). Returns the clip's length.
+# Moving again (animate with some speed) stands it back up.
+func sit(d: String) -> float:
+	if sprite == null or not _has_clip("sit"):
+		return 0.0
+	seated = true
+	facing = d
+	_sprite_play("sit", d)
+	sprite.frame = 0
+	sprite.play(sprite.animation)
+	var count := sprite.sprite_frames.get_frame_count(sprite.animation)
+	var length := count / float(SPRITE_FPS["sit"])
+	_tween_lift(float(SIT_LIFT_PX.get(d, 0.0)) * SPRITE_PIXEL * UPRIGHT, length)
+	return length
+
+
+func stand_up() -> void:
+	if not seated:
+		return
+	seated = false
+	_tween_lift(0.0, 0.15)
+	_sprite_play("idle", facing)
+
+
+func _tween_lift(to: float, time: float) -> void:
+	if sit_tween:
+		sit_tween.kill()
+	sit_tween = create_tween()
+	sit_tween.tween_property(self, "sit_lift", to, time)
 
 
 # Called every physics frame with the body's velocity: walk or stand, and face where we go
 func animate(velocity: Vector3, delta: float) -> void:
 	if sprite and not (shade and shade.visible):
-		if dead:
+		if dead or acting:
 			return
+		if seated:
+			if Vector2(velocity.x, velocity.z).length() <= 0.3:
+				return  # Stays in the chair
+			stand_up()
 		var ground_speed := Vector2(velocity.x, velocity.z).length()
 		if ground_speed > 0.3:
 			facing = _sprite_dir(velocity)
@@ -283,7 +345,12 @@ func face(point: Vector3) -> void:
 func die() -> void:
 	dead = true
 	if sprite:
-		rotation = Vector3(-PI / 2.0, 0.0, 0.0)  # Lying on its back, seen from above
+		seated = false
+		sit_lift = 0.0
+		if _has_clip("death"):
+			_play_death()  # Falls and stays lying on the ground
+			return
+		rotation = Vector3(-PI / 2.0, 0.0, 0.0)  # No drawn death: lying on its back, seen from above
 		_sprite_play("stand", "south")
 		sprite.pause()
 		return
@@ -360,6 +427,8 @@ func _make_shade() -> void:
 # A one-off clip from the shared rig: PickUp, Punch, RecieveHit, Defeat, Death...
 # Walking and idling wait until it ends; hold keeps the last pose (a fall). Returns its length.
 func act(anim_name: String, hold := false, speed := 1.0) -> float:
+	if sprite and not (shade and shade.visible):
+		return _sprite_act(anim_name, hold)
 	if anim == null or not anim.has_animation(anim_name):
 		return 0.0
 	acting = true
@@ -370,6 +439,29 @@ func act(anim_name: String, hold := false, speed := 1.0) -> float:
 	if not hold:
 		get_tree().create_timer(length).timeout.connect(_end_act.bind(act_id))
 	return length
+
+
+# The sprite has only some of the rig's clips: a fall (Defeat, Death) is its drawn death.
+# The others (PickUp, Punch, RecieveHit...) have no frames yet, so nothing plays.
+func _sprite_act(anim_name: String, hold: bool) -> float:
+	if anim_name not in ["Defeat", "Death"] or not _has_clip("death"):
+		return 0.0
+	seated = false
+	sit_lift = 0.0
+	acting = true
+	act_id += 1
+	var length := _play_death()
+	if not hold:
+		get_tree().create_timer(length).timeout.connect(_end_act.bind(act_id))
+	return length
+
+
+# Only drawn facing south: it falls back toward the top of the screen whichever way it was facing
+func _play_death() -> float:
+	sprite.flip_h = false
+	sprite.play("death_south")
+	sprite.frame = 0
+	return sprite.sprite_frames.get_frame_count("death_south") / float(SPRITE_FPS["death"])
 
 
 func _end_act(id: int) -> void:

@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://coab8nqlctlo0" path="res://scripts/ui/PhaseBanner.gd" id="6_73egf"]
 [ext_resource type="Shader" uid="uid://cudikbpjewu53" path="res://shaders/vignette.gdshader" id="7_gq2ka"]
 [ext_resource type="Script" uid="uid://b8qlfb4bh8whw" path="res://scripts/ui/MorningSummary.gd" id="9_tkho8"]
+[ext_resource type="Script" uid="uid://p27x7bttqibj" path="res://scripts/world/Seat.gd" id="10_ljbks"]
 [ext_resource type="PackedScene" uid="uid://cflwpimx1kbw6" path="res://scenes/personagens/NPC.tscn" id="10_p3xqx"]
 [ext_resource type="Resource" uid="uid://dtbgvtwk3tawr" path="res://data/npcs/padre.tres" id="11_2n2no"]
 [ext_resource type="Resource" uid="uid://cbfk62j70stao" path="res://data/npcs/marta.tres" id="12_fm4th"]
@@ -379,6 +380,118 @@ text = "Tavern"
 font = ExtResource("16_5xce6")
 font_size = 64
 outline_size = 18
+
+[node name="Seat01" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=795425564]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.55, -1.48, 5.9)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat02" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=423946139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.55, -1.48, 6.7)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat03" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=947876999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, -1.48, 5.9)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat04" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=1497871144]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, -1.48, 6.7)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat05" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=203694312]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, -1.48, 5.9)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat06" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=255555737]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, -1.48, 6.7)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat07" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=1863673106]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.55, -1.48, 5.9)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat08" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=1250797845]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.55, -1.48, 6.7)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat09" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=302142728]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.55, -1.48, 9.4)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat10" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=885310972]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.55, -1.48, 10.2)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat11" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=1351527726]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, -1.48, 9.4)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat12" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=224551738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, -1.48, 10.2)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat13" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=1189709946]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, -1.48, 9.4)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat14" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=561060838]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, -1.48, 10.2)
+script = ExtResource("10_ljbks")
+facing = "east"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat15" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=180521324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.55, -1.48, 9.4)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
+
+[node name="Seat16" type="Marker3D" parent="NavigationRegion3D/Taverna" unique_id=284570285]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.55, -1.48, 10.2)
+script = ExtResource("10_ljbks")
+facing = "west"
+use_range = 0.45
+metadata/_custom_type_script = "uid://p27x7bttqibj"
 
 [node name="Casa12D" parent="NavigationRegion3D" unique_id=1730402811 instance=ExtResource("b2d_casa1")]
 transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -4, 0, -22.5)
