@@ -30,9 +30,21 @@ const LOOKS := {
 	# The merchant beyond the bridge (not a townsperson: no schedule, never a suspect)
 	"Gideon": ["Worker_Male", {"Skin": Color(0.78, 0.6, 0.48), "Shirt": Color(0.72, 0.68, 0.58), "Vest": Color(0.22, 0.3, 0.2),
 			"Pants": Color(0.28, 0.22, 0.16), "Hat": Color(0.32, 0.3, 0.27)}],
-	"Doctor": ["Doctor_Male_Young", {"Skin": Color(0.85, 0.68, 0.56), "Main": Color(0.88, 0.86, 0.80), "Black": Color(0.35, 0.30, 0.25),
-			"Brown": Color(0.18, 0.15, 0.13), "Hair": Color(0.25, 0.17, 0.10)}],
+	# His Quaternius body was: ["Doctor_Male_Young", {"Skin": Color(0.85, 0.68, 0.56), "Main": Color(0.15, 0.15, 0.18),
+	#     "Black": Color(0.35, 0.30, 0.25), "Brown": Color(0.18, 0.15, 0.13), "Hair": Color(0.25, 0.17, 0.10)}]
+	# 3 Nov, second try: built from the Universal Base Characters kit (CharacterKit): his head and
+	# face, peasant clothes coloured as a dark coat, parted hair and a beard
+	"Doctor": ["KIT", {"parts": ["base/Superhero_Male_FullBody", "outfits/Male_Peasant", "hair/Hair_SimpleParted",
+			"hair/Hair_Beard"], "colors": {"skin": Color(0.90, 0.72, 0.60), "hair": Color(0.40, 0.27, 0.16),
+			"top": Color(0.24, 0.24, 0.30), "legs": Color(0.17, 0.16, 0.19), "feet": Color(0.38, 0.24, 0.14)}}],
 }
+
+# The Universal Animation Library (Quaternius, CC0): the skeleton and 43 clips the kit bodies share (CharacterKit)
+const UAL_PATH := "res://assets/models/characters/UAL1_Standard.glb"
+const UAL_SCALE := 0.93   # About 1.7 m, like the others
+# The shared rig's clip names, for bodies whose clips are named otherwise (the UAL body)
+const CLIP_ALIASES := {"Run": "Jog_Fwd", "Death": "Death01", "Defeat": "Death01", "SitDown": "Sitting_Enter",
+		"PickUp": "PickUp_Table", "RecieveHit": "Hit_Chest", "Punch": "Punch_Cross"}
 
 # At night the hunter wears no face: a plain, shared body instead of their own
 const SHADE_MODEL := "BaseCharacter"
@@ -47,6 +59,10 @@ const SHADE_MODEL := "BaseCharacter"
 # doctor_half: the PixelLab frames halved (40 px), so his pixels are the size of the painted buildings
 # (art_source: 2x2 blocks to one pixel, keeping the dark contour). The full-size frames stay in doctor/.
 const SPRITES := {"Doctor": "res://assets/characters/sprites/doctor_half/"}
+# Prototype (3 Nov): whoever is listed here keeps the 3D body and rig, drawn as pixel art (PixelRig)
+# instead of using a SPRITES folder. Remove the name to go back to the PixelLab sprite.
+const PIXEL_3D := ["Doctor"]
+var rig: PixelRig
 const DIRS := ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"]
 const SPRITE_PIXEL := 0.0215   # 80 px canvas, ~79 px of body -> about 1.7 m (scaled for other canvas sizes)
 const UPRIGHT := 1.5557238      # 1 / cos(50 deg): an upright sprite seen by the 50-degree camera
@@ -100,18 +116,28 @@ var dark_overlay: StandardMaterial3D
 
 # Returns false when this person has no model yet (the capsule stays)
 func setup(look: String) -> bool:
-	if SPRITES.has(look) and _setup_sprite(SPRITES[look]):
+	if SPRITES.has(look) and look not in PIXEL_3D and _setup_sprite(SPRITES[look]):
 		return true
 	if not LOOKS.has(look):
 		return false
 	var entry: Array = LOOKS[look]
-	var path: String = MODEL_DIR + str(entry[0]) + ".gltf"
+	var kit := str(entry[0]) == "KIT"
+	var painted := kit  # Coloured by the kit, not by the model's own materials
+	var path: String = UAL_PATH if painted else MODEL_DIR + str(entry[0]) + ".gltf"
 	if not ResourceLoader.exists(path):
 		return false
-	model = (load(path) as PackedScene).instantiate()
-	model.scale = Vector3.ONE * SCALE
-	add_child(model)
-	var colors: Dictionary = entry[1]
+	if kit:
+		model = CharacterKit.assemble(entry[1])
+	else:
+		model = (load(path) as PackedScene).instantiate()
+	model.scale = Vector3.ONE * (UAL_SCALE if painted else SCALE)
+	if look in PIXEL_3D:
+		rig = PixelRig.new()
+		add_child(rig)
+		rig.build(model)  # The body lives in the rig's little world; the town sees its picture
+	else:
+		add_child(model)
+	var colors: Dictionary = {} if painted else entry[1]
 	for node in model.find_children("*", "MeshInstance3D", true, false):
 		var mi := node as MeshInstance3D
 		meshes.append(mi)
@@ -130,6 +156,8 @@ func setup(look: String) -> bool:
 			elif mat_name != "Face":
 				clothes.append(m)
 				clothes_colors.append(m.albedo_color)
+	if rig:
+		rig.flatten(model)  # Toon bands and outline on the coloured copies
 	var players := model.find_children("*", "AnimationPlayer", true, false)
 	if not players.is_empty():
 		anim = players[0]
@@ -223,7 +251,8 @@ func _sprite_dir(v: Vector3) -> String:
 # The sprite's outline, drawn only where something stands in front of it (inverted depth
 # test: never over the doctor himself, only over the roof or wall that hides him)
 func make_xray(color: Color) -> void:
-	if sprite == null:
+	var flat := _flat()
+	if flat == null:
 		return
 	var shader := Shader.new()
 	shader.code = XRAY_SHADER
@@ -231,23 +260,43 @@ func make_xray(color: Color) -> void:
 	xray_mat.shader = shader
 	xray_mat.set_shader_parameter("tint", color)
 	var quad := QuadMesh.new()
-	quad.size = Vector2(2.0 * half_h, 2.0 * half_h) * px_size
+	quad.size = Vector2(2.0 * half_h, 2.0 * half_h) * px_size if sprite else Vector2(PixelRig.SIZE) * PixelRig.PX
 	xray = MeshInstance3D.new()
 	xray.mesh = quad
 	xray.material_override = xray_mat
 	xray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Upright like the sprite and a hair toward the camera, so it only shows where a wall hides the body
 	xray.scale.y = UPRIGHT
-	xray.position = sprite.position + Vector3(0.0, 0.0, 0.03)
-	add_child(xray)
+	xray.position = flat.position + Vector3(0.0, 0.0, 0.03)
+	if rig:
+		xray_mat.set_shader_parameter("frame_tex", rig.viewport.get_texture())
+		rig.add_child(xray)  # Stands with the picture
+	else:
+		add_child(xray)
+
+
+# The flat picture standing in the town: the sprite, or the pixel-art rig's picture
+func _flat() -> SpriteBase3D:
+	if sprite:
+		return sprite
+	return rig.sprite if rig else null
 
 
 func set_see_through(amount: float) -> void:
-	if sprite:
-		sprite.transparency = amount
+	if rig:
+		rig.set_fade(amount)  # Dithered: a solid picture with every other pixel left out
+		return
+	var flat := _flat()
+	if flat:
+		flat.transparency = amount
 
 
 func _process(_delta: float) -> void:
+	if rig:
+		rig.sync(self)  # The picture follows; the body inside turns (and lies down) as we do
+		if xray:
+			xray.visible = rig.sprite.visible
+		return
 	if sprite == null:
 		return
 	if xray:
@@ -276,7 +325,9 @@ func _has_clip(kind: String) -> bool:
 # Sits down where it stands, facing d ("south", "east", "north", "west"). Returns the clip's length.
 # Moving again (animate with some speed) stands it back up.
 func sit(d: String) -> float:
-	if sprite == null or not _has_clip("sit"):
+	if sprite == null:
+		return _sit_3d(d)
+	if not _has_clip("sit"):
 		return 0.0
 	seated = true
 	facing = d
@@ -293,8 +344,29 @@ func stand_up() -> void:
 	if not seated:
 		return
 	seated = false
+	if sprite == null:
+		acting = false  # Straight up into the walk: no StandUp clip holding him in place
+		act_id += 1
+		current = ""
+		_play("Idle")
+		return
 	_tween_lift(0.0, 0.15)
 	_sprite_play("idle", facing)
+
+
+# The 3D rig's SitDown clip, held seated, turned the way the seat faces
+const FACING_YAW := {"south": 0.0, "east": PI / 2.0, "north": PI, "west": -PI / 2.0}
+
+func _sit_3d(d: String) -> float:
+	if anim == null or not anim.has_animation(_clip("SitDown")):
+		return 0.0
+	target_yaw = FACING_YAW.get(d, 0.0)
+	global_rotation.y = target_yaw
+	seated = true
+	var length := act("SitDown", true)
+	if anim.has_animation("Sitting_Idle"):
+		anim.queue("Sitting_Idle")  # The UAL body sits on, breathing, after sitting down
+	return length
 
 
 func _tween_lift(to: float, time: float) -> void:
@@ -322,6 +394,10 @@ func animate(velocity: Vector3, delta: float) -> void:
 			sprite.speed_scale = 1.0
 			_sprite_play("idle", facing)
 		return
+	if seated and not dead:
+		if Vector2(velocity.x, velocity.z).length() <= 0.3:
+			return  # Stays in the chair
+		stand_up()
 	if dead or anim == null or acting:
 		return
 	var flat := Vector2(velocity.x, velocity.z)
@@ -359,6 +435,12 @@ func die() -> void:
 
 # Blood loss makes the skin paler; servants also turn grey all over
 func tint(blood_lost: float, servant: bool) -> void:
+	if rig and skin == null:
+		# A painted or kit body has no skin material of its own: the whole picture pales, like a sprite
+		var pale := Color.WHITE.lerp(Color(1.0, 0.94, 0.94), clampf(blood_lost, 0.0, 1.0))
+		sprite_tint = pale.lerp(Color(0.75, 0.75, 0.8), 0.5) if servant else pale
+		rig.set_tint(sprite_tint)
+		return
 	if sprite:
 		# No separate skin on a sprite: the whole figure pales, and goes grey for a servant
 		var pale := Color.WHITE.lerp(Color(1.0, 0.94, 0.94), clampf(blood_lost, 0.0, 1.0))
@@ -413,7 +495,11 @@ func _make_shade() -> void:
 	shade = (load(path) as PackedScene).instantiate()
 	shade.scale = Vector3.ONE * SCALE
 	shade.visible = false
-	add_child(shade)
+	if rig:
+		rig.pivot.add_child(shade)
+		rig.flatten(shade)
+	else:
+		add_child(shade)
 	for node in shade.find_children("*", "MeshInstance3D", true, false):
 		(node as MeshInstance3D).material_overlay = dark_overlay
 	var players := shade.find_children("*", "AnimationPlayer", true, false)
@@ -429,6 +515,7 @@ func _make_shade() -> void:
 func act(anim_name: String, hold := false, speed := 1.0) -> float:
 	if sprite and not (shade and shade.visible):
 		return _sprite_act(anim_name, hold)
+	anim_name = _clip(anim_name)
 	if anim == null or not anim.has_animation(anim_name):
 		return 0.0
 	acting = true
@@ -470,7 +557,15 @@ func _end_act(id: int) -> void:
 		current = ""
 
 
+# This body's name for a clip of the shared rig (see CLIP_ALIASES)
+func _clip(anim_name: String) -> String:
+	if anim and not anim.has_animation(anim_name) and CLIP_ALIASES.has(anim_name):
+		return CLIP_ALIASES[anim_name]
+	return anim_name
+
+
 func _play(anim_name: String) -> void:
+	anim_name = _clip(anim_name)
 	if anim and current != anim_name and anim.has_animation(anim_name):
 		current = anim_name
 		anim.play(anim_name, 0.2)

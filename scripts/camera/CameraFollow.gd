@@ -11,6 +11,8 @@ func _ready() -> void:
 	if target:
 		# Keeps the distance the camera already has from the player
 		offset = global_position - target.global_position
+	add_child(PixelScreen.new())  # Test (3 Nov): the town drawn at the buildings' pixel size (F7 toggles, starts off)
+	get_parent().add_child.call_deferred(Nature2D.new())  # Test (3 Nov): painted greenery (F8 toggles)
 
 func _process(delta: float) -> void:
 	if target == null:

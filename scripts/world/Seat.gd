@@ -58,12 +58,15 @@ func _unhandled_input(event: InputEvent) -> void:
 func sit_player(player) -> bool:
 	if player == null or player.visual == null or sitter:
 		return false
+	var was_at: Vector3 = player.global_position
 	player.velocity = Vector3.ZERO
 	player.set_physics_process(false)
 	player.global_position = Vector3(global_position.x, player.global_position.y, global_position.z)
 	player.reset_physics_interpolation()
 	if player.visual.sit(facing) <= 0.0:
-		player.set_physics_process(true)  # No sitting frames for this body: just stands there
+		player.global_position = was_at  # No sitting clip for this body: he stays where he was
+		player.reset_physics_interpolation()
+		player.set_physics_process(true)
 		return false
 	sitter = player
 	return true
