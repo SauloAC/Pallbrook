@@ -147,7 +147,7 @@ const INTERIOR_SLOTS := {
 	"CasaJohn": [Vector3(-1.2, 0.0, -2.0), Vector3(-1.8, 0.0, -2.4), Vector3(-0.6, 0.0, -1.7)],  # as CasaSophia
 	"CasaSebastian": [Vector3(0.0, 0.0, -3.6), Vector3(0.4, 0.0, -2.1), Vector3(-0.1, 0.0, -1.2)],  # as CasaSarah
 	"CasaClara": [Vector3(0.6, 0.0, -2.2), Vector3(-0.4, 0.0, -1.9), Vector3(0.2, 0.0, -2.9)],  # as Casa1
-	"Padaria": [Vector3(4.075, 0.0, -2.65), Vector3(-0.025, 0.0, -1.1), Vector3(1.175, 0.0, -1.0), Vector3(0.575, 0.0, -2.1)],  # 2D bakery: behind the counter, then the shop floor
+	"Padaria": [Vector3(6.748, 0.0, -2.8), Vector3(3.528, 0.0, -0.14), Vector3(6.328, 0.0, -0.14), Vector3(1.848, 0.0, -0.7)],  # 2D bakery: behind the counter, then the shop floor
 	"Fazenda": [Vector3(2.0, 0.0, -2.2), Vector3(-2.1, 0.0, -2.3), Vector3(1.2, 0.0, -1.9)],  # as CasaHugo
 	# Tomas's forge (marker at the house door): beside the anvil, at the hearth, in front of the anvil
 	"Casa2": [
@@ -198,15 +198,17 @@ const BED_SPOTS := {
 	"CasaJohn": [Vector3(-1.0, 0.0, -3.7), 90.0],
 	"CasaSebastian": [Vector3(2.55, 0.0, -3.8), 90.0],
 	"CasaClara": [Vector3(2.15, 0.0, -2.75), 0.0],
-	"Padaria": [Vector3(6.175, 0.0, -1.45), 0.0],
 	"Fazenda": [Vector3(2.7, 0.0, -3.8), 90.0],
+	"Padaria": [Vector3(9.688, 2.94, -2.52), 0.0],  # Bruno sleeps upstairs, over the shop
 	"Taverna": [Vector3(1.45, 3.12, -6.85), -90.0],  # Marta sleeps upstairs, by the window (feet at the foot of the bed, head to the wall)
 }
 const BED_HEIGHT := 0.6
+
 # Upstairs beds: where to walk to first (on the upper floor, beside the bed), relative to the door.
 # The bed itself has no navigation mesh, and its nearest mesh point can be outside the house.
 const BED_APPROACH := {
 	"Taverna": Vector3(0.6, 3.12, -6.6),
+	"Padaria": Vector3(8.568, 2.94, -1.4),  # Up the stone stairs, beside the bed
 }
 var in_bed := false
 
