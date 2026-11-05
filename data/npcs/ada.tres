@@ -21,6 +21,6 @@ dialogue_lines = Array[String](["Fresh eggs and herbs at the square, doctor. Hal
 clue_trait = "hay"
 bedtime = 21
 work_spots = Dictionary[String, Vector3]({
-"Praca": Vector3(13.5, 0, 24.3)
+"Praca": Vector3(13.5, 0, 25.8)
 })
 metadata/_custom_type_script = "uid://dl651qayo3ngb"
