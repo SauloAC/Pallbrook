@@ -8,7 +8,7 @@ extends Node3D
 # A hot meal takes half an hour off the fatigue debt from a collapse, and everyone at the table
 # warms to him a little.
 
-const USE_AT := Vector3(-6.8, 0.0, 17.4)    # Between the two patio tables, south of the door
+const USE_AT := Vector3(-3.9, 0.0, 29.5)    # Between the two patio tables, south of the door
 const USE_RANGE := 1.0
 const OPENS := 12.0
 const LAST_SEAT := 12.0 + 40.0 / 60.0

@@ -8,7 +8,7 @@ render_mode specular_disabled;
 uniform sampler2D baked : source_color, filter_nearest;
 uniform sampler2D grass : source_color, filter_nearest, repeat_enable;
 uniform vec2 origin = vec2(-34.0, -72.0);   // World x, z of the picture's top-left corner
-uniform vec2 size_px = vec2(1920.0, 1856.0);
+uniform vec2 size_px = vec2(1920.0, 2136.0);
 uniform float px = 0.04375;
 uniform float lit_share = 0.5;
 uniform float own_light = 0.85;

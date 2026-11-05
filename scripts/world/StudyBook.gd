@@ -4,7 +4,7 @@ extends Node3D
 # A heavy materia medica on the library lectern. Reading it takes three hours of daylight and
 # teaches the doctor to prepare the iron tonic himself (see "A cadeia do tônico").
 
-const AT := Vector3(14.5, 0.0, 19.4)        # On the desk by the east wall, out of everyone's way
+const AT := Vector3(40.2, 0.0, 25.2)        # On the desk by the east wall, out of everyone's way
 const USE_RANGE := 1.0
 const READ_HOURS := 3.0
 const LATEST_START := 15.0                   # Three hours must fit before dusk

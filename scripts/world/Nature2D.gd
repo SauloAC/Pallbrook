@@ -105,11 +105,11 @@ func _ready() -> void:
 # touched, so the furniture inside the 3D buildings stays as it is.
 const PROPS_DIR := "res://assets/environment2d/props/"
 const ZONES := {
-	"plaza": Rect2(-3.0, -1.5, 11.0, 9.5), "market": Rect2(-0.5, 8.0, 7.5, 4.0),
-	"tavern": Rect2(-11.0, 14.0, 9.0, 10.0), "clinic_yard": Rect2(12.5, 5.0, 3.5, 4.5),
+	"plaza": Rect2(4.7, 12.7, 11.0, 9.5), "market": Rect2(7.2, 22.2, 7.5, 4.0),
+	"tavern": Rect2(-8.1, 26.1, 9.0, 10.0), "clinic_yard": Rect2(23.3, 23.2, 3.5, 4.5),
 	"forge_yard": Rect2(5.0, -25.0, 11.0, 6.0), "river": Rect2(-40.0, -80.0, 50.0, 120.0),
 }
-const WELL_AT := Vector3(2.5, 0.0, 3.35)   # The front of the well's stone base
+const WELL_AT := Vector3(10.2, 0.0, 17.55)   # The front of the well's stone base
 const PROP_RULES := [
 	["^Well", "", "plaza"],   # The well's many pieces: one painted well instead (WELL_AT)
 	["^Stall_Cart_Empty", "stall_ada", "market"],
@@ -441,14 +441,14 @@ func _fence_along(z0: float, z1: float, x: float) -> void:
 
 
 # ---------- Ada's stall ----------
-const STALL_SHIFT := Vector3(0.0, 0.0, 3.3)         # South of its place in town.blend, off the plaza
-const STALL_FOOT := Rect2(1.2, 11.8, 3.6, 2.2)      # Where it now stands: nothing else grows there
+const STALL_SHIFT := Vector3.ZERO                    # Off its place in town.blend (none since the plaza grew)
+const STALL_FOOT := Rect2(8.9, 22.7, 3.6, 2.2)      # Where it stands: nothing else grows there
 const TREE_CLEAR := [
-	Rect2(-1.0, 11.5, 8.0, 5.0),    # In front of the stall
+	Rect2(6.7, 24.0, 8.0, 5.0),     # In front of the stall
 	Rect2(-9.5, -15.5, 4.0, 3.5),   # In front of Sarah's garden and the willow by the bridge
 ]
-const CART_MIDDLE := Vector3(4.25, 0.0, 10.0)        # ColMarketStall's box, from town.blend
-const STALL_MIDDLE := Vector3(3.0, 0.0, 10.0)        # The stall's picture, before the shift
+const CART_MIDDLE := Vector3(11.95, 0.0, 24.2)       # ColMarketStall's box, from town.blend
+const STALL_MIDDLE := Vector3(10.7, 0.0, 24.2)       # The stall's picture, before the shift
 var cleared: Array[Vector2] = []     # Where trees were taken away (their trunks' colliders go too)
 var moved: Array = []                 # [StaticBody3D, its place in town.glb, where it goes with the painted town]
 
@@ -813,13 +813,19 @@ func _plant(at: Vector3, kind: String, height: float, autumn: bool) -> void:
 	painted.add_child(sprite)
 	if kind == "tree":
 		leaf_trees.append([Vector3(at.x, 0.0, at.z), w, h])
+		# The sun's shadow: an unseen copy of the picture standing on the ground itself (the one you see
+		# is pulled toward the camera, and its shadow would start off the trunk's foot). It sways with it.
+		var caster := sprite.duplicate() as Sprite3D
+		caster.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		caster.position = Vector3(at.x, 0.0, at.z)
+		painted.add_child(caster)
 	# A small painted shadow under it, lying on the ground
 	var shadow := Sprite3D.new()
 	shadow.texture = SHADOW
 	shadow.pixel_size = PX * clampf(w / 64.0 * 0.9, 0.35, 2.5)
 	shadow.rotation.x = -PI / 2.0
 	shadow.scale.y = 1.0 / 0.76604444  # Squashed back by the tilt, so it reads as drawn
-	shadow.shaded = false
+	shadow.shaded = true   # Darkens with the night like the ground it lies on
 	shadow.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	shadow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	shadow.position = Vector3(at.x, 0.03, at.z)

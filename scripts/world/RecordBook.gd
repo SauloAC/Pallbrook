@@ -12,8 +12,8 @@ extends Node3D
 
 const ICON := preload("res://assets/ui/icon_examine.png")
 const BOOKS := {
-	"hall": {"at": Vector3(1.7, 0.0, -8.0), "use": Vector3(1.7, 0.0, -7.2), "hours": 2.0, "opens": 9.0, "closes": 17.0},
-	"church": {"at": Vector3(-6.2, 0.0, -9.75), "use": Vector3(-5.9, 0.0, -9.0), "hours": 1.0, "opens": 7.0, "closes": 18.0},
+	"hall": {"at": Vector3(6.7, 0.0, -1.0), "use": Vector3(6.7, 0.0, -0.2), "hours": 2.0, "opens": 9.0, "closes": 17.0},
+	"church": {"at": Vector3(-7.7, 0.0, -3.25), "use": Vector3(-7.4, 0.0, -2.5), "hours": 1.0, "opens": 7.0, "closes": 18.0},
 }
 const USE_RANGE := 1.0
 const PRIEST := "Elias"
