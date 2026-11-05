@@ -165,11 +165,6 @@ const INTERIOR_SLOTS_3D := {
 		Vector3(0.0, 0.0, -5.0), Vector3(0.0, 0.0, -3.8), Vector3(0.0, 0.0, -2.6), Vector3(-1.6, 0.0, -1.2),
 		Vector3(1.6, 0.0, -1.2), Vector3(-0.5, 0.0, -4.2), Vector3(0.5, 0.0, -3.2), Vector3(-0.4, 0.0, -2.0),
 	],
-	# Church (marker at the tower door): the priest at the altar, the rest along the aisle
-	"Igreja": [
-		Vector3(0.0, 0.0, -6.9), Vector3(-0.9, 0.0, -6.6), Vector3(0.9, 0.0, -6.6), Vector3(-0.4, 0.0, -6.2),
-		Vector3(0.4, 0.0, -6.2), Vector3(0.0, 0.0, -5.2), Vector3(0.0, 0.0, -4.3), Vector3(0.0, 0.0, -3.4),
-	],
 	# Library (marker at the south door): around the reading table, by the shelves and the desks
 	"Biblioteca": [
 		Vector3(-1.8, 0.0, -3.2), Vector3(1.8, 0.0, -3.2), Vector3(0.0, 0.0, -1.7), Vector3(-1.3, 0.0, -4.6),

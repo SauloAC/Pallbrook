@@ -165,6 +165,21 @@ def build(h):
         if f.get("box"):
             bx0, bx1, bz0, bz1, bh = f["box"]
             shapes.append((f["name"], bx0, bx1, lift, lift + bh, bz0, bz1))
+        # candles on a standing piece: a small flame at each wick (pixels of the prop's art) and,
+        # with "glow", a warm light among them, seen inside only
+        for ci, (cx_, cy_) in enumerate(f.get("flames", [])):
+            if not any('id="sh_candle"' in e for e in ext):
+                E("Shader", FX + "fx_candle.gdshader", "sh_candle")
+                S('[sub_resource type="ShaderMaterial" id="mt_candle"]\nshader = ExtResource("sh_candle")\n')
+                # 4 x 7 of the props' pixels, upright toward the camera
+                S('[sub_resource type="QuadMesh" id="q_candle"]\nsize = Vector2(%.4f, %.4f)\n' % (4 / 32.0 * FURN, 7 / 32.0 / COS * FURN))
+            fx_ = f["x"] + (cx_ - w / 2.0) / 32.0 * FURN
+            fy_ = lift + qh - cy_ / 32.0 / COS * FURN + 3.5 / 32.0 / COS * FURN
+            N('[node name="%sFlame%d" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_candle")\nsurface_material_override/0 = SubResource("mt_candle")\n'
+              % (f["name"], ci, fpar, tf(fx_, fy_, f["z"] + 0.02)))
+        if f.get("glow"):
+            N('[node name="%sGlow" type="OmniLight3D" parent="%s"]\ntransform = %s\nlight_color = Color(1, 0.7, 0.38, 1)\nlight_energy = %.2f\nomni_range = 3.5\nshadow_enabled = false\n'
+              % (f["name"], fpar, tf(f["x"], lift + qh * 0.8, f["z"] + 0.6), f["glow"]))
 
     # ---------- collision ----------
     WALL = 5.4 if UP else 3.2

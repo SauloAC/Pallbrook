@@ -10,7 +10,7 @@ extends Node
 #
 # Rectangles are on the ground (x, z), in world units. Church and bridge come from town.blend.
 
-const CHURCH := Rect2(-8.8, -12.8, 7.6, 11.6)        # Church walls (-7.3..-2.7, -11.3..-2.7) + its yard
+const CHURCH := Rect2(-9.6, -5.6, 6.2, 12.0)         # Church walls (-9.1..-3.9, -5.1..4) + its steps and yard
 const BRIDGE_DECK := Rect2(-40.0, -14.0, 30.0, 3.4)  # The deck from its east end (x -10) westward
 const BEYOND_RIVER_X := -16.3                        # West bank: the cemetery side
 const BRIDGE_WAIT := Vector3(-8.6, 0.0, -12.0)       # Where it waits when the doctor crossed

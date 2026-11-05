@@ -1,0 +1,390 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://assets/buildings2d/sprite_surface.gdshader" id="sh_sprite"]
+[ext_resource type="Shader" path="res://assets/buildings2d/tile_surface.gdshader" id="sh_tile"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_wood_floor.png" id="tx_floor"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_light.png" id="tx_wall"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_beam.png" id="tx_beam"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_floor.png" id="tx_ground"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/igreja/igreja_front0.obj" id="m_front0"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/igreja/igreja_facade.png" id="tx_igreja_facade"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/igreja/igreja_steps.obj" id="m_steps"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/igreja/igreja_roof.obj" id="m_roof"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/igreja/igreja_body.obj" id="m_body"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/igreja/igreja_floor.obj" id="m_floor"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/igreja/igreja_innerwall.obj" id="m_innerwall"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/igreja/igreja_timber.obj" id="m_timber"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_altar.png" id="tx_p_altar"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_candlestand.png" id="tx_p_candlestand"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_lectern.png" id="tx_p_lectern"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_pew.png" id="tx_p_pew"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_runner.png" id="tx_p_runner"]
+[ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/igreja/igreja_door.png" id="tx_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Shader" path="res://assets/buildings2d/fx/fx_candle.gdshader" id="sh_candle"]
+
+[sub_resource type="ShaderMaterial" id="mt_floor"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_floor")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_wall"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_wall")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_beam"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_beam")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_ground"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_ground")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_igreja_facade"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_igreja_facade")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_altar"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_altar")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_candlestand"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_candlestand")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_lectern"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_lectern")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_pew"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_pew")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_runner"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_runner")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_door"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_door")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_opening"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_opening")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_door"]
+size = Vector2(0.9688, 1.0209)
+
+[sub_resource type="BoxShape3D" id="b_doorway"]
+size = Vector3(1.2688, 1.6, 0.8)
+
+[sub_resource type="QuadMesh" id="q_Runner"]
+size = Vector2(0.5804, 4.4873)
+
+[sub_resource type="QuadMesh" id="q_Altar"]
+size = Vector2(1.6518, 1.5974)
+
+[sub_resource type="ShaderMaterial" id="mt_candle"]
+shader = ExtResource("sh_candle")
+
+[sub_resource type="QuadMesh" id="q_candle"]
+size = Vector2(0.0893, 0.2431)
+
+[sub_resource type="QuadMesh" id="q_CandleW"]
+size = Vector2(0.2679, 1.1807)
+
+[sub_resource type="QuadMesh" id="q_CandleE"]
+size = Vector2(0.2679, 1.1807)
+
+[sub_resource type="QuadMesh" id="q_Lectern"]
+size = Vector2(0.5357, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_PewW1"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="QuadMesh" id="q_PewE1"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="QuadMesh" id="q_PewW2"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="QuadMesh" id="q_PewE2"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="QuadMesh" id="q_PewW3"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="QuadMesh" id="q_PewE3"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="BoxShape3D" id="b_Altar"]
+size = Vector3(1.7000, 0.8000, 0.5000)
+
+[sub_resource type="BoxShape3D" id="b_CandleW"]
+size = Vector3(0.2400, 1.2000, 0.2400)
+
+[sub_resource type="BoxShape3D" id="b_CandleE"]
+size = Vector3(0.2400, 1.2000, 0.2400)
+
+[sub_resource type="BoxShape3D" id="b_Lectern"]
+size = Vector3(0.5000, 1.0000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_PewW1"]
+size = Vector3(1.0200, 0.6000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_PewE1"]
+size = Vector3(1.0200, 0.6000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_PewW2"]
+size = Vector3(1.0200, 0.6000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_PewE2"]
+size = Vector3(1.0200, 0.6000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_PewW3"]
+size = Vector3(1.0200, 0.6000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_PewE3"]
+size = Vector3(1.0200, 0.6000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_Back"]
+size = Vector3(3.7500, 3.2000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_West"]
+size = Vector3(0.3000, 3.2000, 6.6500)
+
+[sub_resource type="BoxShape3D" id="b_FrontLeft"]
+size = Vector3(1.3125, 3.2000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_FrontRight"]
+size = Vector3(1.3750, 3.2000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_East"]
+size = Vector3(0.3000, 3.2000, 6.6500)
+
+[node name="Igreja2D" type="Node3D"]
+
+[node name="Igreja_Front" type="Node3D" parent="."]
+
+[node name="Plane0" type="MeshInstance3D" parent="Igreja_Front"]
+mesh = ExtResource("m_front0")
+material_override = SubResource("mt_igreja_facade")
+
+[node name="Door" type="Node3D" parent="Igreja_Front"]
+script = ExtResource("sc_door")
+
+[node name="Opening" type="MeshInstance3D" parent="Igreja_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0156, 0.9480, 0.0120)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_opening")
+
+[node name="Leaf" type="Node3D" parent="Igreja_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4688, 0.4375, 0.0240)
+
+[node name="Panel" type="MeshInstance3D" parent="Igreja_Front/Door/Leaf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4844, 0.5105, 0.0000)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_door")
+
+[node name="Doorway" type="Area3D" parent="Igreja_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0156, 0.8000, 0.1000)
+collision_layer = 0
+
+[node name="Shape" type="CollisionShape3D" parent="Igreja_Front/Door/Doorway"]
+shape = SubResource("b_doorway")
+
+[node name="Igreja_Roof" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_roof")
+material_override = SubResource("mt_igreja_facade")
+
+[node name="Steps" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_steps")
+material_override = SubResource("mt_igreja_facade")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_body")
+material_override = SubResource("mt_igreja_facade")
+
+[node name="Igreja_Inside" type="Node3D" parent="."]
+
+[node name="Floor" type="MeshInstance3D" parent="Igreja_Inside"]
+mesh = ExtResource("m_floor")
+material_override = SubResource("mt_ground")
+
+[node name="InnerWall" type="MeshInstance3D" parent="Igreja_Inside"]
+mesh = ExtResource("m_innerwall")
+material_override = SubResource("mt_wall")
+
+[node name="Timber" type="MeshInstance3D" parent="Igreja_Inside"]
+mesh = ExtResource("m_timber")
+material_override = SubResource("mt_beam")
+
+[node name="Furniture" type="Node3D" parent="Igreja_Inside"]
+
+[node name="Runner" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.0310, 0.0250, -2.9500)
+mesh = SubResource("q_Runner")
+surface_material_override/0 = SubResource("mt_p_runner")
+
+[node name="Altar" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.7987, -5.7000)
+mesh = SubResource("q_Altar")
+surface_material_override/0 = SubResource("mt_p_altar")
+
+[node name="AltarFlame0" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5580, 1.6842, -5.6800)
+mesh = SubResource("q_candle")
+surface_material_override/0 = SubResource("mt_candle")
+
+[node name="AltarFlame1" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5580, 1.6842, -5.6800)
+mesh = SubResource("q_candle")
+surface_material_override/0 = SubResource("mt_candle")
+
+[node name="AltarGlow" type="OmniLight3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.2779, -5.1000)
+light_color = Color(1, 0.7, 0.38, 1)
+light_energy = 0.90
+omni_range = 3.5
+shadow_enabled = false
+
+[node name="CandleW" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3000, 0.5903, -5.8500)
+mesh = SubResource("q_CandleW")
+surface_material_override/0 = SubResource("mt_p_candlestand")
+
+[node name="CandleWFlame0" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3000, 1.2675, -5.8300)
+mesh = SubResource("q_candle")
+surface_material_override/0 = SubResource("mt_candle")
+
+[node name="CandleE" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3000, 0.5903, -5.8500)
+mesh = SubResource("q_CandleE")
+surface_material_override/0 = SubResource("mt_p_candlestand")
+
+[node name="CandleEFlame0" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3000, 1.2675, -5.8300)
+mesh = SubResource("q_candle")
+surface_material_override/0 = SubResource("mt_candle")
+
+[node name="Lectern" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1000, 0.5209, -4.9500)
+mesh = SubResource("q_Lectern")
+surface_material_override/0 = SubResource("mt_p_lectern")
+
+[node name="PewW1" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.5556, -1.7000)
+mesh = SubResource("q_PewW1")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewE1" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.5556, -1.7000)
+mesh = SubResource("q_PewE1")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewW2" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.5556, -2.6000)
+mesh = SubResource("q_PewW2")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewE2" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.5556, -2.6000)
+mesh = SubResource("q_PewE2")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewW3" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.5556, -3.5000)
+mesh = SubResource("q_PewW3")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewE3" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.5556, -3.5000)
+mesh = SubResource("q_PewE3")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="Walls" type="StaticBody3D" parent="."]
+
+[node name="Altar" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.4000, -5.9500)
+shape = SubResource("b_Altar")
+
+[node name="CandleW" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3000, 0.6000, -5.8500)
+shape = SubResource("b_CandleW")
+
+[node name="CandleE" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3000, 0.6000, -5.8500)
+shape = SubResource("b_CandleE")
+
+[node name="Lectern" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1000, 0.5000, -5.1000)
+shape = SubResource("b_Lectern")
+
+[node name="PewW1" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.3000, -1.8750)
+shape = SubResource("b_PewW1")
+
+[node name="PewE1" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.3000, -1.8750)
+shape = SubResource("b_PewE1")
+
+[node name="PewW2" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.3000, -2.7750)
+shape = SubResource("b_PewW2")
+
+[node name="PewE2" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.3000, -2.7750)
+shape = SubResource("b_PewE2")
+
+[node name="PewW3" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.3000, -3.6750)
+shape = SubResource("b_PewW3")
+
+[node name="PewE3" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.3000, -3.6750)
+shape = SubResource("b_PewE3")
+
+[node name="Back" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.6000, -6.3500)
+shape = SubResource("b_Back")
+
+[node name="West" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7250, 1.6000, -3.1750)
+shape = SubResource("b_West")
+
+[node name="FrontLeft" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2188, 1.6000, 0.0000)
+shape = SubResource("b_FrontLeft")
+
+[node name="FrontRight" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1875, 1.6000, 0.0000)
+shape = SubResource("b_FrontRight")
+
+[node name="East" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7250, 1.6000, -3.1750)
+shape = SubResource("b_East")

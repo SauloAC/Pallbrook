@@ -74,9 +74,11 @@ def build(h):
     if st_ and st_.get("rect"):
         sx0, sr0, sx1, sr1 = st_["rect"]
         zt, zb = st_["z"]
-        h.steps_fn = h.obj("Steps", [([(h.px(sx0), 0.0, zb), (h.px(sx1), 0.0, zb), (h.px(sx1), h.FY, zt), (h.px(sx0), h.FY, zt)],
+        # on level ground (no raised floor) they lie just above the street, which would otherwise hide them
+        y0, y1 = (0.0, h.FY) if h.FY > 0 else (0.03, 0.03)
+        h.steps_fn = h.obj("Steps", [([(h.px(sx0), y0, zb), (h.px(sx1), y0, zb), (h.px(sx1), y1, zt), (h.px(sx0), y1, zt)],
                                        [h.uv(sx0, sr1), h.uv(sx1, sr1), h.uv(sx1, sr0), h.uv(sx0, sr0)], 1)],
-                           ["0 %.4f %.4f" % (zb - zt, h.FY)])
+                           ["0 %.4f %.4f" % ((zb - zt) / math.hypot(zb - zt, h.FY), h.FY / math.hypot(zb - zt, h.FY))])
 
     # bits of the outside art kept on show upstairs (what holds up a balcony, say),
     # laid on a front plane just ahead of it: same place on screen, not cut away with the roof and front
