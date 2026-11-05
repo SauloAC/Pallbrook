@@ -13,6 +13,7 @@ def build_house(spec, out_dir, prop_sizes):
     inside.build(h)
     upper.build(h)
     h.door = door.build(h)
+    h.door2 = door.build(h, "door_art2", "2")
     text = scene.build(h)
     open(os.path.join(out_dir, h.name + "2D.tscn"), "w").write(text)
     h.layout = layout.npc_layout(h)

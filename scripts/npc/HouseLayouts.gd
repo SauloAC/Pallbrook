@@ -16,6 +16,7 @@ const INTERIOR_SLOTS := {
 	"Fazenda": [Vector3(-7.048, 0.0, -2.94), Vector3(-3.828, 0.0, -3.5), Vector3(-5.508, 0.0, -1.4)],
 	"Igreja": [Vector3(0.044, 0.0, -6.58), Vector3(-1.216, 0.0, -5.6), Vector3(-1.356, 0.0, -3.78), Vector3(1.444, 0.0, -3.78), Vector3(-1.356, 0.0, -2.52), Vector3(1.444, 0.0, -2.52), Vector3(0.044, 0.0, -3.22), Vector3(0.044, 0.0, -0.98)],
 	"Padaria": [Vector3(6.754, 0.0, -2.8), Vector3(3.534, 0.0, -0.14), Vector3(6.334, 0.0, -0.14), Vector3(1.854, 0.0, -0.7)],
+	"Prefeitura": [Vector3(0.626, 0.0, -5.32), Vector3(-4.064, 0.0, -2.38), Vector3(-1.614, 0.0, -2.38), Vector3(-2.874, 0.0, -1.12), Vector3(0.626, 0.0, -2.66), Vector3(-8.054, 0.0, -4.34), Vector3(-6.934, 0.0, -2.1), Vector3(-1.754, 0.0, -0.56), Vector3(-7.634, 0.0, -1.12)],
 }
 
 # The foot of the bed and which way the head points (degrees around Y)

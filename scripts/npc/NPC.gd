@@ -155,11 +155,6 @@ const INTERIOR_SLOTS_3D := {
 		Vector3(0.0, 0.0, 1.4), Vector3(-0.6, 0.0, 3.1), Vector3(0.6, 0.0, 3.1), Vector3(2.4, 0.0, 0.9),
 		Vector3(-1.8, 0.0, 4.6), Vector3(1.8, 0.0, 4.6), Vector3(0.0, 0.0, 6.4), Vector3(1.8, 0.0, 7.0),
 	],
-	# Town hall (marker at the tower door): around the round rug, clear of the council desks
-	"Prefeitura": [
-		Vector3(1.0, 0.0, -2.0), Vector3(0.2, 0.0, -2.5), Vector3(1.8, 0.0, -2.5), Vector3(1.0, 0.0, -3.2),
-		Vector3(0.0, 0.0, -3.4), Vector3(2.0, 0.0, -3.4), Vector3(0.6, 0.0, -4.0), Vector3(1.4, 0.0, -4.0),
-	],
 	# School (marker at the south door): the teacher's spot first, then the aisle and the front row
 	"Escola": [
 		Vector3(0.0, 0.0, -5.0), Vector3(0.0, 0.0, -3.8), Vector3(0.0, 0.0, -2.6), Vector3(-1.6, 0.0, -1.2),

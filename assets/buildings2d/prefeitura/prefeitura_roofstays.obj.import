@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cl132xqksf620"
+path="res://.godot/imported/prefeitura_roofstays.obj-2505f6489c2d037fc27c9bd1e4bdb388.mesh"
+
+[deps]
+
+files=["res://.godot/imported/prefeitura_roofstays.obj-2505f6489c2d037fc27c9bd1e4bdb388.mesh"]
+
+source_file="res://assets/buildings2d/prefeitura/prefeitura_roofstays.obj"
+dest_files=["res://.godot/imported/prefeitura_roofstays.obj-2505f6489c2d037fc27c9bd1e4bdb388.mesh", "res://.godot/imported/prefeitura_roofstays.obj-2505f6489c2d037fc27c9bd1e4bdb388.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

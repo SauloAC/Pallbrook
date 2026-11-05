@@ -90,9 +90,21 @@ def build(h):
         h.keep.append(h.obj("Keep%d" % ki, [([(h.px(kx0), h.y_on(kp, kr1), kz), (h.px(kx1), h.y_on(kp, kr1), kz), (h.px(kx1), h.y_on(kp, kr0), kz), (h.px(kx0), h.y_on(kp, kr0), kz)],
                                                [h.uv(kx0, kr1), h.uv(kx1, kr1), h.uv(kx1, kr0), h.uv(kx0, kr0)], 1)], ["0 0 1"]))
 
-    h.roof_fn = h.obj("Roof", [([(XL, ye, ze), (XR, ye, ze), (XR, yt, -D), (XL, yt, -D)],
-                                [h.uv(0, re), h.uv(h.iw, re), h.uv(h.iw, 0), h.uv(0, 0)], 1)],
-                      ["0 %.4f %.4f" % (D / math.hypot(D, yt - ye), (yt - ye) / math.hypot(D, yt - ye))])
+    # a part beside the room that stays on show while the doctor is in (a tower, a gateway): its strip of
+    # the roof is a mesh of its own, kept out of the roof that is cut away
+    rn = ["0 %.4f %.4f" % (D / math.hypot(D, yt - ye), (yt - ye) / math.hypot(D, yt - ye))]
+    h.roofstays_fn = None
+    xr0 = XL
+    if sp.get("stays"):
+        c1 = sp["stays"]["x_px"][1]
+        xs = h.px(c1)
+        h.roofstays_fn = h.obj("RoofStays", [([(XL, ye, ze), (xs, ye, ze), (xs, yt, -D), (XL, yt, -D)],
+                                              [h.uv(0, re), h.uv(c1, re), h.uv(c1, 0), h.uv(0, 0)], 1)], rn)
+        xr0, c0 = xs, c1
+    else:
+        c0 = 0
+    h.roof_fn = h.obj("Roof", [([(xr0, ye, ze), (XR, ye, ze), (XR, yt, -D), (xr0, yt, -D)],
+                                [h.uv(c0, re), h.uv(h.iw, re), h.uv(h.iw, 0), h.uv(c0, 0)], 1)], rn)
     # the volume behind (only for shadows and to close it): back wall and the two sides up to the roof
     solid = tuple(sp["solid_uv"])
     xw0, xw1 = h.xw0, h.xw1

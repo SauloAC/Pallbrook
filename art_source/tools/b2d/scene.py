@@ -25,8 +25,13 @@ def build(h):
     XN, ZN, WT = (h.xn, h.zn, h.wt) if NOTCH else (None, None, None)
     # ---------- props ----------
     ext, sub, nodes, shapes = [], [], [], []
-    def E(kind, path, rid): ext.append('[ext_resource type="%s" path="%s" id="%s"]' % (kind, path, rid))
-    def S(t): sub.append(t)
+    def E(kind, path, rid):
+        if not any('id="%s"]' % rid in e for e in ext):       # each resource once (two doors share some)
+            ext.append('[ext_resource type="%s" path="%s" id="%s"]' % (kind, path, rid))
+    def S(t):
+        if t.startswith("[sub_resource") and t.split("\n")[0] in [u.split("\n")[0] for u in sub]:
+            return
+        sub.append(t)
     def N(t): nodes.append(t)
     def mat(rid, shader, tex):
         S('[sub_resource type="ShaderMaterial" id="%s"]\nshader = ExtResource("%s")\nshader_parameter/tex = ExtResource("%s")\n'
@@ -68,6 +73,8 @@ def build(h):
         E("ArrayMesh", RH + h.porch_fn, "m_porch")
     if h.steps_fn:
         E("ArrayMesh", RH + h.steps_fn, "m_steps")
+    if h.roofstays_fn:
+        E("ArrayMesh", RH + h.roofstays_fn, "m_roofstays")
     for nm, fn in (("roof", roof_fn), ("body", body_fn), ("floor", floor_fn), ("innerwall", wall_fn), ("timber", timber_fn)):
         E("ArrayMesh", RH + fn, "m_" + nm)
     FX = R + "fx/"
@@ -89,14 +96,24 @@ def build(h):
     N('[node name="%s2D" type="Node3D"]\n' % NAME)
     N('[node name="%s_Front" type="Node3D" parent="."]\n' % NAME)
     facade_mat = "mt_" + KEY + "_facade"
+    STAYS = SPEC.get("stays", {}).get("planes", [])
     for i, (fn, tex) in enumerate(fronts):
+        if i in STAYS:
+            continue
         N('[node name="Plane%d" type="MeshInstance3D" parent="%s_Front"]\nmesh = ExtResource("m_front%d")\nmaterial_override = SubResource("mt_%s")\n'
           % (i, NAME, i, tex.replace(".png", "")))
     door_mod.scene_nodes(h, h.door, E, S, N, mat, NAME + "_Front")
+    door_mod.scene_nodes(h, h.door2, E, S, N, mat, NAME + "_Front")
     N('[node name="%s_Roof" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_roof")\nmaterial_override = SubResource("%s")\n' % (NAME, "mt_roof" if DECK else facade_mat))
     if DECK:
         # outside the balcony goes with the roof it was cut from; upstairs a copy shows (below, in _Upper)
         N('[node name="Deck" type="MeshInstance3D" parent="%s_Roof"]' % NAME + '\nmesh = ExtResource("m_deck")\nmaterial_override = SubResource("%s")\n' % facade_mat)
+    if SPEC.get("stays"):   # beside the room, on show inside and out: its planes and its strip of roof
+        N('[node name="Stays" type="Node3D" parent="."]\n')
+        for i in STAYS:
+            N('[node name="Plane%d" type="MeshInstance3D" parent="Stays"]\nmesh = ExtResource("m_front%d")\nmaterial_override = SubResource("mt_%s")\n'
+              % (i, i, fronts[i][1].replace(".png", "")))
+        N('[node name="Roof" type="MeshInstance3D" parent="Stays"]\nmesh = ExtResource("m_roofstays")\nmaterial_override = SubResource("%s")\n' % facade_mat)
     if h.porch_fn:     # outside, always on show: you walk on it to the door
         N('[node name="Porch" type="MeshInstance3D" parent="."]\nmesh = ExtResource("m_porch")\nmaterial_override = SubResource("%s")\n' % facade_mat)
     if h.steps_fn:
@@ -185,7 +202,13 @@ def build(h):
     WALL = 5.4 if UP else 3.2
     FZ_ = UP.get("front_z", 0.0) if UP else 0.0
     FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
-    shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, (ZNL + 0.15) if NL else max(0.15, FZ_ + 0.15), -D)]
+    shapes.append(("Back", xw0, xw1, 0, WALL, -D, ZB))
+    # the west wall, open where a side door is (spec "west_gaps": z ranges, front first)
+    wz = (ZNL + 0.15) if NL else max(0.15, FZ_ + 0.15)
+    for gi, (ga_, gb_) in enumerate(SPEC.get("west_gaps", [])):
+        shapes.append(("West%d" % gi, xw0, XI0, 0, WALL, wz, ga_))
+        wz = gb_
+    shapes.append(("West", xw0, XI0, 0, WALL, wz, -D))
     if NL:        # the left wing: its own front wall (thick outward only, so upstairs the walk in front of the stairs stays wide), and the main room's west wall in front of it
         shapes += [("NotchFront", xw0, XNL + WTL, 0, WALL, ZNL + 0.15, ZNL), ("NotchSide", XNL, XNL + WTL, 0, WALL, 0.15, ZNL)]
     # the front wall, open at the door and at any other openings in the art (arches); a lintel over each opening
