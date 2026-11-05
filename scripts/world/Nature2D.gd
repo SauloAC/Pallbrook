@@ -257,6 +257,19 @@ func _bridge() -> void:
 	# Grass and moss where its ends meet the road
 	for end_x in [x0 + 0.25, x0 + w - 0.25]:
 		_tufts(Vector3(end_x, 0.0, zn + 0.25), Vector3(end_x, 0.0, zs + 0.1), 0.3, int(end_x * 10.0))
+	# Its ends overgrown, so it reads as part of the banks rather than laid on them: grass up the sides of
+	# the deck and of the arch's wall (columns of bridge.png where each is drawn), small bushes at the
+	# corners that stand on grass (the east end runs into the cobbled road: grass only)
+	for side in [-1.0, 1.0]:
+		var deck_edge := x0 + (10.0 if side < 0.0 else 180.0) * PX
+		var wall_edge := x0 + (27.0 if side < 0.0 else 169.0) * PX
+		var seed := 300 if side < 0.0 else 400
+		_tufts(Vector3(deck_edge, 0.0, zn - 0.05), Vector3(deck_edge, 0.0, zs - 0.1), 0.2, seed)
+		_tufts(Vector3(wall_edge, 0.0, zs + 0.05), Vector3(wall_edge, 0.0, zb + 0.25), 0.16, seed + 1)
+		_tufts(Vector3(deck_edge, 0.0, zs), Vector3(wall_edge, 0.0, zs + 0.1), 0.18, seed + 2)
+		_bush(Vector3(deck_edge + side * 0.1, 0.0, zn - 0.05), 0)
+		if side < 0.0:
+			_bush(Vector3(wall_edge - 0.15, 0.0, zb + 0.2), 1)
 
 
 func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, ua: Vector2, ub: Vector2, uc: Vector2, ud: Vector2, normal: Vector3) -> void:
@@ -522,21 +535,29 @@ const LEAF_NEAR := Vector2(16.0, 14.0)   # How far from the doctor (east-west, n
 const LEAF_COLOURS := [Color(0.77, 0.43, 0.16), Color(0.59, 0.27, 0.14), Color(0.81, 0.62, 0.24), Color(0.67, 0.5, 0.2)]
 
 func _leaf_art() -> void:
-	# Two tiny shapes per colour, swapped as it falls, so it seems to turn
-	var shapes := [[".##", "##."], ["#.", "##", ".#"]]
+	# Two small shapes per colour, the leaf flat and then edge-on, swapped as it falls so it seems
+	# to turn; a darker rim like the pack's outlines
+	var shapes := [[".##..", "####.", ".####", "..##."], ["##...", "####.", ".####"]]
 	for c: Color in LEAF_COLOURS:
 		for shape: Array in shapes:
 			var img := Image.create(shape[0].length(), shape.size(), false, Image.FORMAT_RGBA8)
 			for y in shape.size():
 				for x in shape[y].length():
-					if shape[y][x] == "#":
-						img.set_pixel(x, y, c if (x + y) % 3 != 0 else c.darkened(0.25))
+					if shape[y][x] != "#":
+						continue
+					var rim := false
+					for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+						var q := Vector2i(x, y) + d
+						if q.y < 0 or q.y >= shape.size() or q.x < 0 or q.x >= shape[q.y].length() or shape[q.y][q.x] != "#":
+							rim = true
+					img.set_pixel(x, y, c.darkened(0.35) if rim and (x + y) % 2 == 0 else c)
 			leaf_textures.append(ImageTexture.create_from_image(img))
 
 
 func _process(delta: float) -> void:
 	if not on or painted == null:
 		return
+	_lamp_glow()
 	for i in range(leaves.size() - 1, -1, -1):
 		var l: Array = leaves[i]
 		var sprite: Sprite3D = l[0]
@@ -654,15 +675,62 @@ func _tufts(a: Vector3, b: Vector3, step: float, seed: int, pull := PULL) -> voi
 		_stand(tex, at, -1.0, pull).material_override = _sway_material(tex, "tuft", tex.get_height())
 
 
-# The street lamps (StreetLamp.tscn): the post becomes a painted one with its lantern; the light stays
+# The street lamps (StreetLamp.tscn): the post becomes a painted one with its lantern. The lamp's
+# light moves into the lantern (it was on top of the 3D pole) and the lantern's glass glows with it.
+const LAMP_LANTERN := Vector2(39.5, 33.5)   # The glass's middle in lamppost.png (the post's foot is 4 px in)
+const LAMP_SHADER := """
+shader_type spatial;
+render_mode specular_disabled;
+uniform sampler2D tex : source_color, filter_nearest;
+uniform vec3 night_tint : source_color = vec3(0.55, 0.66, 0.95);
+uniform float glow = 0.0;   // 0 out, 1 lit: follows the lamp's light as it fades in and out
+global uniform float sprite_daylight;
+void fragment() {
+	vec4 c = texture(tex, UV);
+	if (c.a < 0.5) {
+		discard;
+	}
+	ALBEDO = c.rgb * 0.5;
+	vec3 tint = mix(night_tint, vec3(1.0), smoothstep(0.12, 0.8, sprite_daylight));
+	EMISSION = c.rgb * 0.85 * sprite_daylight * tint;
+	// The glass and the flame: the warm, bright pixels inside the lantern
+	float glass = step(0.75, c.r) * step(0.42, c.g) * step(c.b, 0.35);
+	EMISSION += c.rgb * glass * glow * 1.6;
+	ROUGHNESS = 1.0;
+}
+"""
+var lamps: Array = []   # [the lamp's light, the lantern's material]
+
+
 func _street_lamps() -> void:
 	var post := load(PROPS_DIR + "lamppost.png") as Texture2D
+	var shader := Shader.new()
+	shader.code = LAMP_SHADER
 	for lamp in get_parent().find_children("StreetLamp*", "Node3D", true, false):
 		for mi in lamp.get_children():
 			if mi is MeshInstance3D:
 				hidden.append(mi)
-		# The lantern hangs from the arm, a little east of the post: the post's foot is 4 px in
-		_stand(post, Vector3(lamp.global_position.x, 0.0, lamp.global_position.z), 4.0)
+		var sprite := _stand(post, Vector3(lamp.global_position.x, 0.0, lamp.global_position.z), 4.0)
+		var mat := ShaderMaterial.new()
+		mat.shader = shader
+		mat.set_shader_parameter("tex", post)
+		sprite.material_override = mat
+		var rows := float(post.get_height())
+		var lantern := sprite.position + Vector3((LAMP_LANTERN.x - 4.0) * PX, (rows - LAMP_LANTERN.y) * PX * UPRIGHT, 0.0)
+		for light in lamp.get_children():
+			if light is Light3D:
+				# A little in front of the painted post, so the light falls on it too
+				moved.append([light, light.global_position, lantern + TOWARD_CAMERA * 0.4])
+				lamps.append([light, mat])
+
+
+func _lamp_glow() -> void:
+	for l in lamps:
+		var light: Light3D = l[0]
+		var full = light.get("on_energy")
+		if not full:
+			full = 2.0
+		(l[1] as ShaderMaterial).set_shader_parameter("glow", clampf(light.light_energy / float(full), 0.0, 1.0))
 
 
 # Gideon's stall (Merchant.gd builds it from boxes): a painted market stall instead
@@ -699,6 +767,25 @@ func _merge(spots: Array) -> Array:
 		if not found:
 			out.append(s.duplicate())
 	return out
+
+
+# A small green bush from the pack (size 0 = the smallest), swaying like the others; no shadow
+func _bush(at: Vector3, size: int) -> void:
+	var piece: Array = ART["bush_green"][size]
+	var w: float = piece[2]
+	var h: float = piece[3]
+	var sprite := Sprite3D.new()
+	sprite.texture = PLANTS
+	sprite.region_enabled = true
+	sprite.region_rect = Rect2(piece[0], piece[1], w, h)
+	sprite.pixel_size = PX
+	sprite.offset = Vector2(w / 2.0 - float(piece[4]), h / 2.0)
+	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	sprite.material_override = _sway_material(PLANTS, "bush", h)
+	sprite.scale.y = UPRIGHT
+	sprite.position = at + TOWARD_CAMERA * PULL
+	painted.add_child(sprite)
 
 
 func _plant(at: Vector3, kind: String, height: float, autumn: bool) -> void:
