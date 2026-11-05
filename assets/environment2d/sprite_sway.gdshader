@@ -21,7 +21,10 @@ varying float seed;
 
 void vertex() {
 	row = VERTEX.y / px;
-	seed = NODE_POSITION_WORLD.x * 0.73 + NODE_POSITION_WORLD.z * 1.31;
+	// The same for a plant and its unseen shadow caster on the ground: the painted one is pulled toward
+	// the camera, (0, 0.766, 0.643) per metre, so the height is taken back out of the depth
+	vec3 at = NODE_POSITION_WORLD;
+	seed = at.x * 0.73 + (at.z - at.y * 0.8391) * 1.31;
 }
 
 void fragment() {
