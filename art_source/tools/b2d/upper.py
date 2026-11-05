@@ -46,6 +46,8 @@ def build(h):
         up_meshes["landingfront"] = (obj("LandingFront", [([(XI0, 0, SF), (LAND_X, 0, SF), (LAND_X, H, SF), (XI0, H, SF)],
             [(XI0 * su2, 0), (LAND_X * su2, 0), (LAND_X * su2, H * COS * sv2), (XI0 * su2, H * COS * sv2)], 1)], ["0 0 1"]), STAIR_MT, "")
         floors = [rect_floor(XI0, XI1, SF, FZ, H + 0.01), rect_floor(RAMP_LOW, XI1, ZB, SF, H + 0.01)]
+        if h.NOTCH_L:   # not over the nook in front of the left wing
+            floors[0:1] = [rect_floor(XI0, h.xnl, SF, h.znl, H + 0.01), rect_floor(h.xnl, XI1, SF, FZ, H + 0.01)]
         line = lambda x: dy / 2 + H * (RAMP_LOW - x) / (RAMP_LOW - LAND_X)
         RZ = SF + 0.05
         beam(rail, RAMP_LOW - dx / 2, line(RAMP_LOW - dx / 2) + RAIL_H, LAND_X + dx / 2, line(LAND_X + dx / 2) + RAIL_H, RZ)
@@ -59,9 +61,17 @@ def build(h):
         prof = [(RAMP_LOW + dx / 2, 0), (LAND_X, 0), (LAND_X, H), (LAND_X + dx / 2, H)]
         conv.append(("Stairs", [(x, y, z) for z in (SF, ZB) for x, y in prof]))
         rp_ = [(RAMP_LOW, 0), (LAND_X, H), (LAND_X, H + 1.0), (RAMP_LOW, 1.0)]
+        if h.NOTCH_L:
+            # a shallow wing: the walk upstairs runs right beside the stairwell, so the rail's collider
+            # stops where its top would reach the upper floor (higher up, the stairs are out of reach from below)
+            yc = H - 1.05
+            xc = RAMP_LOW - (RAMP_LOW - LAND_X) * yc / H
+            rp_ = [(RAMP_LOW, 0), (xc, yc), (xc, yc + 1.0), (RAMP_LOW, 1.0)]
         conv.append(("StairRail", [(x, y, z) for z in (SF - 0.02, SF + 0.08) for x, y in rp_]))
-        up_shapes += [("SlabA", XI0, XI1, H - 0.2, H, SF, FZ), ("SlabB", RAMP_LOW, XI1, H - 0.2, H, ZB, SF),
-                      ("Railing", LAND_X + 0.3, RAMP_LOW, H - 0.2, H + 1.0, SF, SF + 0.1),
+        slab_a = [("SlabA", XI0, h.xnl, H - 0.2, H, SF, h.znl), ("SlabA2", h.xnl, XI1, H - 0.2, H, SF, FZ)] if h.NOTCH_L \
+            else [("SlabA", XI0, XI1, H - 0.2, H, SF, FZ)]
+        up_shapes += slab_a + [("SlabB", RAMP_LOW, XI1, H - 0.2, H, ZB, SF),
+                      ("Railing", max(LAND_X + 0.3, h.xnl + h.wt + 0.35) if h.NOTCH_L else LAND_X + 0.3, RAMP_LOW, H - 0.2, H + 1.0, SF, SF + 0.1),
                       ("RailingSide", RAMP_LOW, RAMP_LOW + 0.1, H - 0.2, H + 1.0, ZB, SF + 0.1)]
         info_up = {"H": H, "stairs_x": [round(LAND_X, 3), round(RAMP_LOW, 3)], "stairs_front": round(SF, 3)}
     elif UP.get("side") == "right":
@@ -158,8 +168,13 @@ def build(h):
     rtop = lp["base"] - H * COS * 32
     up_meshes["lowerfront"] = (obj("LowerFront", [([(XLs, 0, lp["z"] + 0.01), (-XLs, 0, lp["z"] + 0.01), (-XLs, H, lp["z"] + 0.01), (XLs, H, lp["z"] + 0.01)],
         [uv(0, lp["base"]), uv(h.iw, lp["base"]), uv(h.iw, rtop), uv(0, rtop)], 1)], ["0 0 1"]), "PLANE%d" % LFP, "Upper")
-    ut = [([(xw0, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.33), (xw0, H + 0.02, FZ - 0.33)],
-           [(xw0 / BW, 0), (xw1 / BW, 0), (xw1 / BW, 1), (xw0 / BW, 1)], 1)]
+    sx0 = h.xnl if h.NOTCH_L else xw0        # the sill beam runs along the front wall (behind a left wing's nook, along the wing's)
+    ut = [([(sx0, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.33), (sx0, H + 0.02, FZ - 0.33)],
+           [(sx0 / BW, 0), (xw1 / BW, 0), (xw1 / BW, 1), (sx0 / BW, 1)], 1)]
+    if h.NOTCH_L:
+        zw = h.znl
+        ut.append(([(xw0, H + 0.02, zw - 0.005), (h.xnl, H + 0.02, zw - 0.005), (h.xnl, H + 0.02, zw - 0.33), (xw0, H + 0.02, zw - 0.33)],
+                   [(xw0 / BW, 0), (h.xnl / BW, 0), (h.xnl / BW, 1), (xw0 / BW, 1)], 1))
     up_meshes["uppertimber"] = (obj("UpperTimber", ut + ut_extra, ["0 1 0", "0 0 1"]), "mt_beam", "Upper")
     h.info_up = info_up
     h.H, h.FZ = H, FZ

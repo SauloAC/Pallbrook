@@ -32,6 +32,7 @@ const ART := {
 }
 var TREE := RegEx.create_from_string("^(K_)?(Tree|TreeFarW)|^KOuter")
 # Painted over by other means (the bridge, the fields and gardens, see below): only hidden
+var FENCE := RegEx.create_from_string("^(PenFence|Prop_WoodenFence)")   # Wooden rail fences: drawn again from the pack
 var REPLACED := RegEx.create_from_string("^(StoneBridge|BridgePost|BridgeRail|FarmField_|GSoil_|GFence_)|^(Carrot|Plant)(_\\d+)*$")
 var BUSH := RegEx.create_from_string("^(KBush|Bush_Common)")
 var TALL_GRASS := RegEx.create_from_string("^KGrass")
@@ -67,6 +68,10 @@ func _ready() -> void:
 		elif NOISE.search(n) or REPLACED.search(n):
 			hidden.append(mi)
 			continue
+		elif FENCE.search(n):
+			hidden.append(mi)
+			fence_boxes.append(mi.global_transform * mi.get_aabb())
+			continue
 		else:
 			_retile(mi)
 			continue
@@ -83,6 +88,7 @@ func _ready() -> void:
 	_props(town)
 	_fields()
 	_gardens(town)
+	_fences()
 	await get_tree().physics_frame  # Gideon's stall is built a physics frame in
 	await get_tree().process_frame
 	_street_lamps()
@@ -365,6 +371,62 @@ func _garlic() -> void:
 	_apply()
 
 
+# ---------- Fences ----------
+# The wooden rail fences (the farm's pen, the cemetery road): runs east-west get the pack's rail
+# fence, tiled post to post; runs north-south its side rails, one post every few steps.
+# Their colliders stay as they are.
+var fence_boxes: Array[AABB] = []
+const FENCE_POST_PX := 8.0              # A post's width in the pictures: tiles overlap on it
+const FENCE_SIDE_STEP := 24.0 * PX / SIN50   # The side rail between two posts, on the ground
+
+func _fences() -> void:
+	var across := []   # [x0, x1, z] east-west
+	var along := []    # [z0, z1, x] north-south
+	for b in fence_boxes:
+		if b.size.x >= b.size.z:
+			across.append([b.position.x, b.end.x, b.get_center().z])
+		else:
+			along.append([b.position.z, b.end.z, b.get_center().x])
+	for run in _join(across):
+		_fence_across(run[0], run[1], run[2])
+	for run in _join(along):
+		_fence_along(run[0], run[1], run[2])
+
+
+# Pieces on one line that touch (or nearly) become one run
+func _join(pieces: Array) -> Array:
+	pieces.sort_custom(func(a, b): return a[2] < b[2] - 0.05 or (absf(a[2] - b[2]) <= 0.05 and a[0] < b[0]))
+	var runs := []
+	for p in pieces:
+		if not runs.is_empty() and absf(runs[-1][2] - p[2]) <= 0.05 and p[0] <= runs[-1][1] + 0.6:
+			runs[-1][1] = maxf(runs[-1][1], p[1])
+		else:
+			runs.append(p.duplicate())
+	return runs
+
+
+func _fence_across(x0: float, x1: float, z: float) -> void:
+	var long_tex := load(PROPS_DIR + "fence_h_long.png") as Texture2D
+	var short_tex := load(PROPS_DIR + "fence_h_short.png") as Texture2D
+	var x := x0
+	while x < x1 - 0.2:
+		var left := x1 - x
+		var tex := long_tex if left >= (long_tex.get_width() - 2.0) * PX else short_tex
+		var w := tex.get_width() * PX
+		var start := minf(x, x1 - w)   # The last piece ends on the run's end, overlapping the one before
+		_stand(tex, Vector3(start + w / 2.0, 0.0, z + 0.06))
+		if start + w >= x1 - 0.01:
+			break  # That was the last piece
+		x = start + w - FENCE_POST_PX * PX
+
+
+func _fence_along(z0: float, z1: float, x: float) -> void:
+	var tex := load(PROPS_DIR + "fence_v_short.png") as Texture2D
+	var steps := maxi(1, roundi((z1 - z0) / FENCE_SIDE_STEP))
+	for i in steps:
+		_stand(tex, Vector3(x, 0.0, z1 - i * (z1 - z0) / steps))
+
+
 # ---------- Ada's stall ----------
 const STALL_SHIFT := Vector3(0.0, 0.0, 3.3)         # South of its place in town.blend, off the plaza
 const STALL_FOOT := Rect2(1.2, 11.8, 3.6, 2.2)      # Where it now stands: nothing else grows there
@@ -421,6 +483,104 @@ func _rebake_navigation() -> void:
 	var region := town.get_parent() as NavigationRegion3D if town else null
 	if region and region.navigation_mesh and not region.is_baking():
 		region.bake_navigation_mesh(true)  # On a thread: the old mesh serves until the new one is ready
+
+
+# ---------- Wind ----------
+# Trees, bushes, tall grass and tufts sway in the wind (sprite_sway.gdshader): their tops move by
+# whole pixels, the trunk stays. One material per picture, kind and height.
+const SWAY_SHADER := preload("res://assets/environment2d/sprite_sway.gdshader")
+const SWAY := {   # kind: [rows that never move (a share of the height), rows over which it bends (share), pixels at the top, speed]
+	"tree": [0.38, 0.45, 1.6, 0.8], "bush": [0.15, 0.7, 1.2, 1.0], "grass": [0.1, 0.8, 1.4, 1.3], "tuft": [0.2, 0.8, 1.0, 1.5],
+}
+var sway_materials := {}
+
+func _sway_material(tex: Texture2D, kind: String, height_px: float) -> ShaderMaterial:
+	var key := "%s|%s|%d" % [tex.resource_path, kind, int(height_px)]
+	if not sway_materials.has(key):
+		var s: Array = SWAY[kind]
+		var mat := ShaderMaterial.new()
+		mat.shader = SWAY_SHADER
+		mat.set_shader_parameter("tex", tex)
+		mat.set_shader_parameter("lit_share", 0.5)
+		mat.set_shader_parameter("own_light", 0.85)
+		mat.set_shader_parameter("px", PX)
+		mat.set_shader_parameter("still_px", roundf(height_px * s[0]))
+		mat.set_shader_parameter("bend_px", maxf(2.0, roundf(height_px * s[1])))
+		mat.set_shader_parameter("amount", s[2])
+		mat.set_shader_parameter("speed", s[3])
+		sway_materials[key] = mat
+	return sway_materials[key]
+
+
+# Autumn: now and then a leaf comes off a tree near the doctor and drifts down, turning
+var leaf_trees: Array = []          # [foot, width px, height px] of every tree
+var leaves: Array = []              # [Sprite3D, start, fall time, age, lying since]
+var leaf_textures: Array[Texture2D] = []
+var leaf_clock := 0.0
+const LEAF_MAX := 22
+const LEAF_NEAR := Vector2(16.0, 14.0)   # How far from the doctor (east-west, north-south) leaves fall
+const LEAF_COLOURS := [Color(0.77, 0.43, 0.16), Color(0.59, 0.27, 0.14), Color(0.81, 0.62, 0.24), Color(0.67, 0.5, 0.2)]
+
+func _leaf_art() -> void:
+	# Two tiny shapes per colour, swapped as it falls, so it seems to turn
+	var shapes := [[".##", "##."], ["#.", "##", ".#"]]
+	for c: Color in LEAF_COLOURS:
+		for shape: Array in shapes:
+			var img := Image.create(shape[0].length(), shape.size(), false, Image.FORMAT_RGBA8)
+			for y in shape.size():
+				for x in shape[y].length():
+					if shape[y][x] == "#":
+						img.set_pixel(x, y, c if (x + y) % 3 != 0 else c.darkened(0.25))
+			leaf_textures.append(ImageTexture.create_from_image(img))
+
+
+func _process(delta: float) -> void:
+	if not on or painted == null:
+		return
+	for i in range(leaves.size() - 1, -1, -1):
+		var l: Array = leaves[i]
+		var sprite: Sprite3D = l[0]
+		l[3] += delta
+		var t: float = l[3]
+		if t < l[2]:
+			# Down at an easy pace, swinging side to side; in whole pixels, like the rest of the town
+			var start: Vector3 = l[1]
+			var p := start + Vector3(sin(t * 2.3 + start.x) * 0.3, -start.y * t / l[2], 0.0)
+			sprite.position = Vector3(snappedf(p.x, PX), snappedf(p.y, PX * UPRIGHT), p.z)
+			if int(t * 4.0) % 2 != l[4]:
+				l[4] = int(t * 4.0) % 2
+				var base := leaf_textures.find(sprite.texture) / 2 * 2
+				sprite.texture = leaf_textures[base + l[4]]
+				sprite.material_override = _material(sprite.texture)
+		elif t > l[2] + 2.5:
+			sprite.queue_free()   # It has lain on the grass a while
+			leaves.remove_at(i)
+	leaf_clock -= delta
+	if leaf_clock > 0.0 or leaves.size() >= LEAF_MAX or leaf_trees.is_empty():
+		return
+	leaf_clock = randf_range(0.25, 0.7)
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return
+	var near := leaf_trees.filter(func(t3: Array): return absf(t3[0].x - player.global_position.x) < LEAF_NEAR.x \
+			and absf(t3[0].z - player.global_position.z) < LEAF_NEAR.y)
+	if near.is_empty():
+		return
+	var tree: Array = near.pick_random()
+	if leaf_textures.is_empty():
+		_leaf_art()
+	var sprite := Sprite3D.new()
+	sprite.texture = leaf_textures[randi() % leaf_textures.size() / 2 * 2]
+	sprite.pixel_size = PX
+	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	sprite.material_override = _material(sprite.texture)
+	sprite.scale.y = UPRIGHT
+	var foot: Vector3 = tree[0]
+	var height: float = tree[2] * PX * UPRIGHT * randf_range(0.45, 0.8)   # From somewhere in the crown
+	var start := foot + Vector3(randf_range(-0.33, 0.33) * tree[1] * PX, height, 0.0) + TOWARD_CAMERA * (PULL + 0.15)
+	painted.add_child(sprite)
+	leaves.append([sprite, start, height / randf_range(0.8, 1.1), 0.0, 0])
 
 
 # One material per picture, shared by every sprite that shows it (they batch)
@@ -490,7 +650,8 @@ func _tufts(a: Vector3, b: Vector3, step: float, seed: int, pull := PULL) -> voi
 		if h % 4 == 0:
 			continue  # A gap now and then
 		var at := a.lerp(b, float(i) / n) + Vector3(float(h % 7 - 3) * 0.03, 0.0, float((h / 7) % 5 - 2) * 0.03)
-		_stand(load(PROPS_DIR + "tuft_%02d.png" % (h % 16)), at, -1.0, pull)
+		var tex := load(PROPS_DIR + "tuft_%02d.png" % (h % 16)) as Texture2D
+		_stand(tex, at, -1.0, pull).material_override = _sway_material(tex, "tuft", tex.get_height())
 
 
 # The street lamps (StreetLamp.tscn): the post becomes a painted one with its lantern; the light stays
@@ -559,10 +720,12 @@ func _plant(at: Vector3, kind: String, height: float, autumn: bool) -> void:
 	sprite.offset = Vector2(w / 2.0 - float(piece[4]), h / 2.0)  # The trunk's foot on the spot
 	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	sprite.material_override = _material(PLANTS)
+	sprite.material_override = _sway_material(PLANTS, kind, h)
 	sprite.scale.y = UPRIGHT
 	sprite.position = Vector3(at.x, 0.0, at.z) + TOWARD_CAMERA * PULL
 	painted.add_child(sprite)
+	if kind == "tree":
+		leaf_trees.append([Vector3(at.x, 0.0, at.z), w, h])
 	# A small painted shadow under it, lying on the ground
 	var shadow := Sprite3D.new()
 	shadow.texture = SHADOW

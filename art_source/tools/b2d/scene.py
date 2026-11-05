@@ -18,6 +18,8 @@ def build(h):
     BLOCKS, up_meshes, up_shapes, conv = h.blocks, h.up_meshes, h.up_shapes, h.conv
     d0, d1 = h.d0, h.d1
     NOTCH = h.NOTCH
+    NL = h.NOTCH_L                     # a left wing set back (see core.House)
+    XNL, ZNL, WTL = (h.xnl, h.znl, h.wt) if NL else (None, None, None)
     FY = h.FY
     PORCH = getattr(h, "PORCH", None)
     XN, ZN, WT = (h.xn, h.zn, h.wt) if NOTCH else (None, None, None)
@@ -168,14 +170,16 @@ def build(h):
     WALL = 5.4 if UP else 3.2
     FZ_ = UP.get("front_z", 0.0) if UP else 0.0
     FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
-    shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, max(0.15, FZ_ + 0.15), -D)]
+    shapes += [("Back", xw0, xw1, 0, WALL, -D, ZB), ("West", xw0, XI0, 0, WALL, (ZNL + 0.15) if NL else max(0.15, FZ_ + 0.15), -D)]
+    if NL:        # the left wing: its own front wall (thick outward only, so upstairs the walk in front of the stairs stays wide), and the main room's west wall in front of it
+        shapes += [("NotchFront", xw0, XNL + WTL, 0, WALL, ZNL + 0.15, ZNL), ("NotchSide", XNL, XNL + WTL, 0, WALL, 0.15, ZNL)]
     # the front wall, open at the door and at any other openings in the art (arches); a lintel over each opening
     gaps = [(d0, d1, None)]
     for gi, g in enumerate(SPEC.get("front_gaps", [])):
         gp = SPEC["planes"][g.get("plane", 0)]
         gaps.append((px(g["px"][0]), px(g["px"][1]), (gp["base"] - g["top_row"]) / 32.0 / COS))
     gaps.sort()
-    fx = xw0
+    fx = XNL if NL else xw0
     for gi, (ga_, gb_, gtop) in enumerate(gaps):
         nm_ = "FrontLeft" if gi == 0 else "Front%d" % gi
         shapes.append((nm_, fx, ga_, 0, FH, 0.15, -0.15))

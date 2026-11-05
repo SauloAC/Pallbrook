@@ -95,6 +95,6 @@ def build(h):
     solid = tuple(sp["solid_uv"])
     xw0, xw1 = h.xw0, h.xw1
     h.body_fn = h.obj("Body", [([(xw1, 0, -D), (xw0, 0, -D), (xw0, yt, -D), (xw1, yt, -D)], [solid] * 4, 1),
-                               ([(xw0, 0, -D), (xw0, 0, ze), (xw0, ye, ze), (xw0, yt, -D)], [solid] * 4, 2),
+                               ([(xw0, 0, -D), (xw0, 0, h.znl if h.NOTCH_L else ze), (xw0, ye, h.znl if h.NOTCH_L else ze), (xw0, yt, -D)], [solid] * 4, 2),
                                ([(xw1, 0, h.zn if h.NOTCH else ze), (xw1, 0, -D), (xw1, yt, -D), (xw1, ye, h.zn if h.NOTCH else ze)], [solid] * 4, 3)],
                       ["0 0 -1", "-1 0 0", "1 0 0"])

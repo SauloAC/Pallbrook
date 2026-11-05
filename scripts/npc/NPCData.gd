@@ -13,4 +13,7 @@ extends Resource
 @export var dialogue_lines: Array[String] = []  # One is picked at random each time
 @export var clue_trait: String = ""  # Trace this person leaves behind, e.g. "fuligem de forja"
 @export var bedtime: int = 22  # Hour this person goes to bed (if at home)
+# Where this person stands at a place by day instead of among the crowd (place -> spot in the
+# world), facing south: Ada beside her stall at the square
+@export var work_spots: Dictionary[String, Vector3] = {}
 @export var portrait: Texture2D

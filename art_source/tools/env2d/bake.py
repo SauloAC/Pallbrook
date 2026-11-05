@@ -2,7 +2,8 @@ import json, sys, numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage
 A='/mnt/user-data/uploads/Assets/'
-d=json.load(open('/mnt/user-data/uploads/Pallbrook/art_source/_roads.json'))
+import os
+d=json.load(open(os.environ.get('ROADS','/mnt/user-data/uploads/Pallbrook/art_source/_roads.json')))
 PX=0.04375; S50=0.76604444
 x0,x1,z0,z1=d['bounds']
 W=int(round((x1-x0)/PX)); H=int(round((z1-z0)*S50/PX))

@@ -20,4 +20,7 @@ home = "Fazenda"
 dialogue_lines = Array[String](["Fresh eggs and herbs at the square, doctor. Half the town still owes me for last week's.", "The goats won't go near the old road after dark. Animals know things."])
 clue_trait = "hay"
 bedtime = 21
+work_spots = Dictionary[String, Vector3]({
+"Praca": Vector3(5.8, 0, 13.4)
+})
 metadata/_custom_type_script = "uid://dl651qayo3ngb"

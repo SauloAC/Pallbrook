@@ -141,16 +141,12 @@ const PLACE_SLOTS: Array[Vector3] = [
 const HouseLayouts = preload("res://scripts/npc/HouseLayouts.gd")
 
 # Spots inside walk-in buildings, around their marker: open floor, clear of the furniture.
-# Clinic: the last two are outside the door, for a queue.
+# (The clinic's are in HouseLayouts, from its spec: the last two outside the door, for a queue.)
 const INTERIOR_SLOTS_3D := {
 	# Homes (marker at the front door): spots off to the side, so the doctor can step in
 	# Tomas's forge (marker at the house door): beside the anvil, at the hearth, in front of the anvil
 	"Casa2": [
 		Vector3(4.1, 0.0, -1.9), Vector3(4.25, 0.0, -2.3), Vector3(2.6, 0.0, -0.6), Vector3(3.4, 0.0, -0.6),
-	],
-	"Clinica": [
-		Vector3(0.0, 0.0, 0.0), Vector3(-0.6, 0.0, 0.2), Vector3(0.3, 0.0, -1.0), Vector3(-1.0, 0.0, 0.4),
-		Vector3(0.4, 0.0, -1.7), Vector3(0.5, 0.0, 0.5), Vector3(-0.6, 0.0, 2.4), Vector3(0.6, 0.0, 2.6),
 	],
 	# Tavern (marker at the south door): four inside by the bar and the table, eight out on the
 	# patio (the second row of tables, added for lunch on 31 Oct, sits south of the first)
@@ -672,6 +668,10 @@ func _on_arrived() -> void:
 			hunt_returning = false
 			set_state(State.SLEEPING)
 		return
+	# At their own spot (Ada at her stall): face the street, toward the camera
+	if visual and data and data.work_spots.has(current_place) \
+			and Vector2(global_position.x - data.work_spots[current_place].x, global_position.z - data.work_spots[current_place].z).length() < 1.0:
+		visual.face(global_position + Vector3(0.0, 0.0, 2.0))
 	# Reached a building during the routine: go in
 	if state == State.ROUTINE and current_place != "" and not OPEN_AIR_PLACES.has(current_place) \
 			and not WALK_IN_PLACES.has(current_place):
@@ -850,6 +850,8 @@ func _go_to_place(place: String) -> void:
 				spot = _upstairs_spot(marker, place)
 		elif INTERIOR_SLOTS.has(place):
 			spot = _reachable_spot(marker.global_position, spot)
+		elif data and data.work_spots.has(place) and not GameState.is_night and state == State.ROUTINE:
+			spot = data.work_spots[place]  # Their own spot there (Ada at her stall)
 		go_to(spot)
 
 

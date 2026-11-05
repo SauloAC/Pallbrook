@@ -44,6 +44,11 @@ class House:
         if self.NOTCH:
             assert not self.DECK, "a notch and a balcony on the same house are not supported"
             self.xn, self.zn, self.wt = self.px(self.NOTCH["x_px"]), self.NOTCH["z"], t
+        # the same on the left: a wing whose front wall stands behind the main front (the clinic's stair wing)
+        self.NOTCH_L = spec.get("notch_left")
+        if self.NOTCH_L:
+            assert not self.NOTCH and not self.DECK, "a left notch with a right notch or a balcony is not supported"
+            self.xnl, self.znl, self.wt = self.px(self.NOTCH_L["x_px"]), self.NOTCH_L["z"], t
         self.d0, self.d1 = self.px(spec["door_px"][0]), self.px(spec["door_px"][1])
         self.door_x = (self.d0 + self.d1) / 2
         tw, th = spec.get("inner_wall_tile_px", (32, 32))

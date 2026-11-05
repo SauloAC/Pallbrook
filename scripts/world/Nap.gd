@@ -6,7 +6,7 @@ extends Node3D
 # It works on the same fatigue debt as a collapse: after a night on the floor, a nap pays one
 # hour of it back instead. The bed at night is still SleepSpot's.
 
-const BED_AT := Vector3(11.3, 0.0, 4.6)     # Beside the clinic bed (same spot as the night's)
+const BED_FROM_DOOR := Vector3(-0.96, 3.33, -3.22)  # Beside the clinic bed upstairs (same spot as the night's), from its door marker
 const USE_RANGE := 0.9
 const HOURS := 2.0
 const FROM := 13.0
@@ -19,7 +19,11 @@ var prompt: Sprite3D
 var napped_day := -1
 
 
+var bed_at := Vector3.ZERO
+
+
 func _ready() -> void:
+	bed_at = GameState.place_position("Clinica") + BED_FROM_DOOR
 	prompt = Sprite3D.new()
 	prompt.texture = ICON
 	prompt.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -27,14 +31,14 @@ func _ready() -> void:
 	prompt.pixel_size = 0.008
 	prompt.visible = false
 	add_child(prompt)
-	prompt.global_position = BED_AT + Vector3(0.0, 1.8, 0.0)
+	prompt.global_position = bed_at + Vector3(0.0, 1.8, 0.0)
 
 
 func _process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var near := false
 	if player:
-		var gap := player.global_position - BED_AT
+		var gap := player.global_position - bed_at
 		near = Vector2(gap.x, gap.z).length() < USE_RANGE and absf(gap.y) < 2.5
 	prompt.visible = near and not GameState.is_night and not GameState.in_dialogue and not GameState.reading \
 			and not GameState.near_mural
