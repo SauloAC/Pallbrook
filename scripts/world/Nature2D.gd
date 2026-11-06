@@ -94,6 +94,7 @@ func _ready() -> void:
 	_street_lamps()
 	_gideon()
 	_bridge()
+	Cemetery2D.build(self, town.get_parent())   # The cemetery beyond the bridge, and its colliders
 	_colliders(town)
 	_apply()
 	_garlic()
@@ -107,11 +108,12 @@ const PROPS_DIR := "res://assets/environment2d/props/"
 const ZONES := {
 	"plaza": Rect2(4.7, 9.7, 11.0, 9.5), "market": Rect2(7.2, 23.7, 7.5, 4.0),
 	"tavern": Rect2(-4.0, 21.3, 6.6, 6.0), "clinic_yard": Rect2(23.3, 23.2, 3.5, 4.5),
-	"river": Rect2(-40.0, -80.0, 50.0, 120.0),
+	"river": Rect2(-40.0, -80.0, 50.0, 130.0),
 }
 const WELL_AT := Vector3(10.2, 0.0, 14.55)   # The front of the well's stone base
 const PROP_RULES := [
 	["^Well", "", "plaza"],   # The well's many pieces: one painted well instead (WELL_AT)
+	["^Bucket_Wooden", "", "plaza"],   # (the well's bucket: the painted well has its own)
 	["^Stall_Cart_Empty", "stall_ada", "market"],
 	["^(FarmCrate|Bag|Barrel_Apples)", "", "market"],
 	["^Bench", "bench", "plaza"], ["^Bench", "bench", "clinic_yard"],   # (the tavern's courtyard furniture is the 2D tavern's own)

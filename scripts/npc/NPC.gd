@@ -1694,52 +1694,10 @@ func _make_headstone() -> Node3D:
 	return make_headstone(_n(data.npc_name), tr(data.role))
 
 
-# Dark weathered stone with a rounded top and a fresh mound, like the old graves around it.
+# A wooden cross with the name and a fresh mound of earth behind it (Cemetery2D), among the old stones.
 # Static so the town can lay graves that were dug before the game began (Clara's Jonas).
 static func make_headstone(title: String, subtitle: String) -> Node3D:
-	var grave := Node3D.new()
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(0.2, 0.21, 0.2)
-	material.roughness = 0.95
-	var slab := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = Vector3(0.6, 0.62, 0.16)
-	slab.mesh = box
-	slab.position.y = 0.31
-	slab.material_override = material
-	grave.add_child(slab)
-	var top := MeshInstance3D.new()
-	var round_top := CylinderMesh.new()
-	round_top.top_radius = 0.3
-	round_top.bottom_radius = 0.3
-	round_top.height = 0.16
-	top.mesh = round_top
-	top.rotation.x = PI / 2.0
-	top.position.y = 0.62
-	top.material_override = material
-	grave.add_child(top)
-	var mound := MeshInstance3D.new()
-	var earth := SphereMesh.new()
-	earth.radius = 0.5
-	earth.height = 0.36
-	mound.mesh = earth
-	mound.scale = Vector3(0.75, 1.0, 1.5)
-	mound.position = Vector3(0.0, 0.0, -0.8)  # Behind the stone, away from the camera
-	var soil := StandardMaterial3D.new()
-	soil.albedo_color = Color(0.17, 0.11, 0.07)
-	soil.roughness = 1.0
-	mound.material_override = soil
-	grave.add_child(mound)
-	var plate := Label3D.new()
-	plate.text = "%s\n%s" % [title, subtitle]
-	plate.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED  # Already in the current language
-	plate.font_size = 48
-	plate.outline_size = 12
-	plate.pixel_size = 0.006
-	plate.position = Vector3(0.0, 0.42, 0.09)  # On the face of the stone, toward the camera
-	plate.modulate = Color(0.9, 0.88, 0.82)
-	grave.add_child(plate)
-	return grave
+	return Cemetery2D.grave(title, subtitle)
 
 
 # ---------- Clinic visits ----------

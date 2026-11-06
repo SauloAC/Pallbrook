@@ -10,7 +10,7 @@ const SPOTS := [
 	{"key": "willow", "at": Vector3(-9.0, 0.0, -14.4), "gives": {"willow": 2},
 			"text": "Half an hour on the riverbank with a knife: two strips of willow bark."},
 	# Inside the cemetery, where wormwood has always grown among the graves
-	{"key": "herbs", "at": Vector3(-19.2, 0.0, -8.0), "gives": {"thyme": 1, "wormwood": 1},
+	{"key": "herbs", "at": Vector3(-19.75, 0.0, -6.9), "gives": {"thyme": 1, "wormwood": 1},
 			"text": "Half an hour among the old graves: a bunch of wild thyme and a handful of wormwood."},
 ]
 const USE_RANGE := 1.2

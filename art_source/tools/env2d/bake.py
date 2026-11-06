@@ -63,6 +63,22 @@ soil=D*np.array([0.70,0.62,0.55])
 soil=np.where((rows==0)[...,None],soil*0.72,soil)
 soil=np.where((rows==1)[...,None],np.minimum(soil*1.18,255),soil)
 out[field]=soil[field]
+# The cemetery beyond the bridge (see Cemetery2D.gd, same places): its grass darker and greyer inside
+# the fence, a paved walk from the arch down to the statue and to the crypt's door, and the old graves'
+# plots, sunken and darker, behind their stones
+CEM=(-26.4,-10.8,-17.6,-1.8)                       # x0, z0 (north), x1, z1 (south): the fence
+CEM_WALKS=[(-22.55,-11.05,-21.45,-2.95),(-25.3,-7.75,-22.55,-6.95)]
+CEM_OLD=[(-25.5,-5.3),(-20.6,-8.1),(-18.6,-8.1),(-20.6,-5.3)]   # headstones' feet
+def rect(a,b,c,e): return [[a,b],[c,b],[c,e],[a,e]]
+cem=raster([rect(*CEM)])
+out[cem]=out[cem]*np.array([0.88,0.90,0.88])
+plots=raster([rect(x-0.42,z-1.6,x+0.42,z-0.2) for x,z in CEM_OLD])
+pin=ndimage.distance_transform_edt(plots)
+out[plots]=out[plots]*0.86
+out[plots&(pin<=1.5)]=out[plots&(pin<=1.5)]*0.85
+walk=raster([rect(*w) for w in CEM_WALKS])
+out[walk]=Sl[walk]
+slab=slab|walk
 ground=dirt|stone|margin|slab|field
 rim=ndimage.binary_dilation(ground)&~ground
 out[rim]=out[rim]*np.array([0.76,0.80,0.66])

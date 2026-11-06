@@ -19,6 +19,7 @@ Third-party assets used in the game. Keep this list up to date before any public
 ## Art
 - 3D characters: "Ultimate Animated Character Pack" by Quaternius (quaternius.com). CC0, no attribution required.
 - 3D buildings and props: "Medieval Village MegaKit", "Fantasy Props MegaKit" and "Stylized Nature MegaKit" (Standard) by Quaternius (quaternius.com). CC0, no attribution required. Textures downscaled to 1024 px; roof tiles darkened.
+- The cemetery's graves, statue and pillars (assets/environment2d/props/cem_*.png): "Pixel Art Top Down - Basic" by Cainos. Its crypt, iron fence and arch, dead trees, lanterns and wooden cross: KayKit Halloween Bits by Kay Lousberg (www.kaylousberg.com), CC0, rendered to pixel art and recoloured with the Cainos colours (art_source/tools/cemetery/).
 - 2D buildings and their furniture (assets/buildings2d/): "Pixel Art Top Down - Village" by Cainos. Building fronts cut and re-arranged, some props recoloured (the forge's coal heap) or combined (the tool rack). Check the pack's license terms before release.
 - Character portraits, UI art and patient chart: generated with Google Gemini (AI). Steam requires disclosing AI-generated content.
 - Clinic mural art (frame, town map, paper notes, pins: assets/ui/mural/): generated with Google Gemini (AI), assembled in Figma. To be replaced with designed or hand-made 2D art.
