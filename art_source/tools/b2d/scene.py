@@ -182,14 +182,16 @@ def build(h):
     furniture = list(SPEC["furniture"])
     if SPEC.get("door_rug", True):
         furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": DOOR_Z - 0.42})
-    TABLES = [g for g in furniture if g.get("box") and g["prop"].startswith(("table", "desk", "schooldesk"))]
+    def kind(f):    # what a piece is: its prop's name, less the "cel_" of a cel-shaded one (../furniture/)
+        return f["prop"][4:] if f["prop"].startswith("cel_") else f["prop"]
+    TABLES = [g for g in furniture if g.get("box") and kind(g).startswith(("table", "desk", "schooldesk"))]
     def seats_of(f):
-        if f.get("outside") or f.get("seat") is False or f["prop"] not in ("stool", "pew") or not f.get("box"):
+        if f.get("outside") or f.get("seat") is False or kind(f) not in ("stool", "pew") or not f.get("box"):
             return []
         bx0, bx1, bz0, bz1, _ = f["box"]
         cx, cz = (bx0 + bx1) / 2, (bz0 + bz1) / 2
         face = f.get("seat")
-        if face is None and f["prop"] == "stool":
+        if face is None and kind(f) == "stool":
             near = [g for g in TABLES if bool(g.get("upper")) == bool(f.get("upper"))]
             if near:
                 def centre(g):
@@ -201,7 +203,7 @@ def build(h):
                 face = "south"
         if face is None:        # a bench
             face = "south" if bz0 <= ZB + 0.05 else "north"
-        if f["prop"] == "pew":
+        if kind(f) == "pew":
             return [(cx - 0.25, cz, face), (cx + 0.25, cz, face)]
         return [(cx, cz, face)]
     for f in furniture:
