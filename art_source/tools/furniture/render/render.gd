@@ -29,6 +29,13 @@ const RAMPS := {
 	"glass_purple": [Color8(84, 40, 70), Color8(108, 54, 90), Color8(132, 70, 110), Color8(164, 100, 140)],
 	"clay": [Color8(110, 64, 40), Color8(134, 82, 52), Color8(156, 100, 66), Color8(176, 122, 84)],
 	"paper": [Color8(186, 172, 140), Color8(206, 194, 162), Color8(226, 214, 182), Color8(240, 230, 204)],
+	"book_red": [Color8(78, 30, 24), Color8(96, 38, 30), Color8(116, 48, 36), Color8(140, 64, 48)],
+	"book_blue": [Color8(36, 48, 76), Color8(46, 60, 92), Color8(56, 74, 110), Color8(76, 96, 134)],
+	"book_green": [Color8(40, 62, 40), Color8(50, 78, 50), Color8(62, 92, 60), Color8(84, 116, 78)],
+	"book_ochre": [Color8(110, 74, 30), Color8(132, 90, 36), Color8(154, 106, 42), Color8(180, 132, 60)],
+	"book_brown": [Color8(66, 40, 24), Color8(82, 52, 30), Color8(100, 66, 40), Color8(122, 86, 54)],
+	"slate": [Color8(34, 42, 37), Color8(40, 50, 44), Color8(47, 59, 51), Color8(58, 72, 63)],
+	"chalk": [Color8(170, 172, 160), Color8(188, 190, 178), Color8(206, 206, 194), Color8(222, 222, 210)],
 }
 
 var id_mode := false
@@ -168,7 +175,7 @@ func bottle(kind: String, glass: String, x: float, y: float, z: float, h: float,
 
 # ---------- The pieces ----------
 # Sizes as the interiors' furniture has them (a little larger than life, like the Cainos pieces)
-const PIECES := ["bed", "cabinet", "table_round", "stool", "crate"]
+const PIECES := ["bed", "cabinet", "table_round", "stool", "crate", "bookshelf_a", "bookshelf_b", "bookshelf_c", "blackboard"]
 
 
 # A wooden bed, 1 m by 2: a red blanket over the linen, the pillow at the head (north, the wall)
@@ -276,3 +283,87 @@ func _crate(x0: float, x1: float, y0: float, y1: float, z0: float, z1: float) ->
 	var ln := Vector2(x1 - x0 - 2 * t, y1 - y0 - 2 * t).length()
 	var brace := box("wood", -ln / 2.0, ln / 2.0, -0.05, 0.05, z1 - 0.04, z1 - 0.01, g, Vector3(0, 0, diag))
 	brace.position = Vector3((x0 + x1) / 2.0, (y0 + y1) / 2.0, z1 - 0.025)
+
+
+# A tall bookcase, four shelves of books: three of them (a, b, c), filled differently, so that a row of
+# them (the library's) doesn't repeat
+func piece_bookshelf_a() -> void:
+	_bookshelf(11)
+
+
+func piece_bookshelf_b() -> void:
+	_bookshelf(23)
+
+
+func piece_bookshelf_c() -> void:
+	_bookshelf(37)
+
+
+const BOOKS := ["book_red", "book_blue", "book_green", "book_ochre", "book_brown", "book_red", "book_blue", "paper"]
+
+
+func _bookshelf(seed: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed
+	var w := 0.62
+	var d := -0.3
+	var g := _group()
+	planks = Vector4(1, 0, 0, 0.2)
+	box("shadow", -w, w, 0.0, 1.62, d, d + 0.03, g)                              # back
+	planks = Vector4.ZERO
+	for x in [-w, w - 0.07]:
+		box("wood_mid", x, x + 0.07, 0.0, 1.62, d, 0.0, g)                     # sides
+	box("wood_mid", -w - 0.03, w + 0.03, 1.62, 1.7, d - 0.02, 0.03, g)           # top
+	box("wood_mid", -w, w, 0.0, 0.08, d, 0.0, g)                                 # plinth
+	var shelves := [0.08, 0.46, 0.84, 1.22]
+	for y in shelves.slice(1):
+		box("wood_mid", -w + 0.07, w - 0.07, y, y + 0.04, d + 0.03, -0.01, g)    # shelves
+	# the books: upright, now and then one leaning, a gap, or a few lying in a pile
+	for y0 in shelves:
+		var y: float = y0 + (0.04 if y0 > 0.1 else 0.0)
+		var x := -w + 0.08
+		while x < w - 0.1:
+			var roll := rng.randf()
+			if roll < 0.06:
+				x += rng.randf_range(0.08, 0.16)                 # a gap
+				continue
+			if roll < 0.12 and x < w - 0.35:                     # a pile lying down
+				var px := x
+				var py := y
+				for k in rng.randi_range(2, 4):
+					var bw := rng.randf_range(0.2, 0.26)
+					box(BOOKS[rng.randi() % BOOKS.size()], px + 0.01 * k, px + bw, py, py + 0.05, d + 0.05, -0.05, g)
+					py += 0.05
+				x += 0.28
+				continue
+			var bw := rng.randf_range(0.065, 0.11)
+			var bh := rng.randf_range(0.22, 0.3)
+			var col: String = BOOKS[rng.randi() % BOOKS.size()]
+			if roll > 0.93 and x < w - 0.25:                     # leaning on its neighbour
+				var lean := box(col, -bw / 2.0, bw / 2.0, -bh / 2.0, bh / 2.0, d + 0.06, -0.05, g, Vector3(0, 0, -18))
+				lean.position = Vector3(x + bh * 0.3 + bw / 2.0, y + bh * 0.95 / 2.0, (d - 0.05) / 2.0 + 0.0)
+				x += bh * 0.3 + bw + 0.02
+				continue
+			box(col, x, x + bw, y, y + bh, d + 0.04 + rng.randf_range(0.0, 0.04), -0.03, g)
+			x += bw + 0.005
+
+
+# The schoolroom's blackboard on its two legs, a few lines of chalk on it and the chalk on its ledge
+func piece_blackboard() -> void:
+	var w := 0.9
+	var g := _group()
+	for x in [-w - 0.1, w]:
+		box("wood_mid", x, x + 0.1, 0.0, 1.66, -0.22, -0.12, g)                # legs, either side of the board
+		box("wood_mid", x - 0.02, x + 0.12, 0.0, 0.07, -0.4, 0.0, g)           # their feet
+	box("wood", -w, w, 0.58, 1.58, -0.2, -0.15, g)                               # frame
+	var b := _group()
+	box("slate", -w + 0.07, w - 0.07, 0.64, 1.52, -0.16, -0.14, b)               # the board
+	var lines := [[-0.76, -0.1, 1.38], [0.05, 0.62, 1.38], [-0.76, 0.3, 1.25], [-0.76, -0.3, 1.12], [-0.15, 0.4, 1.12],
+		[-0.76, 0.1, 0.98], [0.3, 0.74, 0.98], [-0.76, -0.4, 0.84]]
+	for l in lines:
+		box("chalk", l[0], l[1], l[2], l[2] + 0.03, -0.141, -0.136, b)         # the lesson, in chalk
+	box("chalk", 0.5, 0.7, 0.8, 0.83, -0.141, -0.136, b)                        # a sum: a plus
+	box("chalk", 0.585, 0.615, 0.72, 0.91, -0.141, -0.136, b)
+	box("wood", -w, w, 0.54, 0.6, -0.2, -0.06, g)                                # the ledge
+	box("chalk", -0.4, -0.3, 0.6, 0.625, -0.13, -0.1)                            # a stick of chalk
+	box("paper", 0.3, 0.46, 0.6, 0.645, -0.14, -0.09)                            # the duster

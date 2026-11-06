@@ -24,8 +24,10 @@
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/biblioteca/biblioteca_block0top.obj" id="m_block0t"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_fireplace_front.png" id="tx_block0"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_wall.png" id="tx_block0top"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bookshelf.png" id="tx_p_bookshelf"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_candlestand.png" id="tx_p_candlestand"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bookshelf_a.png" id="tx_p_cel_bookshelf_a"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bookshelf_b.png" id="tx_p_cel_bookshelf_b"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bookshelf_c.png" id="tx_p_cel_bookshelf_c"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_desk.png" id="tx_p_desk"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_ladder.png" id="tx_p_ladder"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_lectern.png" id="tx_p_lectern"]
@@ -81,15 +83,27 @@ shader_parameter/tex = ExtResource("tx_block0top")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_bookshelf"]
-shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_bookshelf")
-shader_parameter/lit_share = 0.5
-shader_parameter/own_light = 0.85
-
 [sub_resource type="ShaderMaterial" id="mt_p_candlestand"]
 shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_candlestand")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bookshelf_a"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bookshelf_a")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bookshelf_b"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bookshelf_b")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bookshelf_c"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bookshelf_c")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -148,16 +162,16 @@ size = Vector2(0.4464, 0.8334)
 size = Vector2(0.4464, 0.8334)
 
 [sub_resource type="QuadMesh" id="q_StackA1"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_StackA2"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_StackB1"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_StackB2"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_Candle"]
 size = Vector2(0.2679, 1.1807)
@@ -181,31 +195,31 @@ size = Vector2(0.4464, 0.8334)
 size = Vector2(0.4464, 0.8334)
 
 [sub_resource type="QuadMesh" id="q_ShelfBack1"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_ShelfBack2"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_Shelf1"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_Shelf2"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_Shelf3"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_Shelf4"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_HallLadder"]
 size = Vector2(0.5804, 2.5350)
 
 [sub_resource type="QuadMesh" id="q_Shelf5"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_Shelf6"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_TableH"]
 size = Vector2(0.7143, 1.3890)
@@ -428,24 +442,24 @@ facing = "north"
 use_range = 0.5
 
 [node name="StackA1" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1500, 1.0071, -4.3000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1500, 1.0591, -4.3000)
 mesh = SubResource("q_StackA1")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_a")
 
 [node name="StackA2" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2500, 1.0071, -4.3000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2500, 1.0591, -4.3000)
 mesh = SubResource("q_StackA2")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b")
 
 [node name="StackB1" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1500, 1.0071, -6.1000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1500, 1.0591, -6.1000)
 mesh = SubResource("q_StackB1")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_c")
 
 [node name="StackB2" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2500, 1.0071, -6.1000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2500, 1.0591, -6.1000)
 mesh = SubResource("q_StackB2")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_a")
 
 [node name="Candle" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4000, 0.5903, -9.4000)
@@ -490,34 +504,34 @@ facing = "west"
 use_range = 0.5
 
 [node name="ShelfBack1" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7500, 1.0071, -9.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7500, 1.0591, -9.4000)
 mesh = SubResource("q_ShelfBack1")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b")
 
 [node name="ShelfBack2" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8300, 1.0071, -9.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8300, 1.0591, -9.4000)
 mesh = SubResource("q_ShelfBack2")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_c")
 
 [node name="Shelf1" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6000, 1.0071, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6000, 1.0591, -4.4000)
 mesh = SubResource("q_Shelf1")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_a")
 
 [node name="Shelf2" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3500, 1.0071, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3500, 1.0591, -4.4000)
 mesh = SubResource("q_Shelf2")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b")
 
 [node name="Shelf3" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3000, 1.0071, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3000, 1.0591, -4.4000)
 mesh = SubResource("q_Shelf3")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_c")
 
 [node name="Shelf4" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2500, 1.0071, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2500, 1.0591, -4.4000)
 mesh = SubResource("q_Shelf4")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_a")
 
 [node name="HallLadder" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9500, 1.2675, -4.3500)
@@ -525,14 +539,14 @@ mesh = SubResource("q_HallLadder")
 surface_material_override/0 = SubResource("mt_p_ladder")
 
 [node name="Shelf5" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7000, 1.0071, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7000, 1.0591, -4.4000)
 mesh = SubResource("q_Shelf5")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b")
 
 [node name="Shelf6" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6500, 1.0071, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6500, 1.0591, -4.4000)
 mesh = SubResource("q_Shelf6")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_c")
 
 [node name="TableH" type="MeshInstance3D" parent="Biblioteca_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3000, 0.6945, -2.5000)

@@ -4,6 +4,7 @@
 # table at the front, two rows of stacks, and at the back the fire with a rug, a small table and shelves on
 # the back wall; the hall is lined with shelves along its back wall, with Sophia's desk, a round table and a
 # lectern by the door.
+# (6 Nov) The shelves are cel-shaded bookcases (art_source/tools/furniture/), three fillings in turn.
 SPEC = {
     "name": "Biblioteca", "facade": "art_source/facades/house11_noshadow.png",
     # the wing's front with its gable (its foot at row 353), the hall's front with its roof (its foot 28 rows
@@ -34,26 +35,26 @@ SPEC = {
         {"name": "StoolR1", "prop": "stool", "x": -3.8, "z": -1.35, "box": (-3.98, -3.62, -1.65, -1.35, 0.5)},
         {"name": "StoolR2", "prop": "stool", "x": -2.8, "z": -1.35, "box": (-2.98, -2.62, -1.65, -1.35, 0.5)},
         # two rows of stacks across the wing, the walk beside them on the east
-        {"name": "StackA1", "prop": "bookshelf", "x": -4.15, "z": -4.3, "box": (-4.6, -3.7, -4.6, -4.3, 1.9)},
-        {"name": "StackA2", "prop": "bookshelf", "x": -3.25, "z": -4.3, "box": (-3.7, -2.8, -4.6, -4.3, 1.9)},
-        {"name": "StackB1", "prop": "bookshelf", "x": -4.15, "z": -6.1, "box": (-4.6, -3.7, -6.4, -6.1, 1.9)},
-        {"name": "StackB2", "prop": "bookshelf", "x": -3.25, "z": -6.1, "box": (-3.7, -2.8, -6.4, -6.1, 1.9)},
+        {"name": "StackA1", "prop": "cel_bookshelf_a", "x": -4.15, "z": -4.3, "box": (-4.6, -3.7, -4.6, -4.3, 1.9)},
+        {"name": "StackA2", "prop": "cel_bookshelf_b", "x": -3.25, "z": -4.3, "box": (-3.7, -2.8, -4.6, -4.3, 1.9)},
+        {"name": "StackB1", "prop": "cel_bookshelf_c", "x": -4.15, "z": -6.1, "box": (-4.6, -3.7, -6.4, -6.1, 1.9)},
+        {"name": "StackB2", "prop": "cel_bookshelf_a", "x": -3.25, "z": -6.1, "box": (-3.7, -2.8, -6.4, -6.1, 1.9)},
         # at the back: the fire and its rug, a small table with stools, shelves on the back wall
         {"name": "Candle", "prop": "candlestand", "x": -3.4, "z": -9.4, "box": (-3.55, -3.25, -9.7, -9.4, 1.2), "flames": [(6, 1)]},
         {"name": "HearthRug", "prop": "rug", "flat": True, "y": 0.025, "x": -4.05, "z": -8.45},
         {"name": "FireTable", "prop": "table_round", "x": -2.2, "z": -7.9, "box": (-2.5, -1.9, -8.4, -7.9, 0.8)},
         {"name": "FireStool1", "prop": "stool", "x": -2.8, "z": -7.7, "box": (-2.98, -2.62, -8.0, -7.7, 0.5)},
         {"name": "FireStool2", "prop": "stool", "x": -1.6, "z": -7.7, "box": (-1.78, -1.42, -8.0, -7.7, 0.5)},
-        {"name": "ShelfBack1", "prop": "bookshelf", "x": -2.75, "z": -9.4, "box": (-3.2, -2.3, -9.7, -9.4, 1.9)},
-        {"name": "ShelfBack2", "prop": "bookshelf", "x": -1.83, "z": -9.4, "box": (-2.28, -1.38, -9.7, -9.4, 1.9)},
+        {"name": "ShelfBack1", "prop": "cel_bookshelf_b", "x": -2.75, "z": -9.4, "box": (-3.2, -2.3, -9.7, -9.4, 1.9)},
+        {"name": "ShelfBack2", "prop": "cel_bookshelf_c", "x": -1.83, "z": -9.4, "box": (-2.28, -1.38, -9.7, -9.4, 1.9)},
         # the hall: shelves all along its back wall, the ladder at one, a round table, Sophia's desk, a lectern
-        {"name": "Shelf1", "prop": "bookshelf", "x": -0.6, "z": -4.4, "box": (-1.05, -0.15, -4.7, -4.4, 1.9)},
-        {"name": "Shelf2", "prop": "bookshelf", "x": 0.35, "z": -4.4, "box": (-0.1, 0.8, -4.7, -4.4, 1.9)},
-        {"name": "Shelf3", "prop": "bookshelf", "x": 1.3, "z": -4.4, "box": (0.85, 1.75, -4.7, -4.4, 1.9)},
-        {"name": "Shelf4", "prop": "bookshelf", "x": 2.25, "z": -4.4, "box": (1.8, 2.7, -4.7, -4.4, 1.9)},
+        {"name": "Shelf1", "prop": "cel_bookshelf_a", "x": -0.6, "z": -4.4, "box": (-1.05, -0.15, -4.7, -4.4, 1.9)},
+        {"name": "Shelf2", "prop": "cel_bookshelf_b", "x": 0.35, "z": -4.4, "box": (-0.1, 0.8, -4.7, -4.4, 1.9)},
+        {"name": "Shelf3", "prop": "cel_bookshelf_c", "x": 1.3, "z": -4.4, "box": (0.85, 1.75, -4.7, -4.4, 1.9)},
+        {"name": "Shelf4", "prop": "cel_bookshelf_a", "x": 2.25, "z": -4.4, "box": (1.8, 2.7, -4.7, -4.4, 1.9)},
         {"name": "HallLadder", "prop": "ladder", "x": 2.95, "z": -4.35, "box": (2.7, 3.2, -4.7, -4.35, 1.5)},
-        {"name": "Shelf5", "prop": "bookshelf", "x": 3.7, "z": -4.4, "box": (3.25, 4.15, -4.7, -4.4, 1.9)},
-        {"name": "Shelf6", "prop": "bookshelf", "x": 4.65, "z": -4.4, "box": (4.2, 5.1, -4.7, -4.4, 1.9)},
+        {"name": "Shelf5", "prop": "cel_bookshelf_b", "x": 3.7, "z": -4.4, "box": (3.25, 4.15, -4.7, -4.4, 1.9)},
+        {"name": "Shelf6", "prop": "cel_bookshelf_c", "x": 4.65, "z": -4.4, "box": (4.2, 5.1, -4.7, -4.4, 1.9)},
         {"name": "TableH", "prop": "table_round", "x": -0.3, "z": -2.5, "box": (-0.6, 0.0, -3.0, -2.5, 0.8)},
         {"name": "StoolH1", "prop": "stool", "x": -0.9, "z": -2.3, "box": (-1.08, -0.72, -2.6, -2.3, 0.5)},
         {"name": "StoolH2", "prop": "stool", "x": 0.3, "z": -2.3, "box": (0.12, 0.48, -2.6, -2.3, 0.5)},

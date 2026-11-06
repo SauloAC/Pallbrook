@@ -34,8 +34,8 @@
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_block0top.obj" id="m_block0t"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_fireplace_front.png" id="tx_block0"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_wall.png" id="tx_block0top"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_blackboard.png" id="tx_p_blackboard"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bookshelf.png" id="tx_p_bookshelf"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_blackboard.png" id="tx_p_cel_blackboard"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bookshelf_b.png" id="tx_p_cel_bookshelf_b"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_desk.png" id="tx_p_desk"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_pew.png" id="tx_p_pew"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
@@ -102,15 +102,15 @@ shader_parameter/tex = ExtResource("tx_block0top")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_blackboard"]
+[sub_resource type="ShaderMaterial" id="mt_p_cel_blackboard"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_blackboard")
+shader_parameter/tex = ExtResource("tx_p_cel_blackboard")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_bookshelf"]
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bookshelf_b"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_bookshelf")
+shader_parameter/tex = ExtResource("tx_p_cel_bookshelf_b")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -169,10 +169,10 @@ size = Vector2(1.0268, 1.1112)
 size = Vector2(1.0268, 1.1112)
 
 [sub_resource type="QuadMesh" id="q_Blackboard"]
-size = Vector2(1.4732, 1.9447)
+size = Vector2(1.4732, 1.9794)
 
 [sub_resource type="QuadMesh" id="q_Shelf"]
-size = Vector2(0.8929, 2.0141)
+size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_TeacherDesk"]
 size = Vector2(1.4286, 1.3890)
@@ -471,14 +471,14 @@ facing = "north"
 use_range = 0.5
 
 [node name="Blackboard" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1500, 5.2523, -6.1000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1500, 5.2697, -6.1000)
 mesh = SubResource("q_Blackboard")
-surface_material_override/0 = SubResource("mt_p_blackboard")
+surface_material_override/0 = SubResource("mt_p_cel_blackboard")
 
 [node name="Shelf" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4500, 5.2871, -6.0500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4500, 5.3391, -6.0500)
 mesh = SubResource("q_Shelf")
-surface_material_override/0 = SubResource("mt_p_bookshelf")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b")
 
 [node name="TeacherDesk" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 4.9745, -4.4000)

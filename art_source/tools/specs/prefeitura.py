@@ -3,6 +3,7 @@
 # lean-to roof, steps go up to a side door in the tower's west wall (out of sight at this angle): a third
 # way in. Inside: the council table, the clerk's desk with the register, shelves of records, a fire in
 # the hearth, a bench in the tower. (No upper floor; no chimney in the art.)
+# (6 Nov) The record shelves are cel-shaded bookcases (art_source/tools/furniture/).
 SPEC = {
     "name": "Prefeitura", "facade": "art_source/facades/house07_noshadow.png",
     # the hall's front (its ground at the door, row 230) and the feet of its piers a little forward, the
@@ -35,8 +36,8 @@ SPEC = {
                       (-1.5, -2.0), (2.2, -0.9), (-2.0, -1.3)]},
     "furniture": [
         {"name": "Desk", "prop": "desk", "x": 3.9, "z": -3.25, "box": (3.18, 4.62, -3.6, -3.25, 0.9)},   # room behind it for the mayor
-        {"name": "ShelfA", "prop": "bookshelf", "x": 1.85, "z": -4.45, "box": (1.4, 2.3, -4.7, -4.4, 1.9)},
-        {"name": "ShelfB", "prop": "bookshelf", "x": 2.8, "z": -4.45, "box": (2.35, 3.25, -4.7, -4.4, 1.9)},
+        {"name": "ShelfA", "prop": "cel_bookshelf_c", "x": 1.85, "z": -4.45, "box": (1.4, 2.3, -4.7, -4.4, 1.9)},
+        {"name": "ShelfB", "prop": "cel_bookshelf_a", "x": 2.8, "z": -4.45, "box": (2.35, 3.25, -4.7, -4.4, 1.9)},
         {"name": "Table", "prop": "table_cloth", "flat": True, "y": 0.57, "x": 1.4, "z": -2.3, "box": (0.5, 2.3, -2.65, -1.95, 0.7)},
         {"name": "StoolA", "prop": "stool", "x": 0.9, "z": -1.65, "box": (0.72, 1.08, -1.95, -1.65, 0.5)},
         {"name": "StoolB", "prop": "stool", "x": 1.9, "z": -1.65, "box": (1.72, 2.08, -1.95, -1.65, 0.5)},

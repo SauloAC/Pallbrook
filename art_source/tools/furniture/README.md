@@ -17,7 +17,8 @@ lines between parts and around the piece, then crops it.
     python3 ../finish.py <out dir> <out dir> [piece ...]     # writes prop_<piece>.png
     # then copy prop_<piece>.png to assets/buildings2d/props/prop_cel_<piece>.png
 
-In use: `bed` and `cabinet` (the clinic). `table_round`, `stool` and `crate` are modelled too, but the
+In use: `bed` and `cabinet` (the clinic); `bookshelf_a`, `_b`, `_c` (the same bookcase, filled three
+ways: the library, the school, the town hall); `blackboard` (the school). `table_round`, `stool` and `crate` are modelled too, but the
 Cainos ones were kept: sturdier. A piece's picture stands at its spec "z" with its foot on the floor:
 give "z" as the front of its footprint.
 (.gdignore: the render project is its own Godot project, not part of the game's)

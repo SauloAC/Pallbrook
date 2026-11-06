@@ -3,6 +3,7 @@
 # Downstairs the entrance hall: a counter, benches to wait on in the wing, the fire in the hearth below
 # the chimney. Stairs along the left wall, from just inside the door, to the schoolroom upstairs, which
 # runs on into the wing: the pupils' desks, and in the wing the teacher's desk and the blackboard.
+# (6 Nov) The blackboard and the bookcase are cel-shaded pieces (art_source/tools/furniture/).
 SPEC = {
     "name": "Escola", "facade": "art_source/facades/house08_noshadow.png",
     # the main front (its ground at the door, row 318) and the feet of its piers a little forward; the
@@ -41,8 +42,8 @@ SPEC = {
         {"name": "BenchBack", "prop": "pew", "x": 2.11, "z": -6.0, "box": (1.6, 2.62, -6.3, -6.0, 0.6)},
         {"name": "BenchFront", "prop": "pew", "x": 2.01, "z": -4.4, "box": (1.5, 2.52, -4.75, -4.4, 0.6)},
         # upstairs: the schoolroom
-        {"name": "Blackboard", "prop": "blackboard", "upper": True, "x": -0.15, "z": -6.1, "box": (-0.85, 0.55, -6.3, -6.05, 1.6)},
-        {"name": "Shelf", "prop": "bookshelf", "upper": True, "x": 1.45, "z": -6.05, "box": (1.0, 1.9, -6.3, -6.0, 1.9)},
+        {"name": "Blackboard", "prop": "cel_blackboard", "upper": True, "x": -0.15, "z": -6.1, "box": (-0.85, 0.55, -6.3, -6.05, 1.6)},
+        {"name": "Shelf", "prop": "cel_bookshelf_b", "upper": True, "x": 1.45, "z": -6.05, "box": (1.0, 1.9, -6.3, -6.0, 1.9)},
         {"name": "TeacherDesk", "prop": "desk", "upper": True, "x": 1.9, "z": -4.4, "box": (1.2, 2.6, -4.75, -4.4, 0.9)},
         {"name": "DeskA1", "prop": "schooldesk", "upper": True, "x": -1.0, "z": -1.6, "box": (-1.4, -0.6, -1.9, -1.6, 0.7)},
         {"name": "DeskB1", "prop": "schooldesk", "upper": True, "x": 0.2, "z": -1.6, "box": (-0.2, 0.6, -1.9, -1.6, 0.7)},
