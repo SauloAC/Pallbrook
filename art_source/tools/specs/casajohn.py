@@ -19,7 +19,7 @@ SPEC = {
     # room x -2.29..1.07, back wall at z -5.5; stairs x -2.29..-1.29 from z -1.0 to -4.2
     # where people stand indoors (x, z; the first is the owner's own spot) and sleep (x, y, z, head angle)
     "npc": {"slots": [(0.404, -1.2), (-0.904, -2.0), (0.804, -2.2)],  # by the door, by the stairs, at the table
-            "bed": (0.554, 2.771, -3.9, 0.0),
+            "bed": (0.554, 2.771, -3.92, 0.0),
             "bed_approach": (-0.504, 2.771, -3.6)},
     "door_art": {"rect": (88, 291, 116, 317), "plane": 1, "hinge": "left"},   # the painted door, which swings open
     "furniture": [
@@ -28,7 +28,7 @@ SPEC = {
         {"name": "StoolB", "prop": "stool", "x": 0.5, "z": -2.5, "box": (0.32, 0.68, -2.8, -2.5, 0.5)},
         {"name": "Barrel", "prop": "barrel_a", "x": 0.65, "z": -4.85, "box": (0.3, 1.0, -5.5, -4.85, 0.8)},
         {"name": "FoodCrate", "prop": "foodcrate", "x": -0.4, "z": -5.0, "box": (-0.75, -0.05, -5.5, -5.0, 0.6)},
-        {"name": "Bed", "prop": "bed", "upper": True, "flat": True, "x": 0.55, "z": -4.5, "box": (0.2, 0.9, -5.2, -3.8, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "upper": True, "split": True, "x": 0.55, "z": -3.8, "box": (0.2, 0.9, -5.2, -3.8, 0.4)},
         {"name": "UpBasket", "prop": "basket", "upper": True, "x": -0.6, "z": -0.6, "box": (-0.9, -0.3, -0.95, -0.6, 0.6)},
     ],
 }

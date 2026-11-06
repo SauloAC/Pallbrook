@@ -15,9 +15,9 @@ SPEC = {
                 "top_tile": "tile_stone_wall.png", "top_tile_px": (128, 40)}],
     # room x -2.20..2.63 (the lean-to from x 1.28, behind z -1.88), back wall at z -4.1; door x -1.16..-0.03
     "npc": {"slots": [(-0.8, -2.6), (-0.6, -1.4), (0.4, -1.2)],  # by the table, mid-room, by the window
-            "bed": (-1.7, 0.0, -2.5, 0.0)},
+            "bed": (-1.7, 0.0, -2.72, 0.0)},
     "furniture": [
-        {"name": "Bed", "prop": "bed", "flat": True, "x": -1.7, "z": -3.3, "box": (-2.05, -1.35, -4.0, -2.6, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "split": True, "x": -1.7, "z": -2.6, "box": (-2.05, -1.35, -4.0, -2.6, 0.4)},
         {"name": "Table", "prop": "table_round", "x": 0.3, "z": -2.4, "box": (0.0, 0.6, -2.9, -2.4, 0.8)},
         {"name": "StoolA", "prop": "stool", "x": -0.2, "z": -2.2, "box": (-0.38, -0.02, -2.5, -2.2, 0.5)},
         {"name": "StoolB", "prop": "stool", "x": 0.6, "z": -1.8, "box": (0.42, 0.78, -2.1, -1.8, 0.5)},

@@ -10,9 +10,9 @@ SPEC = {
     "door_art": {"rect": (164, 104, 189, 142), "hinge": "left"},
     # room x -3.03..3.06, back wall at z -3.7; door x 1.45..2.70
     "npc": {"slots": [(0.5, -1.4), (-1.6, -1.2), (1.4, -1.8)],  # mid-room, by the table, by the prayer table
-            "bed": (-2.5, 0.0, -2.1, 0.0)},
+            "bed": (-2.5, 0.0, -2.32, 0.0)},
     "furniture": [
-        {"name": "Bed", "prop": "bed", "flat": True, "x": -2.5, "z": -2.9, "box": (-2.85, -2.15, -3.6, -2.2, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "split": True, "x": -2.5, "z": -2.2, "box": (-2.85, -2.15, -3.6, -2.2, 0.4)},
         {"name": "Table", "prop": "table", "flat": True, "y": 0.57, "x": -0.4, "z": -2.3, "box": (-1.3, 0.5, -2.65, -1.95, 0.7)},
         {"name": "StoolA", "prop": "stool", "x": -0.8, "z": -1.5, "box": (-0.98, -0.62, -1.8, -1.5, 0.5)},
         {"name": "StoolB", "prop": "stool", "x": 0.0, "z": -1.5, "box": (-0.18, 0.18, -1.8, -1.5, 0.5)},

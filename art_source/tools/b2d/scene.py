@@ -7,6 +7,9 @@ import os
 from .core import COS, SIN, FURN, RES as R, tf
 from . import door as door_mod
 
+SPLIT_HEAD_DEPTH = 1.37   # How far behind a split bed's foot its head stands (building units): as its picture was cut (furniture/finish.py)
+SPLIT_BODY_Y = 0.36       # How high its body lies (building units: 0.5 m), under someone lying in it
+
 
 def build(h):
     SPEC, UP, DECK, NAME, KEY = h.spec, h.UP, h.DECK, h.name, h.key
@@ -92,7 +95,8 @@ def build(h):
         E("Texture2D", R + "props/prop_%s.png" % b["front_tex"], "tx_block%d" % bi); mat("mt_block%d" % bi, "sh_sprite", "tx_block%d" % bi)
         if b.get("top_tile"):
             E("Texture2D", R + b["top_tile"], "tx_block%dtop" % bi); mat("mt_block%dtop" % bi, "sh_tile", "tx_block%dtop" % bi)
-    used = sorted(set(f["prop"] for f in SPEC["furniture"]) | ({"rug"} if SPEC.get("door_rug", True) else set()))
+    used = sorted(set(f["prop"] for f in SPEC["furniture"] if not f.get("split")) | ({"rug"} if SPEC.get("door_rug", True) else set())
+                  | set(f["prop"] + "_" + part for f in SPEC["furniture"] if f.get("split") for part in ("foot", "body", "head")))
     for p in used:
         E("Texture2D", R + "props/prop_%s.png" % p, "tx_p_" + p)
         mat("mt_p_" + p, "sh_sprite", "tx_p_" + p)
@@ -213,7 +217,24 @@ def build(h):
             lift, fpar = 0.0, "."
         w, h = props[f["prop"]]
         qw = w / 32.0 * FURN
-        if f.get("flat"):
+        if f.get("split"):
+            # a bed in three layers (../furniture/finish.py), so that someone lying in it shows between them:
+            # its foot standing at the front of the footprint ("z"), its body flat SPLIT_BODY_Y over the
+            # floor (under the sleeper: NPC.BED_HEIGHT), its head standing SPLIT_HEAD_DEPTH further back.
+            # Each keeps its place on screen: the body's front edge comes forward as it rises, the head
+            # stands sunk into the floor (only its upper rows have anything in them).
+            zf = f["z"]
+            qh = h / 32.0 / COS * FURN
+            S('[sub_resource type="QuadMesh" id="q_%s"]\nsize = Vector2(%.4f, %.4f)\n' % (f["name"], qw, qh))
+            N('[node name="%sFoot" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%s")\nsurface_material_override/0 = SubResource("mt_p_%s_foot")\n'
+              % (f["name"], fpar, tf(f["x"], qh / 2 + lift, zf), f["name"], f["prop"]))
+            N('[node name="%sHead" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%s")\nsurface_material_override/0 = SubResource("mt_p_%s_head")\n'
+              % (f["name"], fpar, tf(f["x"], qh / 2 + lift - SIN / COS * SPLIT_HEAD_DEPTH, zf - SPLIT_HEAD_DEPTH), f["name"], f["prop"]))
+            fh = h / 32.0 / SIN * FURN
+            S('[sub_resource type="QuadMesh" id="q_%sBody"]\nsize = Vector2(%.4f, %.4f)\n' % (f["name"], qw, fh))
+            N('[node name="%s" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%sBody")\nsurface_material_override/0 = SubResource("mt_p_%s_body")\n'
+              % (f["name"], fpar, tf(f["x"], SPLIT_BODY_Y + lift, zf + COS / SIN * SPLIT_BODY_Y - fh / 2, True), f["name"], f["prop"]))
+        elif f.get("flat"):
             qh = h / 32.0 / SIN * FURN
             S('[sub_resource type="QuadMesh" id="q_%s"]\nsize = Vector2(%.4f, %.4f)\n' % (f["name"], qw, qh))
             N('[node name="%s" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%s")\nsurface_material_override/0 = SubResource("mt_p_%s")\n'

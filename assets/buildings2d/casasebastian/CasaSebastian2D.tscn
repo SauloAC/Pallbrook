@@ -21,7 +21,9 @@
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/casasebastian/casasebastian_block0top.obj" id="m_block0t"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_fireplace_front.png" id="tx_block0"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_wall.png" id="tx_block0top"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bed.png" id="tx_p_bed"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_body.png" id="tx_p_cel_bed_body"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_foot.png" id="tx_p_cel_bed_foot"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_head.png" id="tx_p_cel_bed_head"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_crate.png" id="tx_p_crate"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_jar.png" id="tx_p_jar"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_pot.png" id="tx_p_pot"]
@@ -78,9 +80,21 @@ shader_parameter/tex = ExtResource("tx_block0top")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_bed"]
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_body"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_bed")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_body")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_foot"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_foot")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_head"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_head")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -142,7 +156,10 @@ size = Vector3(1.2375, 1.6, 0.8)
 size = Vector2(0.3600, 0.4800)
 
 [sub_resource type="QuadMesh" id="q_Bed"]
-size = Vector2(0.7143, 1.3987)
+size = Vector2(0.7143, 2.3614)
+
+[sub_resource type="QuadMesh" id="q_BedBody"]
+size = Vector2(0.7143, 1.9814)
 
 [sub_resource type="QuadMesh" id="q_Table"]
 size = Vector2(0.7143, 1.3890)
@@ -282,10 +299,20 @@ light_energy = 0.9
 omni_range = 3.0
 shadow_enabled = false
 
-[node name="Bed" type="MeshInstance3D" parent="CasaSebastian_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.1500, 0.3600, -4.5500)
+[node name="BedFoot" type="MeshInstance3D" parent="CasaSebastian_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1500, 1.1807, -3.8500)
 mesh = SubResource("q_Bed")
-surface_material_override/0 = SubResource("mt_p_bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_foot")
+
+[node name="BedHead" type="MeshInstance3D" parent="CasaSebastian_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1500, -0.4520, -5.2200)
+mesh = SubResource("q_Bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_head")
+
+[node name="Bed" type="MeshInstance3D" parent="CasaSebastian_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.1500, 0.3600, -4.5386)
+mesh = SubResource("q_BedBody")
+surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
 [node name="Table" type="MeshInstance3D" parent="CasaSebastian_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7500, 0.6945, -3.0000)

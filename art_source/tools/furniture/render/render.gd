@@ -4,7 +4,9 @@ extends Node
 # DEPTH (the town's camera looks down at 50 degrees; the game stands these pictures up, 1/cos 50 tall,
 # as it does the Cainos ones), cel-shaded in the Cainos art's own colours (ramp.gdshader). Each piece is rendered twice: in colour,
 # and with every part in a flat colour of its own, from which ../finish.py draws the dark lines
-# between the parts and around the piece.
+# between the parts and around the piece. A bed is rendered a third time, each part in the colour of
+# the layer it goes to (its foot, its body, its head: see finish.py), so that the game can stand the
+# three apart and someone lying in it shows between them.
 #   godot --path render render.tscn -- <out dir> [piece ...]      (no pieces: all of them)
 
 const PX := 1.0 / 32.0
@@ -39,6 +41,12 @@ const RAMPS := {
 }
 
 var id_mode := false
+var layer_mode := false
+var layer := Color.BLACK     # The layer of the parts that follow, in a layered piece
+const FOOT := Color(1, 0, 0)
+const BODY := Color(0, 1, 0)
+const HEAD := Color(0, 0, 1)
+const LAYERED := ["bed"]
 var planks := Vector4.ZERO   # The boards' planks for the parts that follow (see ramp.gdshader)
 var next_id := 0
 var piece_root: Node3D
@@ -50,8 +58,9 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(out)
 	var names: Array = Array(args.slice(1)) if args.size() > 1 else PIECES
 	for name in names:
-		for pass_id in [false, true]:
-			id_mode = pass_id
+		for pass_id in ([0, 1, 2] if name in LAYERED else [0, 1]):
+			id_mode = pass_id == 1
+			layer_mode = pass_id == 2
 			next_id = 0
 			var vp := SubViewport.new()
 			vp.transparent_bg = true
@@ -86,7 +95,7 @@ func _ready() -> void:
 			cam.current = true
 			await RenderingServer.frame_post_draw
 			await RenderingServer.frame_post_draw
-			vp.get_texture().get_image().save_png("%s/%s%s.png" % [out, name, "_id" if id_mode else ""])
+			vp.get_texture().get_image().save_png("%s/%s%s.png" % [out, name, ["", "_id", "_layers"][pass_id]])
 			vp.queue_free()
 		print("R ", name)
 	get_tree().quit()
@@ -114,9 +123,11 @@ func _material(ramp: String, group := -1) -> ShaderMaterial:
 			next_id += 1
 		var c := Color.from_hsv(fmod(id * 0.618034, 1.0), 0.6 + 0.4 * float(id % 2), 0.5 + 0.5 * float((id / 2) % 2))
 		cols = [c, c, c, c]
+	elif layer_mode:
+		cols = [layer, layer, layer, layer]
 	for i in 4:
 		m.set_shader_parameter("c%d" % i, cols[i])
-	if not id_mode:
+	if not id_mode and not layer_mode:
 		m.set_shader_parameter("planks", planks)
 	return m
 
@@ -184,12 +195,17 @@ func piece_bed() -> void:
 	var back := -2.0
 	var g := _group()
 	for x in [-w, w - 0.08]:
+		layer = HEAD
 		box("wood", x, x + 0.08, 0.0, 0.9, back, back + 0.08, g)           # head posts
+		layer = FOOT
 		box("wood", x, x + 0.08, 0.0, 0.56, -0.08, 0.0, g)                 # foot posts
+	layer = HEAD
 	planks = Vector4(1, 0, 0, 0.14)
 	box("wood", -w + 0.04, w - 0.04, 0.4, 0.84, back + 0.01, back + 0.06, g)   # headboard
 	planks = Vector4.ZERO
+	layer = FOOT
 	box("wood", -w + 0.04, w - 0.04, 0.24, 0.5, -0.07, -0.02, g)               # footboard
+	layer = BODY
 	for x in [-w, w - 0.06]:
 		box("wood", x, x + 0.06, 0.12, 0.3, back + 0.08, -0.08, g)         # side rails
 	box("linen", -w + 0.06, w - 0.06, 0.26, 0.4, back + 0.08, -0.08)           # mattress

@@ -26,7 +26,9 @@
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/casaclara/casaclara_innerwall.obj" id="m_innerwall"]
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/casaclara/casaclara_timber.obj" id="m_timber"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_basket.png" id="tx_p_basket"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bed.png" id="tx_p_bed"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_body.png" id="tx_p_cel_bed_body"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_foot.png" id="tx_p_cel_bed_foot"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_head.png" id="tx_p_cel_bed_head"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_crate.png" id="tx_p_crate"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_pot2.png" id="tx_p_pot2"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
@@ -85,9 +87,21 @@ shader_parameter/tex = ExtResource("tx_p_basket")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_bed"]
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_body"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_bed")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_body")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_foot"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_foot")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_head"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_head")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -155,7 +169,10 @@ size = Vector2(0.5804, 0.9376)
 size = Vector2(0.7143, 1.5974)
 
 [sub_resource type="QuadMesh" id="q_Bed"]
-size = Vector2(0.7143, 1.3987)
+size = Vector2(0.7143, 2.3614)
+
+[sub_resource type="QuadMesh" id="q_BedBody"]
+size = Vector2(0.7143, 1.9814)
 
 [sub_resource type="QuadMesh" id="q_UpBasket"]
 size = Vector2(0.6250, 1.1460)
@@ -361,10 +378,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2000, 0.7987, -1.5500)
 mesh = SubResource("q_Crate")
 surface_material_override/0 = SubResource("mt_p_crate")
 
-[node name="Bed" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.7500, 2.4600, -2.3500)
+[node name="BedFoot" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7500, 3.2807, -1.6500)
 mesh = SubResource("q_Bed")
-surface_material_override/0 = SubResource("mt_p_bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_foot")
+
+[node name="BedHead" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7500, 1.6480, -3.0200)
+mesh = SubResource("q_Bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_head")
+
+[node name="Bed" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.7500, 2.4600, -2.3386)
+mesh = SubResource("q_BedBody")
+surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
 [node name="UpBasket" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.6730, -1.6000)

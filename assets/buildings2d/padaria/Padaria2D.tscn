@@ -26,7 +26,9 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_a.png" id="tx_p_barrel_a"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_b.png" id="tx_p_barrel_b"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_stack.png" id="tx_p_barrel_stack"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bed.png" id="tx_p_bed"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_body.png" id="tx_p_cel_bed_body"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_foot.png" id="tx_p_cel_bed_foot"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_head.png" id="tx_p_cel_bed_head"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_a.png" id="tx_p_sack_a"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_b.png" id="tx_p_sack_b"]
@@ -89,9 +91,21 @@ shader_parameter/tex = ExtResource("tx_p_barrel_stack")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_bed"]
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_body"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_bed")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_body")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_foot"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_foot")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_head"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_head")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -150,7 +164,10 @@ size = Vector2(0.6696, 1.3196)
 size = Vector2(0.5357, 1.0418)
 
 [sub_resource type="QuadMesh" id="q_Bed"]
-size = Vector2(0.7143, 1.3987)
+size = Vector2(0.7143, 2.3614)
+
+[sub_resource type="QuadMesh" id="q_BedBody"]
+size = Vector2(0.7143, 1.9814)
 
 [sub_resource type="QuadMesh" id="q_UpBarrel"]
 size = Vector2(0.6696, 1.3196)
@@ -334,10 +351,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0000, 0.5209, -0.3000)
 mesh = SubResource("q_SackB")
 surface_material_override/0 = SubResource("mt_p_sack_b")
 
-[node name="Bed" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 3.6000, 2.4600, -2.9000)
+[node name="BedFoot" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6000, 3.2807, -2.2200)
 mesh = SubResource("q_Bed")
-surface_material_override/0 = SubResource("mt_p_bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_foot")
+
+[node name="BedHead" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6000, 1.6480, -3.5900)
+mesh = SubResource("q_Bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_head")
+
+[node name="Bed" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 3.6000, 2.4600, -2.9086)
+mesh = SubResource("q_BedBody")
+surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
 [node name="UpBarrel" type="MeshInstance3D" parent="Padaria_Inside/Padaria_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4000, 2.7598, -3.0510)

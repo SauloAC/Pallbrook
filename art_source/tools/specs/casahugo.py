@@ -20,9 +20,9 @@ SPEC = {
     # room x -1.67..1.70, back wall at z -4.3, floor 0.3 up; door x -0.53..0.50
     "npc": {"slots": [(0.0, -1.25), (-0.55, -1.1), (0.9, -1.5)],  # before the table, by the crate, by the jar
                                                                   # (behind the table is too narrow to walk to)
-            "bed": (-1.27, 0.3, -2.75, 0.0)},
+            "bed": (-1.27, 0.3, -3.02, 0.0)},
     "furniture": [
-        {"name": "Bed", "prop": "bed", "flat": True, "x": -1.27, "z": -3.6, "box": (-1.62, -0.92, -4.3, -2.9, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "split": True, "x": -1.27, "z": -2.9, "box": (-1.62, -0.92, -4.3, -2.9, 0.4)},
         {"name": "Table", "prop": "table_cloth", "flat": True, "y": 0.57, "x": 0.0, "z": -2.4, "box": (-0.9, 0.9, -2.75, -2.05, 0.7)},
         {"name": "StoolA", "prop": "stool", "x": -0.4, "z": -1.75, "box": (-0.58, -0.22, -2.05, -1.75, 0.5)},
         {"name": "StoolB", "prop": "stool", "x": 0.4, "z": -1.75, "box": (0.22, 0.58, -2.05, -1.75, 0.5)},

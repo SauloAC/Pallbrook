@@ -23,19 +23,19 @@ const INTERIOR_SLOTS := {
 	"Taverna": [Vector3(-1.754, 0.0, -3.935), Vector3(-4.834, 0.0, 2.295), Vector3(-4.694, 0.0, -1.065), Vector3(-1.754, 0.0, -0.925), Vector3(-2.174, 0.0, 2.155), Vector3(-1.264, 0.0, 2.155), Vector3(-0.354, 0.0, 4.955), Vector3(-2.944, 0.0, 4.535), Vector3(-2.132, 0.0, 4.535), Vector3(-1.334, 0.0, 4.535), Vector3(2.446, 0.0, 4.045), Vector3(-0.074, 0.0, 5.935)],
 }
 
-# The foot of the bed and which way the head points (degrees around Y)
+# The foot of the bed (just behind its footboard) and which way the head points (degrees around Y)
 const BED_SPOTS := {
-	"Casa1": [Vector3(-6.409, 0.0, -2.24), 0.0],
-	"CasaClara": [Vector3(-0.2, 2.94, -1.75), 0.0],
-	"CasaHugo": [Vector3(-1.756, 0.42, -3.15), 0.0],
-	"CasaJohn": [Vector3(0.251, 3.879, -4.76), 0.0],
-	"CasaSarah": [Vector3(2.966, 3.402, -4.62), 0.0],
-	"CasaSebastian": [Vector3(2.701, 0.0, -4.83), 0.0],
-	"CasaSophia": [Vector3(-1.549, 0.0, -2.8), 0.0],
-	"Fazenda": [Vector3(-8.028, 3.92, -4.48), 0.0],
-	"Casa2": [Vector3(0.757, 0.0, -5.53), 0.0],
-	"Padaria": [Vector3(9.694, 2.94, -2.52), 0.0],
-	"Taverna": [Vector3(-8.194, 3.878, -3.501), 0.0],
+	"Casa1": [Vector3(-6.409, 0.0, -2.548), 0.0],
+	"CasaClara": [Vector3(-0.2, 2.94, -1.778), 0.0],
+	"CasaHugo": [Vector3(-1.756, 0.42, -3.528), 0.0],
+	"CasaJohn": [Vector3(0.251, 3.879, -4.788), 0.0],
+	"CasaSarah": [Vector3(2.966, 3.402, -4.928), 0.0],
+	"CasaSebastian": [Vector3(2.701, 0.0, -4.858), 0.0],
+	"CasaSophia": [Vector3(-1.549, 0.0, -3.108), 0.0],
+	"Fazenda": [Vector3(-8.028, 3.92, -4.788), 0.0],
+	"Casa2": [Vector3(0.757, 0.0, -5.558), 0.0],
+	"Padaria": [Vector3(9.694, 2.94, -2.576), 0.0],
+	"Taverna": [Vector3(-8.194, 3.878, -3.669), 0.0],
 }
 
 # Upstairs beds: where to walk to first, beside the bed on the upper floor

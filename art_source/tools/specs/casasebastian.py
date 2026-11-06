@@ -14,10 +14,10 @@ SPEC = {
     # room x -1.70..1.70, back wall at z -5.3
     # where people stand indoors (x, z; the first is the owner's own spot) and sleep (x, y, z, head angle)
     "npc": {"slots": [(-0.752, -2.3), (0.598, -2.0), (0.398, -3.3)],  # at the table, mid-room, by the bed
-            "bed": (1.148, 0.0, -3.95, 0.0)},
+            "bed": (1.148, 0.0, -3.97, 0.0)},
     "door_art": {"rect": (32, 237, 62, 277), "hinge": "left"},   # the painted door, which swings open
     "furniture": [
-        {"name": "Bed", "prop": "bed", "flat": True, "x": 1.15, "z": -4.55, "box": (0.8, 1.5, -5.3, -3.85, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "split": True, "x": 1.15, "z": -3.85, "box": (0.8, 1.5, -5.3, -3.85, 0.4)},
         {"name": "Table", "prop": "table_round", "x": -0.75, "z": -3.0, "box": (-1.05, -0.45, -3.5, -3.0, 0.8)},
         {"name": "StoolA", "prop": "stool", "x": -1.3, "z": -2.85, "box": (-1.48, -1.12, -3.15, -2.85, 0.5)},
         {"name": "StoolB", "prop": "stool", "x": -0.2, "z": -2.85, "box": (-0.38, -0.02, -3.15, -2.85, 0.5)},

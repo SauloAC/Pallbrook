@@ -63,7 +63,7 @@ SPEC = {
     # Tomas at the anvil first, then: before the anvil, at the hearth, in the front of the house, by his table,
     # among the fuel, by the door from the house
     "npc": {"slots": [(-1.15, -4.95), (-1.15, -3.65), (-2.6, -3.42), (1.95, -1.8), (1.0, -2.25), (3.6, -3.6), (0.05, -3.9)],
-            "bed": (2.15, 0.0, -4.45, 0.0)},
+            "bed": (2.15, 0.0, -4.47, 0.0)},
     "furniture": [
         # the shed's things are seen from the street too, under the eave ("outside")
         # the forge: the anvil beside the hearth's corner (clear of the middle post on screen), the
@@ -82,7 +82,7 @@ SPEC = {
         {"name": "Table", "prop": "table_round", "x": 1.0, "z": -1.35, "box": (0.7, 1.3, -1.6, -1.1, 0.8)},
         {"name": "Stool", "prop": "stool", "x": 1.0, "z": -0.7, "box": (0.82, 1.18, -0.85, -0.55, 0.5)},
         # the back of the room: the bed along the east wall, a cabinet
-        {"name": "Bed", "prop": "bed", "flat": True, "x": 2.15, "z": -5.05, "box": (1.8, 2.5, -5.75, -4.35, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "split": True, "x": 2.15, "z": -4.35, "box": (1.8, 2.5, -5.75, -4.35, 0.4)},
         {"name": "Cabinet", "prop": "cabinet", "x": 1.05, "z": -5.55, "box": (0.7, 1.4, -5.75, -5.45, 1.6)},
     ],
 }

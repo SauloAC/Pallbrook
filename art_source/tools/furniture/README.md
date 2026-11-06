@@ -17,7 +17,14 @@ lines between parts and around the piece, then crops it.
     python3 ../finish.py <out dir> <out dir> [piece ...]     # writes prop_<piece>.png
     # then copy prop_<piece>.png to assets/buildings2d/props/prop_cel_<piece>.png
 
-In use: `bed` and `cabinet` (the clinic); `bookshelf_a`, `_b`, `_c` (the same bookcase, filled three
+A bed is rendered a third time, each part in the colour of its layer, and `finish.py` also writes it
+in three layers (`prop_bed_foot`, `_body`, `_head`, each the size of the whole picture). With
+`"split": True` in a spec the generator stands the foot at the front of the footprint ("z"), lays the
+body flat half a metre up and stands the head 1.37 further back, each where its pixels stay in place on
+screen: someone lying in the bed (NPC.BED_HEIGHT) shows over the blanket, the footboard over their feet.
+The sleeper's spot (the spec's "bed") is just behind the footboard.
+
+In use: `bed` (split, in every home and the clinic) and `cabinet` (the clinic); `bookshelf_a`, `_b`, `_c` (the same bookcase, filled three
 ways: the library, the school, the town hall); `blackboard` (the school). `table_round`, `stool` and `crate` are modelled too, but the
 Cainos ones were kept: sturdier. A piece's picture stands at its spec "z" with its foot on the floor:
 give "z" as the front of its footprint.

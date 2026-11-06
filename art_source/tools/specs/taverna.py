@@ -38,7 +38,7 @@ SPEC = {
     "npc": {"slots": [(1.2, -7.35), (-1.0, -2.9), (-0.9, -5.3), (1.2, -5.2),
                       (0.9, -3.0), (1.55, -3.0), (2.2, -1.0), (0.35, -1.3),
                       (0.93, -1.3), (1.5, -1.3), (4.2, -1.65), (2.4, -0.3)],
-            "bed": (-3.4, 2.77, -7.04, 0.0),
+            "bed": (-3.4, 2.77, -7.16, 0.0),
             "bed_approach": (-2.4, 2.77, -7.0)},
     "furniture": [
         # the bar: the counter with three stools before it, the bottles and the barrels behind it
@@ -78,11 +78,11 @@ SPEC = {
         {"name": "YardStoolB2", "prop": "stool", "outside": True, "x": 4.15, "z": -0.5},
         # upstairs, the rooms off the corridor: a guest's at the front with a table, a guest's in the middle
         # with a crate, Marta's at the back with her chest of drawers
-        {"name": "GuestBed", "prop": "bed", "upper": True, "flat": True, "x": -3.4, "z": -2.07, "box": (-3.74, -3.06, -2.75, -1.39, 0.4)},
+        {"name": "GuestBed", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -1.39, "box": (-3.74, -3.06, -2.75, -1.39, 0.4)},
         {"name": "GuestTable", "prop": "table_round", "upper": True, "x": -2.3, "z": -0.7, "box": (-2.6, -2.0, -1.2, -0.7, 0.8)},
-        {"name": "GuestBed2", "prop": "bed", "upper": True, "flat": True, "x": -3.4, "z": -4.92, "box": (-3.74, -3.06, -5.6, -4.24, 0.4)},
+        {"name": "GuestBed2", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -4.24, "box": (-3.74, -3.06, -5.6, -4.24, 0.4)},
         {"name": "GuestCrate", "prop": "crate", "upper": True, "x": -2.3, "z": -3.6, "box": (-2.6, -2.0, -4.1, -3.6, 0.9)},
-        {"name": "Bed", "prop": "bed", "upper": True, "flat": True, "x": -3.4, "z": -7.72, "box": (-3.74, -3.06, -8.4, -7.04, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -7.04, "box": (-3.74, -3.06, -8.4, -7.04, 0.4)},
         {"name": "Cabinet", "prop": "cabinet", "upper": True, "x": -2.4, "z": -8.15, "box": (-2.7, -2.1, -8.5, -8.15, 1.6)},
         # the landing hall over the main house: a table and a stool, a barrel
         {"name": "HallTable", "prop": "table_round", "upper": True, "x": 0.9, "z": -5.3, "box": (0.6, 1.2, -5.8, -5.3, 0.8)},

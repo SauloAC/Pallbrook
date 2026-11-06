@@ -38,7 +38,7 @@ def write_gd(layouts, path):
          "const INTERIOR_SLOTS := {"]
     for name, lay in layouts.items():
         L.append('\t"%s": [%s],' % (name, ", ".join(_v(p) for p in lay["slots"])))
-    L += ["}", "", "# The foot of the bed and which way the head points (degrees around Y)", "const BED_SPOTS := {"]
+    L += ["}", "", "# The foot of the bed (just behind its footboard) and which way the head points (degrees around Y)", "const BED_SPOTS := {"]
     for name, lay in layouts.items():
         if lay["bed"]:
             L.append('\t"%s": [%s, %s],' % (name, _v(lay["bed"][0]), repr(float(lay["bed"][1]))))

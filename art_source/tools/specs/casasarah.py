@@ -24,7 +24,7 @@ SPEC = {
                 "top_tile": "tile_stone_wall.png", "top_tile_px": (128, 40)}],
     # room x -2.06..0.97, back wall at z -5.4; stairs x -2.06..-1.06 from z -1.3 to -4.1
     "npc": {"slots": [(0.2, -2.3), (-0.5, -1.0), (0.5, -1.6)],  # at the table, by the door, mid-room
-            "bed": (0.4, 2.43, -3.8, 0.0),
+            "bed": (0.4, 2.43, -4.02, 0.0),
             "bed_approach": (-0.4, 2.43, -3.6)},
     "furniture": [
         {"name": "Table", "prop": "table_round", "x": 0.2, "z": -3.0, "box": (-0.1, 0.5, -3.5, -3.0, 0.8)},
@@ -32,7 +32,7 @@ SPEC = {
         {"name": "StoolB", "prop": "stool", "x": 0.72, "z": -2.85, "box": (0.54, 0.9, -3.15, -2.85, 0.5)},
         {"name": "Barrel", "prop": "barrel_a", "x": 0.55, "z": -4.75, "box": (0.2, 0.9, -5.4, -4.75, 0.8)},
         {"name": "Crate", "prop": "crate", "x": -1.55, "z": -4.85, "box": (-1.9, -1.2, -5.4, -4.85, 0.9)},
-        {"name": "Bed", "prop": "bed", "upper": True, "flat": True, "x": 0.4, "z": -4.6, "box": (0.05, 0.75, -5.3, -3.9, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "upper": True, "split": True, "x": 0.4, "z": -3.9, "box": (0.05, 0.75, -5.3, -3.9, 0.4)},
         {"name": "UpBasket", "prop": "basket", "upper": True, "x": 0.3, "z": -1.4, "box": (0.0, 0.6, -1.75, -1.4, 0.6)},
     ],
 }

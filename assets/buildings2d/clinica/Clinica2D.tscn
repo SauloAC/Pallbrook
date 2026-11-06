@@ -33,7 +33,9 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/fx/fx_smoke_ramp.png" id="tx_smoke_ramp"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/fx/fx_flame.png" id="tx_flame"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_basket.png" id="tx_p_basket"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed.png" id="tx_p_cel_bed"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_body.png" id="tx_p_cel_bed_body"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_foot.png" id="tx_p_cel_bed_foot"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_head.png" id="tx_p_cel_bed_head"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_cabinet.png" id="tx_p_cel_cabinet"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_crate.png" id="tx_p_crate"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
@@ -101,9 +103,21 @@ shader_parameter/tex = ExtResource("tx_p_basket")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_cel_bed"]
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_body"]
 shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_cel_bed")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_body")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_foot"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_foot")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_head"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_head")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -172,6 +186,9 @@ size = Vector2(0.6250, 1.1460)
 
 [sub_resource type="QuadMesh" id="q_Bed"]
 size = Vector2(0.7143, 2.3614)
+
+[sub_resource type="QuadMesh" id="q_BedBody"]
+size = Vector2(0.7143, 1.9814)
 
 [sub_resource type="QuadMesh" id="q_UpTable"]
 size = Vector2(0.7143, 1.3890)
@@ -411,10 +428,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8500, 0.5730, -0.5500)
 mesh = SubResource("q_Basket")
 surface_material_override/0 = SubResource("mt_p_basket")
 
-[node name="Bed" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
+[node name="BedFoot" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 3.5607, -2.9000)
 mesh = SubResource("q_Bed")
-surface_material_override/0 = SubResource("mt_p_cel_bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_foot")
+
+[node name="BedHead" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 1.9280, -4.2700)
+mesh = SubResource("q_Bed")
+surface_material_override/0 = SubResource("mt_p_cel_bed_head")
+
+[node name="Bed" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.9000, 2.7400, -3.5886)
+mesh = SubResource("q_BedBody")
+surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
 [node name="UpTable" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3000, 3.0745, -1.4000)

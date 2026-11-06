@@ -21,7 +21,7 @@ SPEC = {
               "lower_front_plane": 0, "show_upstairs": [1], "stair_wall_tile": "tile_stone_light.png"},
     # stable x -3.67..2.00, hall x 2.25..3.29 (stairs x 2.29..3.29, z -0.6 to -3.8), back wall at z -5.3
     "npc": {"slots": [(-2.3, -2.6), (0.0, -3.0), (-1.2, -1.5)],   # tending the stable, by the feed, by the arches
-            "bed": (-3.0, 2.8, -3.7, 0.0),
+            "bed": (-3.0, 2.8, -3.92, 0.0),
             "bed_approach": (-2.0, 2.8, -3.6)},
     "furniture": [
         # the stable: feed and stores along the back wall
@@ -31,7 +31,7 @@ SPEC = {
         {"name": "FoodCrate", "prop": "foodcrate", "x": 0.5, "z": -5.0, "box": (0.15, 0.85, -5.3, -5.0, 0.6)},
         {"name": "Basket", "prop": "basket", "x": 1.4, "z": -4.95, "box": (1.1, 1.7, -5.3, -4.95, 0.6)},
         # Ada's room upstairs
-        {"name": "Bed", "prop": "bed", "upper": True, "flat": True, "x": -3.0, "z": -4.5, "box": (-3.35, -2.65, -5.2, -3.8, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "upper": True, "split": True, "x": -3.0, "z": -3.8, "box": (-3.35, -2.65, -5.2, -3.8, 0.4)},
         {"name": "Table", "prop": "table_round", "upper": True, "x": -0.8, "z": -3.2, "box": (-1.1, -0.5, -3.7, -3.2, 0.8)},
         {"name": "StoolA", "prop": "stool", "upper": True, "x": -1.35, "z": -3.05, "box": (-1.53, -1.17, -3.35, -3.05, 0.5)},
         {"name": "StoolB", "prop": "stool", "upper": True, "x": -0.25, "z": -3.05, "box": (-0.43, -0.07, -3.35, -3.05, 0.5)},

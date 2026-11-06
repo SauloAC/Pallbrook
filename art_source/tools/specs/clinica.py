@@ -3,7 +3,7 @@
 # Downstairs the consulting room: the medicine cabinet and the outbreak board on the back wall, a small
 # table where patients sit. Upstairs the doctor's room, with his bed. The chimney smokes.
 # (6 Nov) The bed and the cabinet are the first cel-shaded pieces (art_source/tools/furniture/: modelled
-# in 3D and rendered in the Cainos colours), the bed now standing up like the rest; the table, stools
+# in 3D and rendered in the Cainos colours), the bed in three layers so a sleeper shows; the table, stools
 # and crates stay the Cainos ones, sturdier than their renders.
 SPEC = {
     "name": "Clinica", "facade": "art_source/facades/house01_noshadow.png",
@@ -32,7 +32,7 @@ SPEC = {
         {"name": "StoolB", "prop": "stool", "x": 0.15, "z": -1.3, "box": (-0.03, 0.33, -1.6, -1.3, 0.5), "seat": "west"},
         {"name": "Basket", "prop": "basket", "x": -0.85, "z": -0.55, "box": (-1.1, -0.6, -0.9, -0.55, 0.6)},
         # the doctor's room upstairs
-        {"name": "Bed", "prop": "cel_bed", "upper": True, "x": 1.9, "z": -2.9, "box": (1.55, 2.25, -4.3, -2.9, 0.4)},
+        {"name": "Bed", "prop": "cel_bed", "upper": True, "split": True, "x": 1.9, "z": -2.9, "box": (1.55, 2.25, -4.3, -2.9, 0.4)},
         {"name": "UpTable", "prop": "table_round", "upper": True, "x": 0.3, "z": -1.4, "box": (0.0, 0.6, -1.9, -1.4, 0.8)},
         {"name": "UpStool", "prop": "stool", "upper": True, "x": -0.2, "z": -1.15, "box": (-0.38, -0.02, -1.45, -1.15, 0.5)},
         {"name": "UpCrate", "prop": "crate", "upper": True, "x": 2.1, "z": -1.0, "box": (1.75, 2.45, -1.55, -1.0, 0.9)},
