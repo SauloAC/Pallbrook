@@ -199,7 +199,7 @@ def build(h):
               % (f["name"], fpar, tf(f["x"], lift + qh * 0.8, f["z"] + 0.6), f["glow"]))
 
     # ---------- collision ----------
-    WALL = 5.4 if UP else 3.2
+    WALL = max(5.4, UP["height"] + 2.4) if UP else 3.2      # a tall ground floor (the school) needs taller walls
     FZ_ = UP.get("front_z", 0.0) if UP else 0.0
     FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
     shapes.append(("Back", xw0, xw1, 0, WALL, -D, ZB))

@@ -298,32 +298,32 @@ mesh = SubResource("q_Lectern")
 surface_material_override/0 = SubResource("mt_p_lectern")
 
 [node name="PewW1" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.5556, -1.7000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5556, -1.7000)
 mesh = SubResource("q_PewW1")
 surface_material_override/0 = SubResource("mt_p_pew")
 
 [node name="PewE1" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.5556, -1.7000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5556, -1.7000)
 mesh = SubResource("q_PewE1")
 surface_material_override/0 = SubResource("mt_p_pew")
 
 [node name="PewW2" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.5556, -2.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5556, -2.6000)
 mesh = SubResource("q_PewW2")
 surface_material_override/0 = SubResource("mt_p_pew")
 
 [node name="PewE2" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.5556, -2.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5556, -2.6000)
 mesh = SubResource("q_PewE2")
 surface_material_override/0 = SubResource("mt_p_pew")
 
 [node name="PewW3" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.5556, -3.5000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5556, -3.5000)
 mesh = SubResource("q_PewW3")
 surface_material_override/0 = SubResource("mt_p_pew")
 
 [node name="PewE3" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.5556, -3.5000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5556, -3.5000)
 mesh = SubResource("q_PewE3")
 surface_material_override/0 = SubResource("mt_p_pew")
 
@@ -346,27 +346,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1000, 0.5000, -5.1000)
 shape = SubResource("b_Lectern")
 
 [node name="PewW1" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.3000, -1.8750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.3000, -1.8750)
 shape = SubResource("b_PewW1")
 
 [node name="PewE1" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.3000, -1.8750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.3000, -1.8750)
 shape = SubResource("b_PewE1")
 
 [node name="PewW2" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.3000, -2.7750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.3000, -2.7750)
 shape = SubResource("b_PewW2")
 
 [node name="PewE2" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.3000, -2.7750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.3000, -2.7750)
 shape = SubResource("b_PewE2")
 
 [node name="PewW3" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.3000, -3.6750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.3000, -3.6750)
 shape = SubResource("b_PewW3")
 
 [node name="PewE3" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9500, 0.3000, -3.6750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.3000, -3.6750)
 shape = SubResource("b_PewE3")
 
 [node name="Back" type="CollisionShape3D" parent="Walls"]

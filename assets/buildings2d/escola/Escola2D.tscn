@@ -1,0 +1,643 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://assets/buildings2d/sprite_surface.gdshader" id="sh_sprite"]
+[ext_resource type="Shader" path="res://assets/buildings2d/tile_surface.gdshader" id="sh_tile"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_wood_floor.png" id="tx_floor"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_light.png" id="tx_wall"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_beam.png" id="tx_beam"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stair_tread.png" id="tx_tread"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_rail_wood.png" id="tx_rail"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_stairtreads.obj" id="m_stairtreads"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_stairside.obj" id="m_stairside"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_landingtop.obj" id="m_landingtop"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_upperfloor.obj" id="m_upperfloor"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_railing.obj" id="m_railing"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_upperrailing.obj" id="m_upperrailing"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_lowerfront.obj" id="m_lowerfront"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_uppertimber.obj" id="m_uppertimber"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_front0.obj" id="m_front0"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/escola/escola_facade.png" id="tx_escola_facade"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_front1.obj" id="m_front1"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_front2.obj" id="m_front2"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_front3.obj" id="m_front3"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_roof.obj" id="m_roof"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_body.obj" id="m_body"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_floor.obj" id="m_floor"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_innerwall.obj" id="m_innerwall"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_timber.obj" id="m_timber"]
+[ext_resource type="Shader" path="res://assets/buildings2d/fx/fx_smoke.gdshader" id="sh_smoke"]
+[ext_resource type="Shader" path="res://assets/buildings2d/fx/fx_flame.gdshader" id="sh_flame"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/fx/fx_smoke.png" id="tx_smoke"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/fx/fx_smoke_ramp.png" id="tx_smoke_ramp"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/fx/fx_flame.png" id="tx_flame"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_block0front.obj" id="m_block0f"]
+[ext_resource type="ArrayMesh" path="res://assets/buildings2d/escola/escola_block0top.obj" id="m_block0t"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_fireplace_front.png" id="tx_block0"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_wall.png" id="tx_block0top"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_blackboard.png" id="tx_p_blackboard"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bookshelf.png" id="tx_p_bookshelf"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_desk.png" id="tx_p_desk"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_pew.png" id="tx_p_pew"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_schooldesk.png" id="tx_p_schooldesk"]
+[ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/escola/escola_door.png" id="tx_door"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+
+[sub_resource type="ShaderMaterial" id="mt_floor"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_floor")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_wall"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_wall")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_beam"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_beam")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_tread"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_tread")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_rail"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_rail")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_escola_facade"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_escola_facade")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_smoke"]
+shader = ExtResource("sh_smoke")
+shader_parameter/smoke = ExtResource("tx_smoke")
+shader_parameter/ramp = ExtResource("tx_smoke_ramp")
+
+[sub_resource type="ShaderMaterial" id="mt_flame"]
+shader = ExtResource("sh_flame")
+shader_parameter/frames = ExtResource("tx_flame")
+
+[sub_resource type="ShaderMaterial" id="mt_block0"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_block0")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_block0top"]
+shader = ExtResource("sh_tile")
+shader_parameter/tex = ExtResource("tx_block0top")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_blackboard"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_blackboard")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_bookshelf"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_bookshelf")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_desk"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_desk")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_pew"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_pew")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_rug"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_rug")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_schooldesk"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_schooldesk")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_door"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_door")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_opening"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_opening")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="QuadMesh" id="q_door"]
+size = Vector2(1.0938, 1.7988)
+
+[sub_resource type="BoxShape3D" id="b_doorway"]
+size = Vector3(1.3938, 1.6, 0.8)
+
+[sub_resource type="QuadMesh" id="q_flame0"]
+size = Vector2(0.3600, 0.4400)
+
+[sub_resource type="QuadMesh" id="q_Counter"]
+size = Vector2(1.4286, 1.3890)
+
+[sub_resource type="QuadMesh" id="q_BenchBack"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="QuadMesh" id="q_BenchFront"]
+size = Vector2(1.0268, 1.1112)
+
+[sub_resource type="QuadMesh" id="q_Blackboard"]
+size = Vector2(1.4732, 1.9447)
+
+[sub_resource type="QuadMesh" id="q_Shelf"]
+size = Vector2(0.8929, 2.0141)
+
+[sub_resource type="QuadMesh" id="q_TeacherDesk"]
+size = Vector2(1.4286, 1.3890)
+
+[sub_resource type="QuadMesh" id="q_DeskA1"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DeskB1"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DeskA2"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DeskB2"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DeskA3"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DeskB3"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DeskA4"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DeskB4"]
+size = Vector2(0.8036, 1.0418)
+
+[sub_resource type="QuadMesh" id="q_DoorRug"]
+size = Vector2(0.8482, 0.4662)
+
+[sub_resource type="QuadMesh" id="q_smoke"]
+size = Vector2(0.9, 3.2)
+
+[sub_resource type="BoxShape3D" id="b_Fireplace"]
+size = Vector3(0.9000, 2.0900, 0.7000)
+
+[sub_resource type="BoxShape3D" id="b_Counter"]
+size = Vector3(1.4400, 0.9000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_BenchBack"]
+size = Vector3(1.0200, 0.6000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_BenchFront"]
+size = Vector3(1.0200, 0.6000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_Blackboard"]
+size = Vector3(1.4000, 1.6000, 0.2500)
+
+[sub_resource type="BoxShape3D" id="b_Shelf"]
+size = Vector3(0.9000, 1.9000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_TeacherDesk"]
+size = Vector3(1.4000, 0.9000, 0.3500)
+
+[sub_resource type="BoxShape3D" id="b_DeskA1"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_DeskB1"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_DeskA2"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_DeskB2"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_DeskA3"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_DeskB3"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_DeskA4"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_DeskB4"]
+size = Vector3(0.8000, 0.7000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_Back"]
+size = Vector3(5.7500, 6.6800, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_West"]
+size = Vector3(0.3000, 6.6800, 6.7500)
+
+[sub_resource type="BoxShape3D" id="b_FrontLeft"]
+size = Vector3(0.4062, 6.6800, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_Front1"]
+size = Vector3(0.6250, 6.6800, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_Lintel1"]
+size = Vector3(1.1875, 4.9298, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_FrontRight"]
+size = Vector3(0.5312, 6.6800, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_NotchSide"]
+size = Vector3(0.3000, 6.6800, 3.7400)
+
+[sub_resource type="BoxShape3D" id="b_NotchFront"]
+size = Vector3(2.2062, 6.6800, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_East"]
+size = Vector3(0.3000, 6.6800, 3.1600)
+
+[sub_resource type="BoxShape3D" id="b_UpperDoor"]
+size = Vector3(1.0938, 1.9000, 0.3000)
+
+[sub_resource type="BoxShape3D" id="b_SlabWing"]
+size = Vector3(1.9063, 0.2000, 2.7100)
+
+[sub_resource type="BoxShape3D" id="b_SlabA"]
+size = Vector3(2.3438, 0.2000, 6.3000)
+
+[sub_resource type="BoxShape3D" id="b_SlabFront"]
+size = Vector3(0.9000, 0.2000, 1.2500)
+
+[sub_resource type="BoxShape3D" id="b_Railing"]
+size = Vector3(0.1000, 1.2000, 3.4000)
+
+[sub_resource type="BoxShape3D" id="b_RailingFront"]
+size = Vector3(1.0000, 1.2000, 0.1000)
+
+[sub_resource type="BoxShape3D" id="b_Landing"]
+size = Vector3(0.9500, 4.2800, 0.6500)
+
+[sub_resource type="ConvexPolygonShape3D" id="c_Stairs"]
+points = PackedVector3Array(-2.5125, 0.0000, -1.1400, -2.5125, 0.0000, -5.6500, -2.5125, 4.2800, -5.6500, -2.5125, 4.2800, -5.5400, -1.6125, 0.0000, -1.1400, -1.6125, 0.0000, -5.6500, -1.6125, 4.2800, -5.6500, -1.6125, 4.2800, -5.5400)
+
+[sub_resource type="ConvexPolygonShape3D" id="c_StairRail"]
+points = PackedVector3Array(-1.6125, 0.0000, -1.2500, -1.6125, 3.3073, -4.6500, -1.6125, 4.3073, -4.6500, -1.6125, 1.0000, -1.2500, -1.5325, 0.0000, -1.2500, -1.5325, 3.3073, -4.6500, -1.5325, 4.3073, -4.6500, -1.5325, 1.0000, -1.2500)
+
+[node name="Escola2D" type="Node3D"]
+
+[node name="Escola_Front" type="Node3D" parent="."]
+
+[node name="Plane0" type="MeshInstance3D" parent="Escola_Front"]
+mesh = ExtResource("m_front0")
+material_override = SubResource("mt_escola_facade")
+
+[node name="Plane1" type="MeshInstance3D" parent="Escola_Front"]
+mesh = ExtResource("m_front1")
+material_override = SubResource("mt_escola_facade")
+
+[node name="Plane2" type="MeshInstance3D" parent="Escola_Front"]
+mesh = ExtResource("m_front2")
+material_override = SubResource("mt_escola_facade")
+
+[node name="Plane3" type="MeshInstance3D" parent="Escola_Front"]
+mesh = ExtResource("m_front3")
+material_override = SubResource("mt_escola_facade")
+
+[node name="Door" type="Node3D" parent="Escola_Front"]
+script = ExtResource("sc_door")
+
+[node name="Opening" type="MeshInstance3D" parent="Escola_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8594, 0.8994, 0.0120)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_opening")
+
+[node name="Leaf" type="Node3D" parent="Escola_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4062, 0.0000, 0.0240)
+
+[node name="Panel" type="MeshInstance3D" parent="Escola_Front/Door/Leaf"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5469, 0.8994, 0.0000)
+mesh = SubResource("q_door")
+surface_material_override/0 = SubResource("mt_door")
+
+[node name="Doorway" type="Area3D" parent="Escola_Front/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8594, 0.8000, 0.1000)
+collision_layer = 0
+
+[node name="Shape" type="CollisionShape3D" parent="Escola_Front/Door/Doorway"]
+shape = SubResource("b_doorway")
+
+[node name="Escola_Roof" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_roof")
+material_override = SubResource("mt_escola_facade")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = ExtResource("m_body")
+material_override = SubResource("mt_escola_facade")
+
+[node name="Escola_Inside" type="Node3D" parent="."]
+
+[node name="Floor" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_floor")
+material_override = SubResource("mt_floor")
+
+[node name="InnerWall" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_innerwall")
+material_override = SubResource("mt_wall")
+
+[node name="Timber" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_timber")
+material_override = SubResource("mt_beam")
+
+[node name="Furniture" type="Node3D" parent="Escola_Inside"]
+
+[node name="Escola_Upper" type="Node3D" parent="Escola_Inside"]
+
+[node name="Stairtreads" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_stairtreads")
+material_override = SubResource("mt_tread")
+
+[node name="Stairside" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_stairside")
+material_override = SubResource("mt_wall")
+
+[node name="Landingtop" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_landingtop")
+material_override = SubResource("mt_floor")
+
+[node name="Upperfloor" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+mesh = ExtResource("m_upperfloor")
+material_override = SubResource("mt_floor")
+
+[node name="Railing" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_railing")
+material_override = SubResource("mt_rail")
+
+[node name="Upperrailing" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+mesh = ExtResource("m_upperrailing")
+material_override = SubResource("mt_rail")
+
+[node name="Lowerfront" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+mesh = ExtResource("m_lowerfront")
+material_override = SubResource("mt_escola_facade")
+
+[node name="Uppertimber" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+mesh = ExtResource("m_uppertimber")
+material_override = SubResource("mt_beam")
+
+[node name="UpstairsPlane2" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+mesh = ExtResource("m_front2")
+material_override = SubResource("mt_escola_facade")
+
+[node name="FireplaceFront" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_block0f")
+material_override = SubResource("mt_block0")
+
+[node name="FireplaceTop" type="MeshInstance3D" parent="Escola_Inside"]
+mesh = ExtResource("m_block0t")
+material_override = SubResource("mt_block0top")
+
+[node name="FireplaceFire" type="MeshInstance3D" parent="Escola_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0160, 0.4700, -5.5800)
+mesh = SubResource("q_flame0")
+surface_material_override/0 = SubResource("mt_flame")
+
+[node name="FireplaceGlow" type="OmniLight3D" parent="Escola_Inside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 0.4000, -5.3000)
+light_color = Color(1, 0.62, 0.3, 1)
+light_energy = 0.9
+omni_range = 3.0
+shadow_enabled = false
+
+[node name="Counter" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3000, 0.6945, -4.8500)
+mesh = SubResource("q_Counter")
+surface_material_override/0 = SubResource("mt_p_desk")
+
+[node name="BenchBack" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1100, 0.5556, -6.0000)
+mesh = SubResource("q_BenchBack")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="BenchFront" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0100, 0.5556, -4.4000)
+mesh = SubResource("q_BenchFront")
+surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="Blackboard" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1500, 5.2523, -6.1000)
+mesh = SubResource("q_Blackboard")
+surface_material_override/0 = SubResource("mt_p_blackboard")
+
+[node name="Shelf" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4500, 5.2871, -6.0500)
+mesh = SubResource("q_Shelf")
+surface_material_override/0 = SubResource("mt_p_bookshelf")
+
+[node name="TeacherDesk" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 4.9745, -4.4000)
+mesh = SubResource("q_TeacherDesk")
+surface_material_override/0 = SubResource("mt_p_desk")
+
+[node name="DeskA1" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8009, -1.6000)
+mesh = SubResource("q_DeskA1")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DeskB1" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8009, -1.6000)
+mesh = SubResource("q_DeskB1")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DeskA2" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8009, -2.6000)
+mesh = SubResource("q_DeskA2")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DeskB2" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8009, -2.6000)
+mesh = SubResource("q_DeskB2")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DeskA3" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8009, -3.6000)
+mesh = SubResource("q_DeskA3")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DeskB3" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8009, -3.6000)
+mesh = SubResource("q_DeskB3")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DeskA4" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8009, -4.6000)
+mesh = SubResource("q_DeskA4")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DeskB4" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8009, -4.6000)
+mesh = SubResource("q_DeskB4")
+surface_material_override/0 = SubResource("mt_p_schooldesk")
+
+[node name="DoorRug" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.8594, 0.0250, -0.4200)
+mesh = SubResource("q_DoorRug")
+surface_material_override/0 = SubResource("mt_p_rug")
+
+[node name="ChimneySmoke" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2188, 9.1736, -5.6700)
+mesh = SubResource("q_smoke")
+surface_material_override/0 = SubResource("mt_smoke")
+
+[node name="Walls" type="StaticBody3D" parent="."]
+
+[node name="Fireplace" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 1.0450, -5.9500)
+shape = SubResource("b_Fireplace")
+
+[node name="Counter" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3000, 0.4500, -5.0250)
+shape = SubResource("b_Counter")
+
+[node name="BenchBack" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1100, 0.3000, -6.1500)
+shape = SubResource("b_BenchBack")
+
+[node name="BenchFront" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0100, 0.3000, -4.5750)
+shape = SubResource("b_BenchFront")
+
+[node name="Blackboard" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1500, 5.0800, -6.1750)
+shape = SubResource("b_Blackboard")
+
+[node name="Shelf" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4500, 5.2300, -6.1500)
+shape = SubResource("b_Shelf")
+
+[node name="TeacherDesk" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 4.7300, -4.5750)
+shape = SubResource("b_TeacherDesk")
+
+[node name="DeskA1" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.6300, -1.7500)
+shape = SubResource("b_DeskA1")
+
+[node name="DeskB1" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.6300, -1.7500)
+shape = SubResource("b_DeskB1")
+
+[node name="DeskA2" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.6300, -2.7500)
+shape = SubResource("b_DeskA2")
+
+[node name="DeskB2" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.6300, -2.7500)
+shape = SubResource("b_DeskB2")
+
+[node name="DeskA3" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.6300, -3.7500)
+shape = SubResource("b_DeskA3")
+
+[node name="DeskB3" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.6300, -3.7500)
+shape = SubResource("b_DeskB3")
+
+[node name="DeskA4" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.6300, -4.7500)
+shape = SubResource("b_DeskA4")
+
+[node name="DeskB4" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.6300, -4.7500)
+shape = SubResource("b_DeskB4")
+
+[node name="Back" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0625, 3.3400, -6.4500)
+shape = SubResource("b_Back")
+
+[node name="West" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6625, 3.3400, -3.2250)
+shape = SubResource("b_West")
+
+[node name="FrontLeft" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6094, 3.3400, 0.0000)
+shape = SubResource("b_FrontLeft")
+
+[node name="Front1" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 3.3400, 0.0000)
+shape = SubResource("b_Front1")
+
+[node name="Lintel1" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0938, 4.2151, 0.0000)
+shape = SubResource("b_Lintel1")
+
+[node name="FrontRight" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7656, 3.3400, 0.0000)
+shape = SubResource("b_FrontRight")
+
+[node name="NotchSide" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8812, 3.3400, -1.7200)
+shape = SubResource("b_NotchSide")
+
+[node name="NotchFront" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8344, 3.3400, -3.5900)
+shape = SubResource("b_NotchFront")
+
+[node name="East" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7875, 3.3400, -5.0200)
+shape = SubResource("b_East")
+
+[node name="UpperDoor" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8594, 5.7300, 0.0000)
+shape = SubResource("b_UpperDoor")
+
+[node name="SlabWing" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6844, 4.1800, -4.9450)
+shape = SubResource("b_SlabWing")
+
+[node name="SlabA" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4406, 4.1800, -3.1500)
+shape = SubResource("b_SlabA")
+
+[node name="SlabFront" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0625, 4.1800, -0.6250)
+shape = SubResource("b_SlabFront")
+
+[node name="Railing" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5625, 4.6800, -2.9500)
+shape = SubResource("b_Railing")
+
+[node name="RailingFront" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0125, 4.6800, -1.3000)
+shape = SubResource("b_RailingFront")
+
+[node name="Landing" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0875, 2.1400, -5.9750)
+shape = SubResource("b_Landing")
+
+[node name="Stairs" type="CollisionShape3D" parent="Walls"]
+shape = SubResource("c_Stairs")
+
+[node name="StairRail" type="CollisionShape3D" parent="Walls"]
+shape = SubResource("c_StairRail")

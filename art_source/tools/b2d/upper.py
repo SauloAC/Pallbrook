@@ -1,6 +1,6 @@
 """An upper floor: stairs (along the back wall rising left, or along the left wall rising back),
 landing, railings, the upper floor itself, and the lower facade that comes back while the doctor is upstairs."""
-from .core import COS, BW, rect_floor
+from .core import COS, SIN, BW, rect_floor
 
 
 def build(h):
@@ -119,23 +119,35 @@ def build(h):
             side.append(([(XI0, i * dy, zf), (XS, i * dy, zf), (XS, y, zf), (XI0, y, zf)],
                          [(XI0 * su2, i * dy * COS * sv2), (XS * su2, i * dy * COS * sv2), (XS * su2, y * COS * sv2), (XI0 * su2, y * COS * sv2)], 1))
         land = (XI0, XS, ZB, ZTOP)
-        floors = [rect_floor(XS, XI1, ZB, FZ, H + 0.01), rect_floor(XI0, XS, ZLOW, FZ, H + 0.01)]
+        # with a set-back wing on the right (a notch) the upper floor runs on into the wing, behind its front
+        XR_ = (h.xn - h.wt) if h.NOTCH else XI1
+        floors = [rect_floor(XS, XR_, ZB, FZ, H + 0.01), rect_floor(XI0, XS, ZLOW, FZ, H + 0.01)]
+        if h.NOTCH:
+            floors.append(rect_floor(XR_, XI1, ZB, h.zn, H + 0.01))
         line = lambda z: dy / 2 + H * (ZLOW - z) / (ZLOW - ZTOP)
         RX = XS + 0.04
-        zrail(rail, RX, ZLOW - dz / 2, line(ZLOW - dz / 2) + RAIL_H, ZTOP + dz / 2, line(ZTOP + dz / 2) + RAIL_H)
-        for i in (0, STEPS // 2, STEPS - 1):
+        # the rail may stop short of the top: there one steps off sideways onto the upper floor (a
+        # landing too shallow to turn on, the stairs starting far enough back to walk past their foot)
+        OPEN = UP.get("top_open", 0.0)
+        ZE = ZTOP + OPEN                                # where the rail ends
+        NE = STEPS - int(round(OPEN / dz))              # the steps it runs along
+        zrail(rail, RX, ZLOW - dz / 2, line(ZLOW - dz / 2) + RAIL_H, ZE + dz / 2, line(ZE + dz / 2) + RAIL_H)
+        for i in (0, NE // 2, NE - 1):
             z = ZLOW - (i + 0.5) * dz
             post(rail, RX, (i + 1) * dy, line(z) + RAIL_H, z)
-        zrail(upr, RX, ZLOW, H + RAIL_H, ZTOP, H + RAIL_H)
+        zrail(upr, RX, ZLOW, H + RAIL_H, ZE, H + RAIL_H)
         beam(upr, XI0, H + RAIL_H, XS, H + RAIL_H, ZLOW - 0.04)
-        for z in (ZLOW, (ZLOW + ZTOP) / 2, ZTOP):
+        for z in (ZLOW, (ZLOW + ZE) / 2, ZE):
             post(upr, RX, H, H + RAIL_H, z)
         prof = [(ZLOW + dz / 2, 0), (ZTOP, 0), (ZTOP, H), (ZTOP + dz / 2, H)]
         conv.append(("Stairs", [(x, y, z) for x in (XI0, XS) for z, y in prof]))
-        rp_ = [(ZLOW, 0), (ZTOP, H), (ZTOP, H + 1.0), (ZLOW, 1.0)]
+        YE = H * (ZLOW - ZE) / (ZLOW - ZTOP)
+        rp_ = [(ZLOW, 0), (ZE, YE), (ZE, YE + 1.0), (ZLOW, 1.0)]
         conv.append(("StairRail", [(x, y, z) for x in (XS, XS + 0.08) for z, y in rp_]))
-        up_shapes += [("SlabA", XS, XI1, H - 0.2, H, ZB, FZ), ("SlabFront", XI0, XS, H - 0.2, H, ZLOW, FZ),
-                      ("Railing", XS, XS + 0.1, H - 0.2, H + 1.0, ZLOW, ZTOP),
+        if h.NOTCH:
+            up_shapes.append(("SlabWing", XR_, XI1, H - 0.2, H, ZB, h.zn))
+        up_shapes += [("SlabA", XS, XR_, H - 0.2, H, ZB, FZ), ("SlabFront", XI0, XS, H - 0.2, H, ZLOW, FZ),
+                      ("Railing", XS, XS + 0.1, H - 0.2, H + 1.0, ZLOW, ZE),
                       ("RailingFront", XI0, XS + 0.1, H - 0.2, H + 1.0, ZLOW - 0.1, ZLOW)]
         info_up = {"H": H, "stairs_x": [round(XI0, 3), round(XS, 3)], "stairs_z": [round(ZLOW, 3), round(ZTOP, 3)]}
     up_meshes["stairtreads"] = (obj("StairTreads", treads, ["0 1 0"]), "mt_tread", "")
@@ -169,8 +181,34 @@ def build(h):
     up_meshes["lowerfront"] = (obj("LowerFront", [([(XLs, 0, lp["z"] + 0.01), (-XLs, 0, lp["z"] + 0.01), (-XLs, H, lp["z"] + 0.01), (XLs, H, lp["z"] + 0.01)],
         [uv(0, lp["base"]), uv(h.iw, lp["base"]), uv(h.iw, rtop), uv(0, rtop)], 1)], ["0 0 1"]), "PLANE%d" % LFP, "Upper")
     sx0 = h.xnl if h.NOTCH_L else xw0        # the sill beam runs along the front wall (behind a left wing's nook, along the wing's)
-    ut = [([(sx0, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.005), (xw1, H + 0.02, FZ - 0.33), (sx0, H + 0.02, FZ - 0.33)],
-           [(sx0 / BW, 0), (xw1 / BW, 0), (xw1 / BW, 1), (sx0 / BW, 1)], 1)]
+    sx1 = h.xn if h.NOTCH else xw1           # ... and stops at a right wing's side wall: the wing has its own
+    ut = [([(sx0, H + 0.02, FZ - 0.005), (sx1, H + 0.02, FZ - 0.005), (sx1, H + 0.02, FZ - 0.33), (sx0, H + 0.02, FZ - 0.33)],
+           [(sx0 / BW, 0), (sx1 / BW, 0), (sx1 / BW, 1), (sx0 / BW, 1)], 1)]
+    if h.NOTCH:
+        zw = h.zn
+        # where the wing's front is cut lower than the floor (at its beam, see fascia below), its sill comes
+        # forward to sit right on that beam in the picture
+        zs = zw
+        for fa in UP.get("fascia", []):
+            pl = sp["planes"][fa["plane"]]
+            if abs(pl["z"] - zw) < 0.01:
+                zs = zw + (H - (pl["base"] - pl["rect"][1]) / (COS * 32)) * COS / SIN
+        ut.append(([(h.xn, H + 0.02, zs - 0.005), (xw1, H + 0.02, zs - 0.005), (xw1, H + 0.02, zs - 0.33), (h.xn, H + 0.02, zs - 0.33)],
+                   [(h.xn / BW, 0), (xw1 / BW, 0), (xw1 / BW, 1), (h.xn / BW, 1)], 1))
+        # the top of the wing's side wall, between the upper floor and the wing: a beam as on the other
+        # walls (else the ground floor shows through, far below)
+        xr = h.xn - h.wt
+        ut.append(([(xr, H + 0.02, FZ), (h.xn, H + 0.02, FZ), (h.xn, H + 0.02, zw), (xr, H + 0.02, zw)],
+                   [(FZ / BW, 0), (FZ / BW, 1), (zw / BW, 1), (zw / BW, 0)], 1))
+    # a facade plane shown upstairs whose art stops below the upper floor (cut at a beam, not through
+    # the braces above it): a fascia closes the gap up to the floor's edge
+    for fa in UP.get("fascia", []):                 # {"plane": i, "px": (from, to)}: the beam's columns in the art
+        pl = sp["planes"][fa["plane"]]
+        ytop = (pl["base"] - pl["rect"][1]) / (COS * 32)
+        if H - ytop > 0.01:
+            xa, xb = px(fa["px"][0]), px(fa["px"][1])
+            ut.append(([(xa, ytop, pl["z"] + 0.012), (xb, ytop, pl["z"] + 0.012), (xb, H + 0.02, pl["z"] + 0.012), (xa, H + 0.02, pl["z"] + 0.012)],
+                       [(0, 0.15), (1, 0.15), (1, 0.85), (0, 0.85)], 2))
     if h.NOTCH_L:
         zw = h.znl
         ut.append(([(xw0, H + 0.02, zw - 0.005), (h.xnl, H + 0.02, zw - 0.005), (h.xnl, H + 0.02, zw - 0.33), (xw0, H + 0.02, zw - 0.33)],

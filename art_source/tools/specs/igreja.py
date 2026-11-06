@@ -12,10 +12,12 @@ SPEC = {
     "floor_tile": "tile_stone_floor.png",
     "door_art": {"rect": (53, 253, 84, 274), "hinge": "left"},   # the leaf only: the steps run on under it
     # room x -1.58..1.58, back wall at z -6.2; door x -0.56..0.50
-    # the priest at the altar first, then beside the lectern and between the pews, then the aisle
-    "npc": {"slots": [(0.0, -5.2), (-0.9, -4.5), (-1.0, -3.2), (1.0, -3.2), (-1.0, -2.3), (1.0, -2.3),
-                      (0.0, -2.8), (0.0, -1.2)]},
+    # the priest at the altar first, then before the altar beside the lectern, then down the aisle (the
+    # spaces between the pews are too narrow to walk into)
+    "npc": {"slots": [(0.0, -5.2), (-0.9, -4.5), (0.35, -4.35), (-1.15, -4.95), (0.0, -3.3), (0.0, -2.3),
+                      (0.0, -1.2)]},
     "door_rug": False,             # the red runner down the aisle instead
+    # the pews stand against the side walls: the aisle between them wide enough for the townsfolk to walk
     "furniture": [
         {"name": "Runner", "prop": "runner", "flat": True, "y": 0.025, "x": -0.031, "z": -2.95},
         {"name": "Altar", "prop": "altar", "x": 0.0, "z": -5.7, "box": (-0.85, 0.85, -6.2, -5.7, 0.8),
@@ -25,11 +27,11 @@ SPEC = {
         {"name": "CandleE", "prop": "candlestand", "x": 1.3, "z": -5.85, "box": (1.18, 1.42, -5.97, -5.73, 1.2),
          "flames": [(6, 1)]},
         {"name": "Lectern", "prop": "lectern", "x": 1.1, "z": -4.95, "box": (0.85, 1.35, -5.25, -4.95, 1.0)},
-        {"name": "PewW1", "prop": "pew", "x": -0.95, "z": -1.7, "box": (-1.46, -0.44, -2.05, -1.7, 0.6)},
-        {"name": "PewE1", "prop": "pew", "x": 0.95, "z": -1.7, "box": (0.44, 1.46, -2.05, -1.7, 0.6)},
-        {"name": "PewW2", "prop": "pew", "x": -0.95, "z": -2.6, "box": (-1.46, -0.44, -2.95, -2.6, 0.6)},
-        {"name": "PewE2", "prop": "pew", "x": 0.95, "z": -2.6, "box": (0.44, 1.46, -2.95, -2.6, 0.6)},
-        {"name": "PewW3", "prop": "pew", "x": -0.95, "z": -3.5, "box": (-1.46, -0.44, -3.85, -3.5, 0.6)},
-        {"name": "PewE3", "prop": "pew", "x": 0.95, "z": -3.5, "box": (0.44, 1.46, -3.85, -3.5, 0.6)},
+        {"name": "PewW1", "prop": "pew", "x": -1.06, "z": -1.7, "box": (-1.57, -0.55, -2.05, -1.7, 0.6)},
+        {"name": "PewE1", "prop": "pew", "x": 1.06, "z": -1.7, "box": (0.55, 1.57, -2.05, -1.7, 0.6)},
+        {"name": "PewW2", "prop": "pew", "x": -1.06, "z": -2.6, "box": (-1.57, -0.55, -2.95, -2.6, 0.6)},
+        {"name": "PewE2", "prop": "pew", "x": 1.06, "z": -2.6, "box": (0.55, 1.57, -2.95, -2.6, 0.6)},
+        {"name": "PewW3", "prop": "pew", "x": -1.06, "z": -3.5, "box": (-1.57, -0.55, -3.85, -3.5, 0.6)},
+        {"name": "PewE3", "prop": "pew", "x": 1.06, "z": -3.5, "box": (0.55, 1.57, -3.85, -3.5, 0.6)},
     ],
 }

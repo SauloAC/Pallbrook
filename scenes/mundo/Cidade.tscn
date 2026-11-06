@@ -43,6 +43,7 @@
 [ext_resource type="PackedScene" path="res://assets/buildings2d/clinica/Clinica2D.tscn" id="b2d_clinica"]
 [ext_resource type="PackedScene" path="res://assets/buildings2d/igreja/Igreja2D.tscn" id="b2d_igreja"]
 [ext_resource type="PackedScene" path="res://assets/buildings2d/prefeitura/Prefeitura2D.tscn" id="b2d_prefeitura"]
+[ext_resource type="PackedScene" path="res://assets/buildings2d/escola/Escola2D.tscn" id="b2d_escola"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/prefeitura/clock_face.png" id="clock_face"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/prefeitura/clock_hour.png" id="clock_hour"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/prefeitura/clock_minute.png" id="clock_minute"]
@@ -79,7 +80,7 @@ size = Vector3(1.9, 6, 2.19)
 size = Vector3(5.7, 3, 5.7)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_schoolroom"]
-size = Vector3(5.7, 3, 5.7)
+size = Vector3(8.2, 10, 9.3)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_churchroom"]
 size = Vector3(5, 4, 9)
@@ -294,20 +295,24 @@ font = ExtResource("16_5xce6")
 font_size = 64
 outline_size = 18
 
+[node name="Escola2D" parent="NavigationRegion3D" unique_id=1730402860 instance=ExtResource("b2d_escola")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 22, 0, 3.3)
+
 [node name="Escola" type="Node3D" parent="NavigationRegion3D" unique_id=72583686]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 1.5, -0.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.09, 1.5, -1.32)
 
 [node name="Interior" type="Area3D" parent="NavigationRegion3D/Escola" unique_id=1364702063]
 script = ExtResource("40_cutaway")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Escola/Interior" unique_id=40873503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
 shape = SubResource("BoxShape3D_schoolroom")
 
 [node name="WindowLight" parent="NavigationRegion3D/Escola" unique_id=454164372 instance=ExtResource("5_o5pq4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.69, 0.5, 4.3)
 
 [node name="Sign" type="Label3D" parent="NavigationRegion3D/Escola" unique_id=907874145]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 11.5, 4.6)
 pixel_size = 0.008
 billboard = 1
 no_depth_test = true
@@ -1248,7 +1253,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.6, 0, 20.6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, 26.7)
 
 [node name="Escola" type="Marker3D" parent="Locations" unique_id=154170603 groups=["locations"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, 3.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.4, 0, 2.6)
 
 [node name="Prefeitura" type="Marker3D" parent="Locations" unique_id=1833403450 groups=["locations"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.83, 0, -5.4)
