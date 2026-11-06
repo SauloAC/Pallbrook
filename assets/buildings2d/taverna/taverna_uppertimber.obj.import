@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dp6hl8syohf6t"
+path="res://.godot/imported/taverna_uppertimber.obj-f48a39dd260c8aaffbf9f4d7f4de8612.mesh"
+
+[deps]
+
+files=["res://.godot/imported/taverna_uppertimber.obj-f48a39dd260c8aaffbf9f4d7f4de8612.mesh"]
+
+source_file="res://assets/buildings2d/taverna/taverna_uppertimber.obj"
+dest_files=["res://.godot/imported/taverna_uppertimber.obj-f48a39dd260c8aaffbf9f4d7f4de8612.mesh", "res://.godot/imported/taverna_uppertimber.obj-f48a39dd260c8aaffbf9f4d7f4de8612.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

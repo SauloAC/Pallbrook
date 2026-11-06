@@ -87,23 +87,40 @@ def build(h):
             side.append(([(XS, i * dy, zf), (XI1, i * dy, zf), (XI1, y, zf), (XS, y, zf)],
                          [(XS * su2, i * dy * COS * sv2), (XI1 * su2, i * dy * COS * sv2), (XI1 * su2, y * COS * sv2), (XS * su2, y * COS * sv2)], 1))
         land = (XS, XI1, ZB, ZTOP)
-        floors = [rect_floor(XI0, XS, ZB, FZ, H + 0.01), rect_floor(XS, XI1, ZLOW, FZ, H + 0.01)]
+        # with a set-back part on the right (a notch) the stairs are in it: the upper floor runs over the
+        # main part up to its front, over the set-back part only up to that part's front
+        ZF_R = h.zn if h.NOTCH else FZ
+        XR_ = (h.xn - h.wt) if h.NOTCH else XS
+        floors = [rect_floor(XI0, XR_, ZB, FZ, H + 0.01)]
+        if h.NOTCH:
+            floors.append(rect_floor(XR_, XS, ZB, ZF_R, H + 0.01))
+        if ZLOW < ZF_R - 0.01:
+            floors.append(rect_floor(XS, XI1, ZLOW, ZF_R, H + 0.01))
         line = lambda z: dy / 2 + H * (ZLOW - z) / (ZLOW - ZTOP)
         RX = XS - 0.04
-        zrail(rail, RX, ZLOW - dz / 2, line(ZLOW - dz / 2) + RAIL_H, ZTOP + dz / 2, line(ZTOP + dz / 2) + RAIL_H)
-        for i in (0, STEPS // 2, STEPS - 1):
+        # the rail may stop short of the top: there one steps off sideways onto the upper floor
+        OPEN = UP.get("top_open", 0.0)
+        ZE = ZTOP + OPEN
+        NE = STEPS - int(round(OPEN / dz))
+        zrail(rail, RX, ZLOW - dz / 2, line(ZLOW - dz / 2) + RAIL_H, ZE + dz / 2, line(ZE + dz / 2) + RAIL_H)
+        for i in (0, NE // 2, NE - 1):
             z = ZLOW - (i + 0.5) * dz
             post(rail, RX, (i + 1) * dy, line(z) + RAIL_H, z)
-        zrail(upr, RX, ZLOW, H + RAIL_H, ZTOP, H + RAIL_H)
+        zrail(upr, RX, ZLOW, H + RAIL_H, ZE, H + RAIL_H)
         beam(upr, XS, H + RAIL_H, XI1, H + RAIL_H, ZLOW - 0.04)
-        for z in (ZLOW, (ZLOW + ZTOP) / 2, ZTOP):
+        for z in (ZLOW, (ZLOW + ZE) / 2, ZE):
             post(upr, RX, H, H + RAIL_H, z)
         prof = [(ZLOW + dz / 2, 0), (ZTOP, 0), (ZTOP, H), (ZTOP + dz / 2, H)]
         conv.append(("Stairs", [(x, y, z) for x in (XS, XI1) for z, y in prof]))
-        rp_ = [(ZLOW, 0), (ZTOP, H), (ZTOP, H + 1.0), (ZLOW, 1.0)]
+        YE = H * (ZLOW - ZE) / (ZLOW - ZTOP)
+        rp_ = [(ZLOW, 0), (ZE, YE), (ZE, YE + 1.0), (ZLOW, 1.0)]
         conv.append(("StairRail", [(x, y, z) for x in (XS - 0.08, XS) for z, y in rp_]))
-        up_shapes += [("SlabA", XI0, XS, H - 0.2, H, ZB, FZ), ("SlabFront", XS, XI1, H - 0.2, H, ZLOW, FZ),
-                      ("Railing", XS - 0.1, XS, H - 0.2, H + 1.0, ZLOW, ZTOP),
+        up_shapes.append(("SlabA", XI0, XR_, H - 0.2, H, ZB, FZ))
+        if h.NOTCH:
+            up_shapes.append(("SlabWing", XR_, XS, H - 0.2, H, ZB, ZF_R))
+        if ZLOW < ZF_R - 0.01:
+            up_shapes.append(("SlabFront", XS, XI1, H - 0.2, H, ZLOW, ZF_R))
+        up_shapes += [("Railing", XS - 0.1, XS, H - 0.2, H + 1.0, ZLOW, ZE),
                       ("RailingFront", XS - 0.1, XI1, H - 0.2, H + 1.0, ZLOW - 0.1, ZLOW)]
         info_up = {"H": H, "stairs_x": [round(XS, 3), round(XI1, 3)], "stairs_z": [round(ZLOW, 3), round(ZTOP, 3)]}
     else:
@@ -213,6 +230,40 @@ def build(h):
         zw = h.znl
         ut.append(([(xw0, H + 0.02, zw - 0.005), (h.xnl, H + 0.02, zw - 0.005), (h.xnl, H + 0.02, zw - 0.33), (xw0, H + 0.02, zw - 0.33)],
                    [(xw0 / BW, 0), (h.xnl / BW, 0), (h.xnl / BW, 1), (xw0 / BW, 1)], 1))
+    # walls upstairs between rooms (spec upper "walls": {"x": (a, b), "z": (front, back), "gaps": [(front, back), ...]},
+    # each running along x or along z, gaps for doorways): cut low like the other walls, a beam on top, the
+    # face toward the camera in the wall tile; they block the doctor and the townsfolk
+    WV = UP.get("wall_cut", 0.9)                        # how high they stand on screen, above the upper floor
+    faces_w = []
+    for wi, w in enumerate(UP.get("walls", [])):
+        (a_, b_), (zf_, zb_) = w["x"], w["z"]
+        along_x = (b_ - a_) >= (zf_ - zb_)
+        pieces = [(a_, b_, zf_, zb_)]
+        for g0, g1 in w.get("gaps", []):
+            nxt = []
+            for (pa, pb, pf, pbk) in pieces:
+                if along_x and pa < g0 < pb:           # gaps along x given as (left, right)
+                    nxt += [(pa, g0, pf, pbk), (g1, pb, pf, pbk)]
+                elif not along_x and pbk < g1 and g0 < pf:   # along z: (front, back)
+                    nxt += [(pa, pb, pf, g0), (pa, pb, g1, pbk)]
+                else:
+                    nxt.append((pa, pb, pf, pbk))
+            pieces = nxt
+        for pi_, (pa, pb, pf, pbk) in enumerate(pieces):
+            if pb - pa < 0.01 or pf - pbk < 0.01:
+                continue
+            up_shapes.append(("UpWall%d_%d" % (wi, pi_), pa, pb, H, H + 2.0, pbk, pf))
+            if along_x:      # the beam runs along the wall either way
+                cuv = [(pa / BW, 0), (pb / BW, 0), (pb / BW, 1), (pa / BW, 1)]
+            else:
+                cuv = [(pf / BW, 0), (pf / BW, 1), (pbk / BW, 1), (pbk / BW, 0)]
+            ut.append(([(pa, H + WV, pf), (pb, H + WV, pf), (pb, H + WV, pbk), (pa, H + WV, pbk)], cuv, 1))
+            # the face in the floor's planks, standing (pixels kept about square on screen)
+            k = COS / (3.0 * SIN)
+            faces_w.append(([(pa, H, pf), (pb, H, pf), (pb, H + WV, pf), (pa, H + WV, pf)],
+                            [(pa / 3.0, H * k), (pb / 3.0, H * k), (pb / 3.0, (H + WV) * k), (pa / 3.0, (H + WV) * k)], 1))
+    if faces_w:
+        up_meshes["upperwalls"] = (obj("UpperWalls", faces_w, ["0 0 1"]), "mt_floor", "Upper")
     up_meshes["uppertimber"] = (obj("UpperTimber", ut + ut_extra, ["0 1 0", "0 0 1"]), "mt_beam", "Upper")
     h.info_up = info_up
     h.H, h.FZ = H, FZ

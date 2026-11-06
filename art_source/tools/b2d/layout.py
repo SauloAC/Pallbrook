@@ -12,7 +12,7 @@ def npc_layout(h):
     npc = h.spec.get("npc")
     if not npc:
         return None
-    mx, mz = h.door_x, MARKER_Z
+    mx, mz = h.door_x, h.DOOR_Z + MARKER_Z
     def rel(p):
         x, y, z = (p[0], 0.0, p[1]) if len(p) == 2 else p
         return (round((x - mx) * TOWN_SCALE, 3), round(y * TOWN_SCALE, 3), round((z - mz) * TOWN_SCALE, 3))

@@ -18,6 +18,7 @@ const INTERIOR_SLOTS := {
 	"Igreja": [Vector3(0.044, 0.0, -6.58), Vector3(-1.216, 0.0, -5.6), Vector3(0.534, 0.0, -5.39), Vector3(-1.566, 0.0, -6.23), Vector3(0.044, 0.0, -3.92), Vector3(0.044, 0.0, -2.52), Vector3(0.044, 0.0, -0.98)],
 	"Padaria": [Vector3(6.754, 0.0, -2.8), Vector3(3.534, 0.0, -0.14), Vector3(6.334, 0.0, -0.14), Vector3(1.854, 0.0, -0.7)],
 	"Prefeitura": [Vector3(0.626, 0.0, -5.11), Vector3(-4.834, 0.0, -2.52), Vector3(-0.914, 0.0, -2.52), Vector3(-2.874, 0.0, -1.12), Vector3(0.626, 0.0, -2.66), Vector3(-8.054, 0.0, -4.34), Vector3(-6.934, 0.0, -2.1), Vector3(-1.754, 0.0, -0.56), Vector3(-7.634, 0.0, -1.12)],
+	"Taverna": [Vector3(-1.754, 0.0, -3.935), Vector3(-4.834, 0.0, 2.295), Vector3(-4.694, 0.0, -1.065), Vector3(-1.754, 0.0, -0.925), Vector3(-2.174, 0.0, 2.155), Vector3(-1.264, 0.0, 2.155), Vector3(-0.354, 0.0, 4.955), Vector3(-2.944, 0.0, 4.535), Vector3(-2.132, 0.0, 4.535), Vector3(-1.334, 0.0, 4.535), Vector3(2.446, 0.0, 4.045), Vector3(-0.074, 0.0, 5.935)],
 }
 
 # The foot of the bed and which way the head points (degrees around Y)
@@ -31,6 +32,7 @@ const BED_SPOTS := {
 	"CasaSophia": [Vector3(-1.549, 0.0, -2.8), 0.0],
 	"Fazenda": [Vector3(-8.028, 3.92, -4.48), 0.0],
 	"Padaria": [Vector3(9.694, 2.94, -2.52), 0.0],
+	"Taverna": [Vector3(-8.194, 3.878, -3.501), 0.0],
 }
 
 # Upstairs beds: where to walk to first, beside the bed on the upper floor
@@ -40,4 +42,5 @@ const BED_APPROACH := {
 	"CasaSarah": Vector3(1.846, 3.402, -4.34),
 	"Fazenda": Vector3(-6.628, 3.92, -4.34),
 	"Padaria": Vector3(8.574, 2.94, -1.4),
+	"Taverna": Vector3(-6.794, 3.878, -3.445),
 }

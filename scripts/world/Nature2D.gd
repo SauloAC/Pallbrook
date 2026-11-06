@@ -106,7 +106,7 @@ func _ready() -> void:
 const PROPS_DIR := "res://assets/environment2d/props/"
 const ZONES := {
 	"plaza": Rect2(4.7, 9.7, 11.0, 9.5), "market": Rect2(7.2, 23.7, 7.5, 4.0),
-	"tavern": Rect2(-8.1, 26.1, 9.0, 10.0), "clinic_yard": Rect2(23.3, 23.2, 3.5, 4.5),
+	"tavern": Rect2(-4.0, 21.3, 6.6, 6.0), "clinic_yard": Rect2(23.3, 23.2, 3.5, 4.5),
 	"forge_yard": Rect2(5.0, -25.0, 11.0, 6.0), "river": Rect2(-40.0, -80.0, 50.0, 120.0),
 }
 const WELL_AT := Vector3(10.2, 0.0, 14.55)   # The front of the well's stone base
@@ -114,8 +114,8 @@ const PROP_RULES := [
 	["^Well", "", "plaza"],   # The well's many pieces: one painted well instead (WELL_AT)
 	["^Stall_Cart_Empty", "stall_ada", "market"],
 	["^(FarmCrate|Bag|Barrel_Apples)", "", "market"],
-	["^Bench", "bench", "plaza"], ["^Bench", "bench", "tavern"], ["^Bench", "bench", "clinic_yard"],
-	["^Table_Large", "table_v_cloth", "tavern"], ["^Table_Large", "table", "clinic_yard"], ["^Table_Large", "table", "forge_yard"],
+	["^Bench", "bench", "plaza"], ["^Bench", "bench", "clinic_yard"],   # (the tavern's courtyard furniture is the 2D tavern's own)
+	["^Table_Large", "table", "clinic_yard"], ["^Table_Large", "table", "forge_yard"],
 	["^Barrel_Holder", "barrels_stack", "tavern"], ["^Barrel_Apples", "crate_apples", "tavern"],
 	["^Barrel", "barrel", "tavern"], ["^Barrel", "barrel", "forge_yard"],
 	["^FarmCrate_Carrot", "crate_carrots", "tavern"], ["^(Crate_Wooden|Crates)", "crate_empty", "tavern"],

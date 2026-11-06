@@ -50,6 +50,8 @@ class House:
             assert not self.NOTCH and not self.DECK, "a left notch with a right notch or a balcony is not supported"
             self.xnl, self.znl, self.wt = self.px(self.NOTCH_L["x_px"]), self.NOTCH_L["z"], t
         self.d0, self.d1 = self.px(spec["door_px"][0]), self.px(spec["door_px"][1])
+        # the front door may be in the set-back part's front wall (the tavern: a courtyard before it)
+        self.DOOR_Z = self.NOTCH["z"] if (self.NOTCH and spec.get("door_in_notch")) else 0.0
         self.door_x = (self.d0 + self.d1) / 2
         tw, th = spec.get("inner_wall_tile_px", (32, 32))
         self.wall_tile = (tw, th)

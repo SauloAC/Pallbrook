@@ -1,7 +1,8 @@
 """Puts a building together as a Godot scene: resources, the node tree the cutaway expects, and collision.
 
 Node tree: <Name>2D / <Name>_Front (planes), <Name>_Roof, Body, <Name>_Inside (the room, shown only while the
-doctor is in: Floor, InnerWall, Timber, Furniture, <Name>_Lower, <Name>_Upper), ChimneySmoke, Walls."""
+doctor is in: Floor, InnerWall, Timber, Furniture, <Name>_Lower, <Name>_Upper), Walls; the chimney smoke goes with
+the roof."""
 import os
 from .core import COS, SIN, FURN, RES as R, tf
 from . import door as door_mod
@@ -17,6 +18,7 @@ def build(h):
     floor_fn, wall_fn, timber_fn, timber_low_fn, timber_up_fn = h.floor_fn, h.wall_fn, h.timber_fn, h.timber_low_fn, h.timber_up_fn
     BLOCKS, up_meshes, up_shapes, conv = h.blocks, h.up_meshes, h.up_shapes, h.conv
     d0, d1 = h.d0, h.d1
+    DOOR_Z, DOOR = h.DOOR_Z, h.door
     NOTCH = h.NOTCH
     NL = h.NOTCH_L                     # a left wing set back (see core.House)
     XNL, ZNL, WTL = (h.xnl, h.znl, h.wt) if NL else (None, None, None)
@@ -163,10 +165,12 @@ def build(h):
               % (b["name"], INS, tf(lx, ly + h.FY, lz)))
     furniture = list(SPEC["furniture"])
     if SPEC.get("door_rug", True):
-        furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": -0.42})
+        furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": DOOR_Z - 0.42})
     for f in furniture:
         lift = UP["height"] if (UP and f.get("upper")) else FY
         fpar = (INS + "/" + NAME + "_Upper") if (UP and f.get("upper")) else (INS + "/Furniture")
+        if f.get("outside"):       # out in front (the tavern's courtyard): always on show, on the ground
+            lift, fpar = 0.0, "."
         w, h = props[f["prop"]]
         qw = w / 32.0 * FURN
         if f.get("flat"):
@@ -212,7 +216,8 @@ def build(h):
     if NL:        # the left wing: its own front wall (thick outward only, so upstairs the walk in front of the stairs stays wide), and the main room's west wall in front of it
         shapes += [("NotchFront", xw0, XNL + WTL, 0, WALL, ZNL + 0.15, ZNL), ("NotchSide", XNL, XNL + WTL, 0, WALL, 0.15, ZNL)]
     # the front wall, open at the door and at any other openings in the art (arches); a lintel over each opening
-    gaps = [(d0, d1, None)]
+    DOOR_IN_NOTCH = DOOR_Z != 0.0
+    gaps = [] if DOOR_IN_NOTCH else [(d0, d1, None)]
     for gi, g in enumerate(SPEC.get("front_gaps", [])):
         gp = SPEC["planes"][g.get("plane", 0)]
         gaps.append((px(g["px"][0]), px(g["px"][1]), (gp["base"] - g["top_row"]) / 32.0 / COS))
@@ -237,7 +242,13 @@ def build(h):
             st, sb = SPEC["steps"]["z"]          # where they meet the porch, where they reach the ground
             conv.append(("Steps", [(x, y, z) for x in (sx0, sx1) for y, z in ((FY, st - 0.05), (0.0, st - 0.05), (0.0, sb), (0.02, sb))]))
     if NOTCH:     # the lean-to: the main room's east wall up to it, and its own front wall
-        shapes += [("NotchSide", XN - WT, XN, 0, WALL, 0.15, ZN), ("NotchFront", XN - WT, xw1, 0, WALL, ZN + 0.15, ZN - 0.15)]
+        shapes.append(("NotchSide", XN - WT, XN, 0, WALL, 0.15, ZN))
+        if DOOR_IN_NOTCH:     # the door in it, a lintel over the door
+            dtop = DOOR["yt"] if DOOR else 2.0
+            shapes += [("NotchFront", XN - WT, d0, 0, WALL, ZN + 0.15, ZN - 0.15), ("NotchFront2", d1, xw1, 0, WALL, ZN + 0.15, ZN - 0.15),
+                       ("NotchLintel", d0, d1, dtop, WALL, ZN + 0.15, ZN - 0.15)]
+        else:
+            shapes.append(("NotchFront", XN - WT, xw1, 0, WALL, ZN + 0.15, ZN - 0.15))
     if FZ_ > 0:
         shapes.append(("UpperFront", xw0, xw1, UP["height"], WALL, FZ_ + 0.15, FZ_ - 0.15))
     if DECK:
@@ -253,7 +264,7 @@ def build(h):
     else:
         shapes.append(("East", XI1, xw1, 0, WALL, ZN + 0.15 if NOTCH else max(0.15, FZ_ + 0.15), -D))
     if UP:
-        if FZ_ <= 0:
+        if FZ_ <= 0 and not DOOR_IN_NOTCH:
             shapes.append(("UpperDoor", d0, d1, UP["height"] + 0.5, WALL, 0.15, -0.15))
         shapes += up_shapes
     for i, (a, b, za, zb) in enumerate(SPEC.get("posts", [])):
@@ -263,8 +274,9 @@ def build(h):
         t = (re - srow) / re
         sy, sz = ye + t * (yt - ye), ze + t * (-D - ze)
         S('[sub_resource type="QuadMesh" id="q_smoke"]\nsize = Vector2(0.9, 3.2)\n')
-        N('[node name="ChimneySmoke" type="MeshInstance3D" parent="."]\ntransform = %s\nmesh = SubResource("q_smoke")\nsurface_material_override/0 = SubResource("mt_smoke")\n'
-          % tf(px(sx), sy + 1.6, sz + 0.05))
+        # with the roof: seen only from outside (the roof is cut away while the doctor is in)
+        N('[node name="ChimneySmoke" type="MeshInstance3D" parent="%s_Roof"]\ntransform = %s\nmesh = SubResource("q_smoke")\nsurface_material_override/0 = SubResource("mt_smoke")\n'
+          % (NAME, tf(px(sx), sy + 1.6, sz + 0.05)))
     # lanterns in the art: a small flame behind the glass and a light that comes on at night
     if SPEC.get("lamps"):
         if not any('id="sh_flame"' in e for e in ext):

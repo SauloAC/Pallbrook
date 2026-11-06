@@ -103,8 +103,12 @@ def build(h):
         xr0, c0 = xs, c1
     else:
         c0 = 0
+    # the roof may stop at a column: beyond it a set-back part's own front plane carries its roof (the tavern)
+    cr = sp["roof"].get("x_px", (0, h.iw))[1]
+    if cr < h.iw:
+        XR = h.px(cr)
     h.roof_fn = h.obj("Roof", [([(xr0, ye, ze), (XR, ye, ze), (XR, yt, -D), (xr0, yt, -D)],
-                                [h.uv(c0, re), h.uv(h.iw, re), h.uv(h.iw, 0), h.uv(c0, 0)], 1)], rn)
+                                [h.uv(c0, re), h.uv(cr, re), h.uv(cr, 0), h.uv(c0, 0)], 1)], rn)
     # the volume behind (only for shadows and to close it): back wall and the two sides up to the roof
     solid = tuple(sp["solid_uv"])
     xw0, xw1 = h.xw0, h.xw1

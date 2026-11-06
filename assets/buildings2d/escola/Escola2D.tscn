@@ -505,7 +505,7 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.8594, 0.0250, -0.4200)
 mesh = SubResource("q_DoorRug")
 surface_material_override/0 = SubResource("mt_p_rug")
 
-[node name="ChimneySmoke" type="MeshInstance3D" parent="."]
+[node name="ChimneySmoke" type="MeshInstance3D" parent="Escola_Roof"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2188, 9.1736, -5.6700)
 mesh = SubResource("q_smoke")
 surface_material_override/0 = SubResource("mt_smoke")

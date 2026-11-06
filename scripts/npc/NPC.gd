@@ -148,13 +148,6 @@ const INTERIOR_SLOTS_3D := {
 	"Casa2": [
 		Vector3(4.1, 0.0, -1.9), Vector3(4.25, 0.0, -2.3), Vector3(2.6, 0.0, -0.6), Vector3(3.4, 0.0, -0.6),
 	],
-	# Tavern (marker at the south door): four inside by the bar and the table, eight out on the
-	# patio (the second row of tables, added for lunch on 31 Oct, sits south of the first)
-	"Taverna": [
-		Vector3(0.5, 0.0, -5.0), Vector3(-0.5, 0.0, -5.0), Vector3(0.0, 0.0, -2.0), Vector3(1.2, 0.0, -7.2),
-		Vector3(0.0, 0.0, 1.4), Vector3(-0.6, 0.0, 3.1), Vector3(0.6, 0.0, 3.1), Vector3(2.4, 0.0, 0.9),
-		Vector3(-1.8, 0.0, 4.6), Vector3(1.8, 0.0, 4.6), Vector3(0.0, 0.0, 6.4), Vector3(1.8, 0.0, 7.0),
-	],
 	# Library (marker at the south door): around the reading table, by the shelves and the desks
 	"Biblioteca": [
 		Vector3(-1.8, 0.0, -3.2), Vector3(1.8, 0.0, -3.2), Vector3(0.0, 0.0, -1.7), Vector3(-1.3, 0.0, -4.6),
@@ -167,14 +160,12 @@ const INTERIOR_SLOTS_3D := {
 # (the tavern rooms upstairs, the priest's quarters) still send their owner out of sight.
 const BED_SPOTS_3D := {
 	"Casa2": [Vector3(-1.9, 0.0, -2.7), 0.0],
-	"Taverna": [Vector3(1.45, 3.12, -6.85), -90.0],  # Marta sleeps upstairs, by the window (feet at the foot of the bed, head to the wall)
 }
 const BED_HEIGHT := 0.6
 
 # Upstairs beds: where to walk to first (on the upper floor, beside the bed), relative to the door.
 # The bed itself has no navigation mesh, and its nearest mesh point can be outside the house.
 const BED_APPROACH_3D := {
-	"Taverna": Vector3(0.6, 3.12, -6.6),
 }
 static var INTERIOR_SLOTS: Dictionary = INTERIOR_SLOTS_3D.merged(HouseLayouts.INTERIOR_SLOTS)
 static var BED_SPOTS: Dictionary = BED_SPOTS_3D.merged(HouseLayouts.BED_SPOTS)

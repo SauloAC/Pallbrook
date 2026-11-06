@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ci8j0a6a6bnj2"
+path="res://.godot/imported/taverna_front2.obj-25fad25e2fcc55453810e3a2cc69ed04.mesh"
+
+[deps]
+
+files=["res://.godot/imported/taverna_front2.obj-25fad25e2fcc55453810e3a2cc69ed04.mesh"]
+
+source_file="res://assets/buildings2d/taverna/taverna_front2.obj"
+dest_files=["res://.godot/imported/taverna_front2.obj-25fad25e2fcc55453810e3a2cc69ed04.mesh", "res://.godot/imported/taverna_front2.obj-25fad25e2fcc55453810e3a2cc69ed04.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
