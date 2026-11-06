@@ -25,7 +25,8 @@ const OLD_GRAVES := [                                 # [stone, foot]: the stone
 	["cem_rip", Vector3(-20.6, 0.0, -8.1)], ["cem_broken", Vector3(-18.6, 0.0, -8.1)],
 	["cem_low", Vector3(-20.6, 0.0, -5.3)], ["cem_tomb", Vector3(-18.65, 0.0, -5.3)],
 ]
-const DEAD_TREES := [["cem_tree_dead_l", Vector3(-27.3, 0.0, -5.8)], ["cem_tree_dead_m", Vector3(-16.9, 0.0, -8.4)]]
+# Outside the fence; the east one far enough south that its picture leaves the road and Gideon's stall clear
+const DEAD_TREES := [["cem_tree_dead_l", Vector3(-27.3, 0.0, -5.8)], ["cem_tree_dead_m", Vector3(-16.9, 0.0, -4.6)]]
 const LANTERNS := [Vector3(-23.15, 0.0, -10.7), Vector3(-20.85, 0.0, -10.7)]
 const ROAD_GATE := Vector3(-26.9, 0.0, -10.5)         # The town's gate across the road, west of the arch (its south end)
 const SIDE_STEP := 3.0                                # One side run of the fence (cem_fence_side.png)
@@ -67,8 +68,8 @@ static func build(n: Nature2D, region: Node3D) -> void:
 
 
 # Where nobody walks through: the fence (open under the arch), the crypt, the statue, the stones, the
-# trees' trunks and the lantern posts; and the floor of its south part. Under the navigation region, so
-# its mesh is baked around (and over) them.
+# trees' trunks, the lantern posts and the road's south side either side; and the floor of its south
+# part. Under the navigation region, so its mesh is baked around (and over) them.
 static func _colliders(region: Node3D) -> void:
 	var body := StaticBody3D.new()
 	body.name = "Cemetery2DColliders"
@@ -94,6 +95,10 @@ static func _colliders(region: Node3D) -> void:
 		boxes.append([t[1].x - 0.25, t[1].x + 0.25, t[1].z - 0.4, t[1].z - 0.05])
 	for at: Vector3 in LANTERNS:
 		boxes.append([at.x - 0.15, at.x + 0.15, at.z - 0.3, at.z - 0.05])
+	# The road's south side either side of the cemetery, so nobody walks off the west bank's floor: from
+	# the road's gate to the fence, and from the fence to the bridge's rail (its wooden fence is town.glb's)
+	boxes.append([-26.9, west, north - 0.15, north + 0.05])
+	boxes.append([east, -15.6, north - 0.15, north + 0.05])
 	for b in boxes:
 		_box(body, b[0], b[1], b[2], b[3], 0.0, 1.5)
 	# The ground under the cemetery's south edge: the west bank's floor (Col046 in town.blend) stops at

@@ -1,7 +1,7 @@
 class_name Merchant
 extends Node3D
 
-# Gideon's stall, on the road in front of the cemetery gate, beyond the bridge (see the design
+# Gideon's stall, by the road in front of the cemetery, beyond the bridge (see the design
 # doc, "O comerciante além da ponte"). He came from the town across the hills that the wolf
 # attacked, and by these graves he feels strangely safe (the vampire can't cross running water;
 # he doesn't know that). He sells ingredients for the doctor's remedies, mornings only, and every
@@ -10,8 +10,10 @@ extends Node3D
 const NAME := "Gideon"
 const OPEN_FROM := 7.0
 const OPEN_UNTIL := 13.0   # Long enough for a quick visit on a morning with patients
-const STALL_AT := Vector3(-24.5, 0.0, -12.9)   # On the road, west of the cemetery gate
-const USE_AT := Vector3(-24.5, 0.0, -11.9)     # Where the doctor stands to buy
+# Off the road, on its north side, east of the cemetery's arch (6 Nov): on the road behind the
+# crypt, the crypt's picture hid him and whoever came to buy (the road's fence stops short of it)
+const STALL_AT := Vector3(-19.3, 0.0, -13.45)
+const USE_AT := Vector3(-19.3, 0.0, -12.45)    # Where the doctor stands to buy, on the road
 const USE_RANGE := 1.4
 const ICON := preload("res://assets/ui/icon_talk.png")
 const WOOD := Color(0.36, 0.24, 0.14)
