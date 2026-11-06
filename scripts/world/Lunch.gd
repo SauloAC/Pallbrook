@@ -54,11 +54,19 @@ func _ready() -> void:
 	prompt.visible = false
 	add_child(prompt)
 	prompt.global_position = USE_AT + Vector3(0.0, 2.0, 0.0)
+	_keep_seat.call_deferred()
 	if not GameState.lunch.has("garlic_hater"):
 		# One innocent who simply can't stand garlic, so a refused bowl proves nothing alone
 		var names: Array = REGULARS.filter(func(n): return n != GameState.vampire_name)
 		GameState.lunch["garlic_hater"] = names.pick_random() if not names.is_empty() else ""
 		GameState.lunch["seen"] = []
+
+
+# The doctor's chair at the table: the townsfolk who sit at the patio leave it for him
+func _keep_seat() -> void:
+	var seat := Seat.nearest(get_tree(), USE_AT, 2.5)
+	if seat:
+		seat.kept = true
 
 
 func _process(_delta: float) -> void:

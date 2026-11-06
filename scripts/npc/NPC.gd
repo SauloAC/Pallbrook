@@ -155,6 +155,17 @@ const BED_HEIGHT := 0.6
 # The bed itself has no navigation mesh, and its nearest mesh point can be outside the house.
 const BED_APPROACH_3D := {
 }
+# Sitting (6 Nov): someone headed for a spot takes a free seat near it (a stool, a bench, a pew: a
+# Seat), walks up beside it and sits, facing as it faces; they get up when they go somewhere else.
+# Not at the first spot of a place (its keeper's: behind the bar, at the anvil, at the altar), not
+# on the way to bed, and not always (SEAT_CHANCE), so a room doesn't fill up in rows.
+const SEAT_REACH := 1.6       # How far from their spot a seat may be (metres)
+const SEAT_CHANCE := 0.75
+var seat: Seat = null          # The seat they are heading for or sitting on
+var seated := false
+var seat_stand_at := Vector3.ZERO  # Where they stood before sitting: they get up there
+var seat_at_lunch := false     # Took it at the tavern lunch (out on the patio): up when lunch is over
+
 static var INTERIOR_SLOTS: Dictionary = INTERIOR_SLOTS_3D.merged(HouseLayouts.INTERIOR_SLOTS)
 static var BED_SPOTS: Dictionary = BED_SPOTS_3D.merged(HouseLayouts.BED_SPOTS)
 static var BED_APPROACH: Dictionary = BED_APPROACH_3D.merged(HouseLayouts.BED_APPROACH)
@@ -254,6 +265,8 @@ func set_state(new_state: State) -> void:
 		Audio.play_at("door" if new_state == State.INSIDE else "door_close", global_position, -6.0)
 	if in_bed:
 		_get_up()
+	if new_state != State.TALKING and new_state != State.ROUTINE:
+		_leave_seat()  # Off to bed, out of sight, scared, hunting, dead: up from the chair first
 	state = new_state
 	# Leaving the hunt: back to a normal, recognizable person
 	if new_state != State.HUNTING and is_dark:
@@ -366,6 +379,7 @@ var jailed := false  # Condemned at a hearing: shut outside the town gate
 func jail() -> void:
 	jailed = true
 	marked = false
+	_leave_seat()
 	_set_present(false)
 	set_process(false)
 	set_physics_process(false)
@@ -422,8 +436,10 @@ func talk(player: Node3D) -> void:
 		return
 
 	set_state(State.TALKING)
-	# Turn to face the doctor (ignore height so we don't tilt)
-	if visual:
+	# Turn to face the doctor (ignore height so we don't tilt); seated, they stay as the seat faces
+	if seated:
+		pass
+	elif visual:
 		visual.face(player.global_position)
 	else:
 		look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z))
@@ -574,6 +590,8 @@ func _physics_process(delta: float) -> void:
 	# Safety net: if no dialogue is open, nobody should be stuck talking
 	if state == State.TALKING and not GameState.in_dialogue:
 		set_state(State.ROUTINE)
+	if seated:
+		return  # In the chair: no walking, no falling
 
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -623,6 +641,8 @@ func _on_arrived() -> void:
 	if wander:
 		_pick_random_destination()
 		return
+	if seat and not seated and state == State.ROUTINE:
+		_sit()
 	# Reached home at night (or while scared): go inside
 	if data and current_place == data.home and (_is_bedtime() or state == State.SCARED):
 		set_state(State.SLEEPING)
@@ -696,6 +716,8 @@ func catch_up() -> void:
 	if state != State.ROUTINE or wander or data == null or chasing:
 		return
 	_follow_schedule()
+	if seated:
+		return  # Still sitting where the day has them
 	var spot := agent.target_position
 	if spot.distance_to(global_position) > 0.5:
 		global_position = spot
@@ -798,6 +820,11 @@ func _follow_schedule() -> void:
 
 func _go_to_place(place: String) -> void:
 	var marker := _find_location(place)
+	var to_bed := data != null and place == data.home and BED_SPOTS.has(place) \
+			and (_is_bedtime() or state == State.SCARED or hunt_returning)
+	if seat and place == current_place and not to_bed and state == State.ROUTINE and seat_at_lunch == _lunch_time(place):
+		return  # Still where they meant to be (a talk ended, an hour struck): they stay in their seat
+	_leave_seat()
 	if marker:
 		current_place = place
 		place_slot = _free_slot(place)
@@ -807,8 +834,7 @@ func _go_to_place(place: String) -> void:
 		if INTERIOR_SLOTS.has(place):
 			jitter *= 0.5  # Indoors: stay on the spot
 		var spot: Vector3 = marker.global_position + slots[place_slot] + jitter
-		if data and place == data.home and BED_SPOTS.has(place) \
-				and (_is_bedtime() or state == State.SCARED or hunt_returning):
+		if to_bed:
 			spot = marker.global_position + BED_SPOTS[place][0]  # Off to bed (stops beside it)
 			if BED_APPROACH.has(place):
 				spot = _upstairs_spot(marker, place)
@@ -816,7 +842,68 @@ func _go_to_place(place: String) -> void:
 			spot = _reachable_spot(marker.global_position, spot)
 		elif data and data.work_spots.has(place) and not GameState.is_night and state == State.ROUTINE:
 			spot = data.work_spots[place]  # Their own spot there (Ada at her stall)
+		if not to_bed and state == State.ROUTINE and place_slot != 0 and not wander \
+				and not (data and data.work_spots.has(place)) and randf() < SEAT_CHANCE:
+			spot = _pick_seat(marker.global_position + slots[place_slot], spot)
 		go_to(spot)
+
+
+# A free seat near their spot: reserve it and return where to stand beside it (or the spot itself).
+# The seat stands on a stool or bench, off the navigation mesh: they walk to the closest point of
+# the mesh beside it, if that point can be reached from the square.
+func _pick_seat(near: Vector3, spot: Vector3) -> Vector3:
+	var chosen := Seat.free_for_npc(get_tree(), near, SEAT_REACH)
+	if chosen == null:
+		return spot
+	var map := agent.get_navigation_map()
+	var hub := _find_location("Praca")
+	if hub == null or NavigationServer3D.map_get_iteration_id(map) == 0:
+		return spot
+	var beside := NavigationServer3D.map_get_closest_point(map, chosen.global_position)
+	if Vector2(beside.x - chosen.global_position.x, beside.z - chosen.global_position.z).length() > 0.9:
+		return spot
+	var path := NavigationServer3D.map_get_path(map, hub.global_position, beside, true)
+	if path.is_empty() or path[path.size() - 1].distance_to(beside) > 0.35:
+		return spot
+	seat = chosen
+	seat.occupant = self
+	seat_at_lunch = _lunch_time(current_place)
+	return beside
+
+
+# Down onto the seat they walked up to (from beside it: a stool's collision keeps them off it)
+func _sit() -> void:
+	var gap := seat.global_position - global_position
+	if Vector2(gap.x, gap.z).length() > 1.2:
+		_leave_seat()  # Didn't get close (blocked): they just stand where they are
+		return
+	seat_stand_at = global_position
+	velocity = Vector3.ZERO
+	collision.disabled = true  # The doctor can't push them off, and they don't push the stool
+	global_position = Vector3(seat.global_position.x, seat.global_position.y - 0.02, seat.global_position.z)
+	reset_physics_interpolation()
+	if visual == null or visual.sit(seat.facing) <= 0.0:
+		global_position = seat_stand_at  # No sitting clip for this body: they stand instead
+		reset_physics_interpolation()
+		collision.disabled = not visible
+		_leave_seat()
+		return
+	seated = true
+
+
+# Up from the seat (if sitting) back where they stood, and the seat is free again
+func _leave_seat() -> void:
+	if seat and seat.occupant == self:
+		seat.occupant = null
+	seat = null
+	if not seated:
+		return
+	seated = false
+	if visual:
+		visual.stand_up()
+	global_position = seat_stand_at
+	reset_physics_interpolation()
+	collision.disabled = not visible
 
 
 # Indoor spots sit among furniture. If one is off the navigation mesh, or on a patch the
@@ -866,12 +953,16 @@ func _free_slot(place: String) -> int:
 		taken.append(npc.place_slot)
 	var count: int = INTERIOR_SLOTS[place].size() if INTERIOR_SLOTS.has(place) else PLACE_SLOTS.size()
 	var order: Array = range(count)
-	if place == "Taverna" and not GameState.is_night and GameState.hour >= 11.5 and GameState.hour < 13.5:
+	if _lunch_time(place):
 		order = range(4, count) + range(0, 4)  # Lunch is out on the patio, where the doctor sits
 	for i in order:
 		if not taken.has(i):
 			return i
 	return randi() % count  # Very crowded: share a spot
+
+
+func _lunch_time(place: String) -> bool:
+	return place == "Taverna" and not GameState.is_night and GameState.hour >= 11.5 and GameState.hour < 13.5
 
 
 func _place_for_hour(hour: int) -> String:

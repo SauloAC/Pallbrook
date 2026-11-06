@@ -6,6 +6,9 @@ extends Marker3D
 # any movement stands him up again. Lunch and other scenes can also seat him (sit_player).
 # Sitting takes the doctor off physics, so a chair's collision doesn't push him out of it;
 # when he stands he steps back to where he stood before sitting down.
+# Townsfolk sit too (6 Nov): one takes a free seat near their spot (NPC._pick_seat) and is its
+# occupant while there; the doctor isn't offered a taken seat. The one kept for the doctor at the
+# tavern lunch (kept) is left free for him.
 
 @export_enum("south", "east", "north", "west") var facing := "south"
 @export var use_range := 0.8
@@ -16,6 +19,8 @@ const ICON := preload("res://assets/ui/icon_sit.png")
 var prompt: Sprite3D
 var sitter: Node3D = null   # The doctor while he sits here
 var stand_at := Vector3.ZERO  # Where he stood before sitting: he gets up there (a stool's collision would lift him onto it)
+var occupant: Node3D = null   # A townsperson sitting here, or on the way to it
+var kept := false             # The doctor's chair at the tavern lunch: townsfolk leave it free
 
 
 func _ready() -> void:
@@ -39,6 +44,9 @@ func _process(_delta: float) -> void:
 		if wants and not GameState.in_dialogue and not GameState.reading:
 			stand_player()
 		return
+	if occupant:
+		prompt.visible = false  # Someone is sitting here
+		return
 	var near := false
 	if player and interactive and player.visual and not player.visual.seated:
 		var gap: Vector3 = player.global_position - global_position
@@ -57,7 +65,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # Seats the doctor here, facing the way the seat faces. Returns false if he can't sit (no sprite clip)
 func sit_player(player) -> bool:
-	if player == null or player.visual == null or sitter:
+	if player == null or player.visual == null or sitter or occupant:
 		return false
 	var was_at: Vector3 = player.global_position
 	player.velocity = Vector3.ZERO
@@ -89,7 +97,20 @@ static func nearest(tree: SceneTree, point: Vector3, reach: float) -> Seat:
 	var best: Seat = null
 	for seat: Seat in tree.get_nodes_in_group("seats"):
 		var d := Vector2(seat.global_position.x - point.x, seat.global_position.z - point.z).length()
-		if d < reach and seat.sitter == null:
+		if d < reach and seat.sitter == null and seat.occupant == null:
+			best = seat
+			reach = d
+	return best
+
+
+# The closest seat to a point a townsperson may take: free, not the doctor's, at the same floor
+static func free_for_npc(tree: SceneTree, point: Vector3, reach: float) -> Seat:
+	var best: Seat = null
+	for seat: Seat in tree.get_nodes_in_group("seats"):
+		if seat.sitter or seat.occupant or seat.kept or absf(seat.global_position.y - point.y) > 0.8:
+			continue
+		var d := Vector2(seat.global_position.x - point.x, seat.global_position.z - point.z).length()
+		if d < reach:
 			best = seat
 			reach = d
 	return best
