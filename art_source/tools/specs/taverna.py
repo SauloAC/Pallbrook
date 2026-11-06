@@ -41,14 +41,13 @@ SPEC = {
             "bed": (-3.4, 2.77, -7.16, 0.0),
             "bed_approach": (-2.4, 2.77, -7.0)},
     "furniture": [
-        # the bar: the counter with three stools before it, the bottles and the barrels behind it
-        {"name": "Bar", "prop": "table", "flat": True, "y": 0.57, "x": 1.2, "z": -6.5, "box": (0.3, 2.1, -6.85, -6.15, 0.9)},
+        # the bar: the counter with three stools before it; behind it, against the wall, the bottles on their
+        # shelves and the two barrels with their taps (cel-shaded pieces, art_source/tools/furniture/)
+        {"name": "Bar", "prop": "cel_bar_counter", "x": 1.2, "z": -6.15, "box": (0.3, 2.1, -6.85, -6.15, 0.9)},
         {"name": "BarStool1", "prop": "stool", "x": 0.6, "z": -5.65, "box": (0.42, 0.78, -5.95, -5.65, 0.5)},
         {"name": "BarStool2", "prop": "stool", "x": 1.2, "z": -5.65, "box": (1.02, 1.38, -5.95, -5.65, 0.5)},
         {"name": "BarStool3", "prop": "stool", "x": 1.8, "z": -5.65, "box": (1.62, 1.98, -5.95, -5.65, 0.5)},
-        {"name": "Bottles", "prop": "cel_cabinet", "x": 0.25, "z": -8.15, "box": (-0.05, 0.55, -8.5, -8.15, 1.6)},
-        {"name": "Bottles2", "prop": "cel_cabinet", "x": 0.9, "z": -8.15, "box": (0.6, 1.2, -8.5, -8.15, 1.6)},
-        {"name": "BarrelStack", "prop": "barrel_stack", "x": 1.95, "z": -7.79, "box": (1.3, 2.6, -8.5, -7.79, 1.0)},
+        {"name": "BarBack", "prop": "cel_bar_back", "x": 1.38, "z": -8.12, "box": (0.15, 2.61, -8.5, -8.12, 1.4)},
         # the hall in the wing: round tables, the rug before the fire, barrels and a crate in the corners
         {"name": "TableA", "prop": "table_round", "x": -2.3, "z": -1.7, "box": (-2.6, -2.0, -2.2, -1.7, 0.8)},
         {"name": "StoolA1", "prop": "stool", "x": -2.9, "z": -1.5, "box": (-3.08, -2.72, -1.8, -1.5, 0.5)},

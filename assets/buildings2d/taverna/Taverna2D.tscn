@@ -36,8 +36,9 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_stone_wall.png" id="tx_block0top"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_a.png" id="tx_p_barrel_a"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_b.png" id="tx_p_barrel_b"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_stack.png" id="tx_p_barrel_stack"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bench_h.png" id="tx_p_bench_h"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bar_back.png" id="tx_p_cel_bar_back"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bar_counter.png" id="tx_p_cel_bar_counter"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_body.png" id="tx_p_cel_bed_body"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_foot.png" id="tx_p_cel_bed_foot"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_head.png" id="tx_p_cel_bed_head"]
@@ -122,15 +123,21 @@ shader_parameter/tex = ExtResource("tx_p_barrel_b")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_barrel_stack"]
-shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_barrel_stack")
-shader_parameter/lit_share = 0.5
-shader_parameter/own_light = 0.85
-
 [sub_resource type="ShaderMaterial" id="mt_p_bench_h"]
 shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_bench_h")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bar_back"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bar_back")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bar_counter"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_bar_counter")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -216,7 +223,7 @@ size = Vector3(1.1125, 1.6, 0.8)
 size = Vector2(0.3600, 0.4400)
 
 [sub_resource type="QuadMesh" id="q_Bar"]
-size = Vector2(1.8304, 1.3112)
+size = Vector2(1.8750, 1.6668)
 
 [sub_resource type="QuadMesh" id="q_BarStool1"]
 size = Vector2(0.4464, 0.8334)
@@ -227,14 +234,8 @@ size = Vector2(0.4464, 0.8334)
 [sub_resource type="QuadMesh" id="q_BarStool3"]
 size = Vector2(0.4464, 0.8334)
 
-[sub_resource type="QuadMesh" id="q_Bottles"]
-size = Vector2(0.7589, 1.9794)
-
-[sub_resource type="QuadMesh" id="q_Bottles2"]
-size = Vector2(0.7589, 1.9794)
-
-[sub_resource type="QuadMesh" id="q_BarrelStack"]
-size = Vector2(1.3393, 1.8752)
+[sub_resource type="QuadMesh" id="q_BarBack"]
+size = Vector2(2.4777, 2.4308)
 
 [sub_resource type="QuadMesh" id="q_TableA"]
 size = Vector2(0.7143, 1.3890)
@@ -359,14 +360,8 @@ size = Vector3(0.3600, 0.5000, 0.3000)
 [sub_resource type="BoxShape3D" id="b_BarStool3"]
 size = Vector3(0.3600, 0.5000, 0.3000)
 
-[sub_resource type="BoxShape3D" id="b_Bottles"]
-size = Vector3(0.6000, 1.6000, 0.3500)
-
-[sub_resource type="BoxShape3D" id="b_Bottles2"]
-size = Vector3(0.6000, 1.6000, 0.3500)
-
-[sub_resource type="BoxShape3D" id="b_BarrelStack"]
-size = Vector3(1.3000, 1.0000, 0.7100)
+[sub_resource type="BoxShape3D" id="b_BarBack"]
+size = Vector3(2.4600, 1.4000, 0.3800)
 
 [sub_resource type="BoxShape3D" id="b_TableA"]
 size = Vector3(0.6000, 0.8000, 0.5000)
@@ -632,9 +627,9 @@ omni_range = 3.0
 shadow_enabled = false
 
 [node name="Bar" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.2000, 0.5700, -6.5000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2000, 0.8334, -6.1500)
 mesh = SubResource("q_Bar")
-surface_material_override/0 = SubResource("mt_p_table")
+surface_material_override/0 = SubResource("mt_p_cel_bar_counter")
 
 [node name="BarStool1" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6000, 0.4167, -5.6500)
@@ -644,7 +639,7 @@ surface_material_override/0 = SubResource("mt_p_stool")
 [node name="BarStool1Seat0" type="Marker3D" parent="Taverna_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6000, 0.0000, -5.8000)
 script = ExtResource("sc_seat")
-facing = "north"
+facing = "west"
 use_range = 0.5
 
 [node name="BarStool2" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
@@ -655,7 +650,7 @@ surface_material_override/0 = SubResource("mt_p_stool")
 [node name="BarStool2Seat0" type="Marker3D" parent="Taverna_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2000, 0.0000, -5.8000)
 script = ExtResource("sc_seat")
-facing = "north"
+facing = "west"
 use_range = 0.5
 
 [node name="BarStool3" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
@@ -666,23 +661,13 @@ surface_material_override/0 = SubResource("mt_p_stool")
 [node name="BarStool3Seat0" type="Marker3D" parent="Taverna_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8000, 0.0000, -5.8000)
 script = ExtResource("sc_seat")
-facing = "north"
+facing = "west"
 use_range = 0.5
 
-[node name="Bottles" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2500, 0.9897, -8.1500)
-mesh = SubResource("q_Bottles")
-surface_material_override/0 = SubResource("mt_p_cel_cabinet")
-
-[node name="Bottles2" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9000, 0.9897, -8.1500)
-mesh = SubResource("q_Bottles2")
-surface_material_override/0 = SubResource("mt_p_cel_cabinet")
-
-[node name="BarrelStack" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9500, 0.9376, -7.7900)
-mesh = SubResource("q_BarrelStack")
-surface_material_override/0 = SubResource("mt_p_barrel_stack")
+[node name="BarBack" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3800, 1.2154, -8.1200)
+mesh = SubResource("q_BarBack")
+surface_material_override/0 = SubResource("mt_p_cel_bar_back")
 
 [node name="TableA" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3000, 0.6945, -1.7000)
@@ -943,17 +928,9 @@ shape = SubResource("b_BarStool2")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8000, 0.2500, -5.8000)
 shape = SubResource("b_BarStool3")
 
-[node name="Bottles" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2500, 0.8000, -8.3250)
-shape = SubResource("b_Bottles")
-
-[node name="Bottles2" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9000, 0.8000, -8.3250)
-shape = SubResource("b_Bottles2")
-
-[node name="BarrelStack" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9500, 0.5000, -8.1450)
-shape = SubResource("b_BarrelStack")
+[node name="BarBack" type="CollisionShape3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3800, 0.7000, -8.3100)
+shape = SubResource("b_BarBack")
 
 [node name="TableA" type="CollisionShape3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3000, 0.4000, -1.9500)

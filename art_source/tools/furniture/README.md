@@ -28,7 +28,8 @@ In use: `bed` (split, in every home and the clinic); `cabinet` (the clinic, the 
 `bookshelf_a`, `_b`, `_c` (the same bookcase, filled three ways: the library, the school, the town hall);
 `blackboard` (the school); `pew` (the church, the school, the town hall: its back toward the camera, as
 whoever sits on it faces north; in two layers, `"split": "seat"`: its back standing at the front, its seat
-lying under the sitter); `schooldesk`, `desk`, `lectern`; `altar` and `candlestand` (the church).
+lying under the sitter); `schooldesk`, `desk`, `teacherdesk` (the school's upstairs: its plain front toward the room, the
+drawers on the teacher's side), `lectern`; `bar_counter` and `bar_back` (the tavern's bar); `altar` and `candlestand` (the church).
 A piece with candles (`flame()`) has finish.py print where they burn, for the spec's "flames".
 `table_round`, `stool` and `crate` are modelled too, but the
 Cainos ones were kept: sturdier. A piece's picture stands at its spec "z" with its foot on the floor:

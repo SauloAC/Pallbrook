@@ -44,7 +44,7 @@ SPEC = {
         # upstairs: the schoolroom
         {"name": "Blackboard", "prop": "cel_blackboard", "upper": True, "x": -0.15, "z": -6.1, "box": (-0.85, 0.55, -6.3, -6.05, 1.6)},
         {"name": "Shelf", "prop": "cel_bookshelf_b", "upper": True, "x": 1.45, "z": -6.05, "box": (1.0, 1.9, -6.3, -6.0, 1.9)},
-        {"name": "TeacherDesk", "prop": "cel_desk", "upper": True, "x": 1.9, "z": -4.4, "box": (1.2, 2.6, -4.75, -4.4, 0.9)},
+        {"name": "TeacherDesk", "prop": "cel_teacherdesk", "upper": True, "x": 1.9, "z": -4.4, "box": (1.2, 2.6, -4.75, -4.4, 0.9)},
         {"name": "DeskA1", "prop": "cel_schooldesk", "upper": True, "x": -1.0, "z": -1.6, "box": (-1.4, -0.6, -1.9, -1.6, 0.7)},
         {"name": "DeskB1", "prop": "cel_schooldesk", "upper": True, "x": 0.2, "z": -1.6, "box": (-0.2, 0.6, -1.9, -1.6, 0.7)},
         {"name": "DeskA2", "prop": "cel_schooldesk", "upper": True, "x": -1.0, "z": -2.6, "box": (-1.4, -0.6, -2.9, -2.6, 0.7)},

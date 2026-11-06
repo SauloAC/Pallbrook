@@ -40,6 +40,7 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_body.png" id="tx_p_cel_pew_body"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_foot.png" id="tx_p_cel_pew_foot"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_schooldesk.png" id="tx_p_cel_schooldesk"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_teacherdesk.png" id="tx_p_cel_teacherdesk"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/escola/escola_door.png" id="tx_door"]
@@ -139,6 +140,12 @@ shader_parameter/tex = ExtResource("tx_p_cel_schooldesk")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_teacherdesk"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_teacherdesk")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
 [sub_resource type="ShaderMaterial" id="mt_p_rug"]
 shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_rug")
@@ -188,7 +195,7 @@ size = Vector2(1.4732, 1.9794)
 size = Vector2(0.9375, 2.1183)
 
 [sub_resource type="QuadMesh" id="q_TeacherDesk"]
-size = Vector2(1.4732, 1.4238)
+size = Vector2(1.4509, 1.3890)
 
 [sub_resource type="QuadMesh" id="q_DeskA1"]
 size = Vector2(0.8036, 1.0765)
@@ -504,9 +511,9 @@ mesh = SubResource("q_Shelf")
 surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b")
 
 [node name="TeacherDesk" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 4.9919, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 4.9745, -4.4000)
 mesh = SubResource("q_TeacherDesk")
-surface_material_override/0 = SubResource("mt_p_cel_desk")
+surface_material_override/0 = SubResource("mt_p_cel_teacherdesk")
 
 [node name="DeskA1" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8183, -1.6000)

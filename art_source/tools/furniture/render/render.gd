@@ -40,6 +40,8 @@ const RAMPS := {
 	"stone": [Color8(104, 102, 108), Color8(132, 130, 134), Color8(160, 158, 158), Color8(184, 182, 178)],
 	"gold": [Color8(140, 100, 28), Color8(180, 136, 40), Color8(214, 172, 64), Color8(238, 206, 106)],
 	"wax": [Color8(190, 178, 146), Color8(212, 202, 170), Color8(230, 222, 194), Color8(244, 238, 214)],
+	"pewter": [Color8(84, 88, 96), Color8(108, 112, 120), Color8(136, 140, 146), Color8(170, 174, 178)],
+	"apple": [Color8(110, 30, 26), Color8(140, 40, 32), Color8(170, 54, 40), Color8(200, 80, 60)],
 	"chalk": [Color8(170, 172, 160), Color8(188, 190, 178), Color8(206, 206, 194), Color8(222, 222, 210)],
 }
 
@@ -199,7 +201,7 @@ func bottle(kind: String, glass: String, x: float, y: float, z: float, h: float,
 # ---------- The pieces ----------
 # Sizes as the interiors' furniture has them (a little larger than life, like the Cainos pieces)
 const PIECES := ["bed", "cabinet", "table_round", "stool", "crate", "bookshelf_a", "bookshelf_b", "bookshelf_c", "blackboard",
-	"pew", "schooldesk", "desk", "lectern", "altar", "candlestand"]
+	"pew", "schooldesk", "desk", "lectern", "altar", "candlestand", "teacherdesk", "bar_counter", "bar_back"]
 
 
 # A wooden bed, 1 m by 2: a red blanket over the linen, the pillow at the head (north, the wall)
@@ -514,3 +516,123 @@ func piece_candlestand() -> void:
 	cyl("iron", 0.0, -0.15, 0.05, 0.95, 0.03, -1.0, 6, g)                        # stem
 	cyl("iron", 0.0, -0.15, 1.0, 0.04, 0.1, 0.05, 6, g)                          # dish
 	candle(0.0, 1.04, -0.15, 0.22, g)
+
+
+
+# The teacher's desk: its plain front toward the room (the camera), the drawers on the far side, where
+# she stands looking at the pupils. Books, the register open, the ink, an apple.
+func piece_teacherdesk() -> void:
+	var w := 0.98
+	var d := -0.62
+	var g := _group()
+	planks = Vector4(1, 0, 0, 0.2)
+	box("wood", -w - 0.03, w + 0.03, 0.74, 0.8, d - 0.03, 0.03, g)              # top
+	planks = Vector4(1, 0, 0, 0.16)
+	box("wood_mid", -w, w, 0.06, 0.74, -0.05, 0.0, g)                            # the front panel, boards upright
+	planks = Vector4.ZERO
+	for x in [-w, w - 0.08]:
+		box("wood", x, x + 0.08, 0.0, 0.74, -0.06, 0.01, g)                     # its corner posts
+		box("wood_mid", x, x + 0.08, 0.0, 0.74, d, d + 0.08, g)
+	box("wood", -w, w, 0.0, 0.06, -0.06, 0.01, g)                               # the rail along its foot
+	box("wood", -w, w, 0.66, 0.74, -0.06, 0.01, g)                              # and under the top
+	box("wood_mid", -w, w, 0.06, 0.74, d, d + 0.03, g)                           # the drawers' side, hidden
+	var b := _group()
+	box("book_blue", -0.85, -0.45, 0.8, 0.86, -0.5, -0.22, b)                    # a pile of books
+	box("book_red", -0.82, -0.47, 0.86, 0.92, -0.48, -0.24, b)
+	box("book_green", -0.84, -0.5, 0.92, 0.97, -0.47, -0.25, b)
+	for x in [-0.3, 0.0]:                                                        # the register, open
+		box("paper", x, x + 0.29, 0.8, 0.82, -0.46, -0.16)
+	cyl("iron", 0.45, -0.32, 0.8, 0.07, 0.05, -1.0, 6)                           # the ink
+	box("paper", 0.43, 0.45, 0.84, 1.0, -0.33, -0.31)                            # its quill
+	cyl("apple", 0.75, -0.3, 0.8, 0.09, 0.055, 0.045, 8)                         # an apple
+
+
+# The tavern's bar: the counter, its boards upright toward the customers, a thick top with the day's
+# bottles, mugs and a jug on it. Marta stands behind it (north).
+func piece_bar_counter() -> void:
+	var w := 1.26
+	var d := -0.72
+	var g := _group()
+	planks = Vector4(1, 0, 0, 0.14)
+	box("wood_mid", -w + 0.04, w - 0.04, 0.06, 0.94, -0.07, -0.02, g)          # the front, boards upright
+	planks = Vector4.ZERO
+	box("wood_mid", -w, w, 0.0, 0.06, -0.08, 0.0, g)                             # its foot
+	for x in [-w, -0.42, 0.42, w - 0.1]:
+		box("wood", x, x + 0.1, 0.06, 0.94, -0.09, -0.01, g)                   # posts between the boards
+	box("wood_mid", -w, w, 0.06, 0.94, d, -0.07, g)                              # the body behind
+	planks = Vector4(0, 0, 1, 0.16)
+	box("wood", -w - 0.05, w + 0.05, 0.94, 1.02, d - 0.03, 0.06, g)              # the thick top, overhanging
+	planks = Vector4.ZERO
+	var t := [["bottle", "glass_green", -1.05, 0.26], ["bottle", "glass_amber", -0.9, 0.22], ["bottle", "glass_purple", -0.76, 0.24]]
+	for b in t:
+		bottle(b[0], b[1], b[2], 1.02, -0.3, b[3])
+	cyl("pewter", -0.2, -0.32, 1.02, 0.12, 0.06, -1.0, 8)                         # mugs
+	cyl("pewter", 0.05, -0.4, 1.02, 0.12, 0.06, -1.0, 8)
+	cyl("clay", 0.72, -0.34, 1.02, 0.2, 0.06, 0.09, 8)                           # the jug
+	cyl("clay", 0.72, -0.34, 1.22, 0.06, 0.045, 0.06, 8)
+	bottle("bottle", "glass_amber", 1.0, 1.02, -0.36, 0.22)
+
+
+# Behind the bar, against the wall: on the left the bottles on two shelves over a cupboard, on the right
+# two barrels on their sides in a cradle, their taps toward the room
+func piece_bar_back() -> void:
+	var d := -0.5
+	var g := _group()
+	# the cupboard along the whole back
+	var x0 := -1.7
+	var x1 := 1.7
+	box("wood_mid", x0, x1, 0.0, 0.7, d, -0.04, g)                               # its body
+	planks = Vector4(1, 0, 0, 0.3)
+	box("wood_mid", x0 + 0.04, x1 - 0.04, 0.06, 0.64, -0.05, 0.0)                # its doors
+	planks = Vector4.ZERO
+	for x in range(5):
+		var kx := x0 + 0.37 + x * 0.74
+		box("iron", kx - 0.02, kx + 0.02, 0.36, 0.42, 0.0, 0.02, g)             # knobs
+	box("wood", x0 - 0.03, x1 + 0.03, 0.7, 0.76, d - 0.02, 0.03, g)              # its top
+	# the shelves, left: a back board and two shelves full of bottles
+	var sx1 := 0.15
+	planks = Vector4(1, 0, 0, 0.2)
+	box("shadow", x0, sx1, 0.76, 1.9, d, d + 0.03, g)
+	planks = Vector4.ZERO
+	for x in [x0, sx1 - 0.06]:
+		box("wood_mid", x, x + 0.06, 0.76, 1.9, d, d + 0.3, g)                 # the shelves' sides
+	for y in [1.2, 1.56, 1.86]:
+		box("wood_mid", x0, sx1, y, y + 0.04, d, d + 0.3, g)                     # shelves
+	var glass := ["glass_green", "glass_purple", "glass_amber", "glass_blue", "glass_green", "glass_amber",
+		"glass_purple", "glass_blue", "glass_amber", "glass_green", "glass_purple", "glass_blue"]
+	for row in 2:
+		var y: float = [0.76, 1.24][row]
+		var i := 0
+		var x := x0 + 0.18
+		while x < sx1 - 0.15:
+			var kind := "flask" if (i + row) % 4 == 3 else "bottle"
+			bottle(kind, glass[(i + row * 5) % glass.size()], x, y, d + 0.15, 0.24 + 0.04 * ((i * 7 + row) % 3), g)
+			x += 0.16
+			i += 1
+	# the barrels, right, on their sides on a cradle, the taps toward the room. (Squat: the picture stands
+	# heights up 1/cos 50, which would draw their round ends tall)
+	for bx in [0.52, 1.28]:
+		var k := _group()
+		box("wood_mid", bx - 0.32, bx + 0.32, 0.76, 0.84, d + 0.02, -0.02, k)    # the cradle
+		var r := 0.35
+		var ry := r * COS50
+		var cy := 0.84 + ry
+		planks = Vector4(1, 0, 0, 0.11)
+		var barrel := cyl("wood", 0.0, 0.0, -0.22, 0.44, r, -1.0, 14, k)
+		planks = Vector4.ZERO
+		barrel.rotation_degrees = Vector3(90, 0, 0)
+		barrel.scale = Vector3(1, 1, COS50)
+		barrel.position = Vector3(bx, cy, d + 0.24)
+		for hz in [0.03, 0.4]:                                                   # iron hoops
+			var hoop := cyl("iron", 0.0, 0.0, -0.02, 0.04, r + 0.012, -1.0, 14, k)
+			hoop.rotation_degrees = Vector3(90, 0, 0)
+			hoop.scale = Vector3(1, 1, COS50)
+			hoop.position = Vector3(bx, cy, d + 0.02 + hz)
+		planks = Vector4(0, 1, 0, 0.09)
+		var end := cyl("wood_end", 0.0, 0.0, -0.01, 0.02, r - 0.03, -1.0, 14)       # its round end, a line about it
+		planks = Vector4.ZERO
+		end.rotation_degrees = Vector3(90, 0, 0)
+		end.scale = Vector3(1, 1, COS50)
+		end.position = Vector3(bx, cy, d + 0.465)
+		box("iron", bx - 0.03, bx + 0.03, cy - 0.1, cy - 0.06, d + 0.46, d + 0.56, k)  # the tap
+		box("iron", bx - 0.02, bx + 0.02, cy - 0.16, cy - 0.08, d + 0.53, d + 0.56, k)
