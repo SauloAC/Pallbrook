@@ -2,11 +2,12 @@ extends Node
 # The interiors' furniture, modelled here from plain boxes and cylinders and rendered as the Cainos art
 # draws it: from the front and above, a pixel of height for every 1/32 m and the tops shortened to
 # DEPTH (the town's camera looks down at 50 degrees; the game stands these pictures up, 1/cos 50 tall,
-# as it does the Cainos ones), cel-shaded in the Cainos art's own colours (ramp.gdshader). Each piece is rendered twice: in colour,
+# as it does the Cainos ones), cel-shaded in hue-shifted ramps, every board bevelled (ramp.gdshader). Each piece is rendered twice: in colour,
 # and with every part in a flat colour of its own, from which ../finish.py draws the dark lines
 # between the parts and around the piece. A bed is rendered a third time, each part in the colour of
 # the layer it goes to (its foot, its body, its head: see finish.py), so that the game can stand the
-# three apart and someone lying in it shows between them.
+# three apart and someone lying in it shows between them. And every piece once more pressed flat onto
+# the floor, its footprint, from which finish.py makes the shadow it casts (down and right of it).
 #   godot --path render render.tscn -- <out dir> [piece ...]      (no pieces: all of them)
 
 const PX := 1.0 / 32.0
@@ -15,46 +16,51 @@ const COS50 := 0.64278761
 const SHADER := preload("res://ramp.gdshader")
 const DEPTH := 0.6     # How long a top looks for its depth (the Cainos tables and crates: about this)
 
-# Four shades each, dark to light, taken from the props already in the interiors
+# Four shades each, dark to light. Shifted as pixel art shifts them (after the references): the shades
+# toward red and purple, the lights toward orange; between the references' saturated wood and the
+# browner Cainos art around them in the game
 const RAMPS := {
-	"wood": [Color8(75, 45, 24), Color8(92, 58, 34), Color8(116, 86, 54), Color8(148, 123, 86)],
-	"wood_dark": [Color8(58, 34, 18), Color8(73, 45, 24), Color8(92, 62, 34), Color8(112, 85, 54)],
-	"wood_mid": [Color8(58, 34, 18), Color8(73, 45, 24), Color8(92, 62, 34), Color8(124, 96, 62)],
-	"shadow": [Color8(30, 18, 10), Color8(38, 23, 12), Color8(46, 28, 14), Color8(56, 34, 18)],
-	"wood_end": [Color8(78, 46, 24), Color8(96, 64, 38), Color8(118, 88, 56), Color8(134, 106, 72)],
-	"linen": [Color8(170, 160, 140), Color8(192, 184, 166), Color8(214, 206, 188), Color8(232, 226, 212)],
-	"red": [Color8(84, 38, 32), Color8(104, 50, 41), Color8(124, 62, 51), Color8(146, 78, 63)],
-	"iron": [Color8(40, 36, 42), Color8(56, 52, 58), Color8(74, 70, 76), Color8(96, 92, 98)],
-	"glass_green": [Color8(40, 66, 38), Color8(58, 96, 54), Color8(80, 128, 70), Color8(126, 172, 104)],
-	"glass_amber": [Color8(100, 64, 26), Color8(140, 94, 36), Color8(180, 126, 52), Color8(214, 166, 80)],
-	"glass_blue": [Color8(48, 62, 92), Color8(64, 84, 118), Color8(86, 108, 142), Color8(128, 150, 178)],
-	"glass_purple": [Color8(84, 40, 70), Color8(108, 54, 90), Color8(132, 70, 110), Color8(164, 100, 140)],
-	"clay": [Color8(110, 64, 40), Color8(134, 82, 52), Color8(156, 100, 66), Color8(176, 122, 84)],
-	"paper": [Color8(186, 172, 140), Color8(206, 194, 162), Color8(226, 214, 182), Color8(240, 230, 204)],
-	"book_red": [Color8(78, 30, 24), Color8(96, 38, 30), Color8(116, 48, 36), Color8(140, 64, 48)],
-	"book_blue": [Color8(36, 48, 76), Color8(46, 60, 92), Color8(56, 74, 110), Color8(76, 96, 134)],
-	"book_green": [Color8(40, 62, 40), Color8(50, 78, 50), Color8(62, 92, 60), Color8(84, 116, 78)],
-	"book_ochre": [Color8(110, 74, 30), Color8(132, 90, 36), Color8(154, 106, 42), Color8(180, 132, 60)],
-	"book_brown": [Color8(66, 40, 24), Color8(82, 52, 30), Color8(100, 66, 40), Color8(122, 86, 54)],
-	"slate": [Color8(34, 42, 37), Color8(40, 50, 44), Color8(47, 59, 51), Color8(58, 72, 63)],
-	"stone": [Color8(104, 102, 108), Color8(132, 130, 134), Color8(160, 158, 158), Color8(184, 182, 178)],
-	"gold": [Color8(140, 100, 28), Color8(180, 136, 40), Color8(214, 172, 64), Color8(238, 206, 106)],
-	"wax": [Color8(190, 178, 146), Color8(212, 202, 170), Color8(230, 222, 194), Color8(244, 238, 214)],
-	"pewter": [Color8(84, 88, 96), Color8(108, 112, 120), Color8(136, 140, 146), Color8(170, 174, 178)],
-	"apple": [Color8(110, 30, 26), Color8(140, 40, 32), Color8(170, 54, 40), Color8(200, 80, 60)],
-	"chalk": [Color8(170, 172, 160), Color8(188, 190, 178), Color8(206, 206, 194), Color8(222, 222, 210)],
+	"wood": [Color8(90, 38, 39), Color8(120, 56, 48), Color8(153, 92, 62), Color8(186, 128, 78)],
+	"wood_mid": [Color8(61, 26, 33), Color8(89, 38, 39), Color8(120, 58, 48), Color8(156, 96, 65)],
+	"wood_dark": [Color8(48, 20, 28), Color8(66, 28, 33), Color8(90, 40, 40), Color8(118, 62, 52)],
+	"wood_end": [Color8(78, 34, 36), Color8(104, 50, 44), Color8(134, 76, 56), Color8(162, 106, 70)],
+	"shadow": [Color8(30, 11, 22), Color8(38, 15, 26), Color8(48, 20, 30), Color8(60, 27, 34)],
+	"linen": [Color8(146, 126, 138), Color8(182, 168, 168), Color8(214, 204, 190), Color8(238, 232, 216)],
+	"red": [Color8(86, 26, 40), Color8(118, 38, 48), Color8(152, 56, 58), Color8(184, 82, 70)],
+	"iron": [Color8(38, 30, 46), Color8(58, 50, 66), Color8(86, 80, 96), Color8(126, 122, 134)],
+	"glass_green": [Color8(30, 66, 52), Color8(46, 100, 64), Color8(70, 136, 76), Color8(128, 184, 106)],
+	"glass_amber": [Color8(110, 54, 30), Color8(152, 86, 34), Color8(196, 128, 46), Color8(232, 178, 80)],
+	"glass_blue": [Color8(40, 50, 92), Color8(56, 76, 126), Color8(80, 108, 160), Color8(132, 160, 196)],
+	"glass_purple": [Color8(78, 30, 72), Color8(108, 46, 96), Color8(140, 66, 122), Color8(178, 104, 156)],
+	"clay": [Color8(112, 50, 42), Color8(146, 72, 52), Color8(178, 100, 64), Color8(206, 132, 84)],
+	"paper": [Color8(178, 156, 142), Color8(204, 188, 164), Color8(228, 214, 184), Color8(244, 236, 210)],
+	"book_red": [Color8(84, 22, 32), Color8(112, 32, 40), Color8(142, 46, 48), Color8(172, 70, 62)],
+	"book_blue": [Color8(34, 38, 78), Color8(46, 54, 100), Color8(60, 74, 126), Color8(88, 104, 156)],
+	"book_green": [Color8(30, 60, 50), Color8(42, 80, 58), Color8(58, 102, 66), Color8(88, 132, 84)],
+	"book_ochre": [Color8(118, 66, 30), Color8(150, 92, 36), Color8(182, 122, 48), Color8(212, 158, 72)],
+	"book_brown": [Color8(66, 30, 30), Color8(88, 42, 36), Color8(112, 60, 44), Color8(140, 86, 58)],
+	"slate": [Color8(28, 36, 40), Color8(36, 46, 48), Color8(44, 58, 56), Color8(58, 74, 68)],
+	"stone": [Color8(90, 80, 98), Color8(120, 112, 126), Color8(152, 146, 154), Color8(186, 182, 182)],
+	"gold": [Color8(128, 62, 30), Color8(176, 108, 36), Color8(218, 160, 54), Color8(246, 212, 110)],
+	"wax": [Color8(182, 160, 148), Color8(210, 194, 170), Color8(232, 220, 194), Color8(248, 242, 220)],
+	"pewter": [Color8(76, 74, 94), Color8(104, 104, 120), Color8(138, 140, 152), Color8(182, 184, 192)],
+	"apple": [Color8(108, 22, 32), Color8(146, 34, 38), Color8(182, 50, 44), Color8(214, 86, 64)],
+	"chalk": [Color8(170, 168, 168), Color8(190, 190, 184), Color8(210, 210, 200), Color8(230, 230, 218)],
 }
 
 var id_mode := false
 var layer_mode := false
+var shadow_mode := false
 var layer := Color.BLACK     # The layer of the parts that follow, in a layered piece
 const FOOT := Color(1, 0, 0)
 const BODY := Color(0, 1, 0)
 const HEAD := Color(0, 0, 1)
-const LAYERED := ["bed", "pew"]
+const LAYERED := ["bed", "pew", "chair_e", "chair_w"]
 var planks := Vector4.ZERO   # The boards' planks for the parts that follow (see ramp.gdshader)
+var plain := false           # No grain on the parts that follow: a small piece reads cleaner without
 var next_id := 0
 var piece_root: Node3D
+var holder: Node3D = null    # Where the parts go, if not straight under piece_root (a piece turned on itself)
 var flames: Array = []       # Where a piece's candles burn (see flame()): written beside its picture
 
 
@@ -64,9 +70,12 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(out)
 	var names: Array = Array(args.slice(1)) if args.size() > 1 else PIECES
 	for name in names:
-		for pass_id in ([0, 1, 2] if name in LAYERED else [0, 1]):
+		var frame := {}
+		flames = []
+		for pass_id in ([0, 1, 2, 3] if name in LAYERED else [0, 1, 3]):
 			id_mode = pass_id == 1
 			layer_mode = pass_id == 2
+			shadow_mode = pass_id == 3
 			next_id = 0
 			var vp := SubViewport.new()
 			vp.transparent_bg = true
@@ -77,6 +86,9 @@ func _ready() -> void:
 			vp.add_child(piece_root)
 			call("piece_" + name)
 			piece_root.scale = Vector3(1.0, 1.0 / COS50, DEPTH / SIN50)
+			if shadow_mode:
+				await _render(vp, frame, "%s/%s_shadow.png" % [out, name], true)
+				continue
 			var box := _bounds(piece_root)
 			var rmin := INF
 			var rmax := -INF
@@ -99,6 +111,7 @@ func _ready() -> void:
 			cam.transform = Transform3D(Basis(Vector3(1, 0, 0), deg_to_rad(-50.0)), target + Vector3(0, SIN50, COS50) * 30.0)
 			vp.add_child(cam)
 			cam.current = true
+			frame = {"size": vp.size, "cam": cam.transform, "ortho": cam.size}
 			await RenderingServer.frame_post_draw
 			await RenderingServer.frame_post_draw
 			vp.get_texture().get_image().save_png("%s/%s%s.png" % [out, name, ["", "_id", "_layers"][pass_id]])
@@ -113,6 +126,26 @@ func _ready() -> void:
 			vp.queue_free()
 		print("R ", name)
 	get_tree().quit()
+
+
+# The footprint: the piece pressed flat (heights to nothing), framed as its picture was, so that the two
+# line up pixel for pixel
+func _render(vp: SubViewport, frame: Dictionary, path: String, flat: bool) -> void:
+	if flat:
+		piece_root.scale.y = 0.001
+	vp.size = frame["size"]
+	var cam := Camera3D.new()
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	cam.size = frame["ortho"]
+	cam.near = 0.05
+	cam.far = 100.0
+	cam.transform = frame["cam"]
+	vp.add_child(cam)
+	cam.current = true
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	vp.get_texture().get_image().save_png(path)
+	vp.queue_free()
 
 
 func _bounds(root: Node3D) -> AABB:
@@ -141,8 +174,13 @@ func _material(ramp: String, group := -1) -> ShaderMaterial:
 		cols = [layer, layer, layer, layer]
 	for i in 4:
 		m.set_shader_parameter("c%d" % i, cols[i])
-	if not id_mode and not layer_mode:
+	if shadow_mode:
+		cols = [Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK]
+	if id_mode or layer_mode or shadow_mode:
+		m.set_shader_parameter("flat_colour", true)
+	else:
 		m.set_shader_parameter("planks", planks)
+		m.set_shader_parameter("grain", 1.0 if ramp.begins_with("wood") and not plain else 0.0)
 	return m
 
 
@@ -153,9 +191,10 @@ func box(ramp: String, x0: float, x1: float, y0: float, y1: float, z0: float, z1
 	mesh.size = Vector3(x1 - x0, y1 - y0, z1 - z0)
 	mi.mesh = mesh
 	mi.material_override = _material(ramp, group)
+	(mi.material_override as ShaderMaterial).set_shader_parameter("box_half", mesh.size / 2.0)   # its bevels
 	mi.position = Vector3((x0 + x1) / 2.0, (y0 + y1) / 2.0, (z0 + z1) / 2.0)
 	mi.rotation_degrees = rot
-	piece_root.add_child(mi)
+	(holder if holder else piece_root).add_child(mi)
 	return mi
 
 
@@ -170,9 +209,10 @@ func cyl(ramp: String, x: float, z: float, y0: float, h: float, r_top: float, r_
 	mesh.rings = 1
 	mi.mesh = mesh
 	mi.material_override = _material(ramp, group)
+	(mi.material_override as ShaderMaterial).set_shader_parameter("cyl", Vector2(r_top, h / 2.0))   # its rim
 	mi.position = Vector3(x, y0 + h / 2.0, z)
 	mi.rotation_degrees.y = 180.0 / sides   # a flat face toward the camera
-	piece_root.add_child(mi)
+	(holder if holder else piece_root).add_child(mi)
 	return mi
 
 
@@ -201,7 +241,8 @@ func bottle(kind: String, glass: String, x: float, y: float, z: float, h: float,
 # ---------- The pieces ----------
 # Sizes as the interiors' furniture has them (a little larger than life, like the Cainos pieces)
 const PIECES := ["bed", "cabinet", "table_round", "stool", "crate", "bookshelf_a", "bookshelf_b", "bookshelf_c", "blackboard",
-	"pew", "schooldesk", "desk", "lectern", "altar", "candlestand", "teacherdesk", "bar_counter", "bar_back", "barstool"]
+	"pew", "pew_s", "schooldesk", "desk", "lectern", "altar", "candlestand", "teacherdesk", "bar_counter", "bar_back", "barstool",
+	"tavern_table", "chair_e", "chair_w"]
 
 
 # A wooden bed, 1 m by 2: a red blanket over the linen, the pillow at the head (north, the wall)
@@ -403,7 +444,7 @@ func piece_blackboard() -> void:
 
 # A candle's flame, where the game lights it (the spec's "flames": the picture's pixel at the wick)
 func flame(x: float, y: float, z: float) -> void:
-	if not id_mode and not layer_mode:
+	if not id_mode and not layer_mode and not shadow_mode:
 		flames.append(Vector3(x, y, z))
 
 
@@ -429,6 +470,20 @@ func piece_pew() -> void:
 	box("wood", -w + 0.07, w - 0.07, 0.1, 0.4, -0.06, 0.0, g)                    # back, two boards
 	planks = Vector4.ZERO
 	box("wood_mid", -w - 0.02, w + 0.02, 0.4, 0.45, -0.08, 0.02, g)              # its top rail
+
+
+# The same pew the other way about, for a bench against the back wall: its back away from the camera,
+# whoever sits on it faces south (the room). They sit in front of all of it: one picture, no layers.
+func piece_pew_s() -> void:
+	var w := 0.72
+	var g := _group()
+	for x in [-w, w - 0.07]:
+		box("wood_mid", x, x + 0.07, 0.0, 0.44, -0.42, 0.0, g)                  # the ends
+	box("wood", -w + 0.07, w - 0.07, 0.3, 0.34, -0.36, 0.0, g)                   # seat
+	planks = Vector4(0, 1, 0, 0.23)
+	box("wood", -w + 0.07, w - 0.07, 0.1, 0.4, -0.42, -0.36, g)                  # back, two boards
+	planks = Vector4.ZERO
+	box("wood_mid", -w - 0.02, w + 0.02, 0.4, 0.45, -0.44, -0.34, g)             # its top rail
 
 
 # A pupil's desk: a sloping lid on four legs, a slate and a book on it
@@ -650,3 +705,58 @@ func piece_barstool() -> void:
 		var z := -0.24 + sin(deg_to_rad(a)) * 0.18
 		cyl("wood_mid", x, z, 0.0, 0.74, 0.035, 0.04, 4, g)
 	cyl("wood_mid", 0.0, -0.24, 0.26, 0.03, 0.18, -1.0, 8, g)                    # the ring for the feet
+
+
+
+# The tavern hall's round table: boards across its top, one thick leg on a cross foot; a candle burning
+# in its dish, two mugs and a plate
+func piece_tavern_table() -> void:
+	var g := _group()
+	planks = Vector4(0, 0, 1, 0.14)
+	cyl("wood", 0.0, -0.5, 0.7, 0.07, 0.5, -1.0, 10, g)                          # top
+	planks = Vector4.ZERO
+	cyl("wood_mid", 0.0, -0.5, 0.08, 0.62, 0.08, 0.1, 6, g)                      # leg
+	box("wood_mid", -0.36, 0.36, 0.0, 0.08, -0.56, -0.44, g)                     # the foot, crossed
+	box("wood_mid", -0.06, 0.06, 0.0, 0.08, -0.86, -0.14, g)
+	var c := _group()
+	cyl("pewter", 0.0, -0.5, 0.77, 0.03, 0.09, -1.0, 8, c)                       # the candle in its dish
+	candle(0.0, 0.8, -0.5, 0.14, c)
+	cyl("pewter", -0.26, -0.36, 0.77, 0.11, 0.055, -1.0, 8)                      # mugs
+	cyl("pewter", 0.3, -0.62, 0.77, 0.11, 0.055, -1.0, 8)
+	cyl("linen", 0.2, -0.3, 0.77, 0.015, 0.11, -1.0, 10)                         # a plate
+
+
+# A chair with a back, for the tavern's tables, turned half toward its table as the reference draws them:
+# chair_e has its table to the east (it faces north-east, its back toward the camera and the west),
+# chair_w the other way. Plain, as Saulo's second reference has it (6 Nov): a thick seat on four square
+# legs braced low, the back two posts and one board across their top; no grain. In two layers, like a
+# pew: the seat lies flat under whoever sits, the rest stands in front of them, its back over theirs.
+func piece_chair_e() -> void:
+	_chair(-40.0)
+
+
+func piece_chair_w() -> void:
+	_chair(40.0)
+
+
+func _chair(yaw: float) -> void:
+	holder = Node3D.new()
+	piece_root.add_child(holder)
+	holder.rotation_degrees.y = yaw
+	holder.position.z = -0.3
+	plain = true
+	var s := 0.24       # half the seat; it faces north (-z), its back on the south side
+	var t := 0.06       # the legs' thickness
+	var g := _group()
+	layer = FOOT
+	for x in [-s + 0.01, s - 0.01 - t]:
+		box("wood_mid", x, x + t, 0.0, 0.42, -s + 0.01, -s + 0.01 + t, g)         # front legs
+		box("wood_mid", x, x + t, 0.0, 0.92, s - 0.01 - t, s - 0.01, g)           # back legs, up into the back's posts
+		box("wood_mid", x + 0.01, x + t - 0.01, 0.12, 0.16, -s + 0.05, s - 0.05, g)  # the braces along the sides
+	box("wood_mid", -s + 0.05, s - 0.05, 0.2, 0.24, -0.02, 0.02, g)               # the brace across
+	box("wood", -s + 0.01, s - 0.01, 0.66, 0.9, s - 0.045, s - 0.01, g)          # the back's board
+	layer = BODY
+	box("wood", -s, s, 0.42, 0.48, -s, s, g)                                     # the seat
+	layer = FOOT
+	plain = false
+	holder = null

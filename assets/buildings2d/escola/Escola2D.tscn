@@ -39,13 +39,22 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_desk.png" id="tx_p_cel_desk"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_body.png" id="tx_p_cel_pew_body"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_foot.png" id="tx_p_cel_pew_foot"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_s.png" id="tx_p_cel_pew_s"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_schooldesk.png" id="tx_p_cel_schooldesk"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_teacherdesk.png" id="tx_p_cel_teacherdesk"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/escola/escola_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Shader" path="res://assets/buildings2d/prop_shadow.gdshader" id="sh_propshadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_desk_shadow.png" id="tx_p_cel_desk_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_s_shadow.png" id="tx_p_cel_pew_s_shadow"]
 [ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_shadow.png" id="tx_p_cel_pew_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_blackboard_shadow.png" id="tx_p_cel_blackboard_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bookshelf_b_shadow.png" id="tx_p_cel_bookshelf_b_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_teacherdesk_shadow.png" id="tx_p_cel_teacherdesk_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_schooldesk_shadow.png" id="tx_p_cel_schooldesk_shadow"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -134,6 +143,12 @@ shader_parameter/tex = ExtResource("tx_p_cel_pew_foot")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_pew_s"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_pew_s")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
 [sub_resource type="ShaderMaterial" id="mt_p_cel_schooldesk"]
 shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_cel_schooldesk")
@@ -176,11 +191,24 @@ size = Vector2(0.3600, 0.4400)
 [sub_resource type="QuadMesh" id="q_Counter"]
 size = Vector2(1.4732, 1.4238)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_desk_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_desk_shadow")
+
+[sub_resource type="QuadMesh" id="q_CounterShadow"]
+size = Vector2(1.5625, 1.3112)
+
 [sub_resource type="QuadMesh" id="q_BenchBack"]
 size = Vector2(1.0714, 0.7987)
 
-[sub_resource type="QuadMesh" id="q_BenchBackBody"]
-size = Vector2(1.0714, 0.6702)
+[sub_resource type="ShaderMaterial" id="mt_p_cel_pew_s_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_pew_s_shadow")
+
+[sub_resource type="QuadMesh" id="q_BenchBackShadow"]
+size = Vector2(1.1607, 0.7867)
 
 [sub_resource type="QuadMesh" id="q_BenchFront"]
 size = Vector2(1.0714, 0.7987)
@@ -188,38 +216,99 @@ size = Vector2(1.0714, 0.7987)
 [sub_resource type="QuadMesh" id="q_BenchFrontBody"]
 size = Vector2(1.0714, 0.6702)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_pew_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_pew_shadow")
+
+[sub_resource type="QuadMesh" id="q_BenchFrontShadow"]
+size = Vector2(1.1607, 0.7867)
+
 [sub_resource type="QuadMesh" id="q_Blackboard"]
 size = Vector2(1.4732, 1.9794)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_blackboard_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_blackboard_shadow")
+
+[sub_resource type="QuadMesh" id="q_BlackboardShadow"]
+size = Vector2(1.5625, 1.7775)
 
 [sub_resource type="QuadMesh" id="q_Shelf"]
 size = Vector2(0.9375, 2.1183)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bookshelf_b_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_bookshelf_b_shadow")
+
+[sub_resource type="QuadMesh" id="q_ShelfShadow"]
+size = Vector2(1.0268, 1.8940)
+
 [sub_resource type="QuadMesh" id="q_TeacherDesk"]
 size = Vector2(1.4509, 1.3890)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_teacherdesk_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_teacherdesk_shadow")
+
+[sub_resource type="QuadMesh" id="q_TeacherDeskShadow"]
+size = Vector2(1.5402, 1.2821)
 
 [sub_resource type="QuadMesh" id="q_DeskA1"]
 size = Vector2(0.8036, 1.0765)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_schooldesk_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_schooldesk_shadow")
+
+[sub_resource type="QuadMesh" id="q_DeskA1Shadow"]
+size = Vector2(0.8929, 1.0198)
+
 [sub_resource type="QuadMesh" id="q_DeskB1"]
 size = Vector2(0.8036, 1.0765)
+
+[sub_resource type="QuadMesh" id="q_DeskB1Shadow"]
+size = Vector2(0.8929, 1.0198)
 
 [sub_resource type="QuadMesh" id="q_DeskA2"]
 size = Vector2(0.8036, 1.0765)
 
+[sub_resource type="QuadMesh" id="q_DeskA2Shadow"]
+size = Vector2(0.8929, 1.0198)
+
 [sub_resource type="QuadMesh" id="q_DeskB2"]
 size = Vector2(0.8036, 1.0765)
+
+[sub_resource type="QuadMesh" id="q_DeskB2Shadow"]
+size = Vector2(0.8929, 1.0198)
 
 [sub_resource type="QuadMesh" id="q_DeskA3"]
 size = Vector2(0.8036, 1.0765)
 
+[sub_resource type="QuadMesh" id="q_DeskA3Shadow"]
+size = Vector2(0.8929, 1.0198)
+
 [sub_resource type="QuadMesh" id="q_DeskB3"]
 size = Vector2(0.8036, 1.0765)
+
+[sub_resource type="QuadMesh" id="q_DeskB3Shadow"]
+size = Vector2(0.8929, 1.0198)
 
 [sub_resource type="QuadMesh" id="q_DeskA4"]
 size = Vector2(0.8036, 1.0765)
 
+[sub_resource type="QuadMesh" id="q_DeskA4Shadow"]
+size = Vector2(0.8929, 1.0198)
+
 [sub_resource type="QuadMesh" id="q_DeskB4"]
 size = Vector2(0.8036, 1.0765)
+
+[sub_resource type="QuadMesh" id="q_DeskB4Shadow"]
+size = Vector2(0.8929, 1.0198)
 
 [sub_resource type="QuadMesh" id="q_DoorRug"]
 size = Vector2(0.8482, 0.4662)
@@ -456,30 +545,37 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3000, 0.7119, -4.8500)
 mesh = SubResource("q_Counter")
 surface_material_override/0 = SubResource("mt_p_cel_desk")
 
-[node name="BenchBackFoot" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1100, 0.3993, -6.0000)
-mesh = SubResource("q_BenchBack")
-surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
+[node name="CounterShadow" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.2554, 0.0300, -5.3891)
+mesh = SubResource("q_CounterShadow")
+surface_material_override/0 = SubResource("mt_p_cel_desk_shadow")
 
 [node name="BenchBack" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 2.1100, 0.2500, -6.1253)
-mesh = SubResource("q_BenchBackBody")
-surface_material_override/0 = SubResource("mt_p_cel_pew_body")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1100, 0.3993, -6.0000)
+mesh = SubResource("q_BenchBack")
+surface_material_override/0 = SubResource("mt_p_cel_pew_s")
+
+[node name="BenchBackShadow" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 2.1546, 0.0300, -6.2768)
+mesh = SubResource("q_BenchBackShadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_s_shadow")
 
 [node name="BenchBackSeat0" type="Marker3D" parent="Escola_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8600, 0.0000, -6.1500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8600, 0.0000, -5.7071)
 script = ExtResource("sc_seat")
 facing = "south"
 use_range = 0.5
+raise = 0.649
 
 [node name="BenchBackSeat1" type="Marker3D" parent="Escola_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3600, 0.0000, -6.1500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3600, 0.0000, -5.7071)
 script = ExtResource("sc_seat")
 facing = "south"
 use_range = 0.5
+raise = 0.649
 
 [node name="BenchFrontFoot" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0100, 0.3993, -4.4000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0100, 0.5424, -4.2800)
 mesh = SubResource("q_BenchFront")
 surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
 
@@ -488,72 +584,134 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 2.0100, 0.2500, -4.5253)
 mesh = SubResource("q_BenchFrontBody")
 surface_material_override/0 = SubResource("mt_p_cel_pew_body")
 
+[node name="BenchFrontShadow" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 2.0546, 0.0300, -4.6768)
+mesh = SubResource("q_BenchFrontShadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_shadow")
+
 [node name="BenchFrontSeat0" type="Marker3D" parent="Escola_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7600, 0.0000, -4.5750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="BenchFrontSeat1" type="Marker3D" parent="Escola_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2600, 0.0000, -4.5750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="Blackboard" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1500, 5.2697, -6.1000)
 mesh = SubResource("q_Blackboard")
 surface_material_override/0 = SubResource("mt_p_cel_blackboard")
 
+[node name="BlackboardShadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.1054, 4.3100, -6.8722)
+mesh = SubResource("q_BlackboardShadow")
+surface_material_override/0 = SubResource("mt_p_cel_blackboard_shadow")
+
 [node name="Shelf" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4500, 5.3391, -6.0500)
 mesh = SubResource("q_Shelf")
 surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b")
+
+[node name="ShelfShadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.4946, 4.3100, -6.8804)
+mesh = SubResource("q_ShelfShadow")
+surface_material_override/0 = SubResource("mt_p_cel_bookshelf_b_shadow")
 
 [node name="TeacherDesk" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9000, 4.9745, -4.4000)
 mesh = SubResource("q_TeacherDesk")
 surface_material_override/0 = SubResource("mt_p_cel_teacherdesk")
 
+[node name="TeacherDeskShadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.9446, 4.3100, -4.9245)
+mesh = SubResource("q_TeacherDeskShadow")
+surface_material_override/0 = SubResource("mt_p_cel_teacherdesk_shadow")
+
 [node name="DeskA1" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8183, -1.6000)
 mesh = SubResource("q_DeskA1")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
+
+[node name="DeskA1Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.9554, 4.3100, -1.9934)
+mesh = SubResource("q_DeskA1Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
 
 [node name="DeskB1" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8183, -1.6000)
 mesh = SubResource("q_DeskB1")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
 
+[node name="DeskB1Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.2446, 4.3100, -1.9934)
+mesh = SubResource("q_DeskB1Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
+
 [node name="DeskA2" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8183, -2.6000)
 mesh = SubResource("q_DeskA2")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
+
+[node name="DeskA2Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.9554, 4.3100, -2.9934)
+mesh = SubResource("q_DeskA2Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
 
 [node name="DeskB2" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8183, -2.6000)
 mesh = SubResource("q_DeskB2")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
 
+[node name="DeskB2Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.2446, 4.3100, -2.9934)
+mesh = SubResource("q_DeskB2Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
+
 [node name="DeskA3" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8183, -3.6000)
 mesh = SubResource("q_DeskA3")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
+
+[node name="DeskA3Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.9554, 4.3100, -3.9934)
+mesh = SubResource("q_DeskA3Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
 
 [node name="DeskB3" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8183, -3.6000)
 mesh = SubResource("q_DeskB3")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
 
+[node name="DeskB3Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.2446, 4.3100, -3.9934)
+mesh = SubResource("q_DeskB3Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
+
 [node name="DeskA4" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0000, 4.8183, -4.6000)
 mesh = SubResource("q_DeskA4")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
 
+[node name="DeskA4Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.9554, 4.3100, -4.9934)
+mesh = SubResource("q_DeskA4Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
+
 [node name="DeskB4" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2000, 4.8183, -4.6000)
 mesh = SubResource("q_DeskB4")
 surface_material_override/0 = SubResource("mt_p_cel_schooldesk")
+
+[node name="DeskB4Shadow" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.2446, 4.3100, -4.9934)
+mesh = SubResource("q_DeskB4Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_schooldesk_shadow")
 
 [node name="DoorRug" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.8594, 0.0250, -0.4200)

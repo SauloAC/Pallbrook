@@ -39,7 +39,7 @@ SPEC = {
         # the entrance hall: the counter toward the back, with room to walk past the wing's corner and
         # round it; the benches in the wing
         {"name": "Counter", "prop": "cel_desk", "x": -0.3, "z": -4.85, "box": (-1.02, 0.42, -5.2, -4.85, 0.9)},
-        {"name": "BenchBack", "prop": "cel_pew", "split": "seat", "x": 2.11, "z": -6.0, "box": (1.6, 2.62, -6.3, -6.0, 0.6)},
+        {"name": "BenchBack", "prop": "cel_pew_s", "x": 2.11, "z": -6.0, "box": (1.6, 2.62, -6.3, -6.0, 0.6)},
         {"name": "BenchFront", "prop": "cel_pew", "split": "seat", "x": 2.01, "z": -4.4, "box": (1.5, 2.52, -4.75, -4.4, 0.6)},
         # upstairs: the schoolroom
         {"name": "Blackboard", "prop": "cel_blackboard", "upper": True, "x": -0.15, "z": -6.1, "box": (-0.85, 0.55, -6.3, -6.05, 1.6)},

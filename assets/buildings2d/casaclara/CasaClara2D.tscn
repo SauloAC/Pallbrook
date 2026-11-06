@@ -38,6 +38,8 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/casaclara/casaclara_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
 [ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
+[ext_resource type="Shader" path="res://assets/buildings2d/prop_shadow.gdshader" id="sh_propshadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_shadow.png" id="tx_p_cel_bed_shadow"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -173,6 +175,14 @@ size = Vector2(0.7143, 2.3614)
 
 [sub_resource type="QuadMesh" id="q_BedBody"]
 size = Vector2(0.7143, 1.9814)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_shadow")
+
+[sub_resource type="QuadMesh" id="q_BedShadow"]
+size = Vector2(0.8036, 2.0980)
 
 [sub_resource type="QuadMesh" id="q_UpBasket"]
 size = Vector2(0.6250, 1.1460)
@@ -392,6 +402,11 @@ surface_material_override/0 = SubResource("mt_p_cel_bed_head")
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.7500, 2.4600, -2.3386)
 mesh = SubResource("q_BedBody")
 surface_material_override/0 = SubResource("mt_p_cel_bed_body")
+
+[node name="BedShadow" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.7946, 2.1300, -2.5824)
+mesh = SubResource("q_BedShadow")
+surface_material_override/0 = SubResource("mt_p_cel_bed_shadow")
 
 [node name="UpBasket" type="MeshInstance3D" parent="CasaClara_Inside/CasaClara_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.6730, -1.6000)

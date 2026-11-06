@@ -25,6 +25,8 @@
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/casa1/casa1_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Shader" path="res://assets/buildings2d/prop_shadow.gdshader" id="sh_propshadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_shadow.png" id="tx_p_cel_bed_shadow"]
 [ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
@@ -128,6 +130,14 @@ size = Vector2(0.7143, 2.3614)
 
 [sub_resource type="QuadMesh" id="q_BedBody"]
 size = Vector2(0.7143, 1.9814)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_shadow")
+
+[sub_resource type="QuadMesh" id="q_BedShadow"]
+size = Vector2(0.8036, 2.0980)
 
 [sub_resource type="QuadMesh" id="q_Table"]
 size = Vector2(1.8304, 1.3112)
@@ -266,6 +276,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -2.5000, 0.3600, -2.8886)
 mesh = SubResource("q_BedBody")
 surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
+[node name="BedShadow" type="MeshInstance3D" parent="Casa1_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -2.4554, 0.0300, -3.1324)
+mesh = SubResource("q_BedShadow")
+surface_material_override/0 = SubResource("mt_p_cel_bed_shadow")
+
 [node name="Table" type="MeshInstance3D" parent="Casa1_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.4000, 0.5700, -2.3000)
 mesh = SubResource("q_Table")
@@ -281,6 +296,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8000, 0.0000, -1.6500)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.508
 
 [node name="StoolB" type="MeshInstance3D" parent="Casa1_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.4167, -1.5000)
@@ -292,6 +308,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, -1.6500)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.508
 
 [node name="PrayerTable" type="MeshInstance3D" parent="Casa1_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.9000, 0.5700, -3.0000)

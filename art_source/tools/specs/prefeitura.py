@@ -43,7 +43,7 @@ SPEC = {
         {"name": "StoolB", "prop": "stool", "x": 1.9, "z": -1.65, "box": (1.72, 2.08, -1.95, -1.65, 0.5)},
         {"name": "Barrel", "prop": "barrel_a", "x": 4.45, "z": -0.6, "box": (4.15, 4.75, -1.0, -0.6, 0.8)},
         # the tower: a bench along its back wall and a rug
-        {"name": "Bench", "prop": "cel_pew", "split": "seat", "x": -2.3, "z": -4.35, "box": (-2.81, -1.79, -4.7, -4.35, 0.6)},
+        {"name": "Bench", "prop": "cel_pew_s", "x": -2.3, "z": -4.35, "box": (-2.81, -1.79, -4.7, -4.35, 0.6)},
         {"name": "SideRug", "prop": "rug_v", "flat": True, "y": 0.025, "x": -3.2, "z": -1.0},   # at the side door, along it
         {"name": "Crate", "prop": "crate", "x": -1.1, "z": -0.6, "box": (-1.45, -0.75, -1.1, -0.6, 0.9)},
     ],

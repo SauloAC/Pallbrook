@@ -23,7 +23,12 @@
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/igreja/igreja_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Shader" path="res://assets/buildings2d/prop_shadow.gdshader" id="sh_propshadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_altar_shadow.png" id="tx_p_cel_altar_shadow"]
 [ext_resource type="Shader" path="res://assets/buildings2d/fx/fx_candle.gdshader" id="sh_candle"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_candlestand_shadow.png" id="tx_p_cel_candlestand_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_lectern_shadow.png" id="tx_p_cel_lectern_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_pew_shadow.png" id="tx_p_cel_pew_shadow"]
 [ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
@@ -116,6 +121,14 @@ size = Vector2(0.5804, 4.4873)
 [sub_resource type="QuadMesh" id="q_Altar"]
 size = Vector2(1.7188, 1.7710)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_altar_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_altar_shadow")
+
+[sub_resource type="QuadMesh" id="q_AltarShadow"]
+size = Vector2(1.8080, 1.6026)
+
 [sub_resource type="ShaderMaterial" id="mt_candle"]
 shader = ExtResource("sh_candle")
 
@@ -125,11 +138,30 @@ size = Vector2(0.0893, 0.2431)
 [sub_resource type="QuadMesh" id="q_CandleW"]
 size = Vector2(0.2455, 1.5279)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_candlestand_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_candlestand_shadow")
+
+[sub_resource type="QuadMesh" id="q_CandleWShadow"]
+size = Vector2(0.3348, 1.3987)
+
 [sub_resource type="QuadMesh" id="q_CandleE"]
 size = Vector2(0.2455, 1.5279)
 
+[sub_resource type="QuadMesh" id="q_CandleEShadow"]
+size = Vector2(0.3348, 1.3987)
+
 [sub_resource type="QuadMesh" id="q_Lectern"]
 size = Vector2(0.4688, 1.4585)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_lectern_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_lectern_shadow")
+
+[sub_resource type="QuadMesh" id="q_LecternShadow"]
+size = Vector2(0.5580, 1.3404)
 
 [sub_resource type="QuadMesh" id="q_PewW1"]
 size = Vector2(1.0714, 0.7987)
@@ -137,11 +169,22 @@ size = Vector2(1.0714, 0.7987)
 [sub_resource type="QuadMesh" id="q_PewW1Body"]
 size = Vector2(1.0714, 0.6702)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_pew_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_pew_shadow")
+
+[sub_resource type="QuadMesh" id="q_PewW1Shadow"]
+size = Vector2(1.1607, 0.7867)
+
 [sub_resource type="QuadMesh" id="q_PewE1"]
 size = Vector2(1.0714, 0.7987)
 
 [sub_resource type="QuadMesh" id="q_PewE1Body"]
 size = Vector2(1.0714, 0.6702)
+
+[sub_resource type="QuadMesh" id="q_PewE1Shadow"]
+size = Vector2(1.1607, 0.7867)
 
 [sub_resource type="QuadMesh" id="q_PewW2"]
 size = Vector2(1.0714, 0.7987)
@@ -149,11 +192,17 @@ size = Vector2(1.0714, 0.7987)
 [sub_resource type="QuadMesh" id="q_PewW2Body"]
 size = Vector2(1.0714, 0.6702)
 
+[sub_resource type="QuadMesh" id="q_PewW2Shadow"]
+size = Vector2(1.1607, 0.7867)
+
 [sub_resource type="QuadMesh" id="q_PewE2"]
 size = Vector2(1.0714, 0.7987)
 
 [sub_resource type="QuadMesh" id="q_PewE2Body"]
 size = Vector2(1.0714, 0.6702)
+
+[sub_resource type="QuadMesh" id="q_PewE2Shadow"]
+size = Vector2(1.1607, 0.7867)
 
 [sub_resource type="QuadMesh" id="q_PewW3"]
 size = Vector2(1.0714, 0.7987)
@@ -161,11 +210,17 @@ size = Vector2(1.0714, 0.7987)
 [sub_resource type="QuadMesh" id="q_PewW3Body"]
 size = Vector2(1.0714, 0.6702)
 
+[sub_resource type="QuadMesh" id="q_PewW3Shadow"]
+size = Vector2(1.1607, 0.7867)
+
 [sub_resource type="QuadMesh" id="q_PewE3"]
 size = Vector2(1.0714, 0.7987)
 
 [sub_resource type="QuadMesh" id="q_PewE3Body"]
 size = Vector2(1.0714, 0.6702)
+
+[sub_resource type="QuadMesh" id="q_PewE3Shadow"]
+size = Vector2(1.1607, 0.7867)
 
 [sub_resource type="BoxShape3D" id="b_Altar"]
 size = Vector3(1.7000, 0.8000, 0.5000)
@@ -281,6 +336,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.8855, -5.7000)
 mesh = SubResource("q_Altar")
 surface_material_override/0 = SubResource("mt_p_cel_altar")
 
+[node name="AltarShadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.0446, 0.0300, -6.3848)
+mesh = SubResource("q_AltarShadow")
+surface_material_override/0 = SubResource("mt_p_cel_altar_shadow")
+
 [node name="AltarFlame0" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6808, 1.8578, -5.6800)
 mesh = SubResource("q_candle")
@@ -303,6 +363,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3000, 0.7640, -5.8500)
 mesh = SubResource("q_CandleW")
 surface_material_override/0 = SubResource("mt_p_cel_candlestand")
 
+[node name="CandleWShadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.2554, 0.0300, -6.4328)
+mesh = SubResource("q_CandleWShadow")
+surface_material_override/0 = SubResource("mt_p_cel_candlestand_shadow")
+
 [node name="CandleWFlame0" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3112, 1.5800, -5.8300)
 mesh = SubResource("q_candle")
@@ -312,6 +377,11 @@ surface_material_override/0 = SubResource("mt_candle")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3000, 0.7640, -5.8500)
 mesh = SubResource("q_CandleE")
 surface_material_override/0 = SubResource("mt_p_cel_candlestand")
+
+[node name="CandleEShadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.3446, 0.0300, -6.4328)
+mesh = SubResource("q_CandleEShadow")
+surface_material_override/0 = SubResource("mt_p_cel_candlestand_shadow")
 
 [node name="CandleEFlame0" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2888, 1.5800, -5.8300)
@@ -323,8 +393,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1000, 0.7292, -4.9500)
 mesh = SubResource("q_Lectern")
 surface_material_override/0 = SubResource("mt_p_cel_lectern")
 
+[node name="LecternShadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.1446, 0.0300, -5.5036)
+mesh = SubResource("q_LecternShadow")
+surface_material_override/0 = SubResource("mt_p_cel_lectern_shadow")
+
 [node name="PewW1Foot" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.3993, -1.7000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5424, -1.5800)
 mesh = SubResource("q_PewW1")
 surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
 
@@ -333,20 +408,27 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.0600, 0.2500, -1.8253)
 mesh = SubResource("q_PewW1Body")
 surface_material_override/0 = SubResource("mt_p_cel_pew_body")
 
+[node name="PewW1Shadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.0154, 0.0300, -1.9768)
+mesh = SubResource("q_PewW1Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_shadow")
+
 [node name="PewW1Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3100, 0.0000, -1.8750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewW1Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8100, 0.0000, -1.8750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewE1Foot" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.3993, -1.7000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5424, -1.5800)
 mesh = SubResource("q_PewE1")
 surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
 
@@ -355,20 +437,27 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.0600, 0.2500, -1.8253)
 mesh = SubResource("q_PewE1Body")
 surface_material_override/0 = SubResource("mt_p_cel_pew_body")
 
+[node name="PewE1Shadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.1046, 0.0300, -1.9768)
+mesh = SubResource("q_PewE1Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_shadow")
+
 [node name="PewE1Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8100, 0.0000, -1.8750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewE1Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3100, 0.0000, -1.8750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewW2Foot" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.3993, -2.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5424, -2.4800)
 mesh = SubResource("q_PewW2")
 surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
 
@@ -377,20 +466,27 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.0600, 0.2500, -2.7253)
 mesh = SubResource("q_PewW2Body")
 surface_material_override/0 = SubResource("mt_p_cel_pew_body")
 
+[node name="PewW2Shadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.0154, 0.0300, -2.8768)
+mesh = SubResource("q_PewW2Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_shadow")
+
 [node name="PewW2Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3100, 0.0000, -2.7750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewW2Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8100, 0.0000, -2.7750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewE2Foot" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.3993, -2.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5424, -2.4800)
 mesh = SubResource("q_PewE2")
 surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
 
@@ -399,20 +495,27 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.0600, 0.2500, -2.7253)
 mesh = SubResource("q_PewE2Body")
 surface_material_override/0 = SubResource("mt_p_cel_pew_body")
 
+[node name="PewE2Shadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.1046, 0.0300, -2.8768)
+mesh = SubResource("q_PewE2Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_shadow")
+
 [node name="PewE2Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8100, 0.0000, -2.7750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewE2Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3100, 0.0000, -2.7750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewW3Foot" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.3993, -3.5000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5424, -3.3800)
 mesh = SubResource("q_PewW3")
 surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
 
@@ -421,20 +524,27 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.0600, 0.2500, -3.6253)
 mesh = SubResource("q_PewW3Body")
 surface_material_override/0 = SubResource("mt_p_cel_pew_body")
 
+[node name="PewW3Shadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.0154, 0.0300, -3.7768)
+mesh = SubResource("q_PewW3Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_shadow")
+
 [node name="PewW3Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3100, 0.0000, -3.6750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewW3Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8100, 0.0000, -3.6750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewE3Foot" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.3993, -3.5000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5424, -3.3800)
 mesh = SubResource("q_PewE3")
 surface_material_override/0 = SubResource("mt_p_cel_pew_foot")
 
@@ -443,17 +553,24 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.0600, 0.2500, -3.6253)
 mesh = SubResource("q_PewE3Body")
 surface_material_override/0 = SubResource("mt_p_cel_pew_body")
 
+[node name="PewE3Shadow" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.1046, 0.0300, -3.7768)
+mesh = SubResource("q_PewE3Shadow")
+surface_material_override/0 = SubResource("mt_p_cel_pew_shadow")
+
 [node name="PewE3Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8100, 0.0000, -3.6750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="PewE3Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3100, 0.0000, -3.6750)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.466
 
 [node name="Walls" type="StaticBody3D" parent="."]
 

@@ -44,7 +44,10 @@
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/clinica/clinica_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Shader" path="res://assets/buildings2d/prop_shadow.gdshader" id="sh_propshadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_cabinet_shadow.png" id="tx_p_cel_cabinet_shadow"]
 [ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_shadow.png" id="tx_p_cel_bed_shadow"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -172,6 +175,14 @@ size = Vector3(1.1438, 1.6, 0.8)
 [sub_resource type="QuadMesh" id="q_Cabinet"]
 size = Vector2(0.7589, 1.9794)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_cabinet_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_cabinet_shadow")
+
+[sub_resource type="QuadMesh" id="q_CabinetShadow"]
+size = Vector2(0.8482, 1.7775)
+
 [sub_resource type="QuadMesh" id="q_Table"]
 size = Vector2(0.7143, 1.3890)
 
@@ -189,6 +200,14 @@ size = Vector2(0.7143, 2.3614)
 
 [sub_resource type="QuadMesh" id="q_BedBody"]
 size = Vector2(0.7143, 1.9814)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_shadow")
+
+[sub_resource type="QuadMesh" id="q_BedShadow"]
+size = Vector2(0.8036, 2.0980)
 
 [sub_resource type="QuadMesh" id="q_UpTable"]
 size = Vector2(0.7143, 1.3890)
@@ -396,6 +415,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0500, 0.9897, -4.0000)
 mesh = SubResource("q_Cabinet")
 surface_material_override/0 = SubResource("mt_p_cel_cabinet")
 
+[node name="CabinetShadow" type="MeshInstance3D" parent="Clinica_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 2.0946, 0.0300, -4.7722)
+mesh = SubResource("q_CabinetShadow")
+surface_material_override/0 = SubResource("mt_p_cel_cabinet_shadow")
+
 [node name="Table" type="MeshInstance3D" parent="Clinica_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3500, 0.6945, -1.7500)
 mesh = SubResource("q_Table")
@@ -407,10 +431,11 @@ mesh = SubResource("q_StoolA")
 surface_material_override/0 = SubResource("mt_p_stool")
 
 [node name="StoolASeat0" type="Marker3D" parent="Clinica_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7500, 0.0000, -1.6500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6000, 0.0000, -1.3571)
 script = ExtResource("sc_seat")
 facing = "east"
 use_range = 0.5
+raise = 0.746
 
 [node name="StoolB" type="MeshInstance3D" parent="Clinica_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1500, 0.4167, -1.3000)
@@ -418,10 +443,11 @@ mesh = SubResource("q_StoolB")
 surface_material_override/0 = SubResource("mt_p_stool")
 
 [node name="StoolBSeat0" type="Marker3D" parent="Clinica_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1500, 0.0000, -1.4500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, -1.1571)
 script = ExtResource("sc_seat")
 facing = "west"
 use_range = 0.5
+raise = 0.746
 
 [node name="Basket" type="MeshInstance3D" parent="Clinica_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8500, 0.5730, -0.5500)
@@ -443,6 +469,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.9000, 2.7400, -3.5886)
 mesh = SubResource("q_BedBody")
 surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
+[node name="BedShadow" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.9446, 2.4100, -3.8324)
+mesh = SubResource("q_BedShadow")
+surface_material_override/0 = SubResource("mt_p_cel_bed_shadow")
+
 [node name="UpTable" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3000, 3.0745, -1.4000)
 mesh = SubResource("q_UpTable")
@@ -454,10 +485,11 @@ mesh = SubResource("q_UpStool")
 surface_material_override/0 = SubResource("mt_p_stool")
 
 [node name="UpStoolSeat0" type="Marker3D" parent="Clinica_Inside/Clinica_Upper"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2000, 2.3800, -1.3000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0500, 2.3800, -1.0071)
 script = ExtResource("sc_seat")
 facing = "east"
 use_range = 0.5
+raise = 0.746
 
 [node name="UpCrate" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1000, 3.1787, -1.0000)

@@ -45,6 +45,9 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/tile_dirt_floor.png" id="tx_fl_tile_dirt_floor"]
 [ext_resource type="ArrayMesh" path="res://assets/buildings2d/casa2/casa2_floor1.obj" id="m_floor1"]
 [ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
+[ext_resource type="Shader" path="res://assets/buildings2d/prop_shadow.gdshader" id="sh_propshadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_shadow.png" id="tx_p_cel_bed_shadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_cabinet_shadow.png" id="tx_p_cel_cabinet_shadow"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -247,8 +250,24 @@ size = Vector2(0.7143, 2.3614)
 [sub_resource type="QuadMesh" id="q_BedBody"]
 size = Vector2(0.7143, 1.9814)
 
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_shadow")
+
+[sub_resource type="QuadMesh" id="q_BedShadow"]
+size = Vector2(0.8036, 2.0980)
+
 [sub_resource type="QuadMesh" id="q_Cabinet"]
 size = Vector2(0.7589, 1.9794)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_cabinet_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_cabinet_shadow")
+
+[sub_resource type="QuadMesh" id="q_CabinetShadow"]
+size = Vector2(0.8482, 1.7775)
 
 [sub_resource type="QuadMesh" id="q_DoorRug"]
 size = Vector2(0.8482, 0.4662)
@@ -448,10 +467,11 @@ mesh = SubResource("q_Stool")
 surface_material_override/0 = SubResource("mt_p_stool")
 
 [node name="StoolSeat0" type="Marker3D" parent="Casa2_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0000, 0.0000, -0.7000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0000, 0.0000, -0.8500)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.508
 
 [node name="BedFoot" type="MeshInstance3D" parent="Casa2_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1500, 1.1807, -4.3500)
@@ -468,10 +488,20 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 2.1500, 0.3600, -5.0386)
 mesh = SubResource("q_BedBody")
 surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
+[node name="BedShadow" type="MeshInstance3D" parent="Casa2_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 2.1946, 0.0300, -5.2824)
+mesh = SubResource("q_BedShadow")
+surface_material_override/0 = SubResource("mt_p_cel_bed_shadow")
+
 [node name="Cabinet" type="MeshInstance3D" parent="Casa2_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0500, 0.9897, -5.5500)
 mesh = SubResource("q_Cabinet")
 surface_material_override/0 = SubResource("mt_p_cel_cabinet")
+
+[node name="CabinetShadow" type="MeshInstance3D" parent="Casa2_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.0946, 0.0300, -6.3222)
+mesh = SubResource("q_CabinetShadow")
+surface_material_override/0 = SubResource("mt_p_cel_cabinet_shadow")
 
 [node name="DoorRug" type="MeshInstance3D" parent="Casa2_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 1.6094, 0.0250, -0.4200)

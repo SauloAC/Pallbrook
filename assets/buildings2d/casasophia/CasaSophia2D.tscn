@@ -33,6 +33,8 @@
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/casasophia/casasophia_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Shader" path="res://assets/buildings2d/prop_shadow.gdshader" id="sh_propshadow"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_shadow.png" id="tx_p_cel_bed_shadow"]
 [ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
@@ -160,6 +162,14 @@ size = Vector2(0.7143, 2.3614)
 
 [sub_resource type="QuadMesh" id="q_BedBody"]
 size = Vector2(0.7143, 1.9814)
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_bed_shadow"]
+render_priority = -1
+shader = ExtResource("sh_propshadow")
+shader_parameter/tex = ExtResource("tx_p_cel_bed_shadow")
+
+[sub_resource type="QuadMesh" id="q_BedShadow"]
+size = Vector2(0.8036, 2.0980)
 
 [sub_resource type="QuadMesh" id="q_Table"]
 size = Vector2(0.7143, 1.3890)
@@ -320,6 +330,11 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.7000, 0.3600, -3.2886)
 mesh = SubResource("q_BedBody")
 surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
+[node name="BedShadow" type="MeshInstance3D" parent="CasaSophia_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -1.6554, 0.0300, -3.5324)
+mesh = SubResource("q_BedShadow")
+surface_material_override/0 = SubResource("mt_p_cel_bed_shadow")
+
 [node name="Table" type="MeshInstance3D" parent="CasaSophia_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3000, 0.6945, -2.4000)
 mesh = SubResource("q_Table")
@@ -331,10 +346,11 @@ mesh = SubResource("q_StoolA")
 surface_material_override/0 = SubResource("mt_p_stool")
 
 [node name="StoolASeat0" type="Marker3D" parent="CasaSophia_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2000, 0.0000, -2.3500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0500, 0.0000, -2.0571)
 script = ExtResource("sc_seat")
 facing = "east"
 use_range = 0.5
+raise = 0.746
 
 [node name="StoolB" type="MeshInstance3D" parent="CasaSophia_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6000, 0.4167, -1.8000)
@@ -346,6 +362,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6000, 0.0000, -1.9500)
 script = ExtResource("sc_seat")
 facing = "north"
 use_range = 0.5
+raise = 0.508
 
 [node name="Pot" type="MeshInstance3D" parent="CasaSophia_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7000, 0.5035, -3.7500)

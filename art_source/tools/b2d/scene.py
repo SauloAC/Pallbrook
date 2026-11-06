@@ -9,7 +9,18 @@ from . import door as door_mod
 
 SPLIT_HEAD_DEPTH = 1.37   # How far behind a split bed's foot its head stands (building units): as its picture was cut (furniture/finish.py)
 SPLIT_BODY_Y = 0.36       # How high its body lies (building units: 0.5 m), under someone lying in it
+SHADOW_PAD = 4            # A cast shadow's picture runs this many px further right and down (furniture/finish.py)
+SEAT_BACK_FWD = 0.12      # How far in front of the seat's footprint its back stands (whoever sits leans past "z")
 SPLIT_SEAT_Y = 0.25       # A split pew's ("split": "seat") seat: under whoever sits on it (0.35 m)
+# Where whoever sits lands (the sitting clip puts their hips HIPS_UP over the seat's marker and HIPS_BACK
+# behind it, in metres): their hips SEAT_PX pixels over the foot of the seat's picture on screen. A seat
+# in one picture (a stool, a pew facing south) stands in front of anyone behind its foot, so they sit
+# SEAT_AHEAD in front of it, lifted as much as keeps them in place on screen; facing north their back is
+# in front of it already. Behind it they stay, only lifted, on a split one (a pew facing north: its back
+# over theirs) and on a stool facing south (its table is then between them and the camera, over their legs).
+SEAT_PX = {"stool": 16, "pew": 16, "pew_s": 14}
+SEAT_AHEAD = 0.2
+HIPS_UP, HIPS_BACK = 0.27, 0.21
 
 
 def build(h):
@@ -190,14 +201,14 @@ def build(h):
         furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": DOOR_Z - 0.42})
     def kind(f):    # what a piece is: its prop's name, less the "cel_" of a cel-shaded one (../furniture/)
         return f["prop"][4:] if f["prop"].startswith("cel_") else f["prop"]
-    TABLES = [g for g in furniture if g.get("box") and kind(g).startswith(("table", "desk", "schooldesk", "bar_counter"))]
+    TABLES = [g for g in furniture if g.get("box") and kind(g).startswith(("table", "desk", "schooldesk", "bar_counter", "tavern_table"))]
     def seats_of(f):
-        if f.get("outside") or f.get("seat") is False or kind(f) not in ("stool", "barstool", "pew") or not f.get("box"):
+        if f.get("outside") or f.get("seat") is False or kind(f) not in ("stool", "barstool", "chair_e", "chair_w", "pew", "pew_s") or not f.get("box"):
             return []
         bx0, bx1, bz0, bz1, _ = f["box"]
         cx, cz = (bx0 + bx1) / 2, (bz0 + bz1) / 2
         face = f.get("seat")
-        if face is None and kind(f) in ("stool", "barstool"):
+        if face is None and kind(f) in ("stool", "barstool", "chair_e", "chair_w"):
             near = [g for g in TABLES if bool(g.get("upper")) == bool(f.get("upper"))]
             if near:
                 def centre(g):
@@ -207,9 +218,9 @@ def build(h):
                 face = ("east" if dx > 0 else "west") if abs(dx) > abs(dz) else ("north" if dz < 0 else "south")
             else:
                 face = "south"
-        if face is None:        # a bench
-            face = "south" if bz0 <= ZB + 0.05 else "north"
-        if kind(f) == "pew":
+        if face is None:        # a bench: a pew facing south ("pew_s") against the back wall
+            face = "south" if kind(f) == "pew_s" or bz0 <= ZB + 0.05 else "north"
+        if kind(f) in ("pew", "pew_s"):
             return [(cx - 0.25, cz, face), (cx + 0.25, cz, face)]
         return [(cx, cz, face)]
     for f in furniture:
@@ -227,9 +238,13 @@ def build(h):
             # stands sunk into the floor (only its upper rows have anything in them).
             zf = f["z"]
             qh = h / 32.0 / COS * FURN
+            # a seat's back (a pew's, a chair's: "seat") stands SEAT_BACK_FWD further forward, raised as much
+            # as keeps it in place on screen, so that it is in front of whoever sits there: their back shows
+            # behind it, not over it
+            fwd = SEAT_BACK_FWD if f["split"] == "seat" else 0.0
             S('[sub_resource type="QuadMesh" id="q_%s"]\nsize = Vector2(%.4f, %.4f)\n' % (f["name"], qw, qh))
             N('[node name="%sFoot" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%s")\nsurface_material_override/0 = SubResource("mt_p_%s_foot")\n'
-              % (f["name"], fpar, tf(f["x"], qh / 2 + lift, zf), f["name"], f["prop"]))
+              % (f["name"], fpar, tf(f["x"], qh / 2 + lift + SIN / COS * fwd, zf + fwd), f["name"], f["prop"]))
             if f["split"] != "seat":     # a pew ("seat"): its back stands at the front, its seat lies flat: no head
                 N('[node name="%sHead" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%s")\nsurface_material_override/0 = SubResource("mt_p_%s_head")\n'
                   % (f["name"], fpar, tf(f["x"], qh / 2 + lift - SIN / COS * SPLIT_HEAD_DEPTH, zf - SPLIT_HEAD_DEPTH), f["name"], f["prop"]))
@@ -248,6 +263,19 @@ def build(h):
             S('[sub_resource type="QuadMesh" id="q_%s"]\nsize = Vector2(%.4f, %.4f)\n' % (f["name"], qw, qh))
             N('[node name="%s" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%s")\nsurface_material_override/0 = SubResource("mt_p_%s")\n'
               % (f["name"], fpar, tf(f["x"], qh / 2 + lift + f.get("hang", 0.0), f["z"]), f["name"], f["prop"]))
+        # the shadow a cel-shaded piece casts (prop_<prop>_shadow.png, ../furniture/finish.py): flat just over
+        # the floor (its boards lie 0.02 up, the upper floor's 0.01), its picture SHADOW_PAD px wider and longer than the piece's, to the right and in front
+        sh = f["prop"] + "_shadow"
+        if sh in props and not f.get("hang") and not f.get("outside"):
+            sw, shh = props[sh]
+            E("Shader", "res://assets/buildings2d/prop_shadow.gdshader", "sh_propshadow")
+            E("Texture2D", R + "props/prop_%s.png" % sh, "tx_p_" + sh)
+            S('[sub_resource type="ShaderMaterial" id="mt_p_%s"]\nrender_priority = -1\nshader = ExtResource("sh_propshadow")\nshader_parameter/tex = ExtResource("tx_p_%s")\n' % (sh, sh))
+            qsw, qsh = sw / 32.0 * FURN, shh / 32.0 / SIN * FURN
+            front = f["z"] + SHADOW_PAD / 32.0 / SIN * FURN
+            S('[sub_resource type="QuadMesh" id="q_%sShadow"]\nsize = Vector2(%.4f, %.4f)\n' % (f["name"], qsw, qsh))
+            N('[node name="%sShadow" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%sShadow")\nsurface_material_override/0 = SubResource("mt_p_%s")\n'
+              % (f["name"], fpar, tf(f["x"] + SHADOW_PAD / 2.0 / 32.0 * FURN, lift + 0.03, front - qsh / 2, True), f["name"], sh))
         if f.get("box"):
             bx0, bx1, bz0, bz1, bh = f["box"]
             shapes.append((f["name"], bx0, bx1, lift, lift + bh, bz0, bz1))
@@ -255,10 +283,25 @@ def build(h):
         # the townsfolk; a stool faces its table, a bench faces north (the altar, the room) unless it stands
         # against the back wall; "seat" in the spec says which way, or False for none
         for si, (sx_, sz_, sface) in enumerate(seats_of(f)):
+            # "seat_fwd": the sitter's place moved that much toward where they face: sitting, their hips go
+            # back behind it (0.21 m, the sitting clip), and on a chair they should land on the seat
+            fdx, fdz = {"east": (1, 0), "west": (-1, 0), "north": (0, -1), "south": (0, 1)}.get(sface, (0, 0))
+            sx_, sz_ = sx_ + fdx * f.get("seat_fwd", 0.0), sz_ + fdz * f.get("seat_fwd", 0.0)
+            rise = f.get("seat_raise")
+            if rise is None and kind(f) in SEAT_PX:
+                # their hips over the middle of the seat across, hz deep (in local units, a metre is FURN)
+                back = HIPS_BACK * FURN
+                if f.get("split") == "seat" or (kind(f) == "stool" and sface == "south"):
+                    hz = sz_ - fdz * back
+                else:
+                    hz = f["z"] + (0.0 if sface == "north" else SEAT_AHEAD * FURN)
+                    sx_, sz_ = sx_ + fdx * back, hz + fdz * back
+                rise = round((SEAT_PX[kind(f)] / 32.0 + SIN * (hz - f["z"]) / FURN) / COS - HIPS_UP, 3)
+                rise = rise if rise > 0.02 else 0.0     # (where the clip puts them already)
             E("Script", "res://scripts/world/Seat.gd", "sc_seat")
             N('[node name="%sSeat%d" type="Marker3D" parent="%s"]\ntransform = %s\nscript = ExtResource("sc_seat")\nfacing = "%s"\nuse_range = 0.5\n'
               % (f["name"], si, fpar, tf(sx_, lift, sz_), sface)
-              + ("raise = %r\n" % float(f["seat_raise"]) if f.get("seat_raise") else ""))
+              + ("raise = %r\n" % float(rise) if rise else ""))
         # candles on a standing piece: a small flame at each wick (pixels of the prop's art) and,
         # with "glow", a warm light among them, seen inside only
         for ci, (cx_, cy_) in enumerate(f.get("flames", [])):

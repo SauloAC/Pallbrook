@@ -52,16 +52,17 @@ SPEC = {
         {"name": "BarStool3", "prop": "cel_barstool", "x": 1.9, "z": -5.87, "box": (1.72, 2.08, -6.17, -5.87, 0.5), "seat": "north", "seat_raise": 0.42},
         {"name": "BarStool4", "prop": "cel_barstool", "x": 2.5, "z": -5.87, "box": (2.32, 2.68, -6.17, -5.87, 0.5), "seat": "north", "seat_raise": 0.42},
         {"name": "BarBack", "prop": "cel_bar_back", "x": 1.38, "z": -8.12, "box": (0.15, 2.61, -8.5, -8.12, 1.4)},
-        # the hall in the wing: round tables, the rug before the fire, barrels and a crate in the corners
-        {"name": "TableA", "prop": "table_round", "x": -2.3, "z": -1.7, "box": (-2.6, -2.0, -2.2, -1.7, 0.8)},
-        {"name": "StoolA1", "prop": "stool", "x": -2.9, "z": -1.5, "box": (-3.08, -2.72, -1.8, -1.5, 0.5)},
-        {"name": "StoolA2", "prop": "stool", "x": -1.7, "z": -1.5, "box": (-1.88, -1.52, -1.8, -1.5, 0.5)},
-        {"name": "TableB", "prop": "table_round", "x": -2.3, "z": -4.2, "box": (-2.6, -2.0, -4.7, -4.2, 0.8)},
-        {"name": "StoolB1", "prop": "stool", "x": -2.9, "z": -4.0, "box": (-3.08, -2.72, -4.3, -4.0, 0.5)},
-        {"name": "StoolB2", "prop": "stool", "x": -1.7, "z": -4.0, "box": (-1.88, -1.52, -4.3, -4.0, 0.5)},
-        {"name": "TableC", "prop": "table_round", "x": -1.5, "z": -6.3, "box": (-1.8, -1.2, -6.8, -6.3, 0.8)},
-        {"name": "StoolC1", "prop": "stool", "x": -2.1, "z": -6.1, "box": (-2.28, -1.92, -6.4, -6.1, 0.5)},
-        {"name": "StoolC2", "prop": "stool", "x": -0.9, "z": -6.1, "box": (-1.08, -0.72, -6.4, -6.1, 0.5)},
+        # the hall in the wing: round tables (a candle burning on each) with a chair either side turned
+        # toward them (cel-shaded pieces), the rug before the fire, barrels and a crate in the corners
+        {"name": "TableA", "prop": "cel_tavern_table", "x": -2.3, "z": -1.7, "box": (-2.6, -2.0, -2.2, -1.7, 0.8), "flames": [(16, 4)]},
+        {"name": "StoolA1", "prop": "cel_chair_e", "split": "seat", "seat_raise": 0.45, "seat_fwd": 0.15, "x": -2.9, "z": -1.5, "box": (-3.08, -2.72, -1.8, -1.5, 0.5)},
+        {"name": "StoolA2", "prop": "cel_chair_w", "split": "seat", "seat_raise": 0.45, "seat_fwd": 0.15, "x": -1.7, "z": -1.5, "box": (-1.88, -1.52, -1.8, -1.5, 0.5)},
+        {"name": "TableB", "prop": "cel_tavern_table", "x": -2.3, "z": -4.2, "box": (-2.6, -2.0, -4.7, -4.2, 0.8), "flames": [(16, 4)]},
+        {"name": "StoolB1", "prop": "cel_chair_e", "split": "seat", "seat_raise": 0.45, "seat_fwd": 0.15, "x": -2.9, "z": -4.0, "box": (-3.08, -2.72, -4.3, -4.0, 0.5)},
+        {"name": "StoolB2", "prop": "cel_chair_w", "split": "seat", "seat_raise": 0.45, "seat_fwd": 0.15, "x": -1.7, "z": -4.0, "box": (-1.88, -1.52, -4.3, -4.0, 0.5)},
+        {"name": "TableC", "prop": "cel_tavern_table", "x": -1.5, "z": -6.3, "box": (-1.8, -1.2, -6.8, -6.3, 0.8), "flames": [(16, 4)]},
+        {"name": "StoolC1", "prop": "cel_chair_e", "split": "seat", "seat_raise": 0.45, "seat_fwd": 0.15, "x": -2.1, "z": -6.1, "box": (-2.28, -1.92, -6.4, -6.1, 0.5)},
+        {"name": "StoolC2", "prop": "cel_chair_w", "split": "seat", "seat_raise": 0.45, "seat_fwd": 0.15, "x": -0.9, "z": -6.1, "box": (-1.08, -0.72, -6.4, -6.1, 0.5)},
         {"name": "HearthRug", "prop": "rug", "flat": True, "y": 0.025, "x": -3.0, "z": -7.35},
         {"name": "Barrel", "prop": "barrel_a", "x": -3.4, "z": -0.55, "box": (-3.72, -3.08, -1.2, -0.55, 0.8)},
         {"name": "Crate", "prop": "crate", "x": -0.75, "z": -0.6, "box": (-1.05, -0.45, -1.1, -0.6, 0.9)},
@@ -82,14 +83,14 @@ SPEC = {
         # upstairs, the rooms off the corridor: a guest's at the front with a table, a guest's in the middle
         # with a crate, Marta's at the back with her chest of drawers
         {"name": "GuestBed", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -1.39, "box": (-3.74, -3.06, -2.75, -1.39, 0.4)},
-        {"name": "GuestTable", "prop": "table_round", "upper": True, "x": -2.3, "z": -0.7, "box": (-2.6, -2.0, -1.2, -0.7, 0.8)},
+        {"name": "GuestTable", "prop": "cel_tavern_table", "upper": True, "x": -2.3, "z": -0.7, "box": (-2.6, -2.0, -1.2, -0.7, 0.8), "flames": [(16, 4)]},
         {"name": "GuestBed2", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -4.24, "box": (-3.74, -3.06, -5.6, -4.24, 0.4)},
         {"name": "GuestCrate", "prop": "crate", "upper": True, "x": -2.3, "z": -3.6, "box": (-2.6, -2.0, -4.1, -3.6, 0.9)},
         {"name": "Bed", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -7.04, "box": (-3.74, -3.06, -8.4, -7.04, 0.4)},
         {"name": "Cabinet", "prop": "cel_cabinet", "upper": True, "x": -2.4, "z": -8.15, "box": (-2.7, -2.1, -8.5, -8.15, 1.6)},
         # the landing hall over the main house: a table and a stool, a barrel
-        {"name": "HallTable", "prop": "table_round", "upper": True, "x": 0.9, "z": -5.3, "box": (0.6, 1.2, -5.8, -5.3, 0.8)},
-        {"name": "HallStool", "prop": "stool", "upper": True, "x": 0.3, "z": -5.1, "box": (0.12, 0.48, -5.4, -5.1, 0.5)},
+        {"name": "HallTable", "prop": "cel_tavern_table", "upper": True, "x": 0.9, "z": -5.3, "box": (0.6, 1.2, -5.8, -5.3, 0.8), "flames": [(16, 4)]},
+        {"name": "HallStool", "prop": "cel_chair_e", "split": "seat", "seat_raise": 0.45, "seat_fwd": 0.15, "upper": True, "x": 0.3, "z": -5.1, "box": (0.12, 0.48, -5.4, -5.1, 0.5)},
         {"name": "HallBarrel", "prop": "barrel_b", "upper": True, "x": 2.3, "z": -4.85, "box": (2.0, 2.6, -5.5, -4.85, 0.8)},
     ],
 }
