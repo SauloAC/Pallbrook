@@ -31,10 +31,10 @@ SPEC = {
     # room x -3.53..4.78, back wall at z -4.7; door x 2.95..3.95, arch x 0.0..1.33; the tower x -3.53..-0.7,
     # its side door in the west wall at z -0.35..-1.65
     # the mayor behind the clerk's desk first, then round the council table, the tower, by the door
-    "npc": {"slots": [(3.9, -4.3), (0.55, -2.2), (2.3, -2.2), (1.4, -1.3), (3.9, -2.4), (-2.3, -3.6),
+    "npc": {"slots": [(3.9, -4.15), (0.0, -2.3), (2.8, -2.3), (1.4, -1.3), (3.9, -2.4), (-2.3, -3.6),
                       (-1.5, -2.0), (2.2, -0.9), (-2.0, -1.3)]},
     "furniture": [
-        {"name": "Desk", "prop": "desk", "x": 3.9, "z": -3.6, "box": (3.18, 4.62, -3.95, -3.6, 0.9)},
+        {"name": "Desk", "prop": "desk", "x": 3.9, "z": -3.25, "box": (3.18, 4.62, -3.6, -3.25, 0.9)},   # room behind it for the mayor
         {"name": "ShelfA", "prop": "bookshelf", "x": 1.85, "z": -4.45, "box": (1.4, 2.3, -4.7, -4.4, 1.9)},
         {"name": "ShelfB", "prop": "bookshelf", "x": 2.8, "z": -4.45, "box": (2.35, 3.25, -4.7, -4.4, 1.9)},
         {"name": "Table", "prop": "table_cloth", "flat": True, "y": 0.57, "x": 1.4, "z": -2.3, "box": (0.5, 2.3, -2.65, -1.95, 0.7)},

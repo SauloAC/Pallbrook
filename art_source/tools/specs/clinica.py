@@ -20,7 +20,7 @@ SPEC = {
               "stair_wall_tile": "tile_stone_light.png", "stair_wall_tile_px": (128, 40), "show_upstairs": [1]},
     # room x -2.50..2.47 (the wing x -2.50..-1.14, behind z -2.73), back wall at z -4.3; door x 1.23..2.14
     # stairs x -1.70..0.70 (landing x -2.50..-1.70), front at z -3.52; upstairs a walk in front of them along the wing
-    "npc": {"slots": [(1.0, -2.3), (0.3, -1.4), (1.7, -2.1), (-0.4, -2.6), (1.3, -1.0), (-0.8, -1.0),
+    "npc": {"slots": [(1.0, -2.3), (0.7, -1.4), (1.7, -2.1), (0.3, -3.0), (1.3, -1.0), (-0.2, -0.75),
                       (1.0, 1.0), (2.3, 1.3)]},   # inside around the consulting table, then two outside the door: a queue
     "furniture": [
         {"name": "Cabinet", "prop": "cabinet", "x": 2.05, "z": -4.0, "box": (1.65, 2.47, -4.3, -3.95, 1.6)},

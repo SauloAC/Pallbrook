@@ -12,7 +12,7 @@ extends Node3D
 
 const ICON := preload("res://assets/ui/icon_examine.png")
 const BOOKS := {
-	"hall": {"at": Vector3(12.46, 0.0, -9.74), "use": Vector3(12.46, 0.0, -9.04), "hours": 2.0, "opens": 9.0, "closes": 17.0},
+	"hall": {"at": Vector3(12.46, 0.0, -9.25), "use": Vector3(12.46, 0.0, -8.55), "hours": 2.0, "opens": 9.0, "closes": 17.0},
 	"church": {"at": Vector3(-4.96, 0.0, -2.93), "use": Vector3(-5.3, 0.0, -2.3), "hours": 1.0, "opens": 7.0, "closes": 18.0},
 }
 const USE_RANGE := 1.0

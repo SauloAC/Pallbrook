@@ -361,7 +361,7 @@ omni_range = 3.0
 shadow_enabled = false
 
 [node name="Desk" type="MeshInstance3D" parent="Prefeitura_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9000, 0.6945, -3.6000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9000, 0.6945, -3.2500)
 mesh = SubResource("q_Desk")
 surface_material_override/0 = SubResource("mt_p_desk")
 
@@ -422,7 +422,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6500, 1.0450, -4.3500)
 shape = SubResource("b_Fireplace")
 
 [node name="Desk" type="CollisionShape3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9000, 0.4500, -3.7750)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9000, 0.4500, -3.4250)
 shape = SubResource("b_Desk")
 
 [node name="ShelfA" type="CollisionShape3D" parent="Walls"]

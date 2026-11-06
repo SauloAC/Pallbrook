@@ -12,6 +12,9 @@ extends Area3D
 
 const PART_SUFFIXES := ["_Roof", "_Upper", "_UpperFront", "_Front"]
 const UPSTAIRS_HEIGHT := 1.6  # Doctor's feet above this = on the upper floor
+# While the doctor is upstairs, whoever is on the floor below would show through the upper floor
+# (sprites and name labels): they go to a render layer the camera leaves out
+const BELOW_LAYER := 1 << 19
 
 @export var hide_sign := true  # The floating name label sits right over the room
 
@@ -22,6 +25,7 @@ var lower: Node3D = null       # <Building>_Lower: shown only while the doctor i
 var building := ""
 var player: Node3D = null      # The doctor, while inside
 var upstairs := false
+var below := {}                # NPC -> {its visual node: its own render layers}, while hidden under the floor
 
 
 func _ready() -> void:
@@ -70,9 +74,57 @@ func _process(_delta: float) -> void:
 	if now_up != upstairs:
 		upstairs = now_up
 		_apply(true)
+	if upstairs:
+		_hide_below()
+
+
+# Upstairs: hide the people downstairs in this building (and show them again once they leave it)
+func _hide_below() -> void:
+	var cam := get_viewport().get_camera_3d()
+	if cam:
+		cam.cull_mask &= ~BELOW_LAYER
+	for npc in get_tree().get_nodes_in_group("npcs"):
+		var n := npc as Node3D
+		var hide_it := n.global_position.y < UPSTAIRS_HEIGHT and _over_room(n.global_position)
+		if hide_it and not below.has(n):
+			var saved := {}
+			for v in n.find_children("*", "VisualInstance3D", true, false):
+				saved[v] = (v as VisualInstance3D).layers
+				(v as VisualInstance3D).layers = BELOW_LAYER
+			below[n] = saved
+		elif not hide_it and below.has(n):
+			_show_again(n)
+
+
+func _show_again(n: Node) -> void:
+	var saved: Dictionary = below[n]
+	below.erase(n)
+	for v in saved:
+		if is_instance_valid(v):
+			(v as VisualInstance3D).layers = saved[v]
+
+
+func _show_all() -> void:
+	for n in below.keys():
+		_show_again(n)
+
+
+# Within this building's walls (its area's boxes), seen from above
+func _over_room(p: Vector3) -> bool:
+	for c in get_children():
+		var shape := c as CollisionShape3D
+		if shape == null or not (shape.shape is BoxShape3D):
+			continue
+		var l := shape.global_transform.affine_inverse() * p
+		var half: Vector3 = (shape.shape as BoxShape3D).size / 2.0
+		if absf(l.x) <= half.x and absf(l.z) <= half.z:
+			return true
+	return false
 
 
 func _apply(open: bool) -> void:
+	if not (open and upstairs):
+		_show_all()
 	for suffix in parts:
 		var cut: bool = open and not (upstairs and suffix == "_Upper")
 		parts[suffix].visible = not cut

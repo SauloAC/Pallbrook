@@ -18,7 +18,8 @@ SPEC = {
                 "front_tex": "fireplace_front", "light": (1.2, 0.4, -3.3), "flame": (1.184, 0.47, -3.58, 0.36, 0.44),
                 "top_tile": "tile_stone_wall.png", "top_tile_px": (128, 40)}],
     # room x -1.67..1.70, back wall at z -4.3, floor 0.3 up; door x -0.53..0.50
-    "npc": {"slots": [(0.0, -3.15), (-0.75, -1.6), (0.9, -1.5)],  # at the table, by the crate, by the jar
+    "npc": {"slots": [(0.0, -1.25), (-0.55, -1.1), (0.9, -1.5)],  # before the table, by the crate, by the jar
+                                                                  # (behind the table is too narrow to walk to)
             "bed": (-1.27, 0.3, -2.75, 0.0)},
     "furniture": [
         {"name": "Bed", "prop": "bed", "flat": True, "x": -1.27, "z": -3.6, "box": (-1.62, -0.92, -4.3, -2.9, 0.4)},

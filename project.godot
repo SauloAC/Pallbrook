@@ -80,6 +80,10 @@ accuse={
 
 locale/translations=PackedStringArray("res://localization/strings.en.translation", "res://localization/strings.ja.translation", "res://localization/strings.pt_BR.translation", "res://localization/strings.es.translation")
 
+[navigation]
+
+3d/default_cell_size=0.2
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
