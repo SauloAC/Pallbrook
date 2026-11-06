@@ -880,7 +880,7 @@ func _sit() -> void:
 	seat_stand_at = global_position
 	velocity = Vector3.ZERO
 	collision.disabled = true  # The doctor can't push them off, and they don't push the stool
-	global_position = Vector3(seat.global_position.x, seat.global_position.y - 0.02, seat.global_position.z)
+	global_position = Vector3(seat.global_position.x, seat.global_position.y - 0.02 + seat.raise, seat.global_position.z)
 	reset_physics_interpolation()
 	if visual == null or visual.sit(seat.facing) <= 0.0:
 		global_position = seat_stand_at  # No sitting clip for this body: they stand instead

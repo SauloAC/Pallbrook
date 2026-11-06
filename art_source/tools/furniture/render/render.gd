@@ -201,7 +201,7 @@ func bottle(kind: String, glass: String, x: float, y: float, z: float, h: float,
 # ---------- The pieces ----------
 # Sizes as the interiors' furniture has them (a little larger than life, like the Cainos pieces)
 const PIECES := ["bed", "cabinet", "table_round", "stool", "crate", "bookshelf_a", "bookshelf_b", "bookshelf_c", "blackboard",
-	"pew", "schooldesk", "desk", "lectern", "altar", "candlestand", "teacherdesk", "bar_counter", "bar_back"]
+	"pew", "schooldesk", "desk", "lectern", "altar", "candlestand", "teacherdesk", "bar_counter", "bar_back", "barstool"]
 
 
 # A wooden bed, 1 m by 2: a red blanket over the linen, the pillow at the head (north, the wall)
@@ -550,27 +550,28 @@ func piece_teacherdesk() -> void:
 # The tavern's bar: the counter, its boards upright toward the customers, a thick top with the day's
 # bottles, mugs and a jug on it. Marta stands behind it (north).
 func piece_bar_counter() -> void:
-	var w := 1.26
+	var w := 1.72     # from the open end (west) to the stairs (east)
 	var d := -0.72
 	var g := _group()
 	planks = Vector4(1, 0, 0, 0.14)
 	box("wood_mid", -w + 0.04, w - 0.04, 0.06, 0.94, -0.07, -0.02, g)          # the front, boards upright
 	planks = Vector4.ZERO
 	box("wood_mid", -w, w, 0.0, 0.06, -0.08, 0.0, g)                             # its foot
-	for x in [-w, -0.42, 0.42, w - 0.1]:
+	for x in [-w, -w / 2.0 - 0.05, -0.05, w / 2.0 - 0.05, w - 0.1]:
 		box("wood", x, x + 0.1, 0.06, 0.94, -0.09, -0.01, g)                   # posts between the boards
 	box("wood_mid", -w, w, 0.06, 0.94, d, -0.07, g)                              # the body behind
 	planks = Vector4(0, 0, 1, 0.16)
 	box("wood", -w - 0.05, w + 0.05, 0.94, 1.02, d - 0.03, 0.06, g)              # the thick top, overhanging
 	planks = Vector4.ZERO
-	var t := [["bottle", "glass_green", -1.05, 0.26], ["bottle", "glass_amber", -0.9, 0.22], ["bottle", "glass_purple", -0.76, 0.24]]
+	var t := [["bottle", "glass_green", -1.45, 0.26], ["bottle", "glass_amber", -1.3, 0.22], ["bottle", "glass_purple", -1.16, 0.24]]
 	for b in t:
 		bottle(b[0], b[1], b[2], 1.02, -0.3, b[3])
-	cyl("pewter", -0.2, -0.32, 1.02, 0.12, 0.06, -1.0, 8)                         # mugs
-	cyl("pewter", 0.05, -0.4, 1.02, 0.12, 0.06, -1.0, 8)
-	cyl("clay", 0.72, -0.34, 1.02, 0.2, 0.06, 0.09, 8)                           # the jug
-	cyl("clay", 0.72, -0.34, 1.22, 0.06, 0.045, 0.06, 8)
-	bottle("bottle", "glass_amber", 1.0, 1.02, -0.36, 0.22)
+	cyl("pewter", -0.55, -0.32, 1.02, 0.12, 0.06, -1.0, 8)                        # mugs
+	cyl("pewter", -0.3, -0.4, 1.02, 0.12, 0.06, -1.0, 8)
+	cyl("pewter", 0.45, -0.34, 1.02, 0.12, 0.06, -1.0, 8)
+	cyl("clay", 0.9, -0.34, 1.02, 0.2, 0.06, 0.09, 8)                            # the jug
+	cyl("clay", 0.9, -0.34, 1.22, 0.06, 0.045, 0.06, 8)
+	bottle("bottle", "glass_amber", 1.25, 1.02, -0.36, 0.22)
 
 
 # Behind the bar, against the wall: on the left the bottles on two shelves over a cupboard, on the right
@@ -636,3 +637,16 @@ func piece_bar_back() -> void:
 		end.position = Vector3(bx, cy, d + 0.465)
 		box("iron", bx - 0.03, bx + 0.03, cy - 0.1, cy - 0.06, d + 0.46, d + 0.56, k)  # the tap
 		box("iron", bx - 0.02, bx + 0.02, cy - 0.16, cy - 0.08, d + 0.53, d + 0.56, k)
+
+
+
+# A tall bar stool: a round seat on four legs, a ring between them for the feet. Its seat is higher than
+# a stool's: whoever sits on it is raised (the spec's "seat_raise", Seat.raise)
+func piece_barstool() -> void:
+	var g := _group()
+	cyl("wood", 0.0, -0.24, 0.74, 0.07, 0.24, -1.0, 8, g)                        # seat
+	for a in [90.0, 210.0, 330.0]:                                               # three legs
+		var x := cos(deg_to_rad(a)) * 0.18
+		var z := -0.24 + sin(deg_to_rad(a)) * 0.18
+		cyl("wood_mid", x, z, 0.0, 0.74, 0.035, 0.04, 4, g)
+	cyl("wood_mid", 0.0, -0.24, 0.26, 0.03, 0.18, -1.0, 8, g)                    # the ring for the feet

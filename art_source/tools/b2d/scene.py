@@ -190,14 +190,14 @@ def build(h):
         furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": DOOR_Z - 0.42})
     def kind(f):    # what a piece is: its prop's name, less the "cel_" of a cel-shaded one (../furniture/)
         return f["prop"][4:] if f["prop"].startswith("cel_") else f["prop"]
-    TABLES = [g for g in furniture if g.get("box") and kind(g).startswith(("table", "desk", "schooldesk"))]
+    TABLES = [g for g in furniture if g.get("box") and kind(g).startswith(("table", "desk", "schooldesk", "bar_counter"))]
     def seats_of(f):
-        if f.get("outside") or f.get("seat") is False or kind(f) not in ("stool", "pew") or not f.get("box"):
+        if f.get("outside") or f.get("seat") is False or kind(f) not in ("stool", "barstool", "pew") or not f.get("box"):
             return []
         bx0, bx1, bz0, bz1, _ = f["box"]
         cx, cz = (bx0 + bx1) / 2, (bz0 + bz1) / 2
         face = f.get("seat")
-        if face is None and kind(f) == "stool":
+        if face is None and kind(f) in ("stool", "barstool"):
             near = [g for g in TABLES if bool(g.get("upper")) == bool(f.get("upper"))]
             if near:
                 def centre(g):
@@ -257,7 +257,8 @@ def build(h):
         for si, (sx_, sz_, sface) in enumerate(seats_of(f)):
             E("Script", "res://scripts/world/Seat.gd", "sc_seat")
             N('[node name="%sSeat%d" type="Marker3D" parent="%s"]\ntransform = %s\nscript = ExtResource("sc_seat")\nfacing = "%s"\nuse_range = 0.5\n'
-              % (f["name"], si, fpar, tf(sx_, lift, sz_), sface))
+              % (f["name"], si, fpar, tf(sx_, lift, sz_), sface)
+              + ("raise = %r\n" % float(f["seat_raise"]) if f.get("seat_raise") else ""))
         # candles on a standing piece: a small flame at each wick (pixels of the prop's art) and,
         # with "glow", a warm light among them, seen inside only
         for ci, (cx_, cy_) in enumerate(f.get("flames", [])):

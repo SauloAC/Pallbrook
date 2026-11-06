@@ -12,6 +12,7 @@ extends Marker3D
 
 @export_enum("south", "east", "north", "west") var facing := "south"
 @export var use_range := 0.8
+@export var raise := 0.0             # A tall seat (a bar stool): whoever sits is lifted this much (m)
 @export var interactive := true   # False for seats only scenes use (lunch), never offered by E
 
 const ICON := preload("res://assets/ui/icon_sit.png")
@@ -70,7 +71,7 @@ func sit_player(player) -> bool:
 	var was_at: Vector3 = player.global_position
 	player.velocity = Vector3.ZERO
 	player.set_physics_process(false)
-	player.global_position = Vector3(global_position.x, player.global_position.y, global_position.z)
+	player.global_position = Vector3(global_position.x, player.global_position.y + raise, global_position.z)
 	player.reset_physics_interpolation()
 	if player.visual.sit(facing) <= 0.0:
 		player.global_position = was_at  # No sitting clip for this body: he stays where he was

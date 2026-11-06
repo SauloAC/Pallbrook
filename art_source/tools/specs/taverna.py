@@ -35,7 +35,7 @@ SPEC = {
     # behind its front (z -4.19); door x 2.05..2.86; stairs x 2.83..3.68 from z -5.2 to -8.1
     # Marta behind the bar first, then about the hall; then out in the courtyard on the benches and by the
     # round tables, where lunch is (see NPC.gd)
-    "npc": {"slots": [(1.2, -7.35), (-1.0, -2.9), (-0.9, -5.3), (1.2, -5.2),
+    "npc": {"slots": [(1.2, -7.6), (-1.0, -2.9), (-0.9, -5.3), (1.2, -5.2),
                       (0.9, -3.0), (1.55, -3.0), (2.2, -1.0), (0.35, -1.3),
                       (0.93, -1.3), (1.5, -1.3), (4.2, -1.65), (2.4, -0.3)],
             "bed": (-3.4, 2.77, -7.16, 0.0),
@@ -43,10 +43,14 @@ SPEC = {
     "furniture": [
         # the bar: the counter with three stools before it; behind it, against the wall, the bottles on their
         # shelves and the two barrels with their taps (cel-shaded pieces, art_source/tools/furniture/)
-        {"name": "Bar", "prop": "cel_bar_counter", "x": 1.2, "z": -6.15, "box": (0.3, 2.1, -6.85, -6.15, 0.9)},
-        {"name": "BarStool1", "prop": "stool", "x": 0.6, "z": -5.65, "box": (0.42, 0.78, -5.95, -5.65, 0.5)},
-        {"name": "BarStool2", "prop": "stool", "x": 1.2, "z": -5.65, "box": (1.02, 1.38, -5.95, -5.65, 0.5)},
-        {"name": "BarStool3", "prop": "stool", "x": 1.8, "z": -5.65, "box": (1.62, 1.98, -5.95, -5.65, 0.5)},
+        # The counter runs from the open end (west), where Marta comes in, to the stairs, closed there; the
+        # way behind it 1.05 deep (the bottles' front at -8.12); four tall stools before it, their seats
+        # raised for whoever sits
+        {"name": "Bar", "prop": "cel_bar_counter", "x": 1.565, "z": -6.37, "box": (0.3, 2.83, -7.07, -6.37, 0.9)},
+        {"name": "BarStool1", "prop": "cel_barstool", "x": 0.7, "z": -5.87, "box": (0.52, 0.88, -6.17, -5.87, 0.5), "seat": "north", "seat_raise": 0.42},
+        {"name": "BarStool2", "prop": "cel_barstool", "x": 1.3, "z": -5.87, "box": (1.12, 1.48, -6.17, -5.87, 0.5), "seat": "north", "seat_raise": 0.42},
+        {"name": "BarStool3", "prop": "cel_barstool", "x": 1.9, "z": -5.87, "box": (1.72, 2.08, -6.17, -5.87, 0.5), "seat": "north", "seat_raise": 0.42},
+        {"name": "BarStool4", "prop": "cel_barstool", "x": 2.5, "z": -5.87, "box": (2.32, 2.68, -6.17, -5.87, 0.5), "seat": "north", "seat_raise": 0.42},
         {"name": "BarBack", "prop": "cel_bar_back", "x": 1.38, "z": -8.12, "box": (0.15, 2.61, -8.5, -8.12, 1.4)},
         # the hall in the wing: round tables, the rug before the fire, barrels and a crate in the corners
         {"name": "TableA", "prop": "table_round", "x": -2.3, "z": -1.7, "box": (-2.6, -2.0, -2.2, -1.7, 0.8)},
