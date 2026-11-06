@@ -35,6 +35,7 @@
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/casaclara/casaclara_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -338,6 +339,12 @@ surface_material_override/0 = SubResource("mt_p_table_cloth")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9000, 0.4167, -1.7500)
 mesh = SubResource("q_Stool")
 surface_material_override/0 = SubResource("mt_p_stool")
+
+[node name="StoolSeat0" type="Marker3D" parent="CasaClara_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9000, 0.0000, -1.9000)
+script = ExtResource("sc_seat")
+facing = "south"
+use_range = 0.5
 
 [node name="Basket" type="MeshInstance3D" parent="CasaClara_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1500, 0.5730, -0.6000)

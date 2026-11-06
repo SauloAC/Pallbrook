@@ -5,7 +5,7 @@ extends Marker3D
 # where his feet go, and pick which way he faces. Near it, an icon shows and E sits him down;
 # any movement stands him up again. Lunch and other scenes can also seat him (sit_player).
 # Sitting takes the doctor off physics, so a chair's collision doesn't push him out of it;
-# when he stands, the collision steps him clear of the chair.
+# when he stands he steps back to where he stood before sitting down.
 
 @export_enum("south", "east", "north", "west") var facing := "south"
 @export var use_range := 0.8
@@ -15,6 +15,7 @@ const ICON := preload("res://assets/ui/icon_sit.png")
 
 var prompt: Sprite3D
 var sitter: Node3D = null   # The doctor while he sits here
+var stand_at := Vector3.ZERO  # Where he stood before sitting: he gets up there (a stool's collision would lift him onto it)
 
 
 func _ready() -> void:
@@ -69,6 +70,7 @@ func sit_player(player) -> bool:
 		player.set_physics_process(true)
 		return false
 	sitter = player
+	stand_at = was_at
 	return true
 
 
@@ -76,6 +78,8 @@ func stand_player() -> void:
 	if sitter == null:
 		return
 	sitter.visual.stand_up()
+	sitter.global_position = stand_at
+	sitter.reset_physics_interpolation()
 	sitter.set_physics_process(true)
 	sitter = null
 

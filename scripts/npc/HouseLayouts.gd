@@ -4,6 +4,7 @@ extends RefCounted
 
 # Indoor spots: the first is the owner's own (or the worker's post)
 const INTERIOR_SLOTS := {
+	"Biblioteca": [Vector3(-3.754, 0.0, -2.53), Vector3(-9.914, 0.0, 0.97), Vector3(-11.314, 0.0, 0.97), Vector3(-8.794, 0.0, -5.12), Vector3(-8.794, 0.0, -7.64), Vector3(-10.194, 0.0, -9.74), Vector3(-4.944, 0.0, -2.74), Vector3(-1.374, 0.0, -2.88), Vector3(0.446, 0.0, -2.6)],
 	"Casa1": [Vector3(-2.209, 0.0, -1.26), Vector3(-5.149, 0.0, -0.98), Vector3(-0.949, 0.0, -1.82)],
 	"CasaClara": [Vector3(-2.23, 0.0, -1.89), Vector3(-1.81, 0.0, -0.42), Vector3(-0.41, 0.0, -0.98)],
 	"CasaHugo": [Vector3(0.022, 0.0, -1.05), Vector3(-0.748, 0.0, -0.84), Vector3(1.282, 0.0, -1.4)],
@@ -15,6 +16,7 @@ const INTERIOR_SLOTS := {
 	"Deposito": [Vector3(-0.192, 0.0, -2.24), Vector3(-2.572, 0.0, -2.8), Vector3(0.787, 0.0, -2.66)],
 	"Escola": [Vector3(2.743, 0.0, -7.35), Vector3(5.053, 0.0, -6.86), Vector3(5.753, 0.0, -6.86), Vector3(2.183, 0.0, -5.32), Vector3(3.023, 0.0, -1.82), Vector3(1.343, 0.0, -2.52), Vector3(2.323, 0.0, -0.56)],
 	"Fazenda": [Vector3(-7.048, 0.0, -2.94), Vector3(-3.828, 0.0, -3.5), Vector3(-5.508, 0.0, -1.4)],
+	"Casa2": [Vector3(-3.863, 0.0, -6.23), Vector3(-3.863, 0.0, -4.41), Vector3(-5.893, 0.0, -4.088), Vector3(0.477, 0.0, -1.82), Vector3(-0.853, 0.0, -2.45), Vector3(2.787, 0.0, -4.34), Vector3(-2.183, 0.0, -4.76)],
 	"Igreja": [Vector3(0.044, 0.0, -6.58), Vector3(-1.216, 0.0, -5.6), Vector3(0.534, 0.0, -5.39), Vector3(-1.566, 0.0, -6.23), Vector3(0.044, 0.0, -3.92), Vector3(0.044, 0.0, -2.52), Vector3(0.044, 0.0, -0.98)],
 	"Padaria": [Vector3(6.754, 0.0, -2.8), Vector3(3.534, 0.0, -0.14), Vector3(6.334, 0.0, -0.14), Vector3(1.854, 0.0, -0.7)],
 	"Prefeitura": [Vector3(0.626, 0.0, -5.11), Vector3(-4.834, 0.0, -2.52), Vector3(-0.914, 0.0, -2.52), Vector3(-2.874, 0.0, -1.12), Vector3(0.626, 0.0, -2.66), Vector3(-8.054, 0.0, -4.34), Vector3(-6.934, 0.0, -2.1), Vector3(-1.754, 0.0, -0.56), Vector3(-7.634, 0.0, -1.12)],
@@ -31,6 +33,7 @@ const BED_SPOTS := {
 	"CasaSebastian": [Vector3(2.701, 0.0, -4.83), 0.0],
 	"CasaSophia": [Vector3(-1.549, 0.0, -2.8), 0.0],
 	"Fazenda": [Vector3(-8.028, 3.92, -4.48), 0.0],
+	"Casa2": [Vector3(0.757, 0.0, -5.53), 0.0],
 	"Padaria": [Vector3(9.694, 2.94, -2.52), 0.0],
 	"Taverna": [Vector3(-8.194, 3.878, -3.501), 0.0],
 }

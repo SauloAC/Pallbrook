@@ -23,6 +23,7 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/igreja/igreja_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
 [ext_resource type="Shader" path="res://assets/buildings2d/fx/fx_candle.gdshader" id="sh_candle"]
+[ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -302,30 +303,102 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5556, -1.7000)
 mesh = SubResource("q_PewW1")
 surface_material_override/0 = SubResource("mt_p_pew")
 
+[node name="PewW1Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3100, 0.0000, -1.8750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
+[node name="PewW1Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8100, 0.0000, -1.8750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
 [node name="PewE1" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5556, -1.7000)
 mesh = SubResource("q_PewE1")
 surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewE1Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8100, 0.0000, -1.8750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
+[node name="PewE1Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3100, 0.0000, -1.8750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
 
 [node name="PewW2" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5556, -2.6000)
 mesh = SubResource("q_PewW2")
 surface_material_override/0 = SubResource("mt_p_pew")
 
+[node name="PewW2Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3100, 0.0000, -2.7750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
+[node name="PewW2Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8100, 0.0000, -2.7750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
 [node name="PewE2" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5556, -2.6000)
 mesh = SubResource("q_PewE2")
 surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewE2Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8100, 0.0000, -2.7750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
+[node name="PewE2Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3100, 0.0000, -2.7750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
 
 [node name="PewW3" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0600, 0.5556, -3.5000)
 mesh = SubResource("q_PewW3")
 surface_material_override/0 = SubResource("mt_p_pew")
 
+[node name="PewW3Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3100, 0.0000, -3.6750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
+[node name="PewW3Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8100, 0.0000, -3.6750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
 [node name="PewE3" type="MeshInstance3D" parent="Igreja_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0600, 0.5556, -3.5000)
 mesh = SubResource("q_PewE3")
 surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="PewE3Seat0" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8100, 0.0000, -3.6750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
+[node name="PewE3Seat1" type="Marker3D" parent="Igreja_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3100, 0.0000, -3.6750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
 
 [node name="Walls" type="StaticBody3D" parent="."]
 

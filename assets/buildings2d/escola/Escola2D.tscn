@@ -43,6 +43,7 @@
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/escola/escola_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -440,10 +441,34 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1100, 0.5556, -6.0000)
 mesh = SubResource("q_BenchBack")
 surface_material_override/0 = SubResource("mt_p_pew")
 
+[node name="BenchBackSeat0" type="Marker3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8600, 0.0000, -6.1500)
+script = ExtResource("sc_seat")
+facing = "south"
+use_range = 0.5
+
+[node name="BenchBackSeat1" type="Marker3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3600, 0.0000, -6.1500)
+script = ExtResource("sc_seat")
+facing = "south"
+use_range = 0.5
+
 [node name="BenchFront" type="MeshInstance3D" parent="Escola_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0100, 0.5556, -4.4000)
 mesh = SubResource("q_BenchFront")
 surface_material_override/0 = SubResource("mt_p_pew")
+
+[node name="BenchFrontSeat0" type="Marker3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7600, 0.0000, -4.5750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
+
+[node name="BenchFrontSeat1" type="Marker3D" parent="Escola_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2600, 0.0000, -4.5750)
+script = ExtResource("sc_seat")
+facing = "north"
+use_range = 0.5
 
 [node name="Blackboard" type="MeshInstance3D" parent="Escola_Inside/Escola_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1500, 5.2523, -6.1000)

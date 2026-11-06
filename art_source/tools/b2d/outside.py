@@ -103,6 +103,10 @@ def build(h):
         xr0, c0 = xs, c1
     else:
         c0 = 0
+        # ...or start at one (the forge: only the house's roof slopes; the shed's is in its own front plane)
+        if sp["roof"].get("x_px", (0, h.iw))[0] > 0:
+            c0 = sp["roof"]["x_px"][0]
+            xr0 = h.px(c0)
     # the roof may stop at a column: beyond it a set-back part's own front plane carries its roof (the tavern)
     cr = sp["roof"].get("x_px", (0, h.iw))[1]
     if cr < h.iw:
@@ -111,8 +115,29 @@ def build(h):
                                 [h.uv(c0, re), h.uv(cr, re), h.uv(cr, 0), h.uv(c0, 0)], 1)], rn)
     # the volume behind (only for shadows and to close it): back wall and the two sides up to the roof
     solid = tuple(sp["solid_uv"])
+    if h.PLAN:      # boxes given by the plan: (x0, x1, z back, z front, height)
+        faces = []
+        for x0, x1, zb, zf, hh in h.PLAN["body"]:
+            faces += [([(x1, 0, zb), (x0, 0, zb), (x0, hh, zb), (x1, hh, zb)], [solid] * 4, 1),
+                      ([(x0, 0, zb), (x0, 0, zf), (x0, hh, zf), (x0, hh, zb)], [solid] * 4, 2),
+                      ([(x1, 0, zf), (x1, 0, zb), (x1, hh, zb), (x1, hh, zf)], [solid] * 4, 3)]
+        h.body_fn = h.obj("Body", faces, ["0 0 -1", "-1 0 0", "1 0 0"])
+        return
     xw0, xw1 = h.xw0, h.xw1
-    h.body_fn = h.obj("Body", [([(xw1, 0, -D), (xw0, 0, -D), (xw0, yt, -D), (xw1, yt, -D)], [solid] * 4, 1),
-                               ([(xw0, 0, -D), (xw0, 0, h.znl if h.NOTCH_L else ze), (xw0, ye, h.znl if h.NOTCH_L else ze), (xw0, yt, -D)], [solid] * 4, 2),
-                               ([(xw1, 0, h.zn if h.NOTCH else ze), (xw1, 0, -D), (xw1, yt, -D), (xw1, ye, h.zn if h.NOTCH else ze)], [solid] * 4, 3)],
+    # where the roof stops short (spec roof "x_px"), the part beyond it is lower: its back wall only rises
+    # as high as keeps its top under the art's top row there (spec roof "beyond_top_row"), so it never
+    # shows above that part's own roof on screen
+    if cr < h.iw and sp["roof"].get("beyond_top_row") is not None:
+        DN = h.DN if h.NOTCH else D
+        hb = max(0.5, (rp["base"] / 32.0 - sp["roof"]["beyond_top_row"] / 32.0 - (ze + DN) * SIN) / COS)
+        back = [([(XR, 0, -D), (xw0, 0, -D), (xw0, yt, -D), (XR, yt, -D)], [solid] * 4, 1),
+                ([(xw1, 0, -DN), (XR, 0, -DN), (XR, hb, -DN), (xw1, hb, -DN)], [solid] * 4, 1)]
+        if DN < D - 0.01:       # the main part's east side, behind the shallower part
+            back.append(([(XR, 0, -DN), (XR, 0, -D), (XR, yt, -D), (XR, ye, -DN)], [solid] * 4, 3))
+        east = ([(xw1, 0, h.zn if h.NOTCH else ze), (xw1, 0, -DN), (xw1, hb, -DN), (xw1, hb, h.zn if h.NOTCH else ze)], [solid] * 4, 3)
+    else:
+        back = [([(xw1, 0, -D), (xw0, 0, -D), (xw0, yt, -D), (xw1, yt, -D)], [solid] * 4, 1)]
+        east = ([(xw1, 0, h.zn if h.NOTCH else ze), (xw1, 0, -D), (xw1, yt, -D), (xw1, ye, h.zn if h.NOTCH else ze)], [solid] * 4, 3)
+    h.body_fn = h.obj("Body", back + [([(xw0, 0, -D), (xw0, 0, h.znl if h.NOTCH_L else ze), (xw0, ye, h.znl if h.NOTCH_L else ze), (xw0, yt, -D)], [solid] * 4, 2),
+                               east],
                       ["0 0 -1", "-1 0 0", "1 0 0"])

@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cv2hv8hymx0oc"
+path="res://.godot/imported/biblioteca_block0top.obj-54621c3816a974bdc4f076cb26d4bcc1.mesh"
+
+[deps]
+
+files=["res://.godot/imported/biblioteca_block0top.obj-54621c3816a974bdc4f076cb26d4bcc1.mesh"]
+
+source_file="res://assets/buildings2d/biblioteca/biblioteca_block0top.obj"
+dest_files=["res://.godot/imported/biblioteca_block0top.obj-54621c3816a974bdc4f076cb26d4bcc1.mesh", "res://.godot/imported/biblioteca_block0top.obj-54621c3816a974bdc4f076cb26d4bcc1.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

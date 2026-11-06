@@ -38,12 +38,18 @@ class House:
         self.HIN = spec["room_height"]
         self.UP = spec.get("upper")
         self.DECK = spec.get("deck")
+        # an odd plan (the forge: a house standing out in front of an open shed) gives its floors, walls and
+        # colliders itself instead of the box room the rest assume (see inside.py, outside.py, scene.py)
+        self.PLAN = spec.get("plan")
         self.FY = spec.get("floor_y", 0.0)           # a raised floor (a house on posts), in local units
         # a set-back part on the right (a lean-to): its front wall stands behind the main front
         self.NOTCH = spec.get("notch")
         if self.NOTCH:
             assert not self.DECK, "a notch and a balcony on the same house are not supported"
             self.xn, self.zn, self.wt = self.px(self.NOTCH["x_px"]), self.NOTCH["z"], t
+            # ...and it may be shallower than the main part (the library's hall beside its deep wing)
+            self.DN = self.NOTCH.get("depth", self.D)
+            self.ZBN = -self.DN + t
         # the same on the left: a wing whose front wall stands behind the main front (the clinic's stair wing)
         self.NOTCH_L = spec.get("notch_left")
         if self.NOTCH_L:

@@ -107,7 +107,7 @@ const PROPS_DIR := "res://assets/environment2d/props/"
 const ZONES := {
 	"plaza": Rect2(4.7, 9.7, 11.0, 9.5), "market": Rect2(7.2, 23.7, 7.5, 4.0),
 	"tavern": Rect2(-4.0, 21.3, 6.6, 6.0), "clinic_yard": Rect2(23.3, 23.2, 3.5, 4.5),
-	"forge_yard": Rect2(5.0, -25.0, 11.0, 6.0), "river": Rect2(-40.0, -80.0, 50.0, 120.0),
+	"river": Rect2(-40.0, -80.0, 50.0, 120.0),
 }
 const WELL_AT := Vector3(10.2, 0.0, 14.55)   # The front of the well's stone base
 const PROP_RULES := [
@@ -115,11 +115,10 @@ const PROP_RULES := [
 	["^Stall_Cart_Empty", "stall_ada", "market"],
 	["^(FarmCrate|Bag|Barrel_Apples)", "", "market"],
 	["^Bench", "bench", "plaza"], ["^Bench", "bench", "clinic_yard"],   # (the tavern's courtyard furniture is the 2D tavern's own)
-	["^Table_Large", "table", "clinic_yard"], ["^Table_Large", "table", "forge_yard"],
+	["^Table_Large", "table", "clinic_yard"],
 	["^Barrel_Holder", "barrels_stack", "tavern"], ["^Barrel_Apples", "crate_apples", "tavern"],
-	["^Barrel", "barrel", "tavern"], ["^Barrel", "barrel", "forge_yard"],
+	["^Barrel", "barrel", "tavern"],
 	["^FarmCrate_Carrot", "crate_carrots", "tavern"], ["^(Crate_Wooden|Crates)", "crate_empty", "tavern"],
-	["^Chest_Wood", "crate_empty", "forge_yard"], ["^Bucket", "", "forge_yard"], ["^Trough", "trough", "forge_yard"],
 	["^Flower_3_Group", "pot_flowers", "plaza"], ["^Flower_4_Group", "pot_flowers2", "plaza"], ["^Vase_2", "", "plaza"],
 	["^Floor_Brick", "", "plaza"], ["^Floor_Brick", "", "tavern"],   # Painted into the ground (stone slabs)
 	["^(KRock|Rock_Medium)", "rock", "river"],

@@ -42,6 +42,7 @@
 [ext_resource type="Script" path="res://scripts/world/Door2D.gd" id="sc_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/clinica/clinica_door.png" id="tx_door"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/door_opening.png" id="tx_opening"]
+[ext_resource type="Script" path="res://scripts/world/Seat.gd" id="sc_seat"]
 
 [sub_resource type="ShaderMaterial" id="mt_floor"]
 shader = ExtResource("sh_tile")
@@ -388,10 +389,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7500, 0.4167, -1.5000)
 mesh = SubResource("q_StoolA")
 surface_material_override/0 = SubResource("mt_p_stool")
 
+[node name="StoolASeat0" type="Marker3D" parent="Clinica_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7500, 0.0000, -1.6500)
+script = ExtResource("sc_seat")
+facing = "east"
+use_range = 0.5
+
 [node name="StoolB" type="MeshInstance3D" parent="Clinica_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1500, 0.4167, -1.3000)
 mesh = SubResource("q_StoolB")
 surface_material_override/0 = SubResource("mt_p_stool")
+
+[node name="StoolBSeat0" type="Marker3D" parent="Clinica_Inside/Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1500, 0.0000, -1.4500)
+script = ExtResource("sc_seat")
+facing = "west"
+use_range = 0.5
 
 [node name="Basket" type="MeshInstance3D" parent="Clinica_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8500, 0.5730, -0.5500)
@@ -412,6 +425,12 @@ surface_material_override/0 = SubResource("mt_p_table_round")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2000, 2.7967, -1.1500)
 mesh = SubResource("q_UpStool")
 surface_material_override/0 = SubResource("mt_p_stool")
+
+[node name="UpStoolSeat0" type="Marker3D" parent="Clinica_Inside/Clinica_Upper"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2000, 2.3800, -1.3000)
+script = ExtResource("sc_seat")
+facing = "east"
+use_range = 0.5
 
 [node name="UpCrate" type="MeshInstance3D" parent="Clinica_Inside/Clinica_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1000, 3.1787, -1.0000)

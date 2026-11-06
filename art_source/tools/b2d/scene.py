@@ -19,7 +19,9 @@ def build(h):
     BLOCKS, up_meshes, up_shapes, conv = h.blocks, h.up_meshes, h.up_shapes, h.conv
     d0, d1 = h.d0, h.d1
     DOOR_Z, DOOR = h.DOOR_Z, h.door
+    DN, ZBN = (h.DN, h.ZBN) if h.NOTCH else (h.D, h.ZB)     # the set-back part's own depth
     NOTCH = h.NOTCH
+    PLAN, PLAN_FLOORS = h.PLAN, h.plan_floors     # (h is reused below for a prop's height)
     NL = h.NOTCH_L                     # a left wing set back (see core.House)
     XNL, ZNL, WTL = (h.xnl, h.znl, h.wt) if NL else (None, None, None)
     FY = h.FY
@@ -98,7 +100,7 @@ def build(h):
     N('[node name="%s2D" type="Node3D"]\n' % NAME)
     N('[node name="%s_Front" type="Node3D" parent="."]\n' % NAME)
     facade_mat = "mt_" + KEY + "_facade"
-    STAYS = SPEC.get("stays", {}).get("planes", [])
+    STAYS = SPEC.get("stays", {}).get("planes", []) + SPEC.get("inside_planes", [])
     for i, (fn, tex) in enumerate(fronts):
         if i in STAYS:
             continue
@@ -128,7 +130,21 @@ def build(h):
     for nm, m, mt in (("Floor", "floor", GROUND_MT), ("InnerWall", "innerwall", "mt_wall"), ("Timber", "timber", "mt_beam")):
         # an open-fronted building (a shed) shows its floor from outside too, through the opening
         par = "." if (nm == "Floor" and SPEC.get("floor_outside")) else INS
+        if nm == "Floor" and PLAN_FLOORS:      # a plan's floors: each its own tile, some on show from outside
+            for fi, (ffn, ftile, fout) in enumerate(PLAN_FLOORS):
+                fmt = "mt_floor"
+                if ftile:
+                    fmt = "mt_fl_" + ftile.replace(".png", "")
+                    E("Texture2D", R + ftile, "tx_fl_" + ftile.replace(".png", "")); mat(fmt, "sh_tile", "tx_fl_" + ftile.replace(".png", ""))
+                if fi:
+                    E("ArrayMesh", RH + ffn, "m_floor%d" % fi)
+                N('[node name="Floor%s" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_floor%s")\nmaterial_override = SubResource("%s")\n'
+                  % (fi or "", "." if fout else INS, fi or "", fmt))
+            continue
         N('[node name="%s" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_%s")\nmaterial_override = SubResource("%s")\n' % (nm, par, m, mt))
+    for i in SPEC.get("inside_planes", []):
+        N('[node name="Plane%d" type="MeshInstance3D" parent="%s"]\nmesh = ExtResource("m_front%d")\nmaterial_override = SubResource("mt_%s")\n'
+          % (i, INS, i, fronts[i][1].replace(".png", "")))
     N('[node name="Furniture" type="Node3D" parent="%s"]\n' % INS)
     if timber_low_fn:
         # <Name>_Lower: shown only while the doctor is inside downstairs (InteriorCutaway)
@@ -161,11 +177,33 @@ def build(h):
               % (b["name"], INS, tf(fx_, fy_ + h.FY, fz_), bi))
         if b.get("light"):
             lx, ly, lz = b["light"]
-            N('[node name="%sGlow" type="OmniLight3D" parent="%s"]\ntransform = %s\nlight_color = Color(1, 0.62, 0.3, 1)\nlight_energy = 0.9\nomni_range = 3.0\nshadow_enabled = false\n'
-              % (b["name"], INS, tf(lx, ly + h.FY, lz)))
+            N('[node name="%sGlow" type="OmniLight3D" parent="%s"]\ntransform = %s\nlight_color = Color(1, 0.62, 0.3, 1)\nlight_energy = %s\nomni_range = %s\nshadow_enabled = false\n'
+              % (b["name"], INS, tf(lx, ly + h.FY, lz), repr(float(b.get("light_energy", 0.9))), repr(float(b.get("light_range", 3.0)))))
     furniture = list(SPEC["furniture"])
     if SPEC.get("door_rug", True):
         furniture.append({"name": "DoorRug", "prop": "rug", "flat": True, "y": 0.025, "x": (d0 + d1) / 2, "z": DOOR_Z - 0.42})
+    TABLES = [g for g in furniture if g.get("box") and g["prop"].startswith(("table", "desk", "schooldesk"))]
+    def seats_of(f):
+        if f.get("outside") or f.get("seat") is False or f["prop"] not in ("stool", "pew") or not f.get("box"):
+            return []
+        bx0, bx1, bz0, bz1, _ = f["box"]
+        cx, cz = (bx0 + bx1) / 2, (bz0 + bz1) / 2
+        face = f.get("seat")
+        if face is None and f["prop"] == "stool":
+            near = [g for g in TABLES if bool(g.get("upper")) == bool(f.get("upper"))]
+            if near:
+                def centre(g):
+                    return ((g["box"][0] + g["box"][1]) / 2, (g["box"][2] + g["box"][3]) / 2)
+                tx, tz = min((centre(g) for g in near), key=lambda c: (c[0] - cx) ** 2 + (c[1] - cz) ** 2)
+                dx, dz = tx - cx, tz - cz
+                face = ("east" if dx > 0 else "west") if abs(dx) > abs(dz) else ("north" if dz < 0 else "south")
+            else:
+                face = "south"
+        if face is None:        # a bench
+            face = "south" if bz0 <= ZB + 0.05 else "north"
+        if f["prop"] == "pew":
+            return [(cx - 0.25, cz, face), (cx + 0.25, cz, face)]
+        return [(cx, cz, face)]
     for f in furniture:
         lift = UP["height"] if (UP and f.get("upper")) else FY
         fpar = (INS + "/" + NAME + "_Upper") if (UP and f.get("upper")) else (INS + "/Furniture")
@@ -182,10 +220,17 @@ def build(h):
             qh = h / 32.0 / COS * FURN
             S('[sub_resource type="QuadMesh" id="q_%s"]\nsize = Vector2(%.4f, %.4f)\n' % (f["name"], qw, qh))
             N('[node name="%s" type="MeshInstance3D" parent="%s"]\ntransform = %s\nmesh = SubResource("q_%s")\nsurface_material_override/0 = SubResource("mt_p_%s")\n'
-              % (f["name"], fpar, tf(f["x"], qh / 2 + lift, f["z"]), f["name"], f["prop"]))
+              % (f["name"], fpar, tf(f["x"], qh / 2 + lift + f.get("hang", 0.0), f["z"]), f["name"], f["prop"]))
         if f.get("box"):
             bx0, bx1, bz0, bz1, bh = f["box"]
             shapes.append((f["name"], bx0, bx1, lift, lift + bh, bz0, bz1))
+        # stools and benches are seats (scripts/world/Seat.gd): the doctor sits on them with E, and later
+        # the townsfolk; a stool faces its table, a bench faces north (the altar, the room) unless it stands
+        # against the back wall; "seat" in the spec says which way, or False for none
+        for si, (sx_, sz_, sface) in enumerate(seats_of(f)):
+            E("Script", "res://scripts/world/Seat.gd", "sc_seat")
+            N('[node name="%sSeat%d" type="Marker3D" parent="%s"]\ntransform = %s\nscript = ExtResource("sc_seat")\nfacing = "%s"\nuse_range = 0.5\n'
+              % (f["name"], si, fpar, tf(sx_, lift, sz_), sface))
         # candles on a standing piece: a small flame at each wick (pixels of the prop's art) and,
         # with "glow", a warm light among them, seen inside only
         for ci, (cx_, cy_) in enumerate(f.get("flames", [])):
@@ -206,63 +251,74 @@ def build(h):
     WALL = max(5.4, UP["height"] + 2.4) if UP else 3.2      # a tall ground floor (the school) needs taller walls
     FZ_ = UP.get("front_z", 0.0) if UP else 0.0
     FH = UP["height"] if (UP and FZ_ > 0) else WALL      # height of the ground floor front
-    shapes.append(("Back", xw0, xw1, 0, WALL, -D, ZB))
-    # the west wall, open where a side door is (spec "west_gaps": z ranges, front first)
-    wz = (ZNL + 0.15) if NL else max(0.15, FZ_ + 0.15)
-    for gi, (ga_, gb_) in enumerate(SPEC.get("west_gaps", [])):
-        shapes.append(("West%d" % gi, xw0, XI0, 0, WALL, wz, ga_))
-        wz = gb_
-    shapes.append(("West", xw0, XI0, 0, WALL, wz, -D))
-    if NL:        # the left wing: its own front wall (thick outward only, so upstairs the walk in front of the stairs stays wide), and the main room's west wall in front of it
-        shapes += [("NotchFront", xw0, XNL + WTL, 0, WALL, ZNL + 0.15, ZNL), ("NotchSide", XNL, XNL + WTL, 0, WALL, 0.15, ZNL)]
-    # the front wall, open at the door and at any other openings in the art (arches); a lintel over each opening
-    DOOR_IN_NOTCH = DOOR_Z != 0.0
-    gaps = [] if DOOR_IN_NOTCH else [(d0, d1, None)]
-    for gi, g in enumerate(SPEC.get("front_gaps", [])):
-        gp = SPEC["planes"][g.get("plane", 0)]
-        gaps.append((px(g["px"][0]), px(g["px"][1]), (gp["base"] - g["top_row"]) / 32.0 / COS))
-    gaps.sort()
-    fx = XNL if NL else xw0
-    for gi, (ga_, gb_, gtop) in enumerate(gaps):
-        nm_ = "FrontLeft" if gi == 0 else "Front%d" % gi
-        shapes.append((nm_, fx, ga_, 0, FH, 0.15, -0.15))
-        if gtop is not None:
-            shapes.append(("Lintel%d" % gi, ga_, gb_, gtop, FH, 0.15, -0.15))
-        fx = gb_
-    shapes.append(("FrontRight", fx, XN if NOTCH else xw1, 0, FH, 0.15, -0.15))
-    for pi, pt in enumerate(SPEC.get("partitions", [])):
-        shapes.append(("Partition%d" % pi, pt["x"][0], pt["x"][1], 0, pt["height"], -0.15, ZB))
-    if FY > 0:    # the raised floor is a solid slab; the porch in front of the door and the steps up to it
-        shapes.append(("RaisedFloor", xw0, xw1, 0, FY, 0.15, -D))
-        if PORCH:
-            pa, pb, pz0, pz1 = PORCH
-            shapes.append(("PorchFloor", pa, pb, 0, FY, pz1, min(pz0, 0.15)))
-        if SPEC.get("steps"):
-            sx0, sx1 = (px(v) for v in SPEC["steps"]["x_px"])
-            st, sb = SPEC["steps"]["z"]          # where they meet the porch, where they reach the ground
-            conv.append(("Steps", [(x, y, z) for x in (sx0, sx1) for y, z in ((FY, st - 0.05), (0.0, st - 0.05), (0.0, sb), (0.02, sb))]))
-    if NOTCH:     # the lean-to: the main room's east wall up to it, and its own front wall
-        shapes.append(("NotchSide", XN - WT, XN, 0, WALL, 0.15, ZN))
-        if DOOR_IN_NOTCH:     # the door in it, a lintel over the door
-            dtop = DOOR["yt"] if DOOR else 2.0
-            shapes += [("NotchFront", XN - WT, d0, 0, WALL, ZN + 0.15, ZN - 0.15), ("NotchFront2", d1, xw1, 0, WALL, ZN + 0.15, ZN - 0.15),
-                       ("NotchLintel", d0, d1, dtop, WALL, ZN + 0.15, ZN - 0.15)]
-        else:
-            shapes.append(("NotchFront", XN - WT, xw1, 0, WALL, ZN + 0.15, ZN - 0.15))
-    if FZ_ > 0:
-        shapes.append(("UpperFront", xw0, xw1, UP["height"], WALL, FZ_ + 0.15, FZ_ - 0.15))
-    if DECK:
-        # a door from the upper room out to the balcony through the east wall; the balcony's floor and rails
-        ga, gb = DECK_Z[1], DECK_Z[0]                 # open all along the balcony
-        H_ = DECK["y"]
-        shapes += [("East", XI1, xw1, 0, H_, max(0.15, FZ_ + 0.15), -D),
-                   ("EastUpFront", XI1, xw1, H_, WALL, max(0.15, FZ_ + 0.15), ga), ("EastUpBack", XI1, xw1, H_, WALL, gb, -D),
-                   ("DeckFloor", xw1, DECK_X1, H_ - 0.2, H_, DECK_Z[0], DECK_Z[1]),
-                   ("DeckRailOut", DECK_X1 - 0.1, DECK_X1, H_, H_ + 1.0, DECK_Z[0], DECK_Z[1]),
-                   ("DeckRailFront", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[1] - 0.1, DECK_Z[1]),
-                   ("DeckRailBack", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[0], DECK_Z[0] + 0.1)]
+    if PLAN:       # the plan's walls: (name, x0, x1, z0, z1) full height, or with (y0, y1)
+        for w_ in PLAN["walls"]:
+            nm_, xa_, xb_, za_, zb_ = w_[:5]
+            ya_, yb_ = w_[5:7] if len(w_) > 5 else (0, WALL)
+            shapes.append((nm_, xa_, xb_, ya_, yb_, za_, zb_))
+    elif NOTCH and DN < D - 0.01:     # a shallower set-back part: its own back wall, the main part's east wall behind it
+        shapes += [("Back", xw0, XN, 0, WALL, -D, ZB), ("BackNotch", XN - WT, xw1, 0, WALL, -DN, ZBN),
+                   ("WingEast", XN - WT, XN, 0, WALL, -D, ZBN)]
     else:
-        shapes.append(("East", XI1, xw1, 0, WALL, ZN + 0.15 if NOTCH else max(0.15, FZ_ + 0.15), -D))
+        shapes.append(("Back", xw0, xw1, 0, WALL, -D, ZB))
+    DOOR_IN_NOTCH = DOOR_Z != 0.0
+    if not PLAN:   # the box room's walls (a plan gives its own, above)
+        # the west wall, open where a side door is (spec "west_gaps": z ranges, front first)
+        wz = (ZNL + 0.15) if NL else max(0.15, FZ_ + 0.15)
+        for gi, (ga_, gb_) in enumerate(SPEC.get("west_gaps", [])):
+            shapes.append(("West%d" % gi, xw0, XI0, 0, WALL, wz, ga_))
+            wz = gb_
+        shapes.append(("West", xw0, XI0, 0, WALL, wz, -D))
+        if NL:        # the left wing: its own front wall (thick outward only, so upstairs the walk in front of the stairs stays wide), and the main room's west wall in front of it
+            shapes += [("NotchFront", xw0, XNL + WTL, 0, WALL, ZNL + 0.15, ZNL), ("NotchSide", XNL, XNL + WTL, 0, WALL, 0.15, ZNL)]
+        # the front wall, open at the door and at any other openings in the art (arches); a lintel over each opening
+        DOOR_IN_NOTCH = DOOR_Z != 0.0
+        gaps = [] if DOOR_IN_NOTCH else [(d0, d1, None)]
+        for gi, g in enumerate(SPEC.get("front_gaps", [])):
+            gp = SPEC["planes"][g.get("plane", 0)]
+            gaps.append((px(g["px"][0]), px(g["px"][1]), (gp["base"] - g["top_row"]) / 32.0 / COS))
+        gaps.sort()
+        fx = XNL if NL else xw0
+        for gi, (ga_, gb_, gtop) in enumerate(gaps):
+            nm_ = "FrontLeft" if gi == 0 else "Front%d" % gi
+            shapes.append((nm_, fx, ga_, 0, FH, 0.15, -0.15))
+            if gtop is not None:
+                shapes.append(("Lintel%d" % gi, ga_, gb_, gtop, FH, 0.15, -0.15))
+            fx = gb_
+        shapes.append(("FrontRight", fx, XN if NOTCH else xw1, 0, FH, 0.15, -0.15))
+        for pi, pt in enumerate(SPEC.get("partitions", [])):
+            shapes.append(("Partition%d" % pi, pt["x"][0], pt["x"][1], 0, pt["height"], -0.15, ZB))
+        if FY > 0:    # the raised floor is a solid slab; the porch in front of the door and the steps up to it
+            shapes.append(("RaisedFloor", xw0, xw1, 0, FY, 0.15, -D))
+            if PORCH:
+                pa, pb, pz0, pz1 = PORCH
+                shapes.append(("PorchFloor", pa, pb, 0, FY, pz1, min(pz0, 0.15)))
+            if SPEC.get("steps"):
+                sx0, sx1 = (px(v) for v in SPEC["steps"]["x_px"])
+                st, sb = SPEC["steps"]["z"]          # where they meet the porch, where they reach the ground
+                conv.append(("Steps", [(x, y, z) for x in (sx0, sx1) for y, z in ((FY, st - 0.05), (0.0, st - 0.05), (0.0, sb), (0.02, sb))]))
+        if NOTCH:     # the lean-to: the main room's east wall up to it, and its own front wall
+            shapes.append(("NotchSide", XN - WT, XN, 0, WALL, 0.15, ZN))
+            if DOOR_IN_NOTCH:     # the door in it, a lintel over the door
+                dtop = DOOR["yt"] if DOOR else 2.0
+                shapes += [("NotchFront", XN - WT, d0, 0, WALL, ZN + 0.15, ZN - 0.15), ("NotchFront2", d1, xw1, 0, WALL, ZN + 0.15, ZN - 0.15),
+                           ("NotchLintel", d0, d1, dtop, WALL, ZN + 0.15, ZN - 0.15)]
+            else:
+                shapes.append(("NotchFront", XN - WT, xw1, 0, WALL, ZN + 0.15, ZN - 0.15))
+        if FZ_ > 0:
+            shapes.append(("UpperFront", xw0, xw1, UP["height"], WALL, FZ_ + 0.15, FZ_ - 0.15))
+        if DECK:
+            # a door from the upper room out to the balcony through the east wall; the balcony's floor and rails
+            ga, gb = DECK_Z[1], DECK_Z[0]                 # open all along the balcony
+            H_ = DECK["y"]
+            shapes += [("East", XI1, xw1, 0, H_, max(0.15, FZ_ + 0.15), -D),
+                       ("EastUpFront", XI1, xw1, H_, WALL, max(0.15, FZ_ + 0.15), ga), ("EastUpBack", XI1, xw1, H_, WALL, gb, -D),
+                       ("DeckFloor", xw1, DECK_X1, H_ - 0.2, H_, DECK_Z[0], DECK_Z[1]),
+                       ("DeckRailOut", DECK_X1 - 0.1, DECK_X1, H_, H_ + 1.0, DECK_Z[0], DECK_Z[1]),
+                       ("DeckRailFront", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[1] - 0.1, DECK_Z[1]),
+                       ("DeckRailBack", xw1, DECK_X1, H_, H_ + 1.0, DECK_Z[0], DECK_Z[0] + 0.1)]
+        else:
+            shapes.append(("East", XI1, xw1, 0, WALL, ZN + 0.15 if NOTCH else max(0.15, FZ_ + 0.15), -DN))
     if UP:
         if FZ_ <= 0 and not DOOR_IN_NOTCH:
             shapes.append(("UpperDoor", d0, d1, UP["height"] + 0.5, WALL, 0.15, -0.15))

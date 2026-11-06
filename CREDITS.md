@@ -19,6 +19,7 @@ Third-party assets used in the game. Keep this list up to date before any public
 ## Art
 - 3D characters: "Ultimate Animated Character Pack" by Quaternius (quaternius.com). CC0, no attribution required.
 - 3D buildings and props: "Medieval Village MegaKit", "Fantasy Props MegaKit" and "Stylized Nature MegaKit" (Standard) by Quaternius (quaternius.com). CC0, no attribution required. Textures downscaled to 1024 px; roof tiles darkened.
+- 2D buildings and their furniture (assets/buildings2d/): "Pixel Art Top Down - Village" by Cainos. Building fronts cut and re-arranged, some props recoloured (the forge's coal heap) or combined (the tool rack). Check the pack's license terms before release.
 - Character portraits, UI art and patient chart: generated with Google Gemini (AI). Steam requires disclosing AI-generated content.
 - Clinic mural art (frame, town map, paper notes, pins: assets/ui/mural/): generated with Google Gemini (AI), assembled in Figma. To be replaced with designed or hand-made 2D art.
 - Test sprites in assets/characters/sprites/ (Tomás and the doctor): generated with PixelLab (AI). Not used by the game (the sprite test is turned off); remove before release or disclose if used.

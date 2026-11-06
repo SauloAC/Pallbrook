@@ -141,26 +141,14 @@ const PLACE_SLOTS: Array[Vector3] = [
 const HouseLayouts = preload("res://scripts/npc/HouseLayouts.gd")
 
 # Spots inside walk-in buildings, around their marker: open floor, clear of the furniture.
-# (The clinic's are in HouseLayouts, from its spec: the last two outside the door, for a queue.)
-const INTERIOR_SLOTS_3D := {
-	# Homes (marker at the front door): spots off to the side, so the doctor can step in
-	# Tomas's forge (marker at the house door): beside the anvil, at the hearth, in front of the anvil
-	"Casa2": [
-		Vector3(4.1, 0.0, -1.9), Vector3(4.25, 0.0, -2.3), Vector3(2.6, 0.0, -0.6), Vector3(3.4, 0.0, -0.6),
-	],
-	# Library (marker at the south door): around the reading table, by the shelves and the desks
-	"Biblioteca": [
-		Vector3(-1.8, 0.0, -3.2), Vector3(1.8, 0.0, -3.2), Vector3(0.0, 0.0, -1.7), Vector3(-1.3, 0.0, -4.6),
-		Vector3(1.3, 0.0, -4.6), Vector3(-0.9, 0.0, -1.1), Vector3(0.9, 0.0, -1.1), Vector3(0.0, 0.0, -0.6),
-	],
-}
+# Every walk-in building is a 2D one now, so these are all in HouseLayouts (the clinic's last two
+# are outside the door, for a queue); a 3D building would add its own here.
+const INTERIOR_SLOTS_3D := {}
 
 # Where each person sleeps: the foot of their bed (from the home's door marker) and which
 # way the head points (degrees around Y; 0 = head toward -z). Homes without a bed here
 # (the tavern rooms upstairs, the priest's quarters) still send their owner out of sight.
-const BED_SPOTS_3D := {
-	"Casa2": [Vector3(-1.9, 0.0, -2.7), 0.0],
-}
+const BED_SPOTS_3D := {}
 const BED_HEIGHT := 0.6
 
 # Upstairs beds: where to walk to first (on the upper floor, beside the bed), relative to the door.

@@ -26,7 +26,7 @@ SPEC = {
         {"name": "Cabinet", "prop": "cabinet", "x": 2.05, "z": -4.0, "box": (1.65, 2.47, -4.3, -3.95, 1.6)},
         {"name": "Table", "prop": "table_round", "x": -0.35, "z": -1.75, "box": (-0.65, -0.05, -2.25, -1.75, 0.8)},
         {"name": "StoolA", "prop": "stool", "x": -0.75, "z": -1.5, "box": (-0.93, -0.57, -1.8, -1.5, 0.5)},
-        {"name": "StoolB", "prop": "stool", "x": 0.15, "z": -1.3, "box": (-0.03, 0.33, -1.6, -1.3, 0.5)},
+        {"name": "StoolB", "prop": "stool", "x": 0.15, "z": -1.3, "box": (-0.03, 0.33, -1.6, -1.3, 0.5), "seat": "west"},
         {"name": "Basket", "prop": "basket", "x": -0.85, "z": -0.55, "box": (-1.1, -0.6, -0.9, -0.55, 0.6)},
         # the doctor's room upstairs
         {"name": "Bed", "prop": "bed", "upper": True, "flat": True, "x": 1.9, "z": -3.6, "box": (1.55, 2.25, -4.3, -2.9, 0.4)},
