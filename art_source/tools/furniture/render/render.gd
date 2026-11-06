@@ -37,6 +37,9 @@ const RAMPS := {
 	"book_ochre": [Color8(110, 74, 30), Color8(132, 90, 36), Color8(154, 106, 42), Color8(180, 132, 60)],
 	"book_brown": [Color8(66, 40, 24), Color8(82, 52, 30), Color8(100, 66, 40), Color8(122, 86, 54)],
 	"slate": [Color8(34, 42, 37), Color8(40, 50, 44), Color8(47, 59, 51), Color8(58, 72, 63)],
+	"stone": [Color8(104, 102, 108), Color8(132, 130, 134), Color8(160, 158, 158), Color8(184, 182, 178)],
+	"gold": [Color8(140, 100, 28), Color8(180, 136, 40), Color8(214, 172, 64), Color8(238, 206, 106)],
+	"wax": [Color8(190, 178, 146), Color8(212, 202, 170), Color8(230, 222, 194), Color8(244, 238, 214)],
 	"chalk": [Color8(170, 172, 160), Color8(188, 190, 178), Color8(206, 206, 194), Color8(222, 222, 210)],
 }
 
@@ -46,10 +49,11 @@ var layer := Color.BLACK     # The layer of the parts that follow, in a layered 
 const FOOT := Color(1, 0, 0)
 const BODY := Color(0, 1, 0)
 const HEAD := Color(0, 0, 1)
-const LAYERED := ["bed"]
+const LAYERED := ["bed", "pew"]
 var planks := Vector4.ZERO   # The boards' planks for the parts that follow (see ramp.gdshader)
 var next_id := 0
 var piece_root: Node3D
+var flames: Array = []       # Where a piece's candles burn (see flame()): written beside its picture
 
 
 func _ready() -> void:
@@ -96,6 +100,14 @@ func _ready() -> void:
 			await RenderingServer.frame_post_draw
 			await RenderingServer.frame_post_draw
 			vp.get_texture().get_image().save_png("%s/%s%s.png" % [out, name, ["", "_id", "_layers"][pass_id]])
+			if pass_id == 0 and not flames.is_empty():
+				var at := []
+				for f in flames:
+					var px := cam.unproject_position(piece_root.to_global(f))
+					at.append([px.x, px.y])
+				var file := FileAccess.open("%s/%s_flames.json" % [out, name], FileAccess.WRITE)
+				file.store_string(JSON.stringify(at))
+			flames = []
 			vp.queue_free()
 		print("R ", name)
 	get_tree().quit()
@@ -186,7 +198,8 @@ func bottle(kind: String, glass: String, x: float, y: float, z: float, h: float,
 
 # ---------- The pieces ----------
 # Sizes as the interiors' furniture has them (a little larger than life, like the Cainos pieces)
-const PIECES := ["bed", "cabinet", "table_round", "stool", "crate", "bookshelf_a", "bookshelf_b", "bookshelf_c", "blackboard"]
+const PIECES := ["bed", "cabinet", "table_round", "stool", "crate", "bookshelf_a", "bookshelf_b", "bookshelf_c", "blackboard",
+	"pew", "schooldesk", "desk", "lectern", "altar", "candlestand"]
 
 
 # A wooden bed, 1 m by 2: a red blanket over the linen, the pillow at the head (north, the wall)
@@ -383,3 +396,121 @@ func piece_blackboard() -> void:
 	box("wood", -w, w, 0.54, 0.6, -0.2, -0.06, g)                                # the ledge
 	box("chalk", -0.4, -0.3, 0.6, 0.625, -0.13, -0.1)                            # a stick of chalk
 	box("paper", 0.3, 0.46, 0.6, 0.645, -0.14, -0.09)                            # the duster
+
+
+
+# A candle's flame, where the game lights it (the spec's "flames": the picture's pixel at the wick)
+func flame(x: float, y: float, z: float) -> void:
+	if not id_mode and not layer_mode:
+		flames.append(Vector3(x, y, z))
+
+
+# A candle standing at (x, y, z): the wax, the wick
+func candle(x: float, y: float, z: float, h: float, g := -1) -> void:
+	cyl("wax", x, z, y, h, 0.055, -1.0, 6, g)
+	flame(x, y + h, z + 0.05)
+
+
+# A pew, its back toward the camera: whoever sits on it faces north (the altar, the teacher), and its
+# low back hides them only to the waist. Two seats (the generator's). In two layers, like a bed: the back
+# standing at the front, the seat lying under whoever sits on it.
+func piece_pew() -> void:
+	var w := 0.72
+	var g := _group()
+	layer = FOOT
+	for x in [-w, w - 0.07]:
+		box("wood_mid", x, x + 0.07, 0.0, 0.44, -0.42, 0.0, g)                  # the ends
+	layer = BODY
+	box("wood", -w + 0.07, w - 0.07, 0.3, 0.34, -0.42, -0.06, g)                 # seat
+	layer = FOOT
+	planks = Vector4(0, 1, 0, 0.23)
+	box("wood", -w + 0.07, w - 0.07, 0.1, 0.4, -0.06, 0.0, g)                    # back, two boards
+	planks = Vector4.ZERO
+	box("wood_mid", -w - 0.02, w + 0.02, 0.4, 0.45, -0.08, 0.02, g)              # its top rail
+
+
+# A pupil's desk: a sloping lid on four legs, a slate and a book on it
+func piece_schooldesk() -> void:
+	var w := 0.54
+	var g := _group()
+	for x in [-w, w - 0.06]:
+		for z in [-0.44, -0.06]:
+			box("wood_mid", x, x + 0.06, 0.0, 0.56, z, z + 0.06, g)            # legs
+	box("wood_mid", -w, w, 0.44, 0.56, -0.44, 0.0, g)                            # the box under the lid
+	var lid := box("wood", -w - 0.02, w + 0.02, -0.025, 0.025, -0.25, 0.25, g, Vector3(12, 0, 0))
+	lid.position = Vector3(0.0, 0.62, -0.22)                                     # the lid, sloping toward the pupil
+	var b := _group()
+	var slate := box("slate", -0.38, -0.06, -0.01, 0.01, -0.13, 0.13, b, Vector3(12, 0, 0))
+	slate.position = Vector3(-0.22, 0.655, -0.24)
+	box("wood_end", -0.4, -0.04, -0.012, 0.012, -0.15, 0.15, b, Vector3(12, 0, 0)).position = Vector3(-0.22, 0.648, -0.24)
+	var book := box("book_red", 0.08, 0.36, -0.02, 0.02, -0.11, 0.11, -1, Vector3(12, 0, 0))
+	book.position = Vector3(0.24, 0.665, -0.2)
+
+
+# The writing desk (the library's, the school's, the mayor's): drawers either side, papers, the ink,
+# a candle
+func piece_desk() -> void:
+	var w := 1.0
+	var d := -0.62
+	var g := _group()
+	planks = Vector4(1, 0, 0, 0.2)
+	box("wood", -w - 0.03, w + 0.03, 0.74, 0.8, d - 0.03, 0.03, g)              # top
+	planks = Vector4.ZERO
+	for x0 in [-w, w - 0.55]:
+		box("wood_mid", x0, x0 + 0.55, 0.0, 0.74, d, 0.0, g)                    # the drawers' cases
+		for y in [0.08, 0.4]:
+			box("wood", x0 + 0.05, x0 + 0.5, y, y + 0.28, -0.02, 0.005)          # drawers
+			box("iron", x0 + 0.24, x0 + 0.31, y + 0.12, y + 0.16, 0.0, 0.02, g)
+	box("shadow", -w + 0.55, w - 0.55, 0.0, 0.74, d + 0.02, d + 0.05, g)         # the knee-hole, in shade
+	box("paper", -0.62, -0.2, 0.8, 0.81, -0.46, -0.14)                           # papers
+	box("paper", -0.5, -0.1, 0.81, 0.82, -0.42, -0.18).rotation_degrees.y = 8.0
+	box("book_brown", 0.05, 0.4, 0.8, 0.86, -0.5, -0.24)                         # a book, shut
+	cyl("iron", 0.62, -0.3, 0.8, 0.07, 0.05, -1.0, 6)                            # the inkwell
+	box("paper", 0.6, 0.62, 0.84, 1.0, -0.31, -0.29)                             # its quill
+	var c := _group()
+	cyl("iron", 0.85, -0.42, 0.8, 0.03, 0.07, -1.0, 6, c)                        # a candle in its dish
+	candle(0.85, 0.83, -0.42, 0.18, c)
+
+
+# The reading stand: a sloping top on one post, a book open on it
+func piece_lectern() -> void:
+	var g := _group()
+	box("wood_mid", -0.25, 0.25, 0.0, 0.06, -0.38, -0.02, g)                     # foot
+	box("wood_mid", -0.06, 0.06, 0.06, 0.95, -0.26, -0.14, g)                    # post
+	var top := box("wood", -0.32, 0.32, -0.03, 0.03, -0.22, 0.22, g, Vector3(22, 0, 0))
+	top.position = Vector3(0.0, 1.0, -0.2)
+	for x in [-0.27, 0.01]:                                                      # the book, open: two pages
+		var page := box("paper", x, x + 0.26, -0.012, 0.012, -0.16, 0.16, -1, Vector3(22, 0, 0))
+		page.position = Vector3(x + 0.13, 1.04, -0.2)
+
+
+# The church's altar: stone, a white cloth over it, the gold cross, a candle at either end
+func piece_altar() -> void:
+	var w := 1.15
+	var d := -0.6
+	var g := _group()
+	planks = Vector4(1, 0, 0, 0.38)
+	box("stone", -w, w, 0.0, 0.9, d, 0.0, g)                                     # the stone block
+	planks = Vector4.ZERO
+	box("stone", -w - 0.05, w + 0.05, 0.0, 0.08, d - 0.05, 0.05, g)              # its plinth
+	var c := _group()
+	box("linen", -w + 0.05, w - 0.05, 0.9, 0.94, d + 0.02, -0.02, c)             # the cloth on top
+	box("linen", -0.6, 0.6, 0.3, 0.94, -0.02, 0.0, c)                            # hanging down the front
+	box("gold", -0.6, 0.6, 0.3, 0.36, 0.0, 0.01, c)                              # its gold hem
+	box("gold", -0.025, 0.025, 0.46, 0.8, 0.0, 0.01, c)                          # the cross on it
+	box("gold", -0.1, 0.1, 0.66, 0.7, 0.0, 0.01, c)
+	for x in [-0.95, 0.95]:
+		var k := _group()
+		cyl("gold", x, -0.3, 0.94, 0.05, 0.1, -1.0, 6, k)                        # candlesticks
+		cyl("gold", x, -0.3, 0.99, 0.08, 0.04, -1.0, 6, k)
+		cyl("gold", x, -0.3, 1.07, 0.03, 0.08, -1.0, 6, k)
+		candle(x, 1.1, -0.3, 0.26, k)
+
+
+# A tall iron candle stand
+func piece_candlestand() -> void:
+	var g := _group()
+	cyl("iron", 0.0, -0.15, 0.0, 0.05, 0.16, -1.0, 6, g)                        # foot
+	cyl("iron", 0.0, -0.15, 0.05, 0.95, 0.03, -1.0, 6, g)                        # stem
+	cyl("iron", 0.0, -0.15, 1.0, 0.04, 0.1, 0.05, 6, g)                          # dish
+	candle(0.0, 1.04, -0.15, 0.22, g)

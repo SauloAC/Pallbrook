@@ -40,7 +40,7 @@ SPEC = {
         {"name": "StackB1", "prop": "cel_bookshelf_c", "x": -4.15, "z": -6.1, "box": (-4.6, -3.7, -6.4, -6.1, 1.9)},
         {"name": "StackB2", "prop": "cel_bookshelf_a", "x": -3.25, "z": -6.1, "box": (-3.7, -2.8, -6.4, -6.1, 1.9)},
         # at the back: the fire and its rug, a small table with stools, shelves on the back wall
-        {"name": "Candle", "prop": "candlestand", "x": -3.4, "z": -9.4, "box": (-3.55, -3.25, -9.7, -9.4, 1.2), "flames": [(6, 1)]},
+        {"name": "Candle", "prop": "cel_candlestand", "x": -3.4, "z": -9.4, "box": (-3.55, -3.25, -9.7, -9.4, 1.2), "flames": [(5, 2)]},
         {"name": "HearthRug", "prop": "rug", "flat": True, "y": 0.025, "x": -4.05, "z": -8.45},
         {"name": "FireTable", "prop": "table_round", "x": -2.2, "z": -7.9, "box": (-2.5, -1.9, -8.4, -7.9, 0.8)},
         {"name": "FireStool1", "prop": "stool", "x": -2.8, "z": -7.7, "box": (-2.98, -2.62, -8.0, -7.7, 0.5)},
@@ -58,7 +58,7 @@ SPEC = {
         {"name": "TableH", "prop": "table_round", "x": -0.3, "z": -2.5, "box": (-0.6, 0.0, -3.0, -2.5, 0.8)},
         {"name": "StoolH1", "prop": "stool", "x": -0.9, "z": -2.3, "box": (-1.08, -0.72, -2.6, -2.3, 0.5)},
         {"name": "StoolH2", "prop": "stool", "x": 0.3, "z": -2.3, "box": (0.12, 0.48, -2.6, -2.3, 0.5)},
-        {"name": "Desk", "prop": "desk", "x": 1.6, "z": -2.3, "box": (0.88, 2.32, -2.65, -2.3, 0.9)},
-        {"name": "Lectern", "prop": "lectern", "x": 5.1, "z": -2.4, "box": (4.85, 5.35, -2.7, -2.4, 1.0)},
+        {"name": "Desk", "prop": "cel_desk", "x": 1.6, "z": -2.3, "box": (0.88, 2.32, -2.65, -2.3, 0.9)},
+        {"name": "Lectern", "prop": "cel_lectern", "x": 5.1, "z": -2.4, "box": (4.85, 5.35, -2.7, -2.4, 1.0)},
     ],
 }

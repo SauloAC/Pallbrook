@@ -46,8 +46,8 @@ SPEC = {
         {"name": "BarStool1", "prop": "stool", "x": 0.6, "z": -5.65, "box": (0.42, 0.78, -5.95, -5.65, 0.5)},
         {"name": "BarStool2", "prop": "stool", "x": 1.2, "z": -5.65, "box": (1.02, 1.38, -5.95, -5.65, 0.5)},
         {"name": "BarStool3", "prop": "stool", "x": 1.8, "z": -5.65, "box": (1.62, 1.98, -5.95, -5.65, 0.5)},
-        {"name": "Bottles", "prop": "cabinet", "x": 0.25, "z": -8.15, "box": (-0.05, 0.55, -8.5, -8.15, 1.6)},
-        {"name": "Bottles2", "prop": "cabinet", "x": 0.9, "z": -8.15, "box": (0.6, 1.2, -8.5, -8.15, 1.6)},
+        {"name": "Bottles", "prop": "cel_cabinet", "x": 0.25, "z": -8.15, "box": (-0.05, 0.55, -8.5, -8.15, 1.6)},
+        {"name": "Bottles2", "prop": "cel_cabinet", "x": 0.9, "z": -8.15, "box": (0.6, 1.2, -8.5, -8.15, 1.6)},
         {"name": "BarrelStack", "prop": "barrel_stack", "x": 1.95, "z": -7.79, "box": (1.3, 2.6, -8.5, -7.79, 1.0)},
         # the hall in the wing: round tables, the rug before the fire, barrels and a crate in the corners
         {"name": "TableA", "prop": "table_round", "x": -2.3, "z": -1.7, "box": (-2.6, -2.0, -2.2, -1.7, 0.8)},
@@ -83,7 +83,7 @@ SPEC = {
         {"name": "GuestBed2", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -4.24, "box": (-3.74, -3.06, -5.6, -4.24, 0.4)},
         {"name": "GuestCrate", "prop": "crate", "upper": True, "x": -2.3, "z": -3.6, "box": (-2.6, -2.0, -4.1, -3.6, 0.9)},
         {"name": "Bed", "prop": "cel_bed", "upper": True, "split": True, "x": -3.4, "z": -7.04, "box": (-3.74, -3.06, -8.4, -7.04, 0.4)},
-        {"name": "Cabinet", "prop": "cabinet", "upper": True, "x": -2.4, "z": -8.15, "box": (-2.7, -2.1, -8.5, -8.15, 1.6)},
+        {"name": "Cabinet", "prop": "cel_cabinet", "upper": True, "x": -2.4, "z": -8.15, "box": (-2.7, -2.1, -8.5, -8.15, 1.6)},
         # the landing hall over the main house: a table and a stool, a barrel
         {"name": "HallTable", "prop": "table_round", "upper": True, "x": 0.9, "z": -5.3, "box": (0.6, 1.2, -5.8, -5.3, 0.8)},
         {"name": "HallStool", "prop": "stool", "upper": True, "x": 0.3, "z": -5.1, "box": (0.12, 0.48, -5.4, -5.1, 0.5)},

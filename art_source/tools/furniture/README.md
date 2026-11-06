@@ -24,8 +24,13 @@ body flat half a metre up and stands the head 1.37 further back, each where its 
 screen: someone lying in the bed (NPC.BED_HEIGHT) shows over the blanket, the footboard over their feet.
 The sleeper's spot (the spec's "bed") is just behind the footboard.
 
-In use: `bed` (split, in every home and the clinic) and `cabinet` (the clinic); `bookshelf_a`, `_b`, `_c` (the same bookcase, filled three
-ways: the library, the school, the town hall); `blackboard` (the school). `table_round`, `stool` and `crate` are modelled too, but the
+In use: `bed` (split, in every home and the clinic); `cabinet` (the clinic, the forge, the tavern);
+`bookshelf_a`, `_b`, `_c` (the same bookcase, filled three ways: the library, the school, the town hall);
+`blackboard` (the school); `pew` (the church, the school, the town hall: its back toward the camera, as
+whoever sits on it faces north; in two layers, `"split": "seat"`: its back standing at the front, its seat
+lying under the sitter); `schooldesk`, `desk`, `lectern`; `altar` and `candlestand` (the church).
+A piece with candles (`flame()`) has finish.py print where they burn, for the spec's "flames".
+`table_round`, `stool` and `crate` are modelled too, but the
 Cainos ones were kept: sturdier. A piece's picture stands at its spec "z" with its foot on the floor:
 give "z" as the front of its footprint.
 (.gdignore: the render project is its own Godot project, not part of the game's)

@@ -83,6 +83,6 @@ SPEC = {
         {"name": "Stool", "prop": "stool", "x": 1.0, "z": -0.7, "box": (0.82, 1.18, -0.85, -0.55, 0.5)},
         # the back of the room: the bed along the east wall, a cabinet
         {"name": "Bed", "prop": "cel_bed", "split": True, "x": 2.15, "z": -4.35, "box": (1.8, 2.5, -5.75, -4.35, 0.4)},
-        {"name": "Cabinet", "prop": "cabinet", "x": 1.05, "z": -5.55, "box": (0.7, 1.4, -5.75, -5.45, 1.6)},
+        {"name": "Cabinet", "prop": "cel_cabinet", "x": 1.05, "z": -5.55, "box": (0.7, 1.4, -5.75, -5.45, 1.6)},
     ],
 }

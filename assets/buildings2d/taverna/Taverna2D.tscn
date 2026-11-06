@@ -38,10 +38,10 @@
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_b.png" id="tx_p_barrel_b"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_barrel_stack.png" id="tx_p_barrel_stack"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_bench_h.png" id="tx_p_bench_h"]
-[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cabinet.png" id="tx_p_cabinet"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_body.png" id="tx_p_cel_bed_body"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_foot.png" id="tx_p_cel_bed_foot"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_bed_head.png" id="tx_p_cel_bed_head"]
+[ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_cel_cabinet.png" id="tx_p_cel_cabinet"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_crate.png" id="tx_p_crate"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_rug.png" id="tx_p_rug"]
 [ext_resource type="Texture2D" path="res://assets/buildings2d/props/prop_sack_a.png" id="tx_p_sack_a"]
@@ -134,12 +134,6 @@ shader_parameter/tex = ExtResource("tx_p_bench_h")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
-[sub_resource type="ShaderMaterial" id="mt_p_cabinet"]
-shader = ExtResource("sh_sprite")
-shader_parameter/tex = ExtResource("tx_p_cabinet")
-shader_parameter/lit_share = 0.5
-shader_parameter/own_light = 0.85
-
 [sub_resource type="ShaderMaterial" id="mt_p_cel_bed_body"]
 shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_cel_bed_body")
@@ -155,6 +149,12 @@ shader_parameter/own_light = 0.85
 [sub_resource type="ShaderMaterial" id="mt_p_cel_bed_head"]
 shader = ExtResource("sh_sprite")
 shader_parameter/tex = ExtResource("tx_p_cel_bed_head")
+shader_parameter/lit_share = 0.5
+shader_parameter/own_light = 0.85
+
+[sub_resource type="ShaderMaterial" id="mt_p_cel_cabinet"]
+shader = ExtResource("sh_sprite")
+shader_parameter/tex = ExtResource("tx_p_cel_cabinet")
 shader_parameter/lit_share = 0.5
 shader_parameter/own_light = 0.85
 
@@ -228,10 +228,10 @@ size = Vector2(0.4464, 0.8334)
 size = Vector2(0.4464, 0.8334)
 
 [sub_resource type="QuadMesh" id="q_Bottles"]
-size = Vector2(0.7143, 1.8058)
+size = Vector2(0.7589, 1.9794)
 
 [sub_resource type="QuadMesh" id="q_Bottles2"]
-size = Vector2(0.7143, 1.8058)
+size = Vector2(0.7589, 1.9794)
 
 [sub_resource type="QuadMesh" id="q_BarrelStack"]
 size = Vector2(1.3393, 1.8752)
@@ -327,7 +327,7 @@ size = Vector2(0.7143, 2.3614)
 size = Vector2(0.7143, 1.9814)
 
 [sub_resource type="QuadMesh" id="q_Cabinet"]
-size = Vector2(0.7143, 1.8058)
+size = Vector2(0.7589, 1.9794)
 
 [sub_resource type="QuadMesh" id="q_HallTable"]
 size = Vector2(0.7143, 1.3890)
@@ -670,14 +670,14 @@ facing = "north"
 use_range = 0.5
 
 [node name="Bottles" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2500, 0.9029, -8.1500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2500, 0.9897, -8.1500)
 mesh = SubResource("q_Bottles")
-surface_material_override/0 = SubResource("mt_p_cabinet")
+surface_material_override/0 = SubResource("mt_p_cel_cabinet")
 
 [node name="Bottles2" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9000, 0.9029, -8.1500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9000, 0.9897, -8.1500)
 mesh = SubResource("q_Bottles2")
-surface_material_override/0 = SubResource("mt_p_cabinet")
+surface_material_override/0 = SubResource("mt_p_cel_cabinet")
 
 [node name="BarrelStack" type="MeshInstance3D" parent="Taverna_Inside/Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9500, 0.9376, -7.7900)
@@ -886,9 +886,9 @@ mesh = SubResource("q_BedBody")
 surface_material_override/0 = SubResource("mt_p_cel_bed_body")
 
 [node name="Cabinet" type="MeshInstance3D" parent="Taverna_Inside/Taverna_Upper"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4000, 3.6729, -8.1500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4000, 3.7597, -8.1500)
 mesh = SubResource("q_Cabinet")
-surface_material_override/0 = SubResource("mt_p_cabinet")
+surface_material_override/0 = SubResource("mt_p_cel_cabinet")
 
 [node name="HallTable" type="MeshInstance3D" parent="Taverna_Inside/Taverna_Upper"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9000, 3.4645, -5.3000)

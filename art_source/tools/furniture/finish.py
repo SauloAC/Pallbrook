@@ -9,12 +9,12 @@ prop_<piece>_foot.png, _body.png, _head.png. The game stands the foot up at the 
 the body flat over it, and stands the head up at its back (art_source/tools/b2d/scene.py, "split"), so
 that someone lying in the bed shows between them. The head stands HEAD_ROWS rows up the picture (at the
 back of the footprint): what of it is lower goes with the body."""
-import glob, os, sys
+import glob, json, os, sys
 import numpy as np
 from PIL import Image
 
 OUTLINE = (72, 37, 16)      # The Cainos props' own outline
-HEAD_ROWS = {"bed": 47}     # 0.766 (sin 50) x 1.37 (the head's depth behind the foot, building units) x 44.8 px
+HEAD_ROWS = {"bed": 47, "pew": 0}   # (a pew has no head: its back is its foot, its seat its body)     # 0.766 (sin 50) x 1.37 (the head's depth behind the foot, building units) x 44.8 px
 INNER = 0.55                # A line between two parts: the nearer part's edge, darkened this much
 
 
@@ -63,7 +63,9 @@ if __name__ == "__main__":
     for n in names:
         img, box = finish(Image.open(os.path.join(src, n + ".png")), Image.open(os.path.join(src, n + "_id.png")))
         img.crop(box).save(os.path.join(dst, "prop_%s.png" % n))
-        print(n, img.crop(box).size)
+        fl = os.path.join(src, n + "_flames.json")
+        flames = [(int(round(x - box[0] - 0.5)), int(round(y - box[1] - 0.5))) for x, y in json.load(open(fl))] if os.path.exists(fl) else []
+        print(n, img.crop(box).size, ("flames %s" % flames) if flames else "")     # the spec's "flames"
         lay = os.path.join(src, n + "_layers.png")
         if os.path.exists(lay):
             for part, im in layers(img, box, Image.open(lay), HEAD_ROWS[n]).items():

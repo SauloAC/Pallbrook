@@ -38,20 +38,20 @@ SPEC = {
     "furniture": [
         # the entrance hall: the counter toward the back, with room to walk past the wing's corner and
         # round it; the benches in the wing
-        {"name": "Counter", "prop": "desk", "x": -0.3, "z": -4.85, "box": (-1.02, 0.42, -5.2, -4.85, 0.9)},
-        {"name": "BenchBack", "prop": "pew", "x": 2.11, "z": -6.0, "box": (1.6, 2.62, -6.3, -6.0, 0.6)},
-        {"name": "BenchFront", "prop": "pew", "x": 2.01, "z": -4.4, "box": (1.5, 2.52, -4.75, -4.4, 0.6)},
+        {"name": "Counter", "prop": "cel_desk", "x": -0.3, "z": -4.85, "box": (-1.02, 0.42, -5.2, -4.85, 0.9)},
+        {"name": "BenchBack", "prop": "cel_pew", "split": "seat", "x": 2.11, "z": -6.0, "box": (1.6, 2.62, -6.3, -6.0, 0.6)},
+        {"name": "BenchFront", "prop": "cel_pew", "split": "seat", "x": 2.01, "z": -4.4, "box": (1.5, 2.52, -4.75, -4.4, 0.6)},
         # upstairs: the schoolroom
         {"name": "Blackboard", "prop": "cel_blackboard", "upper": True, "x": -0.15, "z": -6.1, "box": (-0.85, 0.55, -6.3, -6.05, 1.6)},
         {"name": "Shelf", "prop": "cel_bookshelf_b", "upper": True, "x": 1.45, "z": -6.05, "box": (1.0, 1.9, -6.3, -6.0, 1.9)},
-        {"name": "TeacherDesk", "prop": "desk", "upper": True, "x": 1.9, "z": -4.4, "box": (1.2, 2.6, -4.75, -4.4, 0.9)},
-        {"name": "DeskA1", "prop": "schooldesk", "upper": True, "x": -1.0, "z": -1.6, "box": (-1.4, -0.6, -1.9, -1.6, 0.7)},
-        {"name": "DeskB1", "prop": "schooldesk", "upper": True, "x": 0.2, "z": -1.6, "box": (-0.2, 0.6, -1.9, -1.6, 0.7)},
-        {"name": "DeskA2", "prop": "schooldesk", "upper": True, "x": -1.0, "z": -2.6, "box": (-1.4, -0.6, -2.9, -2.6, 0.7)},
-        {"name": "DeskB2", "prop": "schooldesk", "upper": True, "x": 0.2, "z": -2.6, "box": (-0.2, 0.6, -2.9, -2.6, 0.7)},
-        {"name": "DeskA3", "prop": "schooldesk", "upper": True, "x": -1.0, "z": -3.6, "box": (-1.4, -0.6, -3.9, -3.6, 0.7)},
-        {"name": "DeskB3", "prop": "schooldesk", "upper": True, "x": 0.2, "z": -3.6, "box": (-0.2, 0.6, -3.9, -3.6, 0.7)},
-        {"name": "DeskA4", "prop": "schooldesk", "upper": True, "x": -1.0, "z": -4.6, "box": (-1.4, -0.6, -4.9, -4.6, 0.7)},
-        {"name": "DeskB4", "prop": "schooldesk", "upper": True, "x": 0.2, "z": -4.6, "box": (-0.2, 0.6, -4.9, -4.6, 0.7)},
+        {"name": "TeacherDesk", "prop": "cel_desk", "upper": True, "x": 1.9, "z": -4.4, "box": (1.2, 2.6, -4.75, -4.4, 0.9)},
+        {"name": "DeskA1", "prop": "cel_schooldesk", "upper": True, "x": -1.0, "z": -1.6, "box": (-1.4, -0.6, -1.9, -1.6, 0.7)},
+        {"name": "DeskB1", "prop": "cel_schooldesk", "upper": True, "x": 0.2, "z": -1.6, "box": (-0.2, 0.6, -1.9, -1.6, 0.7)},
+        {"name": "DeskA2", "prop": "cel_schooldesk", "upper": True, "x": -1.0, "z": -2.6, "box": (-1.4, -0.6, -2.9, -2.6, 0.7)},
+        {"name": "DeskB2", "prop": "cel_schooldesk", "upper": True, "x": 0.2, "z": -2.6, "box": (-0.2, 0.6, -2.9, -2.6, 0.7)},
+        {"name": "DeskA3", "prop": "cel_schooldesk", "upper": True, "x": -1.0, "z": -3.6, "box": (-1.4, -0.6, -3.9, -3.6, 0.7)},
+        {"name": "DeskB3", "prop": "cel_schooldesk", "upper": True, "x": 0.2, "z": -3.6, "box": (-0.2, 0.6, -3.9, -3.6, 0.7)},
+        {"name": "DeskA4", "prop": "cel_schooldesk", "upper": True, "x": -1.0, "z": -4.6, "box": (-1.4, -0.6, -4.9, -4.6, 0.7)},
+        {"name": "DeskB4", "prop": "cel_schooldesk", "upper": True, "x": 0.2, "z": -4.6, "box": (-0.2, 0.6, -4.9, -4.6, 0.7)},
     ],
 }
