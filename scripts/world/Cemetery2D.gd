@@ -32,6 +32,16 @@ const ROAD_GATE := Vector3(-26.9, 0.0, -10.5)         # The town's gate across t
 const SIDE_STEP := 3.0                                # One side run of the fence (cem_fence_side.png)
 
 
+# The street lamp by the arch (StreetLamp7, Cidade.tscn) stands on the fence's line, and its picture came
+# out in front of the fence, as if the post stood on the wall. Pulled less toward the camera, along the
+# camera's own line of sight, it shows in the same place on screen but behind the fence, which then hides
+# its foot: the post rises from behind the wall.
+static func lamp_pull(at: Vector3, pull: float) -> float:
+	if at.x > FENCE.position.x and at.x < FENCE.end.x and absf(at.z - FENCE.position.y) < 0.5:
+		return pull - 0.25
+	return pull
+
+
 static func build(n: Nature2D, region: Node3D) -> void:
 	var north := FENCE.position.y
 	var south := FENCE.end.y

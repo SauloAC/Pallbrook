@@ -711,7 +711,8 @@ func _street_lamps() -> void:
 		for mi in lamp.get_children():
 			if mi is MeshInstance3D:
 				hidden.append(mi)
-		var sprite := _stand(post, Vector3(lamp.global_position.x, 0.0, lamp.global_position.z), 4.0)
+		var at := Vector3(lamp.global_position.x, 0.0, lamp.global_position.z)
+		var sprite := _stand(post, at, 4.0, Cemetery2D.lamp_pull(at, PULL))
 		var mat := ShaderMaterial.new()
 		mat.shader = shader
 		mat.set_shader_parameter("tex", post)
